@@ -14,6 +14,8 @@
 
 		var sources = [];
 		var volume = 0.5;
+		var video = element[0];
+		console.log(video);
 
 		// Check if element is corectly selected.
 		if (element.prop('tagName').toLowerCase() != 'video') {
@@ -90,6 +92,20 @@
 		}
 		element.attr('preload', options.preload);
 		// end Setting options.
+
+		// Hot keys.
+		var togglePlay = function () {
+			if (!video.played || video.paused)
+				video.play();
+			else
+				video.pause();
+		};
+		element.keypress(function (e) {
+			if (e.charCode == 32)
+				togglePlay();
+		}).click(function () {
+			togglePlay();
+		});
 	};
 
 	$.fn.lePlayer = function (options) {
