@@ -9,6 +9,21 @@
 		<link rel="stylesheet" href="../dist/css/le-player.css">
 	</head>
 	<body>
-		<video src="sample1.mp4"></video>
+		<h2>Single video</h2>
+		<video id="video1" src="sample1.mp4" height="200"></video>
+		<h2>Multiple videos</h2>
+		<video id="video2" src="sample1.mp4">
+			<source src="sample1.mp4">
+			<source src="sample2.mp4">
+		</video>
 	</body>
+	<script>
+		$().ready(function(){
+			$('#video1').lePlayer({
+				poster: 'poster.jpg'
+			});
+			$('#video2').lePlayer({
+			});
+		});
+	</script>
 </html>
