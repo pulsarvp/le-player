@@ -1,0 +1,38 @@
+{
+  "name": "le-player",
+  "version": "0.0.1",
+  "description": "The best HTML5 video player made for Lectoriy.",
+  "main": "dist/js/le-player.min.js",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miptliot/le-player.git"
+  },
+  "keywords": [
+    "player",
+    "html5",
+    "Lectoriy",
+    "video",
+    "Pulsar"
+  ],
+  "author": "Anna Manaenkova <anna.manaenkova@phystech.edu>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/miptliot/le-player/issues"
+  },
+  "homepage": "https://github.com/miptliot/le-player#readme",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-clean": "^0.7.0",
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-less": "^1.2.0",
+    "grunt-contrib-uglify": "^0.11.1",
+    "grunt-contrib-watch": "^0.6.1"
+  }
+}
