@@ -1,7 +1,11 @@
 .leplayer-container {
   display: inline-block;
   line-height: 0;
+  outline: 0;
   position: relative;
+}
+.leplayer-container video {
+  outline: 0;
 }
 .leplayer-container .play-overlay {
   background: rgba(0, 0, 0, 0.4);
@@ -11,6 +15,7 @@
   height: 100%;
   font-size: 80px;
   left: 0;
+  outline: 0;
   position: absolute;
   right: 0;
   text-align: center;
