@@ -15,7 +15,6 @@
 		var sources = [];
 		var volume = 0.5;
 		var video = element[0];
-		console.log(video);
 
 		// Check if element is corectly selected.
 		if (element.prop('tagName').toLowerCase() != 'video') {
@@ -93,13 +92,30 @@
 		element.attr('preload', options.preload);
 		// end Setting options.
 
-		// Hot keys.
+		var overlay = $('<div />').addClass('play-overlay');
 		var togglePlay = function () {
-			if (!video.played || video.paused)
+			if (!video.played || video.paused) {
+				overlay.hide();
 				video.play();
-			else
+			}
+			else {
+				overlay.show();
 				video.pause();
+			}
 		};
+
+		// Move video to container and add other stuff.
+		var container = $('<div />').addClass('leplayer-container');
+		element.wrap(container);
+		element.after(overlay);
+		setTimeout(function(){
+			overlay.css('line-height', overlay.height() + 'px').html('<i class="fa fa-play-circle"></i>');
+		}, 100);
+		overlay.click(function(){
+			togglePlay();
+		});
+
+		// Hot keys.
 		element.keypress(function (e) {
 			if (e.charCode == 32)
 				togglePlay();
