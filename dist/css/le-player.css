@@ -8,9 +8,9 @@
   outline: 0;
 }
 .leplayer-container .play-overlay {
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
   bottom: 0;
-  color: #fff;
+  color: #94a5bc;
   cursor: pointer;
   height: 100%;
   font-size: 80px;
@@ -19,13 +19,14 @@
   position: absolute;
   right: 0;
   text-align: center;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
   top: 0;
   width: 100%;
   z-index: 501;
 }
 .leplayer-container .play-overlay:hover {
-  background: rgba(0, 0, 0, 0.1);
-  color: #678bae;
+  background: rgba(0, 0, 0, 0.2);
+  color: #fff;
 }
 .leplayer-controls {
   border-collapse: separate;

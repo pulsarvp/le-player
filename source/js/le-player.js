@@ -178,6 +178,9 @@
 
 		var initControl = function(type){
 			switch(type){
+				case 'fullscreen':
+					controls.fullscreen.click(function(){ toggleFullscreen(); });
+					break;
 				case 'play':
 					controls.play.click(function(){ togglePlay(); });
 					break;
@@ -199,6 +202,16 @@
 					controls.play.children('.fa').removeClass('fa-pause').addClass('fa-play');
 			}
 		};
+		var toggleFullscreen = function() {
+			if (video.requestFullScreen)
+				video.requestFullScreen();
+			else if (video.webkitRequestFullScreen)
+				video.webkitRequestFullScreen();
+			else if (video.mozRequestFullScreen)
+				video.mozRequestFullScreen();
+			else
+				console.warn('Cannot toggle fullscreen.');
+		};
 
 		// Move video to container and add other stuff.
 		var videoContainer = $('<div />').addClass('leplayer-video');
@@ -209,7 +222,7 @@
 		container = videoContainer.parent();
 
 		setTimeout(function(){
-			overlay.css('line-height', overlay.height() + 'px').html('<i class="fa fa-play-circle"></i>');
+			overlay.css('line-height', overlay.height() + 'px').html('<i class="fa fa-play"></i>');
 		}, 100);
 		overlay.click(function(){
 			togglePlay();
