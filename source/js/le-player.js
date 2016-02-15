@@ -172,7 +172,42 @@
 					controls.volume = {
 						active: $('<div/>').addClass('volume-active'),
 						marker: $('<div/>').addClass('volume-marker'),
-						icon: $('<div/>').addClass('volume-icon').append($('<i />').addClass('fa fa-volume-down'))
+						icon: $('<div/>').addClass('volume-icon').append($('<i />').addClass('fa fa-volume-down')),
+						set: function(value){
+							var icon = this.icon.children('.fa').eq(0);
+							icon.removeClass();
+							if (value < 0.05) {
+								video.muted = true;
+								icon.addClass('fa fa-volume-off');
+							}
+							else {
+								video.muted = false;
+								video.volume = value;
+								if (value < 0.5)
+									icon.addClass('fa fa-volume-down');
+								else
+									icon.addClass('fa fa-volume-up');
+								this.setCookie(value);
+							}
+							var p = Math.round(value * 100).toString() + '%';
+							this.active.css('height', p);
+							this.marker.css('bottom', p);
+						},
+						toggleMuted: function () {
+							if (video.muted == true)
+								this.set(this.getCookie());
+							else
+								this.set(0);
+						},
+						setCookie: function(value){
+							var d = new Date();
+							d.setDate(d.year + 1);
+							document.cookie = 'leplayer_volume=' + value + ';expires=' + d.toString();
+						},
+						getCookie: function(){
+							var value = document.cookie.replace(/(?:(?:^|.*;\s*)leplayer_volume\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+							return value ? value : 0.4;
+						}
 					};
 					controls.volume.line = $('<div/>').addClass('volume-line').append(controls.volume.active).append(controls.volume.marker);
 					controls.volume.container = $('<div />').addClass('control volume-container').append(controls.volume.icon).append($('<div />').addClass('volume-slider').append(controls.volume.line));
@@ -206,16 +241,16 @@
 					});
 					$(document).on('mousemove', function (e) {
 						if (drag && e.pageY >= range.top && e.pageY <= range.bottom) {
-							setVolume((range.bottom - e.pageY) / range.height);
+							controls.volume.set((range.bottom - e.pageY) / range.height);
 						}
 					}).on('mouseup', function (e) {
 						drag = false;
 					});
 					controls.volume.icon.click(function () {
-						toggleMuted();
+						controls.volume.toggleMuted();
 					});
 
-					setVolume(0.4);
+					controls.volume.set(0.4);
 					break;
 			}
 		};
@@ -244,31 +279,6 @@
 				video.mozRequestFullScreen();
 			else
 				console.warn('Cannot toggle fullscreen.');
-		};
-		var toggleMuted = function () {
-			if (video.muted == true)
-				setVolume(0.4);
-			else
-				setVolume(0);
-		};
-		var setVolume = function (volume) {
-			var icon = controls.volume.icon.children('.fa').eq(0);
-			icon.removeClass();
-			if (volume < 0.05) {
-				video.muted = true;
-				icon.addClass('fa fa-volume-off');
-			}
-			else {
-				video.muted = false;
-				video.volume = volume;
-				if (volume < 0.5)
-					icon.addClass('fa fa-volume-down');
-				else
-					icon.addClass('fa fa-volume-up');
-			}
-			var p = Math.round(volume * 100).toString() + '%';
-			controls.volume.active.css('height', p);
-			controls.volume.marker.css('bottom', p);
 		};
 
 		// Move video to container and add other stuff.
