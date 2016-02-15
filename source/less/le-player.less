@@ -35,3 +35,92 @@
 		}
 	}
 }
+.leplayer-controls
+{
+	border-collapse: separate;
+	display: table;
+	height: @control-height;
+	position: relative;
+	&:not(:last-child)
+	{
+		margin-bottom: 10px;
+	}
+	.control {
+		background: @color-background;
+		color: @color-primary;
+		cursor: pointer;
+		display: table-cell;
+		font-size: @control-font-size;
+		height: @control-height;
+		line-height: 100%;
+		padding: 0 (@control-width - @control-font-size) / 2;
+		text-align: center;
+		vertical-align: middle;
+		width: 1%;
+		&:hover {
+			background: @color-primary;
+			color: @color-background;
+		}
+		&.play {
+			background: @color-background-play;
+			color: #fff;
+			padding: 0 (@control-play-width - @control-font-size) / 2;
+			width: 1%;
+			&:hover {
+				background: @color-primary;
+				color: @color-background;
+			}
+		}
+	}
+	.control-container
+	{
+		display: table-cell;
+		height: @control-height;
+		width: 1%;
+	}
+	.control-text
+	{
+		background: @color-background;
+		color: #000;
+		display: table-cell;
+		font-size: @control-font-size;
+		height: @control-height;
+		line-height: 100%;
+		padding: 0 5px;
+		text-align: center;
+		vertical-align: middle;
+	}
+	.divider
+	{
+		background: none;
+		display: table-cell;
+		padding: 0 @divider-width / 2;
+		width: 0.01%;
+	}
+	.fa
+	{
+		text-align: center;
+		width: @control-font-size;
+	}
+	.timeline
+	{
+		background: @color-background;
+		display: table-cell;
+		height: @control-height;
+		width: 100%;
+	}
+	.timeline-container
+	{
+		display: table-cell;
+		position: relative;
+		white-space: nowrap;
+		width: 100%
+	}
+}
+.leplayer-video
+{
+	display: block;
+	outline: 0;
+	line-height: 0;
+	position: relative;
+}

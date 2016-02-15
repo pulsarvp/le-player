@@ -25,23 +25,27 @@
 			volume: {
 				step: 0.1
 			},
-			controls: {
-				/*play: true,
-				volume: true,
-				timeline: true,
-				currentTime: true,
-				totalTime: true,
-				fullscreen: true,
-				rate: true,
-				backward: true,
-				forward: true,
-				download: true */
-			}
+			controls: [
+				{
+					element: null,
+					controls: [
+						'play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen'
+					]
+				},
+				{
+					element: null,
+					controls: [
+						'rate', 'divider', 'backward', 'divider', 'captions', 'divider', 'download'
+					]
+				}
+			]
+
 		}, opts);
 
 		var sources = [];
 		var volume = 0.5;
 		var video = element[0];
+		var controls = {};
 
 		// Check if element is corectly selected.
 		if (element.prop('tagName').toLowerCase() != 'video') {
@@ -119,22 +123,91 @@
 		element.attr('preload', options.preload);
 		// end Setting options.
 
+		var createControl = function(type){
+			switch (type) {
+				case 'backward':
+					controls.backward = $('<div />').addClass('control backward').append($('<i />').addClass('fa fa-undo'));
+					return controls.backward;
+
+				case 'captions':
+					controls.captions = $('<div />').addClass('control captions').append($('<i />').addClass('fa fa-commenting-o'));
+					return controls.captions;
+
+				case 'divider':
+					return $('<div />').addClass('divider');
+
+				case 'download':
+					controls.download = $('<div />').addClass('control download').append($('<i />').addClass('fa fa-download'));
+					return controls.download;
+
+				case 'forward':
+					controls.forward = $('<div />').addClass('control forkward').append($('<i />').addClass('fa fa-redo'));
+					return controls.forward;
+
+				case 'fullscreen':
+					controls.fullscreen = $('<div />').addClass('control fullscreen').append($('<i />').addClass('fa fa-arrows-alt'));
+					return controls.fullscreen;
+
+				case 'play':
+					controls.play = $('<div />').addClass('control play').append($('<i />').addClass('fa fa-play'));
+					return controls.play;
+
+				case 'rate':
+					controls.rate = {
+						down : $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-backward')),
+						up : $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-forward')),
+						current : $('<div />').addClass('control-text rate-current')
+					};
+					return $('<div />').addClass('control-container').append(controls.rate.down).append(controls.rate.current).append(controls.rate.up);
+
+				case 'timeline':
+					controls.time = {
+						current: $('<div />').addClass('control-text time-current'),
+						total: $('<div />').addClass('control-text time-total'),
+						line: $('<div />').addClass('timeline')
+					};
+					return $('<div />').addClass('timeline-container').append( $('<div />').addClass('timeline-subcontainer').append(controls.time.current).append(controls.time.line).append(controls.time.total) );
+
+				case 'volume':
+					return $('<div />').addClass('control volume').append($('<i />').addClass('fa fa-volume-down'));
+
+				default:
+					return null;
+			}
+		};
+
+		var initControl = function(type){
+			switch(type){
+				case 'play':
+					controls.play.click(function(){ togglePlay(); });
+					break;
+			}
+		};
+
 		var overlay = $('<div />').addClass('play-overlay');
 		var togglePlay = function () {
 			if (!video.played || video.paused) {
 				overlay.hide();
 				video.play();
+				if (typeof controls.play != 'undefined')
+					controls.play.children('.fa').removeClass('fa-play').addClass('fa-pause');
 			}
 			else {
 				overlay.show();
 				video.pause();
+				if (typeof controls.play != 'undefined')
+					controls.play.children('.fa').removeClass('fa-pause').addClass('fa-play');
 			}
 		};
 
 		// Move video to container and add other stuff.
-		var container = $('<div />').addClass('leplayer-container');
+		var videoContainer = $('<div />').addClass('leplayer-video');
+		var container = $('<div />').addClass('leplayer-container').append(videoContainer);
 		element.wrap(container);
-		element.after(overlay);
+		videoContainer = element.parent();
+		videoContainer.append(overlay);
+		container = videoContainer.parent();
+
 		setTimeout(function(){
 			overlay.css('line-height', overlay.height() + 'px').html('<i class="fa fa-play-circle"></i>');
 		}, 100);
@@ -149,6 +222,31 @@
 		}).click(function () {
 			togglePlay();
 		});
+
+		// Display controls.
+		for (var i in options.controls)
+		{
+			var el = options.controls[i].element;
+			if (el == null)
+				el = $('<div />').addClass('leplayer-controls');
+			if (el.length == 0)
+			{
+				console.warn('Error creating controls.');
+			}
+			else
+			{
+				for (var k in options.controls[i].controls) {
+					var c = createControl(options.controls[i].controls[k]);
+					if (c != null && c.length > 0) {
+						el.append(c);
+						initControl(options.controls[i].controls[k]);
+					}
+					else
+						console.warn('Cannot create ' + options.controls[i].controls[k] + ' control.');
+				}
+				container.append(el);
+			}
+		}
 	};
 
 	$.fn.lePlayer = function (options) {
