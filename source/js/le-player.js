@@ -123,7 +123,7 @@
 		element.attr('preload', options.preload);
 		// end Setting options.
 
-		var createControl = function(type){
+		var createControl = function (type) {
 			switch (type) {
 				case 'backward':
 					controls.backward = $('<div />').addClass('control backward').append($('<i />').addClass('fa fa-undo'));
@@ -154,9 +154,9 @@
 
 				case 'rate':
 					controls.rate = {
-						down : $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-backward')),
-						up : $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-forward')),
-						current : $('<div />').addClass('control-text rate-current')
+						down: $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-backward')),
+						up: $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-forward')),
+						current: $('<div />').addClass('control-text rate-current')
 					};
 					return $('<div />').addClass('control-container').append(controls.rate.down).append(controls.rate.current).append(controls.rate.up);
 
@@ -166,23 +166,56 @@
 						total: $('<div />').addClass('control-text time-total'),
 						line: $('<div />').addClass('timeline')
 					};
-					return $('<div />').addClass('timeline-container').append( $('<div />').addClass('timeline-subcontainer').append(controls.time.current).append(controls.time.line).append(controls.time.total) );
+					return $('<div />').addClass('timeline-container').append($('<div />').addClass('timeline-subcontainer').append(controls.time.current).append(controls.time.line).append(controls.time.total));
 
 				case 'volume':
-					return $('<div />').addClass('control volume').append($('<i />').addClass('fa fa-volume-down'));
+					controls.volume = {
+						active: $('<div/>').addClass('volume-active'),
+						marker: $('<div/>').addClass('volume-marker'),
+						icon: $('<div/>').addClass('volume-icon').append($('<i />').addClass('fa fa-volume-down'))
+					};
+					controls.volume.line = $('<div/>').addClass('volume-line').append(controls.volume.active).append(controls.volume.marker);
+					controls.volume.container = $('<div />').addClass('control volume-container').append(controls.volume.icon).append($('<div />').addClass('volume-slider').append(controls.volume.line));
+					return controls.volume.container;
 
 				default:
 					return null;
 			}
 		};
 
-		var initControl = function(type){
-			switch(type){
+		var initControl = function (type) {
+			switch (type) {
 				case 'fullscreen':
-					controls.fullscreen.click(function(){ toggleFullscreen(); });
+					controls.fullscreen.click(function () {
+						toggleFullscreen();
+					});
 					break;
 				case 'play':
-					controls.play.click(function(){ togglePlay(); });
+					controls.play.click(function () {
+						togglePlay();
+					});
+					break;
+				case 'volume':
+					var drag = false;
+					var range = {bottom: 0, height: 0, top: 0};
+					controls.volume.marker.on('mousedown', function (e) {
+						drag = true;
+						range.height = controls.volume.line.height();
+						range.top = controls.volume.line.offset().top;
+						range.bottom = range.top + range.height;
+					});
+					$(document).on('mousemove', function (e) {
+						if (drag && e.pageY >= range.top && e.pageY <= range.bottom) {
+							setVolume((range.bottom - e.pageY) / range.height);
+						}
+					}).on('mouseup', function (e) {
+						drag = false;
+					});
+					controls.volume.icon.click(function () {
+						toggleMuted();
+					});
+
+					setVolume(0.4);
 					break;
 			}
 		};
@@ -202,7 +235,7 @@
 					controls.play.children('.fa').removeClass('fa-pause').addClass('fa-play');
 			}
 		};
-		var toggleFullscreen = function() {
+		var toggleFullscreen = function () {
 			if (video.requestFullScreen)
 				video.requestFullScreen();
 			else if (video.webkitRequestFullScreen)
@@ -211,6 +244,31 @@
 				video.mozRequestFullScreen();
 			else
 				console.warn('Cannot toggle fullscreen.');
+		};
+		var toggleMuted = function () {
+			if (video.muted == true)
+				setVolume(0.4);
+			else
+				setVolume(0);
+		};
+		var setVolume = function (volume) {
+			var icon = controls.volume.icon.children('.fa').eq(0);
+			icon.removeClass();
+			if (volume < 0.05) {
+				video.muted = true;
+				icon.addClass('fa fa-volume-off');
+			}
+			else {
+				video.muted = false;
+				video.volume = volume;
+				if (volume < 0.5)
+					icon.addClass('fa fa-volume-down');
+				else
+					icon.addClass('fa fa-volume-up');
+			}
+			var p = Math.round(volume * 100).toString() + '%';
+			controls.volume.active.css('height', p);
+			controls.volume.marker.css('bottom', p);
 		};
 
 		// Move video to container and add other stuff.
@@ -221,10 +279,10 @@
 		videoContainer.append(overlay);
 		container = videoContainer.parent();
 
-		setTimeout(function(){
+		setTimeout(function () {
 			overlay.css('line-height', overlay.height() + 'px').html('<i class="fa fa-play"></i>');
 		}, 100);
-		overlay.click(function(){
+		overlay.click(function () {
 			togglePlay();
 		});
 
@@ -237,17 +295,14 @@
 		});
 
 		// Display controls.
-		for (var i in options.controls)
-		{
+		for (var i in options.controls) {
 			var el = options.controls[i].element;
 			if (el == null)
 				el = $('<div />').addClass('leplayer-controls');
-			if (el.length == 0)
-			{
+			if (el.length == 0) {
 				console.warn('Error creating controls.');
 			}
-			else
-			{
+			else {
 				for (var k in options.controls[i].controls) {
 					var c = createControl(options.controls[i].controls[k]);
 					if (c != null && c.length > 0) {
