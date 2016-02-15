@@ -9,7 +9,34 @@
 			muted: false,
 			preload: 'metadata',
 			poster: null,
-			width: 'auto'
+			width: 'auto',
+			rate: {
+				step: 0.25,
+				min: 0.5,
+				max: 4.0
+			},
+			playback: {
+				step: {
+					short: 5,
+					medium: 30,
+					long: 60
+				}
+			},
+			volume: {
+				step: 0.1
+			},
+			controls: {
+				/*play: true,
+				volume: true,
+				timeline: true,
+				currentTime: true,
+				totalTime: true,
+				fullscreen: true,
+				rate: true,
+				backward: true,
+				forward: true,
+				download: true */
+			}
 		}, opts);
 
 		var sources = [];
