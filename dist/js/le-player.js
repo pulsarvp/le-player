@@ -173,7 +173,7 @@
 						active: $('<div/>').addClass('volume-active'),
 						marker: $('<div/>').addClass('volume-marker'),
 						icon: $('<div/>').addClass('volume-icon').append($('<i />').addClass('fa fa-volume-down')),
-						set: function(value){
+						set: function (value) {
 							var icon = this.icon.children('.fa').eq(0);
 							icon.removeClass();
 							if (value < 0.05) {
@@ -199,12 +199,12 @@
 							else
 								this.set(0);
 						},
-						setCookie: function(value){
+						setCookie: function (value) {
 							var d = new Date();
 							d.setDate(d.year + 1);
 							document.cookie = 'leplayer_volume=' + value + ';expires=' + d.toString();
 						},
-						getCookie: function(){
+						getCookie: function () {
 							var value = document.cookie.replace(/(?:(?:^|.*;\s*)leplayer_volume\s*\=\s*([^;]*).*$)|^.*$/, "$1");
 							return value ? value : 0.4;
 						}
@@ -233,12 +233,14 @@
 				case 'volume':
 					var drag = false;
 					var range = {bottom: 0, height: 0, top: 0};
+
 					controls.volume.marker.on('mousedown', function (e) {
 						drag = true;
 						range.height = controls.volume.line.height();
 						range.top = controls.volume.line.offset().top;
 						range.bottom = range.top + range.height;
 					});
+
 					$(document).on('mousemove', function (e) {
 						if (drag && e.pageY >= range.top && e.pageY <= range.bottom) {
 							controls.volume.set((range.bottom - e.pageY) / range.height);
@@ -246,11 +248,21 @@
 					}).on('mouseup', function (e) {
 						drag = false;
 					});
+
+					controls.volume.line.click(function (e) {
+						range.height = controls.volume.line.height();
+						range.top = controls.volume.line.offset().top;
+						range.bottom = range.top + range.height;
+						if (e.pageY >= range.top && e.pageY <= range.bottom) {
+							controls.volume.set((range.bottom - e.pageY) / range.height);
+						}
+					});
+
 					controls.volume.icon.click(function () {
 						controls.volume.toggleMuted();
 					});
 
-					controls.volume.set(0.4);
+					controls.volume.set(controls.volume.getCookie());
 					break;
 			}
 		};
