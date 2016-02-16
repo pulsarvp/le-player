@@ -1,5 +1,7 @@
 .leplayer-container {
+  color: #1a4a7e;
   display: inline-block;
+  font-family: "PT Sans", "Open Sans", "Verdana", "Arial", sans-serif;
   line-height: 0;
   outline: 0;
   position: relative;
@@ -54,6 +56,14 @@
   background: #1a4a7e;
   color: #e1e8ef;
 }
+.leplayer-controls .control.disabled {
+  cursor: not-allowed;
+  color: #94a5bc;
+}
+.leplayer-controls .control.disabled:hover {
+  background: #e1e8ef;
+  color: #94a5bc;
+}
 .leplayer-controls .control.play {
   background: #678bae;
   color: #fff;
@@ -73,7 +83,7 @@
   background: #e1e8ef;
   color: #000;
   display: table-cell;
-  font-size: 16px;
+  font-size: 12px;
   height: 32px;
   line-height: 100%;
   padding: 0 5px;

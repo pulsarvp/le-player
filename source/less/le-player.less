@@ -2,7 +2,9 @@
 
 .leplayer-container
 {
+	color: @color-primary;
 	display: inline-block;
+	font-family: "PT Sans", "Open Sans", "Verdana", "Arial", sans-serif;
 	line-height: 0;
 	outline: 0;
 	position: relative;
@@ -60,6 +62,16 @@
 			background: @color-primary;
 			color: @color-background;
 		}
+		&.disabled
+		{
+			cursor: not-allowed;
+			color: @color-disabled;
+			&:hover
+			{
+				background: @color-background;
+				color: @color-disabled;
+			}
+		}
 		&.play {
 			background: @color-background-play;
 			color: #fff;
@@ -80,7 +92,7 @@
 		background: @color-background;
 		color: #000;
 		display: table-cell;
-		font-size: @control-font-size;
+		font-size: @control-text-font-size;
 		height: @control-height;
 		line-height: 100%;
 		padding: 0 5px;

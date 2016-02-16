@@ -156,7 +156,29 @@
 					controls.rate = {
 						down: $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-backward')),
 						up: $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-forward')),
-						current: $('<div />').addClass('control-text rate-current')
+						current: $('<div />').addClass('control-text rate-current'),
+						display: function () {
+							this.current.html('×' + video.playbackRate.toFixed(2));
+						},
+						increase: function(){
+							if (video.playbackRate < options.rate.max) {
+								this.down.removeClass('disabled');
+								video.playbackRate += options.rate.step;
+								this.display();
+							}
+							else
+								this.up.addClass('disabled');
+
+						},
+						decrease: function(){
+							if (video.playbackRate > options.rate.min) {
+								this.up.removeClass('disabled');
+								video.playbackRate -= options.rate.step;
+								this.display();
+							}
+							else
+								this.down.addClass('disabled');
+						}
 					};
 					return $('<div />').addClass('control-container').append(controls.rate.down).append(controls.rate.current).append(controls.rate.up);
 
@@ -225,11 +247,23 @@
 						toggleFullscreen();
 					});
 					break;
+
 				case 'play':
 					controls.play.click(function () {
 						togglePlay();
 					});
 					break;
+
+				case 'rate':
+						controls.rate.display();
+						controls.rate.up.click(function(){
+							controls.rate.increase();
+						});
+						controls.rate.down.click(function(){
+							controls.rate.decrease();
+						});
+					break;
+
 				case 'volume':
 					var drag = false;
 					var range = {bottom: 0, height: 0, top: 0};
