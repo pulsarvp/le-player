@@ -123,6 +123,23 @@
 		element.attr('preload', options.preload);
 		// end Setting options.
 
+		var getCookie = function(name, dflt){
+			var cookies = document.cookie.split(';');
+			for (var i in cookies)
+			{
+				var d = cookies[i].trim().split('=');
+				if (d[0] == 'leplayer_' + name)
+					return d[1];
+			}
+			return dflt;
+		};
+
+		var setCookie = function(name, value) {
+			var d = new Date();
+			d.setDate(d.year + 1);
+			document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
+		};
+
 		var createControl = function (type) {
 			switch (type) {
 				case 'backward':
@@ -165,6 +182,7 @@
 								this.down.removeClass('disabled');
 								video.playbackRate += options.rate.step;
 								this.display();
+								setCookie('rate', video.playbackRate);
 							}
 							else
 								this.up.addClass('disabled');
@@ -175,6 +193,7 @@
 								this.up.removeClass('disabled');
 								video.playbackRate -= options.rate.step;
 								this.display();
+								setCookie('rate', video.playbackRate);
 							}
 							else
 								this.down.addClass('disabled');
@@ -209,26 +228,18 @@
 									icon.addClass('fa fa-volume-down');
 								else
 									icon.addClass('fa fa-volume-up');
-								this.setCookie(value);
+								setCookie('volume', value);
 							}
 							var p = Math.round(value * 100).toString() + '%';
 							this.active.css('height', p);
 							this.marker.css('bottom', p);
 						},
 						toggleMuted: function () {
-							if (video.muted == true)
-								this.set(this.getCookie());
+							if (video.muted == true) {
+								this.set(getCookie('volume', 0.4));
+							}
 							else
 								this.set(0);
-						},
-						setCookie: function (value) {
-							var d = new Date();
-							d.setDate(d.year + 1);
-							document.cookie = 'leplayer_volume=' + value + ';expires=' + d.toString();
-						},
-						getCookie: function () {
-							var value = document.cookie.replace(/(?:(?:^|.*;\s*)leplayer_volume\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-							return value ? value : 0.4;
 						}
 					};
 					controls.volume.line = $('<div/>').addClass('volume-line').append(controls.volume.active).append(controls.volume.marker);
@@ -255,6 +266,7 @@
 					break;
 
 				case 'rate':
+						video.playbackRate = getCookie('rate', 1);
 						controls.rate.display();
 						controls.rate.up.click(function(){
 							controls.rate.increase();
@@ -296,7 +308,7 @@
 						controls.volume.toggleMuted();
 					});
 
-					controls.volume.set(controls.volume.getCookie());
+					controls.volume.set(getCookie('volume', 0.4));
 					break;
 			}
 		};
