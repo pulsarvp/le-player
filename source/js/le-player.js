@@ -153,7 +153,7 @@
 					return $('<div />').addClass('divider');
 
 				case 'download':
-					controls.download = $('<div />').addClass('control download').append($('<i />').addClass('fa fa-download'));
+					controls.download = $('<a />').attr('href', sources[0]).attr('target', '_blank').attr('download', sources[0]).addClass('control download').append($('<i />').addClass('fa fa-download'));
 					return controls.download;
 
 				case 'forward':
