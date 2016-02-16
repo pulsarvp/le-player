@@ -86,7 +86,23 @@
 	.control-container {
 		display: table-cell;
 		height: @control-height;
+		position: relative;
 		width: 1%;
+		&:hover {
+			.control-inner {
+				display: block;
+			}
+		}
+	}
+	.control-inner{
+		background: @color-background;
+		bottom: @control-height;
+		cursor: default;
+		display: none;
+		left: 0;
+		position: absolute;
+		width: 100%;
+		z-index: @z-index-base + 2;
 	}
 	.control-text {
 		background: @color-background;
@@ -109,6 +125,17 @@
 		text-align: center;
 		width: @control-font-size;
 	}
+	.inner-item{
+		display: block;
+		color: @color-primary;
+		cursor: pointer;
+		line-height: @control-height;
+		&:hover
+		{
+			background: lighten(@color-primary, 5%);
+			color: @color-background;
+		}
+	}
 	.timeline {
 		background: @color-background;
 		display: table-cell;
@@ -121,14 +148,6 @@
 		white-space: nowrap;
 		width: 100%
 	}
-	.volume-container {
-		position: relative;
-		&:hover {
-			.volume-slider {
-				display: block;
-			}
-		}
-	}
 	.volume-active
 	{
 		background: @color-primary;
@@ -138,15 +157,7 @@
 		width: 100%;
 	}
 	.volume-slider {
-		background: @color-background;
-		bottom: @control-height;
-		cursor: default;
-		display: none;
 		height: 144px;
-		left: 0;
-		position: absolute;
-		width: 100%;
-		z-index: @z-index-base + 2;
 	}
 	.volume-line {
 		background: @color-background-line;

@@ -35,7 +35,7 @@
 				{
 					element: null,
 					controls: [
-						'rate', 'divider', 'backward', 'divider', 'captions', 'divider', 'download'
+						'rate', 'divider', 'backward', 'divider', 'subtitles', 'divider', 'download'
 					]
 				}
 			]
@@ -43,6 +43,7 @@
 		}, opts);
 
 		var sources = [];
+		var subtitles = [];
 		var volume = 0.5;
 		var video = element[0];
 		var controls = {};
@@ -70,6 +71,20 @@
 			return this;
 		}
 		element.attr('src', sources[0]);
+
+		// Set subtitles.
+		element.children('track[kind="subtitles"]').each(function () {
+			var language = $(this).attr('srclang');
+			var title = $(this).attr('label');
+			var src = $(this).attr('src');
+			if (title.length > 0 && src.length > 0) {
+				subtitles.push({
+					title: title,
+					src: src,
+					language: language
+				});
+			}
+		});
 
 		// Load and set options.
 		// Controls.
@@ -145,10 +160,6 @@
 					controls.backward = $('<div />').addClass('control backward').append($('<i />').addClass('fa fa-undo'));
 					return controls.backward;
 
-				case 'captions':
-					controls.captions = $('<div />').addClass('control captions').append($('<i />').addClass('fa fa-commenting-o'));
-					return controls.captions;
-
 				case 'divider':
 					return $('<div />').addClass('divider');
 
@@ -200,6 +211,20 @@
 					};
 					return $('<div />').addClass('control-container').append(controls.rate.down).append(controls.rate.current).append(controls.rate.up);
 
+				case 'subtitles':
+					if (subtitles.length > 0) {
+						controls.subtitles = [];
+						var list = $('<div/>').addClass('control-inner');
+						for (var i in subtitles) {
+							controls.subtitles.push($('<div />').addClass('inner-item').data('src', subtitles[i].src).data('language', subtitles[i].language).html(subtitles[i].title));
+						}
+						for (var i in controls.subtitles) {
+							list.append(controls.subtitles[i]);
+						}
+						return $('<div />').addClass('control control-container').append($('<div />').addClass('subtitles-icon').append($('<i />').addClass('fa fa-commenting-o'))).append(list);
+					}
+					return null;
+
 				case 'timeline':
 					controls.time = {
 						current: $('<div />').addClass('control-text time-current'),
@@ -242,7 +267,7 @@
 						}
 					};
 					controls.volume.line = $('<div/>').addClass('volume-line').append(controls.volume.active).append(controls.volume.marker);
-					controls.volume.container = $('<div />').addClass('control volume-container').append(controls.volume.icon).append($('<div />').addClass('volume-slider').append(controls.volume.line));
+					controls.volume.container = $('<div />').addClass('control control-container').append(controls.volume.icon).append($('<div />').addClass('control-inner volume-slider').append(controls.volume.line));
 					return controls.volume.container;
 
 				default:
@@ -280,6 +305,15 @@
 					controls.rate.down.click(function () {
 						controls.rate.decrease();
 					});
+					break;
+
+				case 'subtitles':
+					for (var i in controls.subtitles)
+					{
+						controls.subtitles[i].click(function(){
+							switchTrack($(this).data('language'));
+						});
+					}
 					break;
 
 				case 'volume':
@@ -346,6 +380,10 @@
 		};
 		var seek = function (time) {
 			video.currentTime = time;
+		};
+
+		var switchTrack = function(language) {
+			
 		};
 
 		// Move video to container and add other stuff.

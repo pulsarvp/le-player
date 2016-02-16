@@ -77,7 +77,21 @@
 .leplayer-controls .control-container {
   display: table-cell;
   height: 32px;
+  position: relative;
   width: 1%;
+}
+.leplayer-controls .control-container:hover .control-inner {
+  display: block;
+}
+.leplayer-controls .control-inner {
+  background: #e1e8ef;
+  bottom: 32px;
+  cursor: default;
+  display: none;
+  left: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 502;
 }
 .leplayer-controls .control-text {
   background: #e1e8ef;
@@ -100,6 +114,16 @@
   text-align: center;
   width: 16px;
 }
+.leplayer-controls .inner-item {
+  display: block;
+  color: #1a4a7e;
+  cursor: pointer;
+  line-height: 32px;
+}
+.leplayer-controls .inner-item:hover {
+  background: #1e5693;
+  color: #e1e8ef;
+}
 .leplayer-controls .timeline {
   background: #e1e8ef;
   display: table-cell;
@@ -112,12 +136,6 @@
   white-space: nowrap;
   width: 100%;
 }
-.leplayer-controls .volume-container {
-  position: relative;
-}
-.leplayer-controls .volume-container:hover .volume-slider {
-  display: block;
-}
 .leplayer-controls .volume-active {
   background: #1a4a7e;
   bottom: 0;
@@ -126,15 +144,7 @@
   width: 100%;
 }
 .leplayer-controls .volume-slider {
-  background: #e1e8ef;
-  bottom: 32px;
-  cursor: default;
-  display: none;
   height: 144px;
-  left: 0;
-  position: absolute;
-  width: 100%;
-  z-index: 502;
 }
 .leplayer-controls .volume-line {
   background: #768aa7;
