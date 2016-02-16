@@ -123,10 +123,9 @@
 		element.attr('preload', options.preload);
 		// end Setting options.
 
-		var getCookie = function(name, dflt){
+		var getCookie = function (name, dflt) {
 			var cookies = document.cookie.split(';');
-			for (var i in cookies)
-			{
+			for (var i in cookies) {
 				var d = cookies[i].trim().split('=');
 				if (d[0] == 'leplayer_' + name)
 					return d[1];
@@ -134,7 +133,7 @@
 			return dflt;
 		};
 
-		var setCookie = function(name, value) {
+		var setCookie = function (name, value) {
 			var d = new Date();
 			d.setDate(d.year + 1);
 			document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
@@ -177,7 +176,7 @@
 						display: function () {
 							this.current.html('×' + video.playbackRate.toFixed(2));
 						},
-						increase: function(){
+						increase: function () {
 							if (video.playbackRate < options.rate.max) {
 								this.down.removeClass('disabled');
 								video.playbackRate += options.rate.step;
@@ -188,7 +187,7 @@
 								this.up.addClass('disabled');
 
 						},
-						decrease: function(){
+						decrease: function () {
 							if (video.playbackRate > options.rate.min) {
 								this.up.removeClass('disabled');
 								video.playbackRate -= options.rate.step;
@@ -253,6 +252,13 @@
 
 		var initControl = function (type) {
 			switch (type) {
+				case 'backward':
+					controls.backward.click(function () {
+						if (video.currentTime - options.playback.step.medium > 0)
+							seek(video.currentTime - options.playback.step.medium);
+					});
+					break;
+
 				case 'fullscreen':
 					controls.fullscreen.click(function () {
 						toggleFullscreen();
@@ -266,14 +272,14 @@
 					break;
 
 				case 'rate':
-						video.playbackRate = getCookie('rate', 1);
-						controls.rate.display();
-						controls.rate.up.click(function(){
-							controls.rate.increase();
-						});
-						controls.rate.down.click(function(){
-							controls.rate.decrease();
-						});
+					video.playbackRate = getCookie('rate', 1);
+					controls.rate.display();
+					controls.rate.up.click(function () {
+						controls.rate.increase();
+					});
+					controls.rate.down.click(function () {
+						controls.rate.decrease();
+					});
 					break;
 
 				case 'volume':
@@ -337,6 +343,9 @@
 				video.mozRequestFullScreen();
 			else
 				console.warn('Cannot toggle fullscreen.');
+		};
+		var seek = function (time) {
+			video.currentTime = time;
 		};
 
 		// Move video to container and add other stuff.
