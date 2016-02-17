@@ -71,10 +71,19 @@
 			document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
 		};
 
+		var createSimpleControl = function (cssClass, iconClass) {
+			return $('<div />').addClass('control ' + cssClass).append($('<i />').addClass('fa fa-' + iconClass));
+		};
+
 		var createControl = function (type) {
 			switch (type) {
 				case 'backward':
-					controls.backward = $('<div />').addClass('control backward').append($('<i />').addClass('fa fa-undo'));
+					controls.backward = createSimpleControl('backward', 'undo').click(function () {
+						if (video.currentTime - options.playback.step.medium > 0)
+							seek(video.currentTime - options.playback.step.medium);
+						else
+							seek(0);
+					});
 					return controls.backward;
 
 				case 'divider':
@@ -85,21 +94,29 @@
 					return controls.download;
 
 				case 'forward':
-					controls.forward = $('<div />').addClass('control forkward').append($('<i />').addClass('fa fa-redo'));
+					controls.forward = createSimpleControl('forward', 'redo');
 					return controls.forward;
 
 				case 'fullscreen':
-					controls.fullscreen = $('<div />').addClass('control fullscreen').append($('<i />').addClass('fa fa-arrows-alt'));
+					controls.fullscreen = createSimpleControl('fullscreen', 'arrows-alt').click(function () {
+						toggleFullscreen();
+					});
 					return controls.fullscreen;
 
 				case 'play':
-					controls.play = $('<div />').addClass('control play').append($('<i />').addClass('fa fa-play'));
+					controls.play = createSimpleControl('play', 'play').click(function () {
+						togglePlay();
+					});
 					return controls.play;
 
 				case 'rate':
 					controls.rate = {
-						down: $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-backward')),
-						up: $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-forward')),
+						down: $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-backward')).click(function () {
+							controls.rate.decrease();
+						}),
+						up: $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-forward')).click(function () {
+							controls.rate.increase();
+						}),
 						current: $('<div />').addClass('control-text rate-current'),
 						display: function () {
 							this.current.html('×' + video.playbackRate.toFixed(2));
@@ -126,6 +143,7 @@
 								this.down.addClass('disabled');
 						}
 					};
+
 					return $('<div />').addClass('control-container').append(controls.rate.down).append(controls.rate.current).append(controls.rate.up);
 
 				case 'subtitles':
@@ -133,7 +151,9 @@
 						controls.subtitles = [];
 						var list = $('<div/>').addClass('control-inner');
 						for (var i in subtitles) {
-							controls.subtitles.push($('<div />').addClass('inner-item').data('src', subtitles[i].src).data('language', subtitles[i].language).html(subtitles[i].title));
+							controls.subtitles.push($('<div />').addClass('inner-item').data('src', subtitles[i].src).data('language', subtitles[i].language).html(subtitles[i].title).click(function () {
+								switchTrack($(this).data('language'));
+							}));
 						}
 						for (var i in controls.subtitles) {
 							list.append(controls.subtitles[i]);
@@ -151,10 +171,21 @@
 					return $('<div />').addClass('timeline-container').append($('<div />').addClass('timeline-subcontainer').append(controls.time.current).append(controls.time.line).append(controls.time.total));
 
 				case 'volume':
+
+					var drag = false;
+					var range = {bottom: 0, height: 0, top: 0};
+
 					controls.volume = {
 						active: $('<div/>').addClass('volume-active'),
-						marker: $('<div/>').addClass('volume-marker'),
-						icon: $('<div/>').addClass('volume-icon').append($('<i />').addClass('fa fa-volume-down')),
+						marker: $('<div/>').addClass('volume-marker').on('mousedown', function (e) {
+							drag = true;
+							range.height = controls.volume.line.height();
+							range.top = controls.volume.line.offset().top;
+							range.bottom = range.top + range.height;
+						}),
+						icon: $('<div/>').addClass('volume-icon').append($('<i />').addClass('fa fa-volume-down')).click(function () {
+							controls.volume.toggleMuted();
+						}),
 						set: function (value) {
 							var icon = this.icon.children('.fa').eq(0);
 							icon.removeClass();
@@ -183,8 +214,25 @@
 								this.set(0);
 						}
 					};
-					controls.volume.line = $('<div/>').addClass('volume-line').append(controls.volume.active).append(controls.volume.marker);
+					controls.volume.line = $('<div/>').addClass('volume-line').append(controls.volume.active).append(controls.volume.marker).click(function (e) {
+						range.height = controls.volume.line.height();
+						range.top = controls.volume.line.offset().top;
+						range.bottom = range.top + range.height;
+						if (e.pageY >= range.top && e.pageY <= range.bottom) {
+							controls.volume.set((range.bottom - e.pageY) / range.height);
+						}
+					});
 					controls.volume.container = $('<div />').addClass('control control-container').append(controls.volume.icon).append($('<div />').addClass('control-inner volume-slider').append(controls.volume.line));
+/////////
+
+					$(document).on('mousemove', function (e) {
+						if (drag && e.pageY >= range.top && e.pageY <= range.bottom) {
+							controls.volume.set((range.bottom - e.pageY) / range.height);
+						}
+					}).on('mouseup', function (e) {
+						drag = false;
+					});
+
 					return controls.volume.container;
 
 				default:
@@ -225,83 +273,6 @@
 			initHotKeys();
 		};
 
-		var initControl = function (type) {
-			switch (type) {
-				case 'backward':
-					controls.backward.click(function () {
-						if (video.currentTime - options.playback.step.medium > 0)
-							seek(video.currentTime - options.playback.step.medium);
-					});
-					break;
-
-				case 'fullscreen':
-					controls.fullscreen.click(function () {
-						toggleFullscreen();
-					});
-					break;
-
-				case 'play':
-					controls.play.click(function () {
-						togglePlay();
-					});
-					break;
-
-				case 'rate':
-					video.playbackRate = getCookie('rate', 1);
-					controls.rate.display();
-					controls.rate.up.click(function () {
-						controls.rate.increase();
-					});
-					controls.rate.down.click(function () {
-						controls.rate.decrease();
-					});
-					break;
-
-				case 'subtitles':
-					for (var i in controls.subtitles) {
-						controls.subtitles[i].click(function () {
-							switchTrack($(this).data('language'));
-						});
-					}
-					break;
-
-				case 'volume':
-					var drag = false;
-					var range = {bottom: 0, height: 0, top: 0};
-
-					controls.volume.marker.on('mousedown', function (e) {
-						drag = true;
-						range.height = controls.volume.line.height();
-						range.top = controls.volume.line.offset().top;
-						range.bottom = range.top + range.height;
-					});
-
-					$(document).on('mousemove', function (e) {
-						if (drag && e.pageY >= range.top && e.pageY <= range.bottom) {
-							controls.volume.set((range.bottom - e.pageY) / range.height);
-						}
-					}).on('mouseup', function (e) {
-						drag = false;
-					});
-
-					controls.volume.line.click(function (e) {
-						range.height = controls.volume.line.height();
-						range.top = controls.volume.line.offset().top;
-						range.bottom = range.top + range.height;
-						if (e.pageY >= range.top && e.pageY <= range.bottom) {
-							controls.volume.set((range.bottom - e.pageY) / range.height);
-						}
-					});
-
-					controls.volume.icon.click(function () {
-						controls.volume.toggleMuted();
-					});
-
-					controls.volume.set(getCookie('volume', 0.4));
-					break;
-			}
-		};
-
 		var initControls = function () {
 			for (var i in options.controls) {
 				var el = options.controls[i].element;
@@ -315,7 +286,6 @@
 						var c = createControl(options.controls[i].controls[k]);
 						if (c != null && c.length > 0) {
 							el.append(c);
-							initControl(options.controls[i].controls[k]);
 						}
 						else
 							console.warn('Cannot create ' + options.controls[i].controls[k] + ' control.');
@@ -323,6 +293,9 @@
 					container.append(el);
 				}
 			}
+			video.playbackRate = getCookie('rate', 1);
+			controls.rate.display();
+			controls.volume.set(getCookie('volume', 0.4));
 		};
 
 		var initDom = function () {
@@ -334,7 +307,7 @@
 			element.before(container);
 			videoContainer.append(element);
 			video = element[0];
-			video.addEventListener('loadedmetadata', function(){
+			video.addEventListener('loadedmetadata', function () {
 				overlay.css('line-height', overlay.height() + 'px').html('<i class="fa fa-play"></i>');
 			});
 
@@ -463,10 +436,8 @@
 		};
 
 		var switchTrack = function (language) {
-			if (video.textTracks.length > 0)
-			{
-				for (var i = 0; i < video.textTracks.length; i++)
-				{
+			if (video.textTracks.length > 0) {
+				for (var i = 0; i < video.textTracks.length; i++) {
 					if (video.textTracks[i].language == language)
 						video.textTracks[i].mode = 'showing';
 					else
