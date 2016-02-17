@@ -45,98 +45,15 @@
 		var sources = [];
 		var subtitles = [];
 		var volume = 0.5;
-		var video = element[0];
+		var video = null;
 		var controls = {};
 
-		// Check if element is corectly selected.
-		if (element.prop('tagName').toLowerCase() != 'video') {
-			console.warn('Incorrect element selected.');
-			return this;
-		}
-
-		// Set source.
-		element.children('source').each(function () {
-			var src = $(this).attr('src');
-			if (src)
-				sources.push(src);
-		});
-		if (sources.length == 0) {
-			var src = element.attr('src');
-			if (src) {
-				sources.push(element.attr('src'));
-			}
-		}
-		if (sources.length == 0) {
-			console.warn('No sources found.');
-			return this;
-		}
-		element.attr('src', sources[0]);
-
-		// Set subtitles.
-		element.children('track[kind="subtitles"]').each(function () {
-			var language = $(this).attr('srclang');
-			var title = $(this).attr('label');
-			var src = $(this).attr('src');
-			if (title.length > 0 && src.length > 0) {
-				subtitles.push({
-					title: title,
-					src: src,
-					language: language
-				});
-			}
-		});
-
-		// Load and set options.
-		// Controls.
-		element.removeAttr('controls');
-
-		// Height.
-		var h = element.attr('height');
-		if (h) {
-			options.height = h + 'px';
-			element.removeAttr('height');
-		}
-		element.css('height', options.height);
-
-		// Width.
-		var w = element.attr('width');
-		if (w) {
-			options.width = w + 'px';
-			element.removeAttr('width');
-		}
-		element.css('width', options.width);
-
-		// Poster.
-		var p = element.attr('poster');
-		if (p)
-			options.poster = p;
-		else if (options.poster)
-			element.attr('poster', options.poster);
-
-		// Autoplay, loop, muted.
-		var attrs = ['autoplay', 'loop', 'muted'];
-		for (var i in attrs) {
-			var a = element.attr(attrs[i]);
-			if (a)
-				options[attrs[i]] = true;
-			else if (options[attrs[i]])
-				element.attr(attrs[i], '');
-			else
-				element.removeAttr(attrs[i]);
-			element.prop(attrs[i], options[attrs[i]]);
-		}
-
-		// Preload.
-		var p = element.attr('preload');
-		if (p) {
-			p = p.toLowerCase();
-			if (p == 'none' || p == 'metadata')
-				options.preload = p;
-			else
-				options.preload = 'auto';
-		}
-		element.attr('preload', options.preload);
-		// end Setting options.
+		/**
+		 * DOM conatainer to hold video and all other stuff.
+		 * @type object
+		 */
+		var container = null;
+		var overlay = null;
 
 		var getCookie = function (name, dflt) {
 			var cookies = document.cookie.split(';');
@@ -275,6 +192,39 @@
 			}
 		};
 
+		var init = function () {
+
+			// Check if element is correctly selected.
+			if (element.prop('tagName').toLowerCase() != 'video') {
+				console.warn('Incorrect element selected.');
+				return this;
+			}
+
+			// Set source.
+			element.children('source').each(function () {
+				var src = $(this).attr('src');
+				if (src)
+					sources.push(src);
+			});
+			if (sources.length == 0) {
+				var src = element.attr('src');
+				if (src) {
+					sources.push(element.attr('src'));
+				}
+			}
+			if (sources.length == 0) {
+				console.warn('No sources found.');
+				return this;
+			}
+			element.attr('src', sources[0]);
+
+			initOptions();
+			initDom();
+			initSubtitles();
+			initControls();
+			initHotKeys();
+		};
+
 		var initControl = function (type) {
 			switch (type) {
 				case 'backward':
@@ -308,9 +258,8 @@
 					break;
 
 				case 'subtitles':
-					for (var i in controls.subtitles)
-					{
-						controls.subtitles[i].click(function(){
+					for (var i in controls.subtitles) {
+						controls.subtitles[i].click(function () {
 							switchTrack($(this).data('language'));
 						});
 					}
@@ -353,7 +302,136 @@
 			}
 		};
 
-		var overlay = $('<div />').addClass('play-overlay');
+		var initControls = function () {
+			for (var i in options.controls) {
+				var el = options.controls[i].element;
+				if (el == null)
+					el = $('<div />').addClass('leplayer-controls');
+				if (el.length == 0) {
+					console.warn('Error creating controls.');
+				}
+				else {
+					for (var k in options.controls[i].controls) {
+						var c = createControl(options.controls[i].controls[k]);
+						if (c != null && c.length > 0) {
+							el.append(c);
+							initControl(options.controls[i].controls[k]);
+						}
+						else
+							console.warn('Cannot create ' + options.controls[i].controls[k] + ' control.');
+					}
+					container.append(el);
+				}
+			}
+		};
+
+		var initDom = function () {
+
+			overlay = $('<div />').addClass('play-overlay');
+			var videoContainer = $('<div />').addClass('leplayer-video').append(overlay);
+			container = $('<div />').addClass('leplayer-container').append(videoContainer);
+
+			element.before(container);
+			videoContainer.append(element);
+			video = element[0];
+			video.addEventListener('loadedmetadata', function(){
+				overlay.css('line-height', overlay.height() + 'px').html('<i class="fa fa-play"></i>');
+			});
+
+			overlay.click(function () {
+				togglePlay();
+			});
+		};
+
+		var initHotKeys = function () {
+			element.keypress(function (e) {
+				if (e.charCode == 32)
+					togglePlay();
+			}).click(function () {
+				togglePlay();
+			});
+		};
+
+		var initOptions = function () {
+
+			// Controls.
+			element.removeAttr('controls');
+
+			// Height.
+			var h = element.attr('height');
+			if (h) {
+				options.height = h + 'px';
+				element.removeAttr('height');
+			}
+			element.css('height', options.height);
+
+			// Width.
+			var w = element.attr('width');
+			if (w) {
+				options.width = w + 'px';
+				element.removeAttr('width');
+			}
+			element.css('width', options.width);
+
+			// Poster.
+			var p = element.attr('poster');
+			if (p)
+				options.poster = p;
+			else if (options.poster)
+				element.attr('poster', options.poster);
+
+			// Autoplay, loop, muted.
+			var attrs = ['autoplay', 'loop', 'muted'];
+			for (var i in attrs) {
+				var a = element.attr(attrs[i]);
+				if (a)
+					options[attrs[i]] = true;
+				else if (options[attrs[i]])
+					element.attr(attrs[i], '');
+				else
+					element.removeAttr(attrs[i]);
+				element.prop(attrs[i], options[attrs[i]]);
+			}
+
+			// Preload.
+			var p = element.attr('preload');
+			if (p) {
+				p = p.toLowerCase();
+				if (p == 'none' || p == 'metadata')
+					options.preload = p;
+				else
+					options.preload = 'auto';
+			}
+			element.attr('preload', options.preload);
+		};
+
+		var initSubtitles = function () {
+
+			element.children('track[kind="subtitles"]').each(function () {
+				var language = $(this).attr('srclang');
+				var title = $(this).attr('label');
+				var src = $(this).attr('src');
+				if (title.length > 0 && src.length > 0) {
+					subtitles.push({
+						title: title,
+						src: src,
+						language: language
+					});
+				}
+			});
+
+			// This is generally for Firefox only
+			// because it somehow resets track list
+			// for video element after DOM manipulation.
+
+			if (video.textTracks.length == 0 && subtitles.length > 0) {
+				element.children('track[kind="subtitles"]').remove();
+				for (var i in subtitles) {
+					element.append($('<track/>').attr('label', subtitles[i].title).attr('src', subtitles[i].src).attr('srclang', subtitles[i].language).attr('id', subtitles[i].language).attr('kind', 'subtitles'));
+				}
+			}
+		};
+
 		var togglePlay = function () {
 			if (!video.played || video.paused) {
 				overlay.hide();
@@ -368,6 +446,7 @@
 					controls.play.children('.fa').removeClass('fa-pause').addClass('fa-play');
 			}
 		};
+
 		var toggleFullscreen = function () {
 			if (video.requestFullScreen)
 				video.requestFullScreen();
@@ -378,58 +457,26 @@
 			else
 				console.warn('Cannot toggle fullscreen.');
 		};
+
 		var seek = function (time) {
 			video.currentTime = time;
 		};
 
-		var switchTrack = function(language) {
-			
+		var switchTrack = function (language) {
+			if (video.textTracks.length > 0)
+			{
+				for (var i = 0; i < video.textTracks.length; i++)
+				{
+					if (video.textTracks[i].language == language)
+						video.textTracks[i].mode = 'showing';
+					else
+						video.textTracks[i].mode = 'hidden';
+				}
+			}
 		};
 
-		// Move video to container and add other stuff.
-		var videoContainer = $('<div />').addClass('leplayer-video');
-		var container = $('<div />').addClass('leplayer-container').append(videoContainer);
-		element.wrap(container);
-		videoContainer = element.parent();
-		videoContainer.append(overlay);
-		container = videoContainer.parent();
-
-		setTimeout(function () {
-			overlay.css('line-height', overlay.height() + 'px').html('<i class="fa fa-play"></i>');
-		}, 100);
-		overlay.click(function () {
-			togglePlay();
-		});
-
-		// Hot keys.
-		element.keypress(function (e) {
-			if (e.charCode == 32)
-				togglePlay();
-		}).click(function () {
-			togglePlay();
-		});
-
-		// Display controls.
-		for (var i in options.controls) {
-			var el = options.controls[i].element;
-			if (el == null)
-				el = $('<div />').addClass('leplayer-controls');
-			if (el.length == 0) {
-				console.warn('Error creating controls.');
-			}
-			else {
-				for (var k in options.controls[i].controls) {
-					var c = createControl(options.controls[i].controls[k]);
-					if (c != null && c.length > 0) {
-						el.append(c);
-						initControl(options.controls[i].controls[k]);
-					}
-					else
-						console.warn('Cannot create ' + options.controls[i].controls[k] + ' control.');
-				}
-				container.append(el);
-			}
-		}
+		init();
+		return this;
 	};
 
 	$.fn.lePlayer = function (options) {
