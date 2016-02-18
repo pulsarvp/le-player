@@ -173,7 +173,9 @@
 					controls.time = {
 						current: $('<div />').addClass('control-text time-current').html('00:00'),
 						total: $('<div />').addClass('control-text time-total'),
-						line: $('<div />').addClass('timeline'),
+						line: $('<div />').addClass('timeline').click(function(e){
+							seek(video.duration * (e.pageX - controls.time.line.offset().left) / controls.time.line.width());
+						}),
 						marker: $('<div />').addClass('time-marker'),
 						played: $('<div />').addClass('time-played'),
 						move: function(){
