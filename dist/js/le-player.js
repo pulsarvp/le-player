@@ -175,11 +175,14 @@
 						total: $('<div />').addClass('control-text time-total'),
 						line: $('<div />').addClass('timeline'),
 						marker: $('<div />').addClass('time-marker'),
+						played: $('<div />').addClass('time-played'),
 						move: function(){
-							this.marker.css('left', (video.currentTime / video.duration * 100) + '%')
+							var t = (video.currentTime / video.duration * 100).toFixed(2) + '%';
+							this.marker.css('left', t)
+							this.played.css('width', t);
 						}
 					};
-					controls.time.line.append(controls.time.marker);
+					controls.time.line.append(controls.time.marker).append(controls.time.played);
 					return $('<div />').addClass('timeline-container').append($('<div />').addClass('timeline-subcontainer').append(controls.time.current).append(controls.time.line).append(controls.time.total));
 
 				case 'volume':
