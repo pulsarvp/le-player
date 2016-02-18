@@ -135,6 +135,7 @@
   display: block;
   height: 12px;
   margin: 10px 0;
+  position: relative;
   width: 100%;
 }
 .leplayer-controls .timeline-container {
@@ -152,6 +153,18 @@
 .leplayer-controls .time-current,
 .leplayer-controls .time-total {
   width: 1%;
+}
+.leplayer-controls .time-marker {
+  background: #1a4a7e;
+  border-right: 1px solid rgba(225, 232, 239, 0.7);
+  cursor: pointer;
+  height: 16px;
+  left: 0;
+  margin-left: -1px;
+  position: absolute;
+  top: -2px;
+  transition: left 0.5s linear;
+  width: 2px;
 }
 .leplayer-controls .volume-active {
   background: #1a4a7e;

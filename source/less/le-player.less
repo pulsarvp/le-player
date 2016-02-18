@@ -148,6 +148,7 @@
 		display: block;
 		height: 12px;
 		margin: (@control-height - 12px) / 2 0;
+		position: relative;
 		width: 100%;
 	}
 	.timeline-container {
@@ -166,6 +167,19 @@
 	.time-current, .time-total
 	{
 		width: 1%;
+	}
+	.time-marker
+	{
+		background: @color-primary;
+		border-right: 1px solid rgba(225, 232, 239, 0.7);
+		cursor: pointer;
+		height: 16px;
+		left: 0;
+		margin-left: -1px;
+		position: absolute;
+		top: -2px;
+		transition: left 0.5s linear;
+		width: 2px;
 	}
 	.volume-active
 	{

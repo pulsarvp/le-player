@@ -173,8 +173,13 @@
 					controls.time = {
 						current: $('<div />').addClass('control-text time-current').html('00:00'),
 						total: $('<div />').addClass('control-text time-total'),
-						line: $('<div />').addClass('timeline')
+						line: $('<div />').addClass('timeline'),
+						marker: $('<div />').addClass('time-marker'),
+						move: function(){
+							this.marker.css('left', (video.currentTime / video.duration * 100) + '%')
+						}
 					};
+					controls.time.line.append(controls.time.marker);
 					return $('<div />').addClass('timeline-container').append($('<div />').addClass('timeline-subcontainer').append(controls.time.current).append(controls.time.line).append(controls.time.total));
 
 				case 'volume':
@@ -324,6 +329,9 @@
 				if (typeof controls.time != 'undefined')
 					controls.time.total.html(secondsToTime(video.duration));
 			});
+			video.ontimeupdate = function(){
+				controls.time.move();
+			};
 			overlay.click(function () {
 				togglePlay();
 			});
