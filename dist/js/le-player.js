@@ -321,6 +321,8 @@
 			video.addEventListener('loadedmetadata', function (e) {
 				overlay.css('line-height', e.target.clientHeight + 'px').html('<i class="fa fa-play"></i>');
 				container.css('width', e.target.clientWidth + 'px');
+				if (typeof controls.time != 'undefined')
+					controls.time.total.html(secondsToTime(video.duration));
 			});
 			overlay.click(function () {
 				togglePlay();
@@ -441,6 +443,22 @@
 				video.mozRequestFullScreen();
 			else
 				console.warn('Cannot toggle fullscreen.');
+		};
+
+		var secondsToTime = function(seconds){
+			var h = Math.floor(seconds / 3600);
+			var m = Math.floor(seconds % 3600 / 60);
+			var s = Math.floor(seconds % 3600 % 60);
+			var out = '';
+			if (h > 0)
+				out = h + ':';
+			if (m < 10)
+				out += '0';
+			out += m + ':';
+			if (s < 10)
+				out += '0';
+			out += s;
+			return out;
 		};
 
 		var seek = function (time) {
