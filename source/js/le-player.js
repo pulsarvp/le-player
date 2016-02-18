@@ -178,8 +178,9 @@
 						played: $('<div />').addClass('time-played'),
 						move: function(){
 							var t = (video.currentTime / video.duration * 100).toFixed(2) + '%';
-							this.marker.css('left', t)
+							this.marker.css('left', t);
 							this.played.css('width', t);
+							this.current.html(secondsToTime(video.currentTime));
 						}
 					};
 					controls.time.line.append(controls.time.marker).append(controls.time.played);
