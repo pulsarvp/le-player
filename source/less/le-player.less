@@ -112,7 +112,7 @@
 	}
 	.control-text {
 		background: @color-background;
-		color: #000;
+		color: @color-primary;
 		display: table-cell;
 		font-size: @control-text-font-size;
 		height: @control-height;
@@ -143,16 +143,28 @@
 		}
 	}
 	.timeline {
-		background: @color-background;
-		display: table-cell;
-		height: @control-height;
+		background: @color-background-line;
+		display: block;
+		height: 12px;
+		margin: (@control-height - 12px) / 2 0;
 		width: 100%;
 	}
 	.timeline-container {
+		background: @color-background;
 		display: table-cell;
 		position: relative;
 		white-space: nowrap;
 		width: 100%
+	}
+	.timeline-subcontainer
+	{
+		display: table;
+		height: 100%;
+		width: 100%;
+	}
+	.time-current, .time-total
+	{
+		width: 1%;
 	}
 	.volume-active
 	{

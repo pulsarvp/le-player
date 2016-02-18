@@ -171,7 +171,7 @@
 
 				case 'timeline':
 					controls.time = {
-						current: $('<div />').addClass('control-text time-current'),
+						current: $('<div />').addClass('control-text time-current').html('00:00'),
 						total: $('<div />').addClass('control-text time-total'),
 						line: $('<div />').addClass('timeline')
 					};
@@ -308,13 +308,14 @@
 
 			overlay = $('<div />').addClass('play-overlay');
 			var videoContainer = $('<div />').addClass('leplayer-video').append(overlay);
-			container = $('<div />').addClass('leplayer-container').append(videoContainer);
+			container = $('<div />').addClass('leplayer-container').append(videoContainer).css('width', element.width() + 'px');
 
 			element.before(container);
 			videoContainer.append(element);
 			video = element[0];
 			video.addEventListener('loadedmetadata', function (e) {
 				overlay.css('line-height', e.target.clientHeight + 'px').html('<i class="fa fa-play"></i>');
+				container.css('width', e.target.clientWidth + 'px');
 			});
 			overlay.click(function () {
 				togglePlay();

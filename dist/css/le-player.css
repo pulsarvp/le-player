@@ -100,7 +100,7 @@
 }
 .leplayer-controls .control-text {
   background: #e1e8ef;
-  color: #000;
+  color: #1a4a7e;
   display: table-cell;
   font-size: 12px;
   height: 32px;
@@ -130,16 +130,27 @@
   color: #e1e8ef;
 }
 .leplayer-controls .timeline {
-  background: #e1e8ef;
-  display: table-cell;
-  height: 32px;
+  background: #768aa7;
+  display: block;
+  height: 12px;
+  margin: 10px 0;
   width: 100%;
 }
 .leplayer-controls .timeline-container {
+  background: #e1e8ef;
   display: table-cell;
   position: relative;
   white-space: nowrap;
   width: 100%;
+}
+.leplayer-controls .timeline-subcontainer {
+  display: table;
+  height: 100%;
+  width: 100%;
+}
+.leplayer-controls .time-current,
+.leplayer-controls .time-total {
+  width: 1%;
 }
 .leplayer-controls .volume-active {
   background: #1a4a7e;
