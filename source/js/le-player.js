@@ -149,8 +149,8 @@
 				case 'subtitles':
 					if (subtitles.length > 0) {
 						controls.subtitles = {
-							list : [],
-							icon : $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-commenting-o')).click(function(){
+							list: [],
+							icon: $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-commenting-o')).click(function () {
 								switchTrack('');
 								$(this).html($('<i />').addClass('fa fa-commenting-o'));
 							})
@@ -282,6 +282,7 @@
 		var initControls = function () {
 			for (var i in options.controls) {
 				var el = options.controls[i].element;
+				var hasTimeline = false;
 				if (el == null)
 					el = $('<div />').addClass('leplayer-controls');
 				if (el.length == 0) {
@@ -292,10 +293,14 @@
 						var c = createControl(options.controls[i].controls[k]);
 						if (c != null && c.length > 0) {
 							el.append(c);
+							if (options.controls[i].controls[k] == 'timeline')
+								hasTimeline = true;
 						}
 						else
 							console.warn('Cannot create ' + options.controls[i].controls[k] + ' control.');
 					}
+					if (!hasTimeline)
+						el.css('width', '1px');
 					container.append(el);
 				}
 			}
