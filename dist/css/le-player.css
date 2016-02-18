@@ -77,11 +77,16 @@
 .leplayer-controls .control-container {
   display: table-cell;
   height: 32px;
+  padding: 0;
   position: relative;
   width: 1%;
 }
 .leplayer-controls .control-container:hover .control-inner {
   display: block;
+}
+.leplayer-controls .control-icon {
+  line-height: 32px;
+  padding: 0 8px;
 }
 .leplayer-controls .control-inner {
   background: #e1e8ef;

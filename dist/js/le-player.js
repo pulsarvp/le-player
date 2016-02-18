@@ -148,17 +148,24 @@
 
 				case 'subtitles':
 					if (subtitles.length > 0) {
-						controls.subtitles = [];
+						controls.subtitles = {
+							list : [],
+							icon : $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-commenting-o')).click(function(){
+								switchTrack('');
+								$(this).html($('<i />').addClass('fa fa-commenting-o'));
+							})
+						};
 						var list = $('<div/>').addClass('control-inner');
 						for (var i in subtitles) {
-							controls.subtitles.push($('<div />').addClass('inner-item').data('src', subtitles[i].src).data('language', subtitles[i].language).html(subtitles[i].title).click(function () {
+							controls.subtitles.list.push($('<div />').addClass('inner-item').data('src', subtitles[i].src).data('language', subtitles[i].language).html(subtitles[i].title).click(function () {
 								switchTrack($(this).data('language'));
+								controls.subtitles.icon.html($(this).html());
 							}));
 						}
-						for (var i in controls.subtitles) {
-							list.append(controls.subtitles[i]);
+						for (var i in controls.subtitles.list) {
+							list.append(controls.subtitles.list[i]);
 						}
-						return $('<div />').addClass('control control-container').append($('<div />').addClass('subtitles-icon').append($('<i />').addClass('fa fa-commenting-o'))).append(list);
+						return $('<div />').addClass('control control-container').append(controls.subtitles.icon).append(list);
 					}
 					return null;
 
@@ -183,7 +190,7 @@
 							range.top = controls.volume.line.offset().top;
 							range.bottom = range.top + range.height;
 						}),
-						icon: $('<div/>').addClass('volume-icon').append($('<i />').addClass('fa fa-volume-down')).click(function () {
+						icon: $('<div/>').addClass('control-icon').append($('<i />').addClass('fa fa-volume-down')).click(function () {
 							controls.volume.toggleMuted();
 						}),
 						set: function (value) {
@@ -223,7 +230,6 @@
 						}
 					});
 					controls.volume.container = $('<div />').addClass('control control-container').append(controls.volume.icon).append($('<div />').addClass('control-inner volume-slider').append(controls.volume.line));
-/////////
 
 					$(document).on('mousemove', function (e) {
 						if (drag && e.pageY >= range.top && e.pageY <= range.bottom) {
@@ -307,16 +313,16 @@
 			element.before(container);
 			videoContainer.append(element);
 			video = element[0];
-			video.addEventListener('loadedmetadata', function () {
-				overlay.css('line-height', overlay.height() + 'px').html('<i class="fa fa-play"></i>');
+			video.addEventListener('loadedmetadata', function (e) {
+				overlay.css('line-height', e.target.clientHeight + 'px').html('<i class="fa fa-play"></i>');
 			});
-
 			overlay.click(function () {
 				togglePlay();
 			});
 		};
 
 		var initHotKeys = function () {
+			// Space.
 			element.keypress(function (e) {
 				if (e.charCode == 32)
 					togglePlay();
@@ -367,11 +373,11 @@
 			}
 
 			// Preload.
-			var p = element.attr('preload');
-			if (p) {
-				p = p.toLowerCase();
-				if (p == 'none' || p == 'metadata')
-					options.preload = p;
+			var r = element.attr('preload');
+			if (r) {
+				r = r.toLowerCase();
+				if (r == 'none' || r == 'metadata')
+					options.preload = r;
 				else
 					options.preload = 'auto';
 			}
