@@ -334,6 +334,8 @@
 			video.playbackRate = getCookie('rate', 1);
 			controls.rate.display();
 			controls.volume.set(getCookie('volume', 0.4));
+			if (controls.time.line.width() < 20)
+				controls.time.line.hide();
 		};
 
 		var initDom = function () {
