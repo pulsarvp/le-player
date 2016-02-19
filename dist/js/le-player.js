@@ -174,18 +174,34 @@
 						current: $('<div />').addClass('control-text time-current').html('00:00'),
 						total: $('<div />').addClass('control-text time-total'),
 						line: $('<div />').addClass('timeline').click(function(e){
-							seek(video.duration * (e.pageX - controls.time.line.offset().left) / controls.time.line.width());
+							seek(video.duration * controls.time.getPosition(e.pageX));
+						}).mousemove(function(e){
+							var p = controls.time.getPosition(e.pageX);
+							if (p > 0 && p < 1) {
+								controls.time.markerShadow.show();
+								controls.time.markerShadow.css('left', p * 100 + '%');
+								controls.time.markerShadowTime.html(secondsToTime(video.duration * p));
+							}
+							else
+								controls.time.markerShadow.hide();
+						}).mouseleave(function(){
+							controls.time.markerShadow.hide();
 						}),
 						marker: $('<div />').addClass('time-marker'),
+						markerShadow: $('<div />').addClass('time-marker shadow').append().hide(),
+						markerShadowTime: $('<div/>').addClass('time'),
 						played: $('<div />').addClass('time-played'),
 						move: function(){
 							var t = (video.currentTime / video.duration * 100).toFixed(2) + '%';
 							this.marker.css('left', t);
 							this.played.css('width', t);
 							this.current.html(secondsToTime(video.currentTime));
+						},
+						getPosition: function(x){
+							return (x - this.line.offset().left) / this.line.width();
 						}
 					};
-					controls.time.line.append(controls.time.marker).append(controls.time.played);
+					controls.time.line.append(controls.time.marker).append(controls.time.markerShadow.append(controls.time.markerShadowTime)).append(controls.time.played);
 					return $('<div />').addClass('timeline-container').append($('<div />').addClass('timeline-subcontainer').append(controls.time.current).append(controls.time.line).append(controls.time.total));
 
 				case 'volume':

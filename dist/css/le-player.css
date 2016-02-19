@@ -132,6 +132,7 @@
 }
 .leplayer-controls .timeline {
   background: #768aa7;
+  cursor: pointer;
   display: block;
   height: 12px;
   margin: 10px 0;
@@ -160,11 +161,28 @@
   cursor: pointer;
   height: 16px;
   left: 0;
-  margin-left: -1px;
+  margin-left: -2px;
   position: absolute;
   top: -2px;
-  transition: left 0.5s linear;
+  transition: left 0.2s linear;
   width: 2px;
+}
+.leplayer-controls .time-marker.shadow {
+  background: rgba(26, 74, 126, 0.8);
+  border-right: 1px solid rgba(225, 232, 239, 0.5);
+  transition: none;
+}
+.leplayer-controls .time-marker.shadow .time {
+  background: rgba(118, 138, 167, 0.8);
+  border-radius: 1px;
+  bottom: 20px;
+  color: #fff;
+  font-size: 12px;
+  line-height: 18px;
+  margin-left: -18px;
+  padding: 0 5px;
+  position: absolute;
+  z-index: 503;
 }
 .leplayer-controls .time-played {
   background: rgba(0, 0, 0, 0.25);
@@ -172,7 +190,7 @@
   left: 0;
   position: absolute;
   top: 0;
-  transition: width 0.5s linear;
+  transition: width 0.2s linear;
   width: 0;
 }
 .leplayer-controls .volume-active {
