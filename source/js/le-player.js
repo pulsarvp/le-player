@@ -90,7 +90,7 @@
 					return $('<div />').addClass('divider');
 
 				case 'download':
-					controls.download = $('<a />').attr('href', '').attr('target', '_blank').attr('download', sources[0]).addClass('control download').append($('<i />').addClass('fa fa-download'));
+					controls.download = $('<a />').attr('href', '').attr('target', '_blank').attr('download', '').addClass('control download').append($('<i />').addClass('fa fa-download'));
 					return controls.download;
 
 				case 'forward':
@@ -320,7 +320,10 @@
 			if (sources.length == 0) {
 				var src = element.attr('src');
 				if (src) {
-					sources.push(element.attr('src'));
+					sources.push({
+						src: src,
+						title: $(this).attr('title') || 'default'
+					});
 				}
 			}
 			if (sources.length == 0) {
@@ -537,7 +540,7 @@
 				}
 
 				if (typeof controls.download != 'undefined') {
-					controls.download.attr('href', sources[index].src);
+					controls.download.attr('href', sources[index].src).attr('download', sources[index].src);
 				}
 			}
 		};
