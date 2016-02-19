@@ -47,7 +47,7 @@ module.exports = function(grunt) {
 				tasks : [ 'less:development' ]
 			},
 			js : {
-				files: [ 'js/**/*.js' ],
+				files: [ 'source/js/**/*.js' ],
 				tasks: [ 'concat' ]
 			},
 			uglify : {
@@ -69,6 +69,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 
-	grunt.registerTask('default', [ 'less', 'concat', 'watch' ]);
+	grunt.registerTask('default', [ 'less', 'concat', 'uglify', 'watch' ]);
 	grunt.registerTask('production', [ 'clean', 'less', 'concat', 'uglify' ]);
 };

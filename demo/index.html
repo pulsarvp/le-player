@@ -6,9 +6,27 @@
 		<title>LePlayer Demo Page</title>
 		<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
 		<script src="../dist/js/le-player.js"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 		<link rel="stylesheet" href="../dist/css/le-player.css">
 	</head>
 	<body>
-		<video src="sample1.mp4"></video>
+		<h2>Single video</h2>
+		<video id="video1" src="sample1.mp4" height="200"></video>
+		<h2>Multiple videos</h2>
+		<video id="video2" width="500">
+			<source src="sample1.mp4" title="320p">
+			<source src="sample2.mp4" title="1280">
+			<track label="EN" srclang="en" src="subs_en.vtt" kind="subtitles">
+			<track label="RU" srclang="ru" src="subs_ru.vtt" kind="subtitles">
+		</video>
 	</body>
+	<script>
+		$(document).ready(function(){
+			$('#video1').lePlayer({
+				poster: 'poster.jpg'
+			});
+			$('#video2').lePlayer({
+			});
+		});
+	</script>
 </html>
