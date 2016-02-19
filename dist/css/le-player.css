@@ -95,8 +95,9 @@
   cursor: default;
   display: none;
   left: 0;
+  min-width: 100%;
   position: absolute;
-  width: 100%;
+  width: auto;
   z-index: 502;
 }
 .leplayer-controls .control-text {
@@ -124,10 +125,16 @@
   display: block;
   color: #1a4a7e;
   cursor: pointer;
+  font-size: 12px;
   line-height: 32px;
+  padding: 0 7px;
 }
 .leplayer-controls .inner-item:hover {
-  background: #1e5693;
+  background: #1e5693 !important;
+  color: #e1e8ef;
+}
+.leplayer-controls .inner-item.active {
+  background: #678bae;
   color: #e1e8ef;
 }
 .leplayer-controls .timeline {

@@ -35,7 +35,7 @@
 				{
 					element: null,
 					controls: [
-						'rate', 'divider', 'backward', 'divider', 'subtitles', 'divider', 'download'
+						'rate', 'divider', 'backward', 'divider', 'sources', 'divider', 'subtitles', 'divider', 'download'
 					]
 				}
 			]
@@ -90,7 +90,7 @@
 					return $('<div />').addClass('divider');
 
 				case 'download':
-					controls.download = $('<a />').attr('href', sources[0]).attr('target', '_blank').attr('download', sources[0]).addClass('control download').append($('<i />').addClass('fa fa-download'));
+					controls.download = $('<a />').attr('href', '').attr('target', '_blank').attr('download', sources[0]).addClass('control download').append($('<i />').addClass('fa fa-download'));
 					return controls.download;
 
 				case 'forward':
@@ -146,6 +146,33 @@
 
 					return $('<div />').addClass('control-container').append(controls.rate.down).append(controls.rate.current).append(controls.rate.up);
 
+				case 'sources':
+					if (sources.length > 1) {
+						controls.sources = {
+							list: [],
+							icon: $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-bullseye')),
+							setActive: function (index) {
+								for (var i in this.list) {
+									if (this.list[i].data('index') == index)
+										this.list[i].addClass('active');
+									else
+										this.list[i].removeClass('active');
+								}
+							}
+						};
+						var list = $('<div/>').addClass('control-inner');
+						for (var i in sources) {
+							controls.sources.list.push($('<div />').addClass('inner-item').data('index', i).html(sources[i].title).click(function () {
+								setSource($(this).data('index'));
+							}));
+						}
+						for (var i in controls.sources.list) {
+							list.append(controls.sources.list[i]);
+						}
+						return $('<div />').addClass('control control-container').append(controls.sources.icon).append(list);
+					}
+					return null;
+
 				case 'subtitles':
 					if (subtitles.length > 0) {
 						controls.subtitles = {
@@ -173,9 +200,9 @@
 					controls.time = {
 						current: $('<div />').addClass('control-text time-current').html('00:00'),
 						total: $('<div />').addClass('control-text time-total'),
-						line: $('<div />').addClass('timeline').click(function(e){
+						line: $('<div />').addClass('timeline').click(function (e) {
 							seek(video.duration * controls.time.getPosition(e.pageX));
-						}).mousemove(function(e){
+						}).mousemove(function (e) {
 							var p = controls.time.getPosition(e.pageX);
 							if (p > 0 && p < 1) {
 								controls.time.markerShadow.show();
@@ -184,20 +211,20 @@
 							}
 							else
 								controls.time.markerShadow.hide();
-						}).mouseleave(function(){
+						}).mouseleave(function () {
 							controls.time.markerShadow.hide();
 						}),
 						marker: $('<div />').addClass('time-marker'),
 						markerShadow: $('<div />').addClass('time-marker shadow').append().hide(),
 						markerShadowTime: $('<div/>').addClass('time'),
 						played: $('<div />').addClass('time-played'),
-						move: function(){
+						move: function () {
 							var t = (video.currentTime / video.duration * 100).toFixed(2) + '%';
 							this.marker.css('left', t);
 							this.played.css('width', t);
 							this.current.html(secondsToTime(video.currentTime));
 						},
-						getPosition: function(x){
+						getPosition: function (x) {
 							return (x - this.line.offset().left) / this.line.width();
 						}
 					};
@@ -285,7 +312,10 @@
 			element.children('source').each(function () {
 				var src = $(this).attr('src');
 				if (src)
-					sources.push(src);
+					sources.push({
+						src: src,
+						title: $(this).attr('title')
+					});
 			});
 			if (sources.length == 0) {
 				var src = element.attr('src');
@@ -297,13 +327,14 @@
 				console.warn('No sources found.');
 				return this;
 			}
-			element.attr('src', sources[0]);
 
 			initOptions();
 			initDom();
 			initSubtitles();
 			initControls();
 			initHotKeys();
+
+			setSource(0);
 		};
 
 		var initControls = function () {
@@ -353,7 +384,7 @@
 				if (typeof controls.time != 'undefined')
 					controls.time.total.html(secondsToTime(video.duration));
 			});
-			video.ontimeupdate = function(){
+			video.ontimeupdate = function () {
 				controls.time.move();
 			};
 			overlay.click(function () {
@@ -477,7 +508,7 @@
 				console.warn('Cannot toggle fullscreen.');
 		};
 
-		var secondsToTime = function(seconds){
+		var secondsToTime = function (seconds) {
 			var h = Math.floor(seconds / 3600);
 			var m = Math.floor(seconds % 3600 / 60);
 			var s = Math.floor(seconds % 3600 % 60);
@@ -495,6 +526,20 @@
 
 		var seek = function (time) {
 			video.currentTime = time;
+		};
+
+		var setSource = function (index) {
+			if (typeof sources[index] != 'undefined') {
+				element.attr('src', sources[index].src);
+
+				if (typeof controls.sources != 'undefined') {
+					controls.sources.setActive(index);
+				}
+
+				if (typeof controls.download != 'undefined') {
+					controls.download.attr('href', sources[index].src);
+				}
+			}
 		};
 
 		var switchTrack = function (language) {

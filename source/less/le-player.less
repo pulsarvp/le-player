@@ -107,8 +107,9 @@
 		cursor: default;
 		display: none;
 		left: 0;
+		min-width: 100%;
 		position: absolute;
-		width: 100%;
+		width: auto;
 		z-index: @z-index-base + 2;
 	}
 	.control-text {
@@ -136,10 +137,17 @@
 		display: block;
 		color: @color-primary;
 		cursor: pointer;
+		font-size: @control-text-font-size;
 		line-height: @control-height;
+		padding: 0 7px;
 		&:hover
 		{
-			background: lighten(@color-primary, 5%);
+			background: lighten(@color-primary, 5%) !important;
+			color: @color-background;
+		}
+		&.active
+		{
+			background: @color-background-play;
 			color: @color-background;
 		}
 	}
