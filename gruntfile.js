@@ -12,7 +12,7 @@ module.exports = function (grunt) {
 		concat: {
 			js: {
 				src : [
-					'source/js/<%= pkg.name %>.js'
+					'source/js/<%= pkg.name %>.es6.js'
 				],
 				dest: 'dist/js/<%= pkg.name %>.js'
 			}
