@@ -42,6 +42,10 @@
 
 		}, opts);
 
+		class Control {
+			
+		}
+
 		var Controls = function () {
 			this.backward = null;
 			this.download = null;
