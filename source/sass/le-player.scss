@@ -1,0 +1,280 @@
+@import "import.scss";
+
+.leplayer-container
+{
+	color: $color-primary;
+	display: inline-block;
+	font-family: "PT Sans", "Open Sans", "Verdana", "Arial", sans-serif;
+	line-height: 0;
+	outline: 0;
+	position: relative;
+
+	video
+	{
+		outline: 0;
+	}
+
+	.play-overlay
+	{
+		background: rgba(0, 0, 0, 0.5);
+		bottom: 0;
+		color: $color-disabled;
+		cursor: pointer;
+		height: 100%;
+		font-size: 80px;
+		left: 0;
+		outline: 0;
+		position: absolute;
+		right: 0;
+		text-align: center;
+		text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+		top: 0;
+		width: 100%;
+		z-index: $z-index-base + 1;
+		&:hover
+		{
+			background: rgba(0, 0, 0, 0.2);
+			color: #fff;
+		}
+	}
+}
+
+.leplayer-controls
+{
+	border-collapse: separate;
+	display: table;
+	height: $control-height;
+	position: relative;
+	width: 100%;
+	&:not(:last-child)
+	{
+		margin-bottom: 10px;
+	}
+	.control
+	{
+		background: $color-background;
+		color: $color-primary;
+		cursor: pointer;
+		display: table-cell;
+		font-size: $control-font-size;
+		height: $control-height;
+		line-height: 100%;
+		padding: 0 ($control-width - $control-font-size) / 2;
+		text-align: center;
+		vertical-align: middle;
+		width: 1%;
+		&:hover
+		{
+			background: $color-primary;
+			color: $color-background;
+		}
+		&.disabled
+		{
+			cursor: not-allowed;
+			color: $color-disabled;
+			&:hover
+			{
+				background: $color-background;
+				color: $color-disabled;
+			}
+		}
+		&.play
+		{
+			background: $color-background-play;
+			color: #fff;
+			padding: 0 ($control-play-width - $control-font-size) / 2;
+			width: 1%;
+			&:hover
+			{
+				background: $color-primary;
+				color: $color-background;
+			}
+		}
+	}
+	.control-container
+	{
+		display: table-cell;
+		height: $control-height;
+		padding: 0;
+		position: relative;
+		width: 1%;
+		&:hover
+		{
+			.control-inner
+			{
+				display: block;
+			}
+		}
+	}
+	.control-icon
+	{
+		line-height: $control-height;
+		padding: 0 ($control-width - $control-font-size) / 2;
+	}
+	.control-inner
+	{
+		background: $color-background;
+		bottom: $control-height;
+		cursor: default;
+		display: none;
+		left: 0;
+		min-width: 100%;
+		position: absolute;
+		width: auto;
+		z-index: $z-index-base + 2;
+	}
+	.control-text
+	{
+		background: $color-background;
+		color: $color-primary;
+		display: table-cell;
+		font-size: $control-text-font-size;
+		height: $control-height;
+		line-height: 100%;
+		padding: 0 5px;
+		text-align: center;
+		vertical-align: middle;
+	}
+	.divider
+	{
+		background: none;
+		display: table-cell;
+		padding: 0 $divider-width / 2;
+		width: 0.01%;
+	}
+	.fa
+	{
+		text-align: center;
+		width: $control-font-size;
+	}
+	.inner-item
+	{
+		display: block;
+		color: $color-primary;
+		cursor: pointer;
+		font-size: $control-text-font-size;
+		line-height: $control-height;
+		padding: 0 7px;
+		&:hover
+		{
+			background: lighten($color-primary, 5%) !important;
+			color: $color-background;
+		}
+		&.active
+		{
+			background: $color-background-play;
+			color: $color-background;
+		}
+	}
+	.timeline
+	{
+		background: $color-background-line;
+		cursor: pointer;
+		display: block;
+		height: 12px;
+		margin: ($control-height - 12px) / 2 0;
+		position: relative;
+		width: 100%;
+	}
+	.timeline-container
+	{
+		background: $color-background;
+		display: table-cell;
+		position: relative;
+		white-space: nowrap;
+		width: 100%
+	}
+	.timeline-subcontainer
+	{
+		display: table;
+		height: 100%;
+		width: 100%;
+	}
+	.time-current, .time-total
+	{
+		width: 1%;
+	}
+	.time-marker
+	{
+		background: $color-primary;
+		border-right: 1px solid rgba(225, 232, 239, 0.7);
+		cursor: pointer;
+		height: 16px;
+		left: 0;
+		margin-left: -2px;
+		position: absolute;
+		top: -2px;
+		transition: left 0.2s linear;
+		width: 2px;
+		&.shadow
+		{
+			background: rgba(26, 74, 126, 0.8);
+			border-right: 1px solid rgba(225, 232, 239, 0.5);
+			transition: none;
+			.time
+			{
+				background: rgba(118, 138, 167, 0.8);
+				border-radius: 1px;
+				bottom: 20px;
+				color: #fff;
+				font-size: $control-text-font-size;
+				line-height: $control-text-font-size + 6px;
+				margin-left: -18px;
+				padding: 0 5px;
+				position: absolute;
+				z-index: $z-index-base + 3;
+			}
+		}
+	}
+	.time-played
+	{
+		background: rgba(0, 0, 0, 0.25);
+		bottom: 0;
+		left: 0;
+		position: absolute;
+		top: 0;
+		transition: width 0.2s linear;
+		width: 0;
+	}
+	.volume-active
+	{
+		background: $color-primary;
+		bottom: 0;
+		height: 50%;
+		position: absolute;
+		width: 100%;
+	}
+	.volume-slider
+	{
+		height: 144px;
+	}
+	.volume-line
+	{
+		background: $color-background-line;
+		bottom: 10px;
+		position: absolute;
+		left: 12px;
+		right: 12px;
+		top: 10px;
+	}
+	.volume-marker
+	{
+		background: $color-primary;
+		bottom: 50%;
+		border-top: 1px solid rgba(225, 232, 239, 0.7);
+		cursor: pointer;
+		height: 2px;
+		left: -4px;
+		margin-bottom: -1px;
+		right: -4px;
+		position: absolute;
+	}
+}
+
+.leplayer-video
+{
+	display: block;
+	outline: 0;
+	line-height: 0;
+	position: relative;
+}
