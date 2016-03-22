@@ -2,39 +2,53 @@
 	'use strict';
 
 	var Player = function (element, opts) {
+		const C_BACKWARD   = 'backward';
+		const C_DIVIDER    = 'divider';
+		const C_DOWNLOAD   = 'download';
+		const C_FORWARD    = 'forward';
+		const C_FULLSCREEN = 'fullscreen';
+		const C_PLAY       = 'play';
+		const C_RATE       = 'rate';
+		const C_SOURCE     = 'source';
+		const C_SOURCES    = 'sources';
+		const C_SUBTITLE   = 'subtitle';
+		const C_SUBTITLES  = 'subtitles';
+		const C_TIMELINE   = 'timeline';
+		const C_VOLUME     = 'volume';
+
 		var options = $.extend(true, {
-			autoplay: false,
-			height  : 'auto',
-			loop    : false,
-			muted   : false,
-			preload : 'metadata',
-			poster  : null,
-			width   : 'auto',
-			rate    : {
-				step: 0.25,
-				min : 0.5,
-				max : 4.0
+			autoplay : false,
+			height   : 'auto',
+			loop     : false,
+			muted    : false,
+			preload  : 'metadata',
+			poster   : null,
+			width    : 'auto',
+			rate     : {
+				step : 0.25,
+				min  : 0.5,
+				max  : 4.0
 			},
-			playback: {
-				step: {
-					short : 5,
-					medium: 30,
-					long  : 60
+			playback : {
+				step : {
+					short  : 5,
+					medium : 30,
+					long   : 60
 				}
 			},
-			volume  : {
-				step: 0.1
+			volume   : {
+				step : 0.1
 			},
-			controls: [
+			controls : [
 				{
-					element : null,
-					controls: [
+					element  : null,
+					controls : [
 						'play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen'
 					]
 				},
 				{
-					element : null,
-					controls: [
+					element  : null,
+					controls : [
 						'rate', 'divider', 'backward', 'divider', 'sources', 'divider', 'subtitles', 'divider', 'download'
 					]
 				}
@@ -43,507 +57,325 @@
 		}, opts);
 
 		class Control {
+			constructor (cssClass, iconClass) {
+				this.element = $('<div />').addClass('control ' + cssClass).append($('<i />').addClass('fa fa-' + iconClass));
+			}
+
+			static divider () {
+				return $('<div />').addClass('divider');
+			}
+		}
+
+		class ControlText {
+			constructor (classname) {
+				this.element = $('<div />').addClass('control-text ' + classname);
+			}
+
+			set text (value) {
+				this.element.html(value);
+			}
+		}
+
+		class ControlContainer {
+			constructor (iconClass) {
+				this.icon        = $('<div />').addClass('control-icon').append($('<i />').addClass('fa ' + iconClass));
+				this.listElement = $('<div/>').addClass('control-inner');
+				this.element     = $('<div />').addClass('control control-container').append(this.icon).append(this.listElement);
+				this._index      = 0;
+			}
+
+			set active (index) {
+				for (let i in this.list) {
+					if (this.list[ i ].data('index') == index) {
+						this.list[ i ].addClass('active');
+						this.icon.html(this.list[ i ].html);
+					}
+					else
+						this.list[ i ].removeClass('active');
+				}
+			}
+
+			addItem (text, index) {
+				index    = index || this._index;
+				var item = $('<div />').addClass('inner-item').data('index', index).html(text).click(function () {
+					return this.onItemClick($(this).data('index'));
+				});
+				this._index++;
+				this.list.push(item);
+				this.listElement.append(item);
+
+				return item;
+			}
+
+			onItemClick (index) {
+				this.active = index;
+			}
+		}
+
+		class BackwardControl extends Control {
+			constructor () {
+				super('backward', 'undo');
+				this.element.click(e => {
+					if (video.currentTime - options.playback.step.medium > 0)
+						seek(video.currentTime - options.playback.step.medium);
+					else
+						seek(0);
+				});
+			}
+		}
+
+		class DownloadControl extends Control {
+			constructor () {
+				this.element = $('<a />').attr('href', '').attr('target', '_blank').attr('download', '').addClass('control download').append($('<i />').addClass('fa fa-download'));
+			}
+		}
+
+		class ForwardControl extends Control {
+			constructor () {
+				super('forward', 'redo');
+			}
+		}
+
+		class FullscreenControl extends Control {
+			constructor () {
+				super('fullscreen', 'arrows-alt');
+				this.element.click(e => {
+					toggleFullscreen();
+				});
+			}
+		}
+
+		class PlayControl extends Control {
+			constructor () {
+				super('play', 'play');
+				this.element.click(e => {
+					togglePlay();
+				});
+			}
+		}
+
+		class RateControl {
+			constructor () {
+				this.down    = new Control('rate-down', 'fa-backward');
+				this.up      = new Control('rate-up', 'fa-forward');
+				this.current = new ControlText('rate-current');
+
+				this.down.element.click(e => {
+					this.decrease();
+				});
+
+				this.up.element.click(e => {
+					this.increase();
+				});
+
+				this.element = $('<div />').addClass('control-container').append(this.down.element).append(this.current.element).append(this.up.element);
+			}
+
+			decrease () {
+				if (video.playbackRate > options.rate.min) {
+					this.up.element.removeClass('disabled');
+					video.playbackRate -= options.rate.step;
+					this.display();
+					Cookie.set('rate', video.playbackRate);
+				}
+				else
+					this.down.element.addClass('disabled');
+			}
+
+			display () {
+				this.current.text = '×' + video.playbackRate.toFixed(2);
+			}
+
+			increase () {
+				if (video.playbackRate < options.rate.max) {
+					this.down.element.removeClass('disabled');
+					video.playbackRate += options.rate.step;
+					this.display();
+					Cookie.set('rate', video.playbackRate);
+				}
+				else
+					this.up.element.addClass('disabled');
+			}
+		}
+
+		class SourceControl extends ControlContainer {
+			constructor () {
+				super('fa-bullseye');
+				if (sources.length > 1) {
+					for (var i in sources) {
+						this.addItem(sources[ i ].title);
+					}
+				}
+			}
+
+			onItemClick (index) {
+				super.onItemClick(index);
+				setSource(index);
+			}
+		}
+
+		class SubtitleControl extends ControlContainer {
+			constructor () {
+				super('fa-commenting-o');
+				if (subtitles.length > 0) {
+					for (var i in subtitles) {
+						this.addItem(subtitles[ i ].title, subtitles[ i ].language).data('src', subtitles[ i ].src);
+					}
+				}
+				switchTrack('');
+			}
+
+			onItemClick (index) {
+				super.onItemClick(index);
+				switchTrack(index);
+			}
+		}
+
+		class TimelineControl {
+			constructor () {
+				this.current = new ControlText('time-current');
+				this.total   = new ControlText('time-total');
+
+				this.marker           = $('<div />').addClass('time-marker');
+				this.markerShadow     = $('<div />').addClass('time-marker shadow').append().hide();
+				this.markerShadowTime = $('<div />').addClass('time');
+				this.played           = $('<div />').addClass('time-played');
+				this.line             = $('<div />').addClass('timeline').click(function (e) {
+					seek(video.duration * this.getPosition(e.pageX));
+				}).mousemove(function (e) {
+					var p = this.getPosition(e.pageX);
+					if (p > 0 && p < 1) {
+						this.markerShadow.show();
+						this.markerShadow.css('left', p * 100 + '%');
+						this.markerShadowTime.html(secondsToTime(video.duration * p));
+					}
+					else
+						this.markerShadow.hide();
+				}).mouseleave(function () {
+					this.markerShadow.hide();
+				});
+
+				this.element = $('<div />').addClass('timeline-container').append($('<div />').addClass('timeline-subcontainer').append(this.current).append(this.line).append(this.total));
+			}
+
+			getPosition (x) {
+				return (x - this.line.offset().left) / this.line.width();
+			}
+
+			move () {
+				var t = (video.currentTime / video.duration * 100).toFixed(2) + '%';
+				this.marker.css('left', t);
+				this.played.css('width', t);
+				this.current.text = secondsToTime(video.currentTime);
+			}
+		}
+
+		class VolumeControl {
+			constructor () {
+				this.drag  = false;
+				this.range = { bottom : 0, height : 0, top : 0 };
+
+				this.active = $('<div/>').addClass('volume-active');
+				this.marker = $('<div/>').addClass('volume-marker').on('mousedown', function (e) {
+					this.drag         = true;
+					this.range.height = this.line.height();
+					this.range.top    = this.line.offset().top;
+					this.range.bottom = this.range.top + this.range.height;
+				});
+				this.icon   = $('<div/>').addClass('control-icon').append($('<i />').addClass('fa fa-volume-down')).click(function () {
+					this.toggleMuted();
+				});
+				this.line   = $('<div/>').addClass('volume-line').append(this.active).append(this.marker).click(function (e) {
+					this.range.height = this.line.height();
+					this.range.top    = this.line.offset().top;
+					this.range.bottom = this.range.top + this.range.height;
+					if (e.pageY >= range.top && e.pageY <= this.range.bottom) {
+						this.value = (this.range.bottom - e.pageY) / this.range.height;
+					}
+				});
+
+				this.element = $('<div />').addClass('control control-container').append(this.icon).append($('<div />').addClass('control-inner volume-slider').append(this.line));
+
+				$(document).on('mousemove', function (e) {
+					if (this.drag && e.pageY >= this.range.top && e.pageY <= this.range.bottom) {
+						this.value = (range.bottom - e.pageY) / range.height;
+					}
+				}).on('mouseup', function (e) {
+					this.drag = false;
+				});
+			}
+
+			set value (value) {
+				var icon = this.icon.children('.fa').eq(0);
+				icon.removeClass();
+				if (value < 0.05) {
+					video.muted = true;
+					icon.addClass('fa fa-volume-off');
+				}
+				else {
+					video.muted  = false;
+					video.volume = value;
+					if (value < 0.5)
+						icon.addClass('fa fa-volume-down');
+					else
+						icon.addClass('fa fa-volume-up');
+					Cookie.set('volume', value);
+				}
+
+				var p = Math.round(value * 100).toString() + '%';
+				this.active.css('height', p);
+				this.marker.css('bottom', p);
+			}
+
+			toggleMuted () {
+				if (video.muted == true) {
+					this.value = Cookie.get('volume', 0.4);
+				}
+				else
+					this.value = 0;
+			}
 
 		}
-		;
 
-		var Controls = function () {
-			this.backward = null;
-			this.download = null;
-			this.forward = null;
-			this.fullscreen = null;
-			this.play = null;
-			this.rate = null;
-			this.sources = null;
-			this.subtitles = null;
-			this.timeline = null;
-			this.volume = null;
-		};
+		class Cookie {
+			static get (name, dflt) {
+				var cookies = document.cookie.split(';');
+				for (var i in cookies) {
+					var d = cookies[ i ].trim().split('=');
+					if (d[ 0 ] == 'leplayer_' + name)
+						return d[ 1 ];
+				}
+				return dflt;
+			};
 
-		Controls.prototype.createSimple = function (cssClass, iconClass) {
-			return $('<div />').addClass('control ' + cssClass).append($('<i />').addClass('fa fa-' + iconClass));
-		};
+			static set (name, value) {
+				var d = new Date();
+				d.setDate(d.year + 1);
+				document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
+			};
+		}
 
-		Controls.prototype.create = function (name) {
-			switch (name) {
-				case 'backward':
-					this.backward = this.createSimple('backward', 'undo').click(function () {
-						if (video.currentTime - options.playback.step.medium > 0)
-							seek(video.currentTime - options.playback.step.medium);
-						else
-							seek(0);
-					});
-					return this.backward;
-
-				case 'divider':
-					return $('<div />').addClass('divider');
-
-				case 'download':
-					this.download = $('<a />').attr('href', '').attr('target', '_blank').attr('download', '').addClass('control download').append($('<i />').addClass('fa fa-download'));
-					return this.download;
-
-				case 'forward':
-					this.forward = this.createSimple('forward', 'redo');
-					return this.forward;
-
-				case 'fullscreen':
-					this.fullscreen = this.createSimple('fullscreen', 'arrows-alt').click(function () {
-						toggleFullscreen();
-					});
-					return this.fullscreen;
-
-				case 'play':
-					this.play = this.createSimple('play', 'play').click(function () {
-						togglePlay();
-					});
-					return this.play;
-
-				case 'rate':
-					this.rate = {
-						down    : $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-backward')).click(function () {
-							this.decrease();
-						}),
-						up      : $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-forward')).click(function () {
-							this.increase();
-						}),
-						current : $('<div />').addClass('control-text rate-current'),
-						display : function () {
-							this.current.html('×' + video.playbackRate.toFixed(2));
-						},
-						increase: function () {
-							if (video.playbackRate < options.rate.max) {
-								this.down.removeClass('disabled');
-								video.playbackRate += options.rate.step;
-								this.display();
-								setCookie('rate', video.playbackRate);
-							}
-							else
-								this.up.addClass('disabled');
-
-						},
-						decrease: function () {
-							if (video.playbackRate > options.rate.min) {
-								this.up.removeClass('disabled');
-								video.playbackRate -= options.rate.step;
-								this.display();
-								setCookie('rate', video.playbackRate);
-							}
-							else
-								this.down.addClass('disabled');
-						}
-					};
-
-					return $('<div />').addClass('control-container').append(this.rate.down).append(this.rate.current).append(this.rate.up);
-
-				case 'sources':
-					if (sources.length > 1) {
-						this.sources = {
-							list     : [],
-							icon     : $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-bullseye')),
-							setActive: function (index) {
-								for (var i in this.list) {
-									if (this.list[i].data('index') == index)
-										this.list[i].addClass('active');
-									else
-										this.list[i].removeClass('active');
-								}
-							}
-						};
-						var list = $('<div/>').addClass('control-inner');
-						for (var i in sources) {
-							this.sources.list.push($('<div />').addClass('inner-item').data('index', i).html(sources[i].title).click(function () {
-								setSource($(this).data('index'));
-							}));
-						}
-						for (var i in this.sources.list) {
-							list.append(this.sources.list[i]);
-						}
-						return $('<div />').addClass('control control-container').append(this.sources.icon).append(list);
-					}
-					return null;
-
-				case 'subtitles':
-					if (subtitles.length > 0) {
-						this.subtitles = {
-							list: [],
-							icon: $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-commenting-o')).click(function () {
-								switchTrack('');
-								$(this).html($('<i />').addClass('fa fa-commenting-o'));
-							})
-						};
-						var list = $('<div/>').addClass('control-inner');
-						for (var i in subtitles) {
-							this.subtitles.list.push($('<div />').addClass('inner-item').data('src', subtitles[i].src).data('language', subtitles[i].language).html(subtitles[i].title).click(function () {
-								switchTrack($(this).data('language'));
-								this.subtitles.icon.html($(this).html());
-							}));
-						}
-						for (var i in this.subtitles.list) {
-							list.append(this.subtitles.list[i]);
-						}
-						return $('<div />').addClass('control control-container').append(this.subtitles.icon).append(list);
-					}
-					return null;
-
-				case 'timeline':
-					this.time = {
-						current         : $('<div />').addClass('control-text time-current').html('00:00'),
-						total           : $('<div />').addClass('control-text time-total'),
-						line            : $('<div />').addClass('timeline').click(function (e) {
-							seek(video.duration * this.time.getPosition(e.pageX));
-						}).mousemove(function (e) {
-							var p = this.time.getPosition(e.pageX);
-							if (p > 0 && p < 1) {
-								this.time.markerShadow.show();
-								this.time.markerShadow.css('left', p * 100 + '%');
-								this.time.markerShadowTime.html(secondsToTime(video.duration * p));
-							}
-							else
-								this.time.markerShadow.hide();
-						}).mouseleave(function () {
-							this.time.markerShadow.hide();
-						}),
-						marker          : $('<div />').addClass('time-marker'),
-						markerShadow    : $('<div />').addClass('time-marker shadow').append().hide(),
-						markerShadowTime: $('<div/>').addClass('time'),
-						played          : $('<div />').addClass('time-played'),
-						move            : function () {
-							var t = (video.currentTime / video.duration * 100).toFixed(2) + '%';
-							this.marker.css('left', t);
-							this.played.css('width', t);
-							this.current.html(secondsToTime(video.currentTime));
-						},
-						getPosition     : function (x) {
-							return (x - this.line.offset().left) / this.line.width();
-						}
-					};
-					this.time.line.append(this.time.marker).append(this.time.markerShadow.append(this.time.markerShadowTime)).append(this.time.played);
-					return $('<div />').addClass('timeline-container').append($('<div />').addClass('timeline-subcontainer').append(this.time.current).append(this.time.line).append(this.time.total));
-
-				case 'volume':
-					var drag = false;
-					var range = { bottom: 0, height: 0, top: 0 };
-
-					this.volume = {
-						active     : $('<div/>').addClass('volume-active'),
-						marker     : $('<div/>').addClass('volume-marker').on('mousedown', function (e) {
-							drag = true;
-							range.height = this.volume.line.height();
-							range.top = this.volume.line.offset().top;
-							range.bottom = range.top + range.height;
-						}),
-						icon       : $('<div/>').addClass('control-icon').append($('<i />').addClass('fa fa-volume-down')).click(function () {
-							this.volume.toggleMuted();
-						}),
-						set        : function (value) {
-							var icon = this.icon.children('.fa').eq(0);
-							icon.removeClass();
-							if (value < 0.05) {
-								video.muted = true;
-								icon.addClass('fa fa-volume-off');
-							}
-							else {
-								video.muted = false;
-								video.volume = value;
-								if (value < 0.5)
-									icon.addClass('fa fa-volume-down');
-								else
-									icon.addClass('fa fa-volume-up');
-								setCookie('volume', value);
-							}
-							var p = Math.round(value * 100).toString() + '%';
-							this.active.css('height', p);
-							this.marker.css('bottom', p);
-						},
-						toggleMuted: function () {
-							if (video.muted == true) {
-								this.set(getCookie('volume', 0.4));
-							}
-							else
-								this.set(0);
-						}
-					};
-					this.volume.line = $('<div/>').addClass('volume-line').append(this.volume.active).append(this.volume.marker).click(function (e) {
-						range.height = this.volume.line.height();
-						range.top = this.volume.line.offset().top;
-						range.bottom = range.top + range.height;
-						if (e.pageY >= range.top && e.pageY <= range.bottom) {
-							this.volume.set((range.bottom - e.pageY) / range.height);
-						}
-					});
-					this.volume.container = $('<div />').addClass('control control-container').append(this.volume.icon).append($('<div />').addClass('control-inner volume-slider').append(this.volume.line));
-
-					$(document).on('mousemove', function (e) {
-						if (drag && e.pageY >= range.top && e.pageY <= range.bottom) {
-							this.volume.set((range.bottom - e.pageY) / range.height);
-						}
-					}).on('mouseup', function (e) {
-						drag = false;
-					});
-
-					return this.volume.container;
-
-				default:
-					return null;
+		class Controls {
+			constructor () {
+				this.items = [];
 			}
-		};
 
-		var sources = [];
+			add (name) {
+			}
+		}
+
+		var sources   = [];
 		var subtitles = [];
-		var volume = 0.5;
-		var video = null;
-		var controls = {};
+		var volume    = 0.5;
+		var video     = null;
+		var controls  = {};
 
 		/**
 		 * DOM container to hold video and all other stuff.
 		 * @type object
 		 */
 		var container = null;
-		var overlay = null;
-
-		var getCookie = function (name, dflt) {
-			var cookies = document.cookie.split(';');
-			for (var i in cookies) {
-				var d = cookies[i].trim().split('=');
-				if (d[0] == 'leplayer_' + name)
-					return d[1];
-			}
-			return dflt;
-		};
-
-		var setCookie = function (name, value) {
-			var d = new Date();
-			d.setDate(d.year + 1);
-			document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
-		};
-
-		var createSimpleControl = function (cssClass, iconClass) {
-			return $('<div />').addClass('control ' + cssClass).append($('<i />').addClass('fa fa-' + iconClass));
-		};
-
-		var createControl = function (type) {
-			switch (type) {
-				case 'backward':
-					controls.backward = createSimpleControl('backward', 'undo').click(function () {
-						if (video.currentTime - options.playback.step.medium > 0)
-							seek(video.currentTime - options.playback.step.medium);
-						else
-							seek(0);
-					});
-					return controls.backward;
-
-				case 'divider':
-					return $('<div />').addClass('divider');
-
-				case 'download':
-					controls.download = $('<a />').attr('href', '').attr('target', '_blank').attr('download', '').addClass('control download').append($('<i />').addClass('fa fa-download'));
-					return controls.download;
-
-				case 'forward':
-					controls.forward = createSimpleControl('forward', 'redo');
-					return controls.forward;
-
-				case 'fullscreen':
-					controls.fullscreen = createSimpleControl('fullscreen', 'arrows-alt').click(function () {
-						toggleFullscreen();
-					});
-					return controls.fullscreen;
-
-				case 'play':
-					controls.play = createSimpleControl('play', 'play').click(function () {
-						togglePlay();
-					});
-					return controls.play;
-
-				case 'rate':
-					controls.rate = {
-						down    : $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-backward')).click(function () {
-							controls.rate.decrease();
-						}),
-						up      : $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-forward')).click(function () {
-							controls.rate.increase();
-						}),
-						current : $('<div />').addClass('control-text rate-current'),
-						display : function () {
-							this.current.html('×' + video.playbackRate.toFixed(2));
-						},
-						increase: function () {
-							if (video.playbackRate < options.rate.max) {
-								this.down.removeClass('disabled');
-								video.playbackRate += options.rate.step;
-								this.display();
-								setCookie('rate', video.playbackRate);
-							}
-							else
-								this.up.addClass('disabled');
-
-						},
-						decrease: function () {
-							if (video.playbackRate > options.rate.min) {
-								this.up.removeClass('disabled');
-								video.playbackRate -= options.rate.step;
-								this.display();
-								setCookie('rate', video.playbackRate);
-							}
-							else
-								this.down.addClass('disabled');
-						}
-					};
-
-					return $('<div />').addClass('control-container').append(controls.rate.down).append(controls.rate.current).append(controls.rate.up);
-
-				case 'sources':
-					if (sources.length > 1) {
-						controls.sources = {
-							list     : [],
-							icon     : $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-bullseye')),
-							setActive: function (index) {
-								for (var i in this.list) {
-									if (this.list[i].data('index') == index)
-										this.list[i].addClass('active');
-									else
-										this.list[i].removeClass('active');
-								}
-							}
-						};
-						var list = $('<div/>').addClass('control-inner');
-						for (var i in sources) {
-							controls.sources.list.push($('<div />').addClass('inner-item').data('index', i).html(sources[i].title).click(function () {
-								setSource($(this).data('index'));
-							}));
-						}
-						for (var i in controls.sources.list) {
-							list.append(controls.sources.list[i]);
-						}
-						return $('<div />').addClass('control control-container').append(controls.sources.icon).append(list);
-					}
-					return null;
-
-				case 'subtitles':
-					if (subtitles.length > 0) {
-						controls.subtitles = {
-							list: [],
-							icon: $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-commenting-o')).click(function () {
-								switchTrack('');
-								$(this).html($('<i />').addClass('fa fa-commenting-o'));
-							})
-						};
-						var list = $('<div/>').addClass('control-inner');
-						for (var i in subtitles) {
-							controls.subtitles.list.push($('<div />').addClass('inner-item').data('src', subtitles[i].src).data('language', subtitles[i].language).html(subtitles[i].title).click(function () {
-								switchTrack($(this).data('language'));
-								controls.subtitles.icon.html($(this).html());
-							}));
-						}
-						for (var i in controls.subtitles.list) {
-							list.append(controls.subtitles.list[i]);
-						}
-						return $('<div />').addClass('control control-container').append(controls.subtitles.icon).append(list);
-					}
-					return null;
-
-				case 'timeline':
-					controls.time = {
-						current         : $('<div />').addClass('control-text time-current').html('00:00'),
-						total           : $('<div />').addClass('control-text time-total'),
-						line            : $('<div />').addClass('timeline').click(function (e) {
-							seek(video.duration * controls.time.getPosition(e.pageX));
-						}).mousemove(function (e) {
-							var p = controls.time.getPosition(e.pageX);
-							if (p > 0 && p < 1) {
-								controls.time.markerShadow.show();
-								controls.time.markerShadow.css('left', p * 100 + '%');
-								controls.time.markerShadowTime.html(secondsToTime(video.duration * p));
-							}
-							else
-								controls.time.markerShadow.hide();
-						}).mouseleave(function () {
-							controls.time.markerShadow.hide();
-						}),
-						marker          : $('<div />').addClass('time-marker'),
-						markerShadow    : $('<div />').addClass('time-marker shadow').append().hide(),
-						markerShadowTime: $('<div/>').addClass('time'),
-						played          : $('<div />').addClass('time-played'),
-						move            : function () {
-							var t = (video.currentTime / video.duration * 100).toFixed(2) + '%';
-							this.marker.css('left', t);
-							this.played.css('width', t);
-							this.current.html(secondsToTime(video.currentTime));
-						},
-						getPosition     : function (x) {
-							return (x - this.line.offset().left) / this.line.width();
-						}
-					};
-					controls.time.line.append(controls.time.marker).append(controls.time.markerShadow.append(controls.time.markerShadowTime)).append(controls.time.played);
-					return $('<div />').addClass('timeline-container').append($('<div />').addClass('timeline-subcontainer').append(controls.time.current).append(controls.time.line).append(controls.time.total));
-
-				case 'volume':
-					var drag = false;
-					var range = { bottom: 0, height: 0, top: 0 };
-
-					controls.volume = {
-						active     : $('<div/>').addClass('volume-active'),
-						marker     : $('<div/>').addClass('volume-marker').on('mousedown', function (e) {
-							drag = true;
-							range.height = controls.volume.line.height();
-							range.top = controls.volume.line.offset().top;
-							range.bottom = range.top + range.height;
-						}),
-						icon       : $('<div/>').addClass('control-icon').append($('<i />').addClass('fa fa-volume-down')).click(function () {
-							controls.volume.toggleMuted();
-						}),
-						set        : function (value) {
-							var icon = this.icon.children('.fa').eq(0);
-							icon.removeClass();
-							if (value < 0.05) {
-								video.muted = true;
-								icon.addClass('fa fa-volume-off');
-							}
-							else {
-								video.muted = false;
-								video.volume = value;
-								if (value < 0.5)
-									icon.addClass('fa fa-volume-down');
-								else
-									icon.addClass('fa fa-volume-up');
-								setCookie('volume', value);
-							}
-							var p = Math.round(value * 100).toString() + '%';
-							this.active.css('height', p);
-							this.marker.css('bottom', p);
-						},
-						toggleMuted: function () {
-							if (video.muted == true) {
-								this.set(getCookie('volume', 0.4));
-							}
-							else
-								this.set(0);
-						}
-					};
-					controls.volume.line = $('<div/>').addClass('volume-line').append(controls.volume.active).append(controls.volume.marker).click(function (e) {
-						range.height = controls.volume.line.height();
-						range.top = controls.volume.line.offset().top;
-						range.bottom = range.top + range.height;
-						if (e.pageY >= range.top && e.pageY <= range.bottom) {
-							controls.volume.set((range.bottom - e.pageY) / range.height);
-						}
-					});
-					controls.volume.container = $('<div />').addClass('control control-container').append(controls.volume.icon).append($('<div />').addClass('control-inner volume-slider').append(controls.volume.line));
-
-					$(document).on('mousemove', function (e) {
-						if (drag && e.pageY >= range.top && e.pageY <= range.bottom) {
-							controls.volume.set((range.bottom - e.pageY) / range.height);
-						}
-					}).on('mouseup', function (e) {
-						drag = false;
-					});
-
-					return controls.volume.container;
-
-				default:
-					return null;
-			}
-		};
+		var overlay   = null;
 
 		var hasControl = function (name) {
 			return controls.hasOwnProperty(name);
@@ -561,16 +393,16 @@
 				var src = $(this).attr('src');
 				if (src)
 					sources.push({
-						src  : src,
-						title: $(this).attr('title')
+						src   : src,
+						title : $(this).attr('title')
 					});
 			});
 			if (sources.length == 0) {
 				var src = element.attr('src');
 				if (src) {
 					sources.push({
-						src  : src,
-						title: $(this).attr('title') || 'default'
+						src   : src,
+						title : $(this).attr('title') || 'default'
 					});
 				}
 			}
@@ -590,7 +422,7 @@
 
 		var initControls = function () {
 			for (var i in options.controls) {
-				var el = options.controls[i].element;
+				var el          = options.controls[ i ].element;
 				var hasTimeline = false;
 				if (el == null)
 					el = $('<div />').addClass('leplayer-controls');
@@ -598,8 +430,8 @@
 					console.warn('Error creating controls.');
 				}
 				else {
-					for (var k in options.controls[i].controls) {
-						var controlName = options.controls[i].controls[k];
+					for (var k in options.controls[ i ].controls) {
+						var controlName = options.controls[ i ].controls[ k ];
 
 						if (controlName == 'divider' || !hasControl(controlName)) {
 							// Create control only if divider or does not exist yet.
@@ -619,22 +451,22 @@
 					container.append(el);
 				}
 			}
-			video.playbackRate = getCookie('rate', 1);
+			video.playbackRate = Cookie.get('rate', 1);
 			controls.rate.display();
-			controls.volume.set(getCookie('volume', 0.4));
+			controls.volume.set(Cookie.get('volume', 0.4));
 			if (controls.time.line.width() < 20)
 				controls.time.line.hide();
 		};
 
 		var initDom = function () {
 
-			overlay = $('<div />').addClass('play-overlay');
+			overlay            = $('<div />').addClass('play-overlay');
 			var videoContainer = $('<div />').addClass('leplayer-video').append(overlay);
-			container = $('<div />').addClass('leplayer-container').append(videoContainer).css('width', element.width() + 'px');
+			container          = $('<div />').addClass('leplayer-container').append(videoContainer).css('width', element.width() + 'px');
 
 			element.before(container);
 			videoContainer.append(element);
-			video = element[0];
+			video = element[ 0 ];
 			video.addEventListener('loadedmetadata', function (e) {
 				overlay.css('line-height', e.target.clientHeight + 'px').html('<i class="fa fa-play"></i>');
 				container.css('width', e.target.clientWidth + 'px');
@@ -688,16 +520,16 @@
 				element.attr('poster', options.poster);
 
 			// Autoplay, loop, muted.
-			var attrs = ['autoplay', 'loop', 'muted'];
+			var attrs = [ 'autoplay', 'loop', 'muted' ];
 			for (var i in attrs) {
-				var a = element.attr(attrs[i]);
+				var a = element.attr(attrs[ i ]);
 				if (a)
-					options[attrs[i]] = true;
-				else if (options[attrs[i]])
-					element.attr(attrs[i], '');
+					options[ attrs[ i ] ] = true;
+				else if (options[ attrs[ i ] ])
+					element.attr(attrs[ i ], '');
 				else
-					element.removeAttr(attrs[i]);
-				element.prop(attrs[i], options[attrs[i]]);
+					element.removeAttr(attrs[ i ]);
+				element.prop(attrs[ i ], options[ attrs[ i ] ]);
 			}
 
 			// Preload.
@@ -716,13 +548,13 @@
 
 			element.children('track[kind="subtitles"]').each(function () {
 				var language = $(this).attr('srclang');
-				var title = $(this).attr('label');
-				var src = $(this).attr('src');
+				var title    = $(this).attr('label');
+				var src      = $(this).attr('src');
 				if (title.length > 0 && src.length > 0) {
 					subtitles.push({
-						title   : title,
-						src     : src,
-						language: language
+						title    : title,
+						src      : src,
+						language : language
 					});
 				}
 			});
@@ -734,7 +566,7 @@
 			if (video.textTracks.length == 0 && subtitles.length > 0) {
 				element.children('track[kind="subtitles"]').remove();
 				for (var i in subtitles) {
-					element.append($('<track/>').attr('label', subtitles[i].title).attr('src', subtitles[i].src).attr('srclang', subtitles[i].language).attr('id', subtitles[i].language).attr('kind', 'subtitles'));
+					element.append($('<track/>').attr('label', subtitles[ i ].title).attr('src', subtitles[ i ].src).attr('srclang', subtitles[ i ].language).attr('id', subtitles[ i ].language).attr('kind', 'subtitles'));
 				}
 			}
 		};
@@ -766,9 +598,9 @@
 		};
 
 		var secondsToTime = function (seconds) {
-			var h = Math.floor(seconds / 3600);
-			var m = Math.floor(seconds % 3600 / 60);
-			var s = Math.floor(seconds % 3600 % 60);
+			var h   = Math.floor(seconds / 3600);
+			var m   = Math.floor(seconds % 3600 / 60);
+			var s   = Math.floor(seconds % 3600 % 60);
 			var out = '';
 			if (h > 0)
 				out = h + ':';
@@ -786,15 +618,15 @@
 		};
 
 		var setSource = function (index) {
-			if (typeof sources[index] != 'undefined') {
-				element.attr('src', sources[index].src);
+			if (typeof sources[ index ] != 'undefined') {
+				element.attr('src', sources[ index ].src);
 
 				if (typeof controls.sources != 'undefined') {
 					controls.sources.setActive(index);
 				}
 
 				if (typeof controls.download != 'undefined') {
-					controls.download.attr('href', sources[index].src).attr('download', sources[index].src);
+					controls.download.attr('href', sources[ index ].src).attr('download', sources[ index ].src);
 				}
 			}
 		};
@@ -802,10 +634,10 @@
 		var switchTrack = function (language) {
 			if (video.textTracks.length > 0) {
 				for (var i = 0; i < video.textTracks.length; i++) {
-					if (video.textTracks[i].language == language)
-						video.textTracks[i].mode = 'showing';
+					if (video.textTracks[ i ].language == language)
+						video.textTracks[ i ].mode = 'showing';
 					else
-						video.textTracks[i].mode = 'hidden';
+						video.textTracks[ i ].mode = 'hidden';
 				}
 			}
 		};
