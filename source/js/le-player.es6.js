@@ -602,6 +602,11 @@
 		};
 
 		var initDom = function () {
+			var initVideo = function (w, h) {
+				overlay.css('line-height', w + 'px');
+				container.css('width', h + 'px');
+				controls.totalTime = secondsToTime(video.duration);
+			};
 
 			overlay            = $('<div />').addClass('play-overlay').html('<i class="fa fa-play"></i>');
 			var videoContainer = $('<div />').addClass('leplayer-video').append(overlay);
@@ -610,11 +615,10 @@
 			element.before(container);
 			videoContainer.append(element);
 			video = element[ 0 ];
-			video.addEventListener('loadedmetadata', function (e) {
-				overlay.css('line-height', e.target.clientHeight + 'px');
-				container.css('width', e.target.clientWidth + 'px');
-				controls.totalTime = secondsToTime(video.duration);
-			});
+			if (video.readyState > HTMLMediaElement.HAVE_METADATA)
+				initVideo(video.videoWidth, video.videoHeight);
+			else
+				video.addEventListener('loadedmetadata', function (e) { initVideo(e.target.clientHeight, e.target.clientWidth); });
 			video.ontimeupdate = function () {
 				controls.moveTimeMarker();
 			};
