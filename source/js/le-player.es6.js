@@ -603,8 +603,8 @@
 
 		var initDom = function () {
 			var initVideo = function (w, h) {
-				overlay.css('line-height', w + 'px');
-				container.css('width', h + 'px');
+				overlay.css('line-height', h + 'px');
+				container.css('width', w + 'px');
 				controls.totalTime = secondsToTime(video.duration);
 			};
 
@@ -615,10 +615,10 @@
 			element.before(container);
 			videoContainer.append(element);
 			video = element[ 0 ];
-			if (video.readyState > HTMLMediaElement.HAVE_METADATA)
-				initVideo(video.videoWidth, video.videoHeight);
+			if (video.readyState > HTMLMediaElement.HAVE_NOTHING)
+				initVideo(video.clientWidth, video.clientHeight);
 			else
-				video.addEventListener('loadedmetadata', function (e) { initVideo(e.target.clientHeight, e.target.clientWidth); });
+				video.addEventListener('loadedmetadata', function (e) { initVideo(e.target.clientWidth, e.target.clientHeight); });
 			video.ontimeupdate = function () {
 				controls.moveTimeMarker();
 			};
