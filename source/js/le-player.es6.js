@@ -411,6 +411,11 @@
 				this.active = active || false;
 			}
 
+			set totalTime (value) {
+				if (this.has(C_TIMELINE))
+					this.items.timeline.total.text = value;
+			}
+
 			set volume (value) {
 				if (this.has(C_VOLUME))
 					this.items.volume.value = value;
@@ -478,10 +483,8 @@
 			}
 
 			set totalTime (value) {
-				console.log(value);
 				for (var i in this.collections) {
-					if (this.collections[ i ].has(C_TIMELINE))
-						this.collections[ i ].timeline.total.text = value;
+					this.collections[ i ].totalTime = value;
 				}
 			}
 
