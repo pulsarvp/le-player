@@ -268,7 +268,6 @@
 						this.addItem(subtitles[ i ].title, subtitles[ i ].language).data('src', subtitles[ i ].src);
 					}
 				}
-				switchTrack('');
 			}
 
 			onItemClick (index) {
@@ -289,7 +288,7 @@
 				this.markerShadowTime = $('<div />').addClass('time');
 				this.played           = $('<div />').addClass('time-played');
 				this.line             = $('<div />').addClass('timeline').click(function (e) {
-					seek(video.duration * this.getPosition(e.pageX));
+					seek(video.duration * _self.getPosition(e.pageX));
 				}).mousemove(function (e) {
 					var p = _self.getPosition(e.pageX);
 					if (p > 0 && p < 1) {
@@ -440,6 +439,7 @@
 				this.showRate();
 				this.volume = Cookie.get('volume', 0.4);
 				this.initTimeline();
+				this.totalTime = secondsToTime(video.duration)
 			}
 
 			initTimeline () {
@@ -491,8 +491,9 @@
 			}
 
 			init () {
-				for (var i in this.collections)
+				for (var i in this.collections) {
 					this.collections[ i ].init();
+				}
 			}
 
 			moveTimeMarker () {
@@ -563,8 +564,9 @@
 
 			initOptions();
 			initDom();
-			initSubtitles();
 			initControls();
+			initVideo();
+			initSubtitles();
 			initHotKeys();
 		};
 
@@ -599,31 +601,15 @@
 					container.append(el);
 				}
 			}
-			video.playbackRate = Cookie.get('rate', 1);
-			controls.init();
 		};
 
 		var initDom = function () {
-			var initVideo = function (w, h) {
-				overlay.css('line-height', h + 'px');
-				container.css('width', w + 'px');
-				controls.totalTime = secondsToTime(video.duration);
-			};
-
 			overlay            = $('<div />').addClass('play-overlay').html('<i class="fa fa-play"></i>');
 			var videoContainer = $('<div />').addClass('leplayer-video').append(overlay);
 			container          = $('<div />').addClass('leplayer-container').append(videoContainer).css('width', element.width() + 'px');
 
 			element.before(container);
 			videoContainer.append(element);
-			video = element[ 0 ];
-			if (video.readyState > HTMLMediaElement.HAVE_NOTHING)
-				initVideo(video.clientWidth, video.clientHeight);
-			else
-				video.addEventListener('loadedmetadata', function (e) { initVideo(e.target.clientWidth, e.target.clientHeight); });
-			video.ontimeupdate = function () {
-				controls.moveTimeMarker();
-			};
 			overlay.click(function () {
 				togglePlay();
 			});
@@ -693,7 +679,6 @@
 		};
 
 		var initSubtitles = function () {
-
 			element.children('track[kind="subtitles"]').each(function () {
 				var language = $(this).attr('srclang');
 				var title    = $(this).attr('label');
@@ -706,6 +691,26 @@
 					});
 				}
 			});
+		};
+
+		var initVideo = function () {
+			video = element[ 0 ];
+			if (video.readyState > HTMLMediaElement.HAVE_NOTHING)
+				initVideoEvent();
+			else
+				video.onloadedmetadata = function () { initVideoEvent(); };
+		};
+
+		var initVideoEvent = function () {
+			overlay.css('line-height', video.clientHeight + 'px');
+			container.css('width', video.clientWidth + 'px');
+			video.playbackRate = Cookie.get('rate', 1);
+
+			video.ontimeupdate = function () {
+				controls.moveTimeMarker();
+			};
+
+			controls.init();
 
 			// This is generally for Firefox only
 			// because it somehow resets track list
