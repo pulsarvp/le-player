@@ -304,6 +304,7 @@
 
 				this.current.text = '00:00';
 
+				this.line.append(this.marker).append(this.markerShadow.append(this.markerShadowTime)).append(this.played);
 				this.element = $('<div />').addClass('timeline-container').append($('<div />').addClass('timeline-subcontainer').append(this.current.element).append(this.line).append(this.total.element));
 			}
 
