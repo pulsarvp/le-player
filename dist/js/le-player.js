@@ -128,9 +128,10 @@
 
 			set active (index) {
 				for (let i in this.list) {
+					console.log(this.list[ i ].data('index'));
 					if (this.list[ i ].data('index') == index) {
 						this.list[ i ].addClass('active');
-						this.icon.html(this.list[ i ].html);
+						this.icon.html(this.list[ i ].html());
 					}
 					else
 						this.list[ i ].removeClass('active');
@@ -138,9 +139,10 @@
 			}
 
 			addItem (text, index) {
-				index    = index || this._index;
-				var item = $('<div />').addClass('inner-item').data('index', index).html(text).click(function () {
-					return this.onItemClick($(this).data('index'));
+				index     = index || this._index;
+				let _self = this;
+				var item  = $('<div />').addClass('inner-item').data('index', index).html(text).click(function () {
+					_self.onItemClick($(this).data('index'));
 				});
 				this._index++;
 				this.list.push(item);
@@ -257,6 +259,11 @@
 						this.addItem(sources[ i ].title);
 					}
 				}
+			}
+
+			onItemClick (index) {
+				super.onItemClick(index);
+				// TODO: switch source
 			}
 		}
 
