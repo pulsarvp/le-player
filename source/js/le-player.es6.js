@@ -322,36 +322,38 @@
 
 		class VolumeControl {
 			constructor () {
+				let _self = this;
+
 				this.drag  = false;
 				this.range = { bottom : 0, height : 0, top : 0 };
 
 				this.active = $('<div/>').addClass('volume-active');
 				this.marker = $('<div/>').addClass('volume-marker').on('mousedown', function (e) {
-					this.drag         = true;
-					this.range.height = this.line.height();
-					this.range.top    = this.line.offset().top;
-					this.range.bottom = this.range.top + this.range.height;
+					_self.drag         = _self;
+					_self.range.height = _self.line.height();
+					_self.range.top    = _self.line.offset().top;
+					_self.range.bottom = _self.range.top + _self.range.height;
 				});
 				this.icon   = $('<div/>').addClass('control-icon').append($('<i />').addClass('fa fa-volume-down')).click(function () {
-					this.toggleMuted();
+					_self.toggleMuted();
 				});
 				this.line   = $('<div/>').addClass('volume-line').append(this.active).append(this.marker).click(function (e) {
-					this.range.height = this.line.height();
-					this.range.top    = this.line.offset().top;
-					this.range.bottom = this.range.top + this.range.height;
-					if (e.pageY >= range.top && e.pageY <= this.range.bottom) {
-						this.value = (this.range.bottom - e.pageY) / this.range.height;
+					_self.range.height = _self.line.height();
+					_self.range.top    = _self.line.offset().top;
+					_self.range.bottom = _self.range.top + _self.range.height;
+					if (e.pageY >= _self.range.top && e.pageY <= _self.range.bottom) {
+						_self.value = (_self.range.bottom - e.pageY) / _self.range.height;
 					}
 				});
 
 				this.element = $('<div />').addClass('control control-container').append(this.icon).append($('<div />').addClass('control-inner volume-slider').append(this.line));
 
 				$(document).on('mousemove', function (e) {
-					if (this.drag && e.pageY >= this.range.top && e.pageY <= this.range.bottom) {
-						this.value = (range.bottom - e.pageY) / range.height;
+					if (_self.drag && e.pageY >= _self.range.top && e.pageY <= _self.range.bottom) {
+						_self.value = (_self.range.bottom - e.pageY) / _self.range.height;
 					}
 				}).on('mouseup', function (e) {
-					this.drag = false;
+					_self.drag = false;
 				});
 			}
 
