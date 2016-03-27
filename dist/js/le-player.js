@@ -10,9 +10,7 @@
 		const C_PLAY       = 'play';
 		const C_RATE       = 'rate';
 		const C_SOURCE     = 'source';
-		const C_SOURCES    = 'sources';
 		const C_SUBTITLE   = 'subtitle';
-		const C_SUBTITLES  = 'subtitles';
 		const C_TIMELINE   = 'timeline';
 		const C_VOLUME     = 'volume';
 
@@ -49,7 +47,7 @@
 				{
 					element  : null,
 					controls : [
-						'rate', 'divider', 'backward', 'divider', 'sources', 'divider', 'subtitles', 'divider', 'download'
+						'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download'
 					]
 				}
 			]
@@ -88,11 +86,9 @@
 						return new RateControl();
 
 					case C_SOURCE:
-					case C_SOURCES:
 						return new SourceControl();
 
 					case C_SUBTITLE:
-					case C_SUBTITLES:
 						return new SubtitleControl();
 
 					case C_TIMELINE:
@@ -486,6 +482,11 @@
 				}
 			}
 
+			set source (value) {
+				if (this.has(C_SOURCE))
+					this.items.source.source = value;
+			}
+
 			set totalTime (value) {
 				if (this.has(C_TIMELINE))
 					this.items.timeline.total.text = value;
@@ -513,7 +514,8 @@
 				this.showRate();
 				this.volume = Cookie.get('volume', 0.4);
 				this.initTimeline();
-				this.totalTime = secondsToTime(video.duration)
+				this.totalTime = secondsToTime(video.duration);
+				this.source    = 0;
 			}
 
 			initTimeline () {
@@ -558,15 +560,21 @@
 				return this.collections.common;
 			}
 
-			set totalTime (value) {
-				for (var i in this.collections) {
-					this.collections[ i ].totalTime = value;
-				}
-			}
-
 			set download (value) {
 				for (var i in this.collections) {
 					this.collections[ i ].download = value;
+				}
+			}
+
+			set source (value) {
+				for (var i in this.collections) {
+					this.collections[ i ].source = value;
+				}
+			}
+
+			set totalTime (value) {
+				for (var i in this.collections) {
+					this.collections[ i ].totalTime = value;
 				}
 			}
 
