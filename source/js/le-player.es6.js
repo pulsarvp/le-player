@@ -199,6 +199,10 @@
 				super('', '');
 				this.element = $('<a />').attr('href', '').attr('target', '_blank').attr('download', '').addClass('control download').append($('<i />').addClass('fa fa-download'));
 			}
+
+			set link (value) {
+				this.element.attr('href', value);
+			}
 		}
 
 		class ForwardControl extends Control {
@@ -289,8 +293,10 @@
 
 			set source (index) {
 				let s = this.getByIndex(index);
-				if (s != null)
+				if (s != null) {
 					element.attr('src', s.data('src'));
+					controls.download = s.data('src');
+				}
 			}
 
 			onItemClick (index) {
@@ -474,6 +480,12 @@
 				this.active = active || false;
 			}
 
+			set download (value) {
+				if (this.has(C_DOWNLOAD)) {
+					this.items.download.link = value;
+				}
+			}
+
 			set totalTime (value) {
 				if (this.has(C_TIMELINE))
 					this.items.timeline.total.text = value;
@@ -549,6 +561,12 @@
 			set totalTime (value) {
 				for (var i in this.collections) {
 					this.collections[ i ].totalTime = value;
+				}
+			}
+
+			set download (value) {
+				for (var i in this.collections) {
+					this.collections[ i ].download = value;
 				}
 			}
 
