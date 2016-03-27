@@ -294,14 +294,27 @@
 				super('commenting-o');
 				if (subtitles.length > 0) {
 					for (var i in subtitles) {
-						this.addItem(subtitles[ i ].title, { src : subtitles[ i ].src });
+						this.addItem(subtitles[ i ].title, { src : subtitles[ i ].src, language : subtitles[ i ].language });
+					}
+				}
+			}
+
+			set track (index) {
+				var t = this.getByIndex(index);
+				if (t != null && video.textTracks.length > 0) {
+					let language = t.data('language');
+					for (var i = 0; i < video.textTracks.length; i++) {
+						if (video.textTracks[ i ].language == language)
+							video.textTracks[ i ].mode = 'showing';
+						else
+							video.textTracks[ i ].mode = 'hidden';
 					}
 				}
 			}
 
 			onItemClick (index) {
 				super.onItemClick(index);
-				switchTrack(index);
+				this.track = index;
 			}
 		}
 
@@ -594,9 +607,9 @@
 
 			initOptions();
 			initDom();
+			initSubtitles();
 			initControls();
 			initVideo();
-			initSubtitles();
 			initHotKeys();
 		};
 
@@ -797,17 +810,6 @@
 
 		var seek = function (time) {
 			video.currentTime = time;
-		};
-
-		var switchTrack = function (language) {
-			if (video.textTracks.length > 0) {
-				for (var i = 0; i < video.textTracks.length; i++) {
-					if (video.textTracks[ i ].language == language)
-						video.textTracks[ i ].mode = 'showing';
-					else
-						video.textTracks[ i ].mode = 'hidden';
-				}
-			}
 		};
 
 		init();
