@@ -126,9 +126,15 @@
 				this.list        = [];
 			}
 
+			get active () {
+				for (let i in this.list)
+					if (this.list[ i ].hasClass('active'))
+						return this.list[ i ];
+				return null;
+			}
+
 			set active (index) {
 				for (let i in this.list) {
-					console.log(this.list[ i ].data('index'));
 					if (this.list[ i ].data('index') == index) {
 						this.list[ i ].addClass('active');
 						this.icon.html(this.list[ i ].html());
@@ -138,17 +144,27 @@
 				}
 			}
 
-			addItem (text, index) {
-				index     = index || this._index;
+			addItem (text, data) {
 				let _self = this;
-				var item  = $('<div />').addClass('inner-item').data('index', index).html(text).click(function () {
+				var item  = $('<div />').addClass('inner-item').data('index', this._index).html(text).click(function () {
 					_self.onItemClick($(this).data('index'));
 				});
+				if (typeof data == 'object') {
+					for (let k in data)
+						item.data(k, data[ k ]);
+				}
 				this._index++;
 				this.list.push(item);
 				this.listElement.append(item);
 
 				return item;
+			}
+
+			getByIndex (index) {
+				for (let i in this.list)
+					if (this.list[ i ].data('index') == index)
+						return this.list[ i ];
+				return null;
 			}
 
 			onItemClick (index) {
@@ -256,14 +272,20 @@
 				super('bullseye');
 				if (sources.length > 1) {
 					for (var i in sources) {
-						this.addItem(sources[ i ].title);
+						this.addItem(sources[ i ].title, { src : sources[ i ].src });
 					}
 				}
 			}
 
+			set source (index) {
+				let s = this.getByIndex(index);
+				if (s != null)
+					element.attr('src', s.data('src'));
+			}
+
 			onItemClick (index) {
 				super.onItemClick(index);
-				// TODO: switch source
+				this.source = index;
 			}
 		}
 
@@ -272,7 +294,7 @@
 				super('commenting-o');
 				if (subtitles.length > 0) {
 					for (var i in subtitles) {
-						this.addItem(subtitles[ i ].title, subtitles[ i ].language).data('src', subtitles[ i ].src);
+						this.addItem(subtitles[ i ].title, { src : subtitles[ i ].src });
 					}
 				}
 			}
@@ -634,7 +656,6 @@
 		};
 
 		var initOptions = function () {
-
 			// Controls.
 			element.removeAttr('controls');
 
@@ -706,7 +727,9 @@
 			if (video.readyState > HTMLMediaElement.HAVE_NOTHING)
 				initVideoEvent();
 			else
-				video.onloadedmetadata = function () { initVideoEvent(); };
+				video.onloadedmetadata = function () {
+					initVideoEvent();
+				};
 		};
 
 		var initVideoEvent = function () {
