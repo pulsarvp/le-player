@@ -119,11 +119,14 @@
 
 		class ControlContainer {
 			constructor (iconClass) {
+				let _self        = this;
+				this.iconClass   = iconClass;
 				this.icon        = $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-' + iconClass));
 				this.listElement = $('<div/>').addClass('control-inner');
 				this.element     = $('<div />').addClass('control control-container').append(this.icon).append(this.listElement);
 				this._index      = 0;
 				this.list        = [];
+				this.icon.click(function () { _self.onContainerClick(); });
 			}
 
 			get active () {
@@ -134,14 +137,18 @@
 			}
 
 			set active (index) {
+				let hasActive = false;
 				for (let i in this.list) {
 					if (this.list[ i ].data('index') == index) {
 						this.list[ i ].addClass('active');
 						this.icon.html(this.list[ i ].html());
+						hasActive = true;
 					}
 					else
 						this.list[ i ].removeClass('active');
 				}
+				if (!hasActive)
+					this.icon.html($('<i />').addClass('fa fa-' + this.iconClass));
 			}
 
 			addItem (text, data) {
@@ -165,6 +172,9 @@
 					if (this.list[ i ].data('index') == index)
 						return this.list[ i ];
 				return null;
+			}
+
+			onContainerClick () {
 			}
 
 			onItemClick (index) {
@@ -309,6 +319,15 @@
 						else
 							video.textTracks[ i ].mode = 'hidden';
 					}
+				}
+			}
+
+			onContainerClick () {
+				super.onContainerClick();
+				super.onItemClick(-1);
+				if (video.textTracks.length > 0) {
+					for (var i = 0; i < video.textTracks.length; i++)
+						video.textTracks[ i ].mode = 'hidden';
 				}
 			}
 
