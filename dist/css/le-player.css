@@ -9,6 +9,12 @@
 .leplayer-container video {
   outline: 0;
 }
+.leplayer-container video::-webkit-media-controls {
+  display: none !important;
+}
+.leplayer-container video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
 .leplayer-container .play-overlay {
   background: rgba(0, 0, 0, 0.5);
   bottom: 0;
@@ -39,6 +45,12 @@
 }
 .leplayer-controls:not(:last-child) {
   margin-bottom: 10px;
+}
+.leplayer-controls.controls-common {
+  margin-top: 10px;
+}
+.leplayer-controls.controls-fullscreen {
+  display: none;
 }
 .leplayer-controls .control {
   background: #e1e8ef;

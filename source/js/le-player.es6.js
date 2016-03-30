@@ -38,9 +38,12 @@
 				step : 0.1
 			},
 			controls : {
-				common : [
+				common     : [
 					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen' ],
 					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download' ]
+				],
+				fullscreen : [
+					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'fullscreen' ]
 				]
 			}
 		}, opts);
@@ -203,7 +206,7 @@
 			constructor () {
 				super('fullscreen', 'arrows-alt');
 				this.element.click(e => {
-					toggleFullscreen();
+					Fullscreen.toggle();
 				});
 			}
 		}
@@ -557,6 +560,14 @@
 				return this.collections.common;
 			}
 
+			get fullscreen () {
+				return this.collections.fullscreen;
+			}
+
+			get mini () {
+				return this.collections.mini;
+			}
+
 			set download (value) {
 				for (var i in this.collections) {
 					this.collections[ i ].download = value;
@@ -599,6 +610,40 @@
 			play () {
 				for (var i in this.collections)
 					this.collections[ i ].play();
+			}
+		}
+
+		class Fullscreen {
+			/**
+			 * @returns {boolean} Whether browser supports fullscreen mode.
+			 */
+			static enabled () {
+				return !!(document.fullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled || document.webkitSupportsFullscreen || document.webkitFullscreenEnabled || document.createElement('video').webkitRequestFullScreen);
+			}
+
+			/**
+			 * @returns {boolean} Whether browser is in fullscreen mode.
+			 */
+			static is () {
+				return !!(document.fullScreen || document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement);
+			}
+
+			static toggle () {
+				if (this.is()) {
+					if (document.exitFullscreen)                document.exitFullscreen();
+					else if (document.mozCancelFullScreen)      document.mozCancelFullScreen();
+					else if (document.webkitCancelFullScreen)   document.webkitCancelFullScreen();
+					else if (document.msExitFullscreen)         document.msExitFullscreen();
+					container.removeClass('fullscreen');
+				}
+				else {
+					let containerEl = container[ 0 ];
+					if (containerEl.requestFullScreen)            containerEl.requestFullScreen();
+					else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();
+					else if (containerEl.mozRequestFullScreen)    containerEl.mozRequestFullScreen();
+					else if (containerEl.msExitFullscreen)        containerEl.msRequestFullscreen();
+					container.addClass('fullscreen');
+				}
 			}
 		}
 
@@ -659,7 +704,7 @@
 					for (let rowIndex in options.controls[ name ]) {
 						let row         = options.controls[ name ][ rowIndex ],
 						    hasTimeline = false,
-						    el          = $('<div />').addClass('leplayer-controls');
+						    rowElement  = $('<div />').addClass('leplayer-controls controls-' + name);
 
 						for (let i in row) {
 							let controlName = row[ i ];
@@ -668,7 +713,7 @@
 								// Create control only if divider or does not exist yet.
 								var c = controls.collections[ name ].add(controlName);
 								if (c != null) {
-									el.append(c);
+									rowElement.append(c);
 									if (controlName == C_TIMELINE)
 										hasTimeline = true;
 								}
@@ -678,10 +723,11 @@
 						}
 
 						if (!hasTimeline)
-							el.css('width', '1px');
-						el.find('.divider+.divider').remove();
+							rowElement.css('width', '1px');
 
-						container.append(el);
+						rowElement.find('.divider + .divider').remove();
+
+						container.append(rowElement);
 					}
 				}
 			}
@@ -819,17 +865,6 @@
 				video.pause();
 				controls.pause();
 			}
-		};
-
-		var toggleFullscreen = function () {
-			if (video.requestFullScreen)
-				video.requestFullScreen();
-			else if (video.webkitRequestFullScreen)
-				video.webkitRequestFullScreen();
-			else if (video.mozRequestFullScreen)
-				video.mozRequestFullScreen();
-			else
-				console.warn('Cannot toggle fullscreen.');
 		};
 
 		var secondsToTime = function (seconds) {
