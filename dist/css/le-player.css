@@ -6,6 +6,17 @@
   outline: 0;
   position: relative;
 }
+.leplayer-container.fullscreen {
+  position: absolute;
+  width: 100% !important;
+}
+.leplayer-container.fullscreen .leplayer-video,
+.leplayer-container.fullscreen video {
+  height: 100% !important;
+  margin: 0 auto;
+  position: absolute;
+  width: 100% !important;
+}
 .leplayer-container video {
   outline: 0;
 }
@@ -50,7 +61,10 @@
   margin-top: 10px;
 }
 .leplayer-controls.controls-fullscreen {
-  display: none;
+  bottom: 20px;
+  left: 20px;
+  position: fixed;
+  right: 20px;
 }
 .leplayer-controls .control {
   background: #e1e8ef;

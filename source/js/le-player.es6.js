@@ -471,9 +471,10 @@
 		}
 
 		class ControlCollection {
-			constructor (active) {
+			constructor (name, active) {
 				this.items  = [];
 				this.active = active || false;
+				this.name   = name;
 			}
 
 			set download (value) {
@@ -510,6 +511,10 @@
 				return (typeof this.items[ name ] == 'object');
 			}
 
+			hide () {
+				container.find('.controls-' + this.name).hide();
+			}
+
 			init () {
 				this.volume = Cookie.get('volume', 0.4);
 				this.initTimeline();
@@ -544,14 +549,18 @@
 				if (this.has(C_PLAY))
 					this.items.play.play();
 			}
+
+			show () {
+				container.find('.controls-' + this.name).show();
+			}
 		}
 
 		class Controls {
 			constructor () {
 				this.collections               = {
-					common     : new ControlCollection(),
-					mini       : new ControlCollection(),
-					fullscreen : new ControlCollection()
+					common     : new ControlCollection('common'),
+					mini       : new ControlCollection('mini'),
+					fullscreen : new ControlCollection('fullscreen')
 				};
 				this.collections.common.active = true;
 			}
@@ -594,6 +603,9 @@
 				for (var i in this.collections) {
 					this.collections[ i ].init();
 				}
+				this.collections.common.show();
+				this.collections.mini.hide();
+				this.collections.fullscreen.hide();
 			}
 
 			moveTimeMarker () {
@@ -635,6 +647,9 @@
 					else if (document.webkitCancelFullScreen)   document.webkitCancelFullScreen();
 					else if (document.msExitFullscreen)         document.msExitFullscreen();
 					container.removeClass('fullscreen');
+					controls.fullscreen.hide();
+					controls.common.show();
+					controls.mini.hide();
 				}
 				else {
 					let containerEl = container[ 0 ];
@@ -643,6 +658,9 @@
 					else if (containerEl.mozRequestFullScreen)    containerEl.mozRequestFullScreen();
 					else if (containerEl.msExitFullscreen)        containerEl.msRequestFullscreen();
 					container.addClass('fullscreen');
+					controls.fullscreen.show();
+					controls.common.hide();
+					controls.mini.hide();
 				}
 			}
 		}

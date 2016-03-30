@@ -9,6 +9,19 @@
 	outline: 0;
 	position: relative;
 
+	&.fullscreen
+	{
+		position: absolute;
+		width: 100% !important;
+		.leplayer-video, video
+		{
+			height: 100% !important;
+			margin: 0 auto;
+			position: absolute;
+			width: 100% !important;
+		}
+	}
+
 	video
 	{
 		outline: 0;
@@ -64,7 +77,10 @@
 	}
 	&.controls-fullscreen
 	{
-		display: none;
+		bottom: 20px;
+		left: 20px;
+		position: fixed;
+		right: 20px;
 	}
 	.control
 	{
