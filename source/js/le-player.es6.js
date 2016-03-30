@@ -646,10 +646,7 @@
 					else if (document.mozCancelFullScreen)      document.mozCancelFullScreen();
 					else if (document.webkitCancelFullScreen)   document.webkitCancelFullScreen();
 					else if (document.msExitFullscreen)         document.msExitFullscreen();
-					container.removeClass('fullscreen');
-					controls.fullscreen.hide();
-					controls.common.show();
-					controls.mini.hide();
+					this.updateDom(true);
 				}
 				else {
 					let containerEl = container[ 0 ];
@@ -657,6 +654,21 @@
 					else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();
 					else if (containerEl.mozRequestFullScreen)    containerEl.mozRequestFullScreen();
 					else if (containerEl.msExitFullscreen)        containerEl.msRequestFullscreen();
+					this.updateDom(false);
+				}
+			}
+
+			/**
+			 * Update DOM structure according to current state.
+			 */
+			static updateDom (isFullscreen) {
+				if (!!isFullscreen) {
+					container.removeClass('fullscreen');
+					controls.fullscreen.hide();
+					controls.common.show();
+					controls.mini.hide();
+				}
+				else {
 					container.addClass('fullscreen');
 					controls.fullscreen.show();
 					controls.common.hide();
@@ -868,6 +880,20 @@
 					element.append($('<track/>').attr('label', subtitles[ i ].title).attr('src', subtitles[ i ].src).attr('srclang', subtitles[ i ].language).attr('id', subtitles[ i ].language).attr('kind', 'subtitles'));
 				}
 			}
+
+			// Assing fullscreen events.
+			video.addEventListener('fullscreenchange', function (e) {
+				Fullscreen.updateDom(!!(video.fullScreen || video.fullscreenElement));
+			});
+			video.addEventListener('webkitfullscreenchange', function () {
+				Fullscreen.updateDom(!!video.webkitIsFullScreen);
+			});
+			video.addEventListener('mozfullscreenchange', function () {
+				Fullscreen.updateDom(!!video.mozFullScreen);
+			});
+			video.addEventListener('msfullscreenchange', function () {
+				Fullscreen.updateDom(!!video.msFullscreenElement);
+			});
 
 			controls.init();
 		};
