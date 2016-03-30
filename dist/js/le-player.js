@@ -37,20 +37,12 @@
 			volume   : {
 				step : 0.1
 			},
-			controls : [
-				{
-					element  : null,
-					controls : [
-						'play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen'
-					]
-				},
-				{
-					element  : null,
-					controls : [
-						'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download'
-					]
-				}
-			]
+			controls : {
+				common : [
+					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen' ],
+					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download' ]
+				]
+			}
 		}, opts);
 
 		class Control {
@@ -583,6 +575,10 @@
 				}
 			}
 
+			has (name) {
+				return (typeof this.collections[ name ] == 'object');
+			}
+
 			init () {
 				for (var i in this.collections) {
 					this.collections[ i ].init();
@@ -658,34 +654,35 @@
 		};
 
 		var initControls = function () {
-			for (var i in options.controls) {
-				var el          = options.controls[ i ].element;
-				var hasTimeline = false;
-				if (el == null)
-					el = $('<div />').addClass('leplayer-controls');
-				if (el.length == 0) {
-					console.warn('Error creating controls.');
-				}
-				else {
-					for (var k in options.controls[ i ].controls) {
-						var controlName = options.controls[ i ].controls[ k ];
+			for (let name in options.controls) {
+				if (controls.has(name)) {
+					for (let rowIndex in options.controls[ name ]) {
+						let row         = options.controls[ name ][ rowIndex ],
+						    hasTimeline = false,
+						    el          = $('<div />').addClass('leplayer-controls');
 
-						if (controlName == C_DIVIDER || !controls.common.has(controlName)) {
-							// Create control only if divider or does not exist yet.
-							var c = controls.common.add(controlName);
-							if (c != null) {
-								el.append(c);
-								if (controlName == C_TIMELINE)
-									hasTimeline = true;
+						for (let i in row) {
+							let controlName = row[ i ];
+
+							if (controlName == C_DIVIDER || !controls.collections[ name ].has(controlName)) {
+								// Create control only if divider or does not exist yet.
+								var c = controls.collections[ name ].add(controlName);
+								if (c != null) {
+									el.append(c);
+									if (controlName == C_TIMELINE)
+										hasTimeline = true;
+								}
+								else
+									console.warn('Cannot create ' + controlName + ' control for collection ' + name + '.');
 							}
-							else
-								console.warn('Cannot create ' + controlName + ' control.');
 						}
+
+						if (!hasTimeline)
+							el.css('width', '1px');
+						el.find('.divider+.divider').remove();
+
+						container.append(el);
 					}
-					if (!hasTimeline)
-						el.css('width', '1px');
-					el.find('.divider+.divider').remove();
-					container.append(el);
 				}
 			}
 		};
