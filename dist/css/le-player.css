@@ -65,6 +65,16 @@
   left: 20px;
   position: fixed;
   right: 20px;
+  width: auto;
+}
+.leplayer-controls.controls-fullscreen .timeline {
+  margin: 0;
+  top: -2px;
+}
+.leplayer-controls.controls-fullscreen .timeline-container .control-text {
+  height: auto;
+  position: relative;
+  top: -2px;
 }
 .leplayer-controls .control {
   background: #e1e8ef;
@@ -181,7 +191,6 @@
 }
 .leplayer-controls .timeline-subcontainer {
   display: table;
-  height: 100%;
   width: 100%;
 }
 .leplayer-controls .time-current,
