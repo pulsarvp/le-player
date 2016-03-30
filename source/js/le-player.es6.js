@@ -261,6 +261,11 @@
 					this.down.element.addClass('disabled');
 			}
 
+			load () {
+				video.playbackRate = Cookie.get('rate', 1);
+				this.show();
+			}
+
 			show () {
 				this.current.text = '×' + video.playbackRate.toFixed(2);
 			}
@@ -511,11 +516,16 @@
 			}
 
 			init () {
-				this.showRate();
 				this.volume = Cookie.get('volume', 0.4);
 				this.initTimeline();
 				this.totalTime = secondsToTime(video.duration);
 				this.source    = 0;
+				this.initRate();
+			}
+
+			initRate () {
+				if (this.has(C_RATE))
+					this.items.rate.load();
 			}
 
 			initTimeline () {
@@ -538,11 +548,6 @@
 			play () {
 				if (this.has(C_PLAY))
 					this.items.play.play();
-			}
-
-			showRate () {
-				if (this.has(C_RATE))
-					this.items.rate.show();
 			}
 		}
 
@@ -598,12 +603,6 @@
 			play () {
 				for (var i in this.collections)
 					this.collections[ i ].play();
-			}
-
-			showRate () {
-				for (var i in this.collections)
-					if (this.collections[ i ].active)
-						this.collections[ i ].init();
 			}
 		}
 
@@ -793,13 +792,10 @@
 		var initVideoEvent = function () {
 			overlay.css('line-height', video.clientHeight + 'px');
 			container.css('width', video.clientWidth + 'px');
-			video.playbackRate = Cookie.get('rate', 1);
 
 			video.ontimeupdate = function () {
 				controls.moveTimeMarker();
 			};
-
-			controls.init();
 
 			// This is generally for Firefox only
 			// because it somehow resets track list
@@ -811,6 +807,8 @@
 					element.append($('<track/>').attr('label', subtitles[ i ].title).attr('src', subtitles[ i ].src).attr('srclang', subtitles[ i ].language).attr('id', subtitles[ i ].language).attr('kind', 'subtitles'));
 				}
 			}
+
+			controls.init();
 		};
 
 		var togglePlay = function () {
