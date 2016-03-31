@@ -777,9 +777,11 @@
 
 		var initHotKeys = function () {
 			// Space.
-			element.keypress(function (e) {
-				if (e.charCode == 32)
+			element.keypress(e => {
+				if (e.charCode == 32) {
+					//e.preventDefault();
 					togglePlay();
+				}
 			}).click(function () {
 				togglePlay();
 			});
@@ -882,17 +884,22 @@
 			}
 
 			// Assing fullscreen events.
-			video.addEventListener('fullscreenchange', function (e) {
-				Fullscreen.updateDom(!!(video.fullScreen || video.fullscreenElement));
+			let containerEl = container[ 0 ];
+			containerEl.addEventListener('fullscreenchange', function (e) {
+				console.log('fullscreenchange');
+				Fullscreen.updateDom(!!(containerEl.fullScreen || containerEl.fullscreenElement));
 			});
-			video.addEventListener('webkitfullscreenchange', function () {
-				Fullscreen.updateDom(!!video.webkitIsFullScreen);
+			containerEl.addEventListener('webkitfullscreenchange', function () {
+				console.log('webkitfullscreenchange');
+				Fullscreen.updateDom(!!containerEl.webkitIsFullScreen);
 			});
-			video.addEventListener('mozfullscreenchange', function () {
-				Fullscreen.updateDom(!!video.mozFullScreen);
+			containerEl.addEventListener('mozfullscreenchange', function () {
+				console.log('mozfullscreenchange');
+				Fullscreen.updateDom(!!containerEl.mozFullScreen);
 			});
-			video.addEventListener('msfullscreenchange', function () {
-				Fullscreen.updateDom(!!video.msFullscreenElement);
+			containerEl.addEventListener('msfullscreenchange', function () {
+				console.log('msfullscreenchange');
+				Fullscreen.updateDom(!!containerEl.msFullscreenElement);
 			});
 
 			controls.init();
