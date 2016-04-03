@@ -287,8 +287,9 @@
 				}
 			}
 
-			set source (index) {
+			set (index) {
 				let s = this.getByIndex(index);
+				console.log(index);
 				if (s != null) {
 					element.attr('src', s.data('src'));
 					controls.download = s.data('src');
@@ -297,7 +298,7 @@
 
 			onItemClick (index) {
 				super.onItemClick(index);
-				this.source = index;
+				this.set(index);
 			}
 		}
 
@@ -485,7 +486,7 @@
 
 			set source (value) {
 				if (this.has(C_SOURCE))
-					this.items.source.source = value;
+					this.items.source.set(value);
 			}
 
 			set totalTime (value) {
@@ -519,7 +520,6 @@
 				this.volume = Cookie.get('volume', 0.4);
 				this.initTimeline();
 				this.totalTime = secondsToTime(video.duration);
-				this.source    = 0;
 				this.initRate();
 			}
 
