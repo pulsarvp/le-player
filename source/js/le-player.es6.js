@@ -625,12 +625,41 @@
 			}
 		}
 
+		/**
+		 * This class manages FullScreen API.
+		 * @TODO: add fullscreenerror handler.
+		 */
 		class Fullscreen {
 			/**
 			 * @returns {boolean} Whether browser supports fullscreen mode.
 			 */
 			static enabled () {
 				return !!(document.fullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled || document.webkitSupportsFullscreen || document.webkitFullscreenEnabled || document.createElement('video').webkitRequestFullScreen);
+			}
+
+			static hideElements () {
+				container.removeClass('fullscreen');
+				controls.fullscreen.hide();
+				controls.common.show();
+				controls.mini.hide();
+			}
+
+			static init () {
+				if (this.enabled()) {
+					// Fullscreen change handlers.
+					document.addEventListener('fullscreenchange', function (e) {
+						Fullscreen.toggleElements(!!(document.fullScreen || document.fullscreenElement));
+					}, false);
+					document.addEventListener('webkitfullscreenchange', function (e) {
+						Fullscreen.toggleElements(!!document.webkitIsFullScreen);
+					}, false);
+					document.addEventListener('mozfullscreenchange', function () {
+						Fullscreen.toggleElements(!!document.mozFullScreen);
+					}, false);
+					document.addEventListener('msfullscreenchange', function () {
+						Fullscreen.toggleElements(!!document.msFullscreenElement);
+					}, false);
+				}
 			}
 
 			/**
@@ -640,13 +669,20 @@
 				return !!(document.fullScreen || document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement);
 			}
 
+			static showElements () {
+				container.addClass('fullscreen');
+				controls.fullscreen.show();
+				controls.common.hide();
+				controls.mini.hide();
+			}
+
 			static toggle () {
 				if (this.is()) {
 					if (document.exitFullscreen)                document.exitFullscreen();
 					else if (document.mozCancelFullScreen)      document.mozCancelFullScreen();
 					else if (document.webkitCancelFullScreen)   document.webkitCancelFullScreen();
 					else if (document.msExitFullscreen)         document.msExitFullscreen();
-					this.updateDom(true);
+					this.hideElements(); // @TODO: make this only if fullscreen fired.
 				}
 				else {
 					let containerEl = container[ 0 ];
@@ -654,25 +690,19 @@
 					else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();
 					else if (containerEl.mozRequestFullScreen)    containerEl.mozRequestFullScreen();
 					else if (containerEl.msExitFullscreen)        containerEl.msRequestFullscreen();
-					this.updateDom(false);
+					this.showElements(); // @TODO: make this only if fullscreen fired.
 				}
 			}
 
 			/**
 			 * Update DOM structure according to current state.
 			 */
-			static updateDom (isFullscreen) {
-				if (!!isFullscreen) {
-					container.removeClass('fullscreen');
-					controls.fullscreen.hide();
-					controls.common.show();
-					controls.mini.hide();
+			static toggleElements (show) {
+				if (!!show) {
+					this.showElements();
 				}
 				else {
-					container.addClass('fullscreen');
-					controls.fullscreen.show();
-					controls.common.hide();
-					controls.mini.hide();
+					this.hideElements();
 				}
 			}
 		}
@@ -883,25 +913,7 @@
 				}
 			}
 
-			// Assing fullscreen events.
-			let containerEl = container[ 0 ];
-			containerEl.addEventListener('fullscreenchange', function (e) {
-				console.log('fullscreenchange');
-				Fullscreen.updateDom(!!(containerEl.fullScreen || containerEl.fullscreenElement));
-			});
-			containerEl.addEventListener('webkitfullscreenchange', function () {
-				console.log('webkitfullscreenchange');
-				Fullscreen.updateDom(!!containerEl.webkitIsFullScreen);
-			});
-			containerEl.addEventListener('mozfullscreenchange', function () {
-				console.log('mozfullscreenchange');
-				Fullscreen.updateDom(!!containerEl.mozFullScreen);
-			});
-			containerEl.addEventListener('msfullscreenchange', function () {
-				console.log('msfullscreenchange');
-				Fullscreen.updateDom(!!containerEl.msFullscreenElement);
-			});
-
+			Fullscreen.init();
 			controls.init();
 		};
 
