@@ -406,7 +406,7 @@
 					_self.range.top    = _self.line.offset().top;
 					_self.range.bottom = _self.range.top + _self.range.height;
 					if (e.pageY >= _self.range.top && e.pageY <= _self.range.bottom) {
-						_self.value = (_self.range.bottom - e.pageY) / _self.range.height;
+						controls.volume = (_self.range.bottom - e.pageY) / _self.range.height;
 					}
 				});
 
@@ -414,7 +414,7 @@
 
 				$(document).on('mousemove', function (e) {
 					if (_self.drag && e.pageY >= _self.range.top && e.pageY <= _self.range.bottom) {
-						_self.value = (_self.range.bottom - e.pageY) / _self.range.height;
+						controls.volume = (_self.range.bottom - e.pageY) / _self.range.height;
 					}
 				}).on('mouseup', function (e) {
 					_self.drag = false;
@@ -592,6 +592,12 @@
 			set totalTime (value) {
 				for (var i in this.collections) {
 					this.collections[ i ].totalTime = value;
+				}
+			}
+
+			set volume (value) {
+				for (var i in this.collections) {
+					this.collections[ i ].volume = value;
 				}
 			}
 
