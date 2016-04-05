@@ -610,8 +610,7 @@
 
 			moveTimeMarker () {
 				for (var i in this.collections)
-					if (this.collections[ i ].active)
-						this.collections[ i ].moveTimeMarker();
+					this.collections[ i ].moveTimeMarker();
 			}
 
 			pause () {
