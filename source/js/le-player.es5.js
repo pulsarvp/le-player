@@ -1,39 +1,39 @@
-(function($) {
+(function ($) {
 	'use strict';
 
 	var Player = function (element, opts) {
 		var options = $.extend(true, {
 			autoplay: false,
-			height: 'auto',
-			loop: false,
-			muted: false,
-			preload: 'metadata',
-			poster: null,
-			width: 'auto',
-			rate: {
+			height  : 'auto',
+			loop    : false,
+			muted   : false,
+			preload : 'metadata',
+			poster  : null,
+			width   : 'auto',
+			rate    : {
 				step: 0.25,
-				min: 0.5,
-				max: 4.0
+				min : 0.5,
+				max : 4.0
 			},
 			playback: {
 				step: {
-					short: 5,
+					short : 5,
 					medium: 30,
-					long: 60
+					long  : 60
 				}
 			},
-			volume: {
+			volume  : {
 				step: 0.1
 			},
 			controls: [
 				{
-					element: null,
+					element : null,
 					controls: [
 						'play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen'
 					]
 				},
 				{
-					element: null,
+					element : null,
 					controls: [
 						'rate', 'divider', 'backward', 'divider', 'sources', 'divider', 'subtitles', 'divider', 'download'
 					]
@@ -42,6 +42,247 @@
 
 		}, opts);
 
+		var Controls = function () {
+			this.backward = null;
+			this.download = null;
+			this.forward = null;
+			this.fullscreen = null;
+			this.play = null;
+			this.rate = null;
+			this.sources = null;
+			this.subtitles = null;
+			this.timeline = null;
+			this.volume = null;
+		};
+
+		Controls.prototype.createSimple = function (cssClass, iconClass) {
+			return $('<div />').addClass('control ' + cssClass).append($('<i />').addClass('fa fa-' + iconClass));
+		};
+
+		Controls.prototype.create = function (name) {
+			switch (name) {
+				case 'backward':
+					this.backward = this.createSimple('backward', 'undo').click(function () {
+						if (video.currentTime - options.playback.step.medium > 0)
+							seek(video.currentTime - options.playback.step.medium);
+						else
+							seek(0);
+					});
+					return this.backward;
+
+				case 'divider':
+					return $('<div />').addClass('divider');
+
+				case 'download':
+					this.download = $('<a />').attr('href', '').attr('target', '_blank').attr('download', '').addClass('control download').append($('<i />').addClass('fa fa-download'));
+					return this.download;
+
+				case 'forward':
+					this.forward = this.createSimple('forward', 'redo');
+					return this.forward;
+
+				case 'fullscreen':
+					this.fullscreen = this.createSimple('fullscreen', 'arrows-alt').click(function () {
+						toggleFullscreen();
+					});
+					return this.fullscreen;
+
+				case 'play':
+					this.play = this.createSimple('play', 'play').click(function () {
+						togglePlay();
+					});
+					return this.play;
+
+				case 'rate':
+					this.rate = {
+						down    : $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-backward')).click(function () {
+							this.decrease();
+						}),
+						up      : $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-forward')).click(function () {
+							this.increase();
+						}),
+						current : $('<div />').addClass('control-text rate-current'),
+						display : function () {
+							this.current.html('×' + video.playbackRate.toFixed(2));
+						},
+						increase: function () {
+							if (video.playbackRate < options.rate.max) {
+								this.down.removeClass('disabled');
+								video.playbackRate += options.rate.step;
+								this.display();
+								setCookie('rate', video.playbackRate);
+							}
+							else
+								this.up.addClass('disabled');
+
+						},
+						decrease: function () {
+							if (video.playbackRate > options.rate.min) {
+								this.up.removeClass('disabled');
+								video.playbackRate -= options.rate.step;
+								this.display();
+								setCookie('rate', video.playbackRate);
+							}
+							else
+								this.down.addClass('disabled');
+						}
+					};
+
+					return $('<div />').addClass('control-container').append(this.rate.down).append(this.rate.current).append(this.rate.up);
+
+				case 'sources':
+					if (sources.length > 1) {
+						this.sources = {
+							list     : [],
+							icon     : $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-bullseye')),
+							setActive: function (index) {
+								for (var i in this.list) {
+									if (this.list[i].data('index') == index)
+										this.list[i].addClass('active');
+									else
+										this.list[i].removeClass('active');
+								}
+							}
+						};
+						var list = $('<div/>').addClass('control-inner');
+						for (var i in sources) {
+							this.sources.list.push($('<div />').addClass('inner-item').data('index', i).html(sources[i].title).click(function () {
+								setSource($(this).data('index'));
+							}));
+						}
+						for (var i in this.sources.list) {
+							list.append(this.sources.list[i]);
+						}
+						return $('<div />').addClass('control control-container').append(this.sources.icon).append(list);
+					}
+					return null;
+
+				case 'subtitles':
+					if (subtitles.length > 0) {
+						this.subtitles = {
+							list: [],
+							icon: $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-commenting-o')).click(function () {
+								switchTrack('');
+								$(this).html($('<i />').addClass('fa fa-commenting-o'));
+							})
+						};
+						var list = $('<div/>').addClass('control-inner');
+						for (var i in subtitles) {
+							this.subtitles.list.push($('<div />').addClass('inner-item').data('src', subtitles[i].src).data('language', subtitles[i].language).html(subtitles[i].title).click(function () {
+								switchTrack($(this).data('language'));
+								this.subtitles.icon.html($(this).html());
+							}));
+						}
+						for (var i in this.subtitles.list) {
+							list.append(this.subtitles.list[i]);
+						}
+						return $('<div />').addClass('control control-container').append(this.subtitles.icon).append(list);
+					}
+					return null;
+
+				case 'timeline':
+					this.time = {
+						current         : $('<div />').addClass('control-text time-current').html('00:00'),
+						total           : $('<div />').addClass('control-text time-total'),
+						line            : $('<div />').addClass('timeline').click(function (e) {
+							seek(video.duration * this.time.getPosition(e.pageX));
+						}).mousemove(function (e) {
+							var p = this.time.getPosition(e.pageX);
+							if (p > 0 && p < 1) {
+								this.time.markerShadow.show();
+								this.time.markerShadow.css('left', p * 100 + '%');
+								this.time.markerShadowTime.html(secondsToTime(video.duration * p));
+							}
+							else
+								this.time.markerShadow.hide();
+						}).mouseleave(function () {
+							this.time.markerShadow.hide();
+						}),
+						marker          : $('<div />').addClass('time-marker'),
+						markerShadow    : $('<div />').addClass('time-marker shadow').append().hide(),
+						markerShadowTime: $('<div/>').addClass('time'),
+						played          : $('<div />').addClass('time-played'),
+						move            : function () {
+							var t = (video.currentTime / video.duration * 100).toFixed(2) + '%';
+							this.marker.css('left', t);
+							this.played.css('width', t);
+							this.current.html(secondsToTime(video.currentTime));
+						},
+						getPosition     : function (x) {
+							return (x - this.line.offset().left) / this.line.width();
+						}
+					};
+					this.time.line.append(this.time.marker).append(this.time.markerShadow.append(this.time.markerShadowTime)).append(this.time.played);
+					return $('<div />').addClass('timeline-container').append($('<div />').addClass('timeline-subcontainer').append(this.time.current).append(this.time.line).append(this.time.total));
+
+				case 'volume':
+					var drag = false;
+					var range = { bottom: 0, height: 0, top: 0 };
+
+					this.volume = {
+						active     : $('<div/>').addClass('volume-active'),
+						marker     : $('<div/>').addClass('volume-marker').on('mousedown', function (e) {
+							drag = true;
+							range.height = this.volume.line.height();
+							range.top = this.volume.line.offset().top;
+							range.bottom = range.top + range.height;
+						}),
+						icon       : $('<div/>').addClass('control-icon').append($('<i />').addClass('fa fa-volume-down')).click(function () {
+							this.volume.toggleMuted();
+						}),
+						set        : function (value) {
+							var icon = this.icon.children('.fa').eq(0);
+							icon.removeClass();
+							if (value < 0.05) {
+								video.muted = true;
+								icon.addClass('fa fa-volume-off');
+							}
+							else {
+								video.muted = false;
+								video.volume = value;
+								if (value < 0.5)
+									icon.addClass('fa fa-volume-down');
+								else
+									icon.addClass('fa fa-volume-up');
+								setCookie('volume', value);
+							}
+							var p = Math.round(value * 100).toString() + '%';
+							this.active.css('height', p);
+							this.marker.css('bottom', p);
+						},
+						toggleMuted: function () {
+							if (video.muted == true) {
+								this.set(getCookie('volume', 0.4));
+							}
+							else
+								this.set(0);
+						}
+					};
+					this.volume.line = $('<div/>').addClass('volume-line').append(this.volume.active).append(this.volume.marker).click(function (e) {
+						range.height = this.volume.line.height();
+						range.top = this.volume.line.offset().top;
+						range.bottom = range.top + range.height;
+						if (e.pageY >= range.top && e.pageY <= range.bottom) {
+							this.volume.set((range.bottom - e.pageY) / range.height);
+						}
+					});
+					this.volume.container = $('<div />').addClass('control control-container').append(this.volume.icon).append($('<div />').addClass('control-inner volume-slider').append(this.volume.line));
+
+					$(document).on('mousemove', function (e) {
+						if (drag && e.pageY >= range.top && e.pageY <= range.bottom) {
+							this.volume.set((range.bottom - e.pageY) / range.height);
+						}
+					}).on('mouseup', function (e) {
+						drag = false;
+					});
+
+					return this.volume.container;
+
+				default:
+					return null;
+			}
+		};
+
 		var sources = [];
 		var subtitles = [];
 		var volume = 0.5;
@@ -49,7 +290,7 @@
 		var controls = {};
 
 		/**
-		 * DOM conatainer to hold video and all other stuff.
+		 * DOM container to hold video and all other stuff.
 		 * @type object
 		 */
 		var container = null;
@@ -111,14 +352,14 @@
 
 				case 'rate':
 					controls.rate = {
-						down: $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-backward')).click(function () {
+						down    : $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-backward')).click(function () {
 							controls.rate.decrease();
 						}),
-						up: $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-forward')).click(function () {
+						up      : $('<div />').addClass('control rate-down').append($('<i />').addClass('fa fa-forward')).click(function () {
 							controls.rate.increase();
 						}),
-						current: $('<div />').addClass('control-text rate-current'),
-						display: function () {
+						current : $('<div />').addClass('control-text rate-current'),
+						display : function () {
 							this.current.html('×' + video.playbackRate.toFixed(2));
 						},
 						increase: function () {
@@ -149,8 +390,8 @@
 				case 'sources':
 					if (sources.length > 1) {
 						controls.sources = {
-							list: [],
-							icon: $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-bullseye')),
+							list     : [],
+							icon     : $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-bullseye')),
 							setActive: function (index) {
 								for (var i in this.list) {
 									if (this.list[i].data('index') == index)
@@ -198,9 +439,9 @@
 
 				case 'timeline':
 					controls.time = {
-						current: $('<div />').addClass('control-text time-current').html('00:00'),
-						total: $('<div />').addClass('control-text time-total'),
-						line: $('<div />').addClass('timeline').click(function (e) {
+						current         : $('<div />').addClass('control-text time-current').html('00:00'),
+						total           : $('<div />').addClass('control-text time-total'),
+						line            : $('<div />').addClass('timeline').click(function (e) {
 							seek(video.duration * controls.time.getPosition(e.pageX));
 						}).mousemove(function (e) {
 							var p = controls.time.getPosition(e.pageX);
@@ -214,17 +455,17 @@
 						}).mouseleave(function () {
 							controls.time.markerShadow.hide();
 						}),
-						marker: $('<div />').addClass('time-marker'),
-						markerShadow: $('<div />').addClass('time-marker shadow').append().hide(),
+						marker          : $('<div />').addClass('time-marker'),
+						markerShadow    : $('<div />').addClass('time-marker shadow').append().hide(),
 						markerShadowTime: $('<div/>').addClass('time'),
-						played: $('<div />').addClass('time-played'),
-						move: function () {
+						played          : $('<div />').addClass('time-played'),
+						move            : function () {
 							var t = (video.currentTime / video.duration * 100).toFixed(2) + '%';
 							this.marker.css('left', t);
 							this.played.css('width', t);
 							this.current.html(secondsToTime(video.currentTime));
 						},
-						getPosition: function (x) {
+						getPosition     : function (x) {
 							return (x - this.line.offset().left) / this.line.width();
 						}
 					};
@@ -232,22 +473,21 @@
 					return $('<div />').addClass('timeline-container').append($('<div />').addClass('timeline-subcontainer').append(controls.time.current).append(controls.time.line).append(controls.time.total));
 
 				case 'volume':
-
 					var drag = false;
-					var range = {bottom: 0, height: 0, top: 0};
+					var range = { bottom: 0, height: 0, top: 0 };
 
 					controls.volume = {
-						active: $('<div/>').addClass('volume-active'),
-						marker: $('<div/>').addClass('volume-marker').on('mousedown', function (e) {
+						active     : $('<div/>').addClass('volume-active'),
+						marker     : $('<div/>').addClass('volume-marker').on('mousedown', function (e) {
 							drag = true;
 							range.height = controls.volume.line.height();
 							range.top = controls.volume.line.offset().top;
 							range.bottom = range.top + range.height;
 						}),
-						icon: $('<div/>').addClass('control-icon').append($('<i />').addClass('fa fa-volume-down')).click(function () {
+						icon       : $('<div/>').addClass('control-icon').append($('<i />').addClass('fa fa-volume-down')).click(function () {
 							controls.volume.toggleMuted();
 						}),
-						set: function (value) {
+						set        : function (value) {
 							var icon = this.icon.children('.fa').eq(0);
 							icon.removeClass();
 							if (value < 0.05) {
@@ -300,8 +540,11 @@
 			}
 		};
 
-		var init = function () {
+		var hasControl = function (name) {
+			return controls.hasOwnProperty(name);
+		};
 
+		var init = function () {
 			// Check if element is correctly selected.
 			if (element.prop('tagName').toLowerCase() != 'video') {
 				console.warn('Incorrect element selected.');
@@ -313,7 +556,7 @@
 				var src = $(this).attr('src');
 				if (src)
 					sources.push({
-						src: src,
+						src  : src,
 						title: $(this).attr('title')
 					});
 			});
@@ -321,7 +564,7 @@
 				var src = element.attr('src');
 				if (src) {
 					sources.push({
-						src: src,
+						src  : src,
 						title: $(this).attr('title') || 'default'
 					});
 				}
@@ -351,17 +594,23 @@
 				}
 				else {
 					for (var k in options.controls[i].controls) {
-						var c = createControl(options.controls[i].controls[k]);
-						if (c != null && c.length > 0) {
-							el.append(c);
-							if (options.controls[i].controls[k] == 'timeline')
-								hasTimeline = true;
+						var controlName = options.controls[i].controls[k];
+
+						if (controlName == 'divider' || !hasControl(controlName)) {
+							// Create control only if divider or does not exist yet.
+							var c = createControl(controlName);
+							if (c != null && c.length > 0) {
+								el.append(c);
+								if (controlName == 'timeline')
+									hasTimeline = true;
+							}
+							else
+								console.warn('Cannot create ' + controlName + ' control.');
 						}
-						else
-							console.warn('Cannot create ' + options.controls[i].controls[k] + ' control.');
 					}
 					if (!hasTimeline)
 						el.css('width', '1px');
+					el.find('.divider+.divider').remove();
 					container.append(el);
 				}
 			}
@@ -466,8 +715,8 @@
 				var src = $(this).attr('src');
 				if (title.length > 0 && src.length > 0) {
 					subtitles.push({
-						title: title,
-						src: src,
+						title   : title,
+						src     : src,
 						language: language
 					});
 				}
