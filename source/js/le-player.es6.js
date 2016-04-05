@@ -354,7 +354,7 @@
 				this.line             = $('<div />').addClass('timeline').click(function (e) {
 					seek(video.duration * _self.getPosition(e.pageX));
 				}).mousemove(function (e) {
-					var p = _self.getPosition(e.pageX);
+					let p = _self.getPosition(e.pageX);
 					if (p > 0 && p < 1) {
 						_self.markerShadow.show();
 						_self.markerShadow.css('left', p * 100 + '%');
@@ -393,7 +393,7 @@
 
 				this.active = $('<div/>').addClass('volume-active');
 				this.marker = $('<div/>').addClass('volume-marker').on('mousedown', function (e) {
-					_self.drag         = _self;
+					_self.drag         = true;
 					_self.range.height = _self.line.height();
 					_self.range.top    = _self.line.offset().top;
 					_self.range.bottom = _self.range.top + _self.range.height;
