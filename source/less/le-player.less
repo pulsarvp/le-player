@@ -17,7 +17,8 @@
 		{
 			height: 100% !important;
 			margin: 0 auto;
-			position: absolute;
+			position: fixed;
+			top: 0;
 			width: 100% !important;
 		}
 	}
@@ -157,10 +158,10 @@
 			{
 				background: @color-fs-marker-shadow;
 				border-right: 1px solid @color-fs-marker-shadow-border;
-				.time
-				{
-					background: @color-fs-marker-shadow-time;
-				}
+			}
+			.time
+			{
+				background: @color-fs-marker-shadow-time;
 			}
 		}
 		.time-played
@@ -347,19 +348,19 @@
 			border-right: 1px solid @color-marker-shadow-border;
 			transition: none;
 			z-index: @z-index-base + 5;
-			.time
-			{
-				background: @color-marker-shadow-time;
-				border-radius: 1px;
-				bottom: 20px;
-				color: #fff;
-				font-size: @control-text-font-size;
-				line-height: @control-text-font-size + 6px;
-				margin-left: -18px;
-				padding: 0 5px;
-				position: absolute;
-				z-index: @z-index-base + 3;
-			}
+		}
+		.time
+		{
+			background: @color-marker-shadow-time;
+			border-radius: 1px;
+			bottom: 20px;
+			color: #fff;
+			font-size: @control-text-font-size;
+			line-height: @control-text-font-size + 6px;
+			margin-left: -18px;
+			padding: 0 5px;
+			position: absolute;
+			z-index: @z-index-base + 3;
 		}
 	}
 	.time-played
