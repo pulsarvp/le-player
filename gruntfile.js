@@ -70,6 +70,14 @@ module.exports = function (grunt) {
 				}
 			}
 		},
+		concat: {
+			js: {
+				src : [
+					'source/js/<%= pkg.name %>.es6.js'
+				],
+				dest: 'dist/js/<%= pkg.name %>.es6.js'
+			}
+		},
 		watch : {
 			less: {
 				files: ['source/less/**/*'],
@@ -101,5 +109,5 @@ module.exports = function (grunt) {
 
 
 	grunt.registerTask('default', ['less', 'webpack:build-dev', 'watch']);
-	grunt.registerTask('production', ['clean', 'less', 'webpack:build', 'uglify']);
+	grunt.registerTask('production', ['clean', 'less', 'concat', 'webpack:build', 'uglify']);
 };
