@@ -1,3 +1,7 @@
+var path = require('path');
+var webpack = require('webpack');
+var webpackConfig = require('./webpack.config.js');
+
 module.exports = function (grunt) {
 	grunt.initConfig({
 		pkg   : grunt.file.readJSON('package.json'),
@@ -9,12 +13,15 @@ module.exports = function (grunt) {
 				'dist/**/*'
 			]
 		},
-		concat: {
-			js: {
-				src : [
-					'source/js/<%= pkg.name %>.es6.js'
-				],
-				dest: 'dist/js/<%= pkg.name %>.js'
+		webpack : {
+			options : webpackConfig,
+			build : {
+			},
+			"build-dev" : {
+				devtool : 'cheap-inline-module-source-map',
+				plugins : [
+					new webpack.NoErrorsPlugin()
+				]
 			}
 		},
 		less  : {
@@ -63,6 +70,14 @@ module.exports = function (grunt) {
 				}
 			}
 		},
+		concat: {
+			js: {
+				src : [
+					'source/js/<%= pkg.name %>.es6.js'
+				],
+				dest: 'dist/js/<%= pkg.name %>.es6.js'
+			}
+		},
 		watch : {
 			less: {
 				files: ['source/less/**/*'],
@@ -74,7 +89,7 @@ module.exports = function (grunt) {
 			},
 			js  : {
 				files: ['source/js/**/*.js'],
-				tasks: ['concat']
+				tasks: ['webpack:build']
 			}
 		},
 		uglify: {
@@ -85,12 +100,14 @@ module.exports = function (grunt) {
 		}
 	});
 
+	grunt.loadNpmTasks('grunt-webpack');
 	grunt.loadNpmTasks('grunt-contrib-less');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 
-	grunt.registerTask('default', ['less', 'concat', 'watch']);
-	grunt.registerTask('production', ['clean', 'less', 'concat', 'uglify']);
+
+	grunt.registerTask('default', ['less', 'webpack:build-dev', 'watch']);
+	grunt.registerTask('production', ['clean', 'less', 'concat', 'webpack:build', 'uglify']);
 };
