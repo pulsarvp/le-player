@@ -4,16 +4,16 @@ import $ from 'jquery';
 
 var Player = function (element, opts) {
 	const C_BACKWARD   = 'backward';
-	const C_DIVIDER	= 'divider';
+	const C_DIVIDER    = 'divider';
 	const C_DOWNLOAD   = 'download';
-	const C_FORWARD	= 'forward';
+	const C_FORWARD    = 'forward';
 	const C_FULLSCREEN = 'fullscreen';
-	const C_PLAY	   = 'play';
-	const C_RATE	   = 'rate';
-	const C_SOURCE	 = 'source';
+	const C_PLAY       = 'play';
+	const C_RATE       = 'rate';
+	const C_SOURCE     = 'source';
 	const C_SUBTITLE   = 'subtitle';
 	const C_TIMELINE   = 'timeline';
-	const C_VOLUME	 = 'volume';
+	const C_VOLUME     = 'volume';
 
 	var options = $.extend(true, {
 		autoplay : false,
@@ -39,7 +39,7 @@ var Player = function (element, opts) {
 			step : 0.1
 		},
 		controls : {
-			common : [
+			common     : [
 				[ 'play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen' ],
 				[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download' ]
 			],
@@ -111,13 +111,13 @@ var Player = function (element, opts) {
 
 	class ControlContainer {
 		constructor (iconClass) {
-			let _self = this;
-			this.iconClass = iconClass;
-			this.icon = $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-' + iconClass));
+			let _self        = this;
+			this.iconClass   = iconClass;
+			this.icon        = $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-' + iconClass));
 			this.listElement = $('<div/>').addClass('control-inner');
-			this.element = $('<div />').addClass('control control-container').append(this.icon).append(this.listElement);
-			this._index = 0;
-			this.list = [];
+			this.element     = $('<div />').addClass('control control-container').append(this.icon).append(this.listElement);
+			this._index      = 0;
+			this.list        = [];
 			this.icon.click(function () { _self.onContainerClick(); });
 		}
 
@@ -231,8 +231,8 @@ var Player = function (element, opts) {
 
 	class RateControl {
 		constructor () {
-			this.down	= new Control('rate-down', 'backward');
-			this.up	  = new Control('rate-up', 'forward');
+			this.down    = new Control('rate-down', 'backward');
+			this.up      = new Control('rate-up', 'forward');
 			this.current = new ControlText('rate-current');
 
 			this.down.element.click(e => {
@@ -349,18 +349,17 @@ var Player = function (element, opts) {
 			this.current = new ControlText('time-current');
 			this.total   = new ControlText('time-total');
 
-			this.marker = $('<div />').addClass('time-marker')
+			this.marker = $('<div />').addClass('time-marker');
 
-
-			this.markerShadow	 = $('<div />')
+			this.markerShadow = $('<div />')
 				.addClass('time-marker shadow')
 				.append()
 				.hide();
 
 			this.markerShadowTime = $('<div />').addClass('time');
-			this.played = $('<div />').addClass('time-played');
-			this.current.text = '00:00';
-			this.line = $('<div />')
+			this.played           = $('<div />').addClass('time-played');
+			this.current.text     = '00:00';
+			this.line             = $('<div />')
 				.addClass('timeline')
 				.append(this.marker)
 				.append(this.markerShadow.append(this.markerShadowTime))
@@ -393,15 +392,14 @@ var Player = function (element, opts) {
 			this.element = $('<div />')
 				.addClass('timeline-container')
 				.append($('<div />')
-				.addClass('timeline-subcontainer')
-				.append(this.current.element)
-				.append(this.line)
-				.append(this.total.element));
-
+					.addClass('timeline-subcontainer')
+					.append(this.current.element)
+					.append(this.line)
+					.append(this.total.element));
 
 			this.marker.on('mousedown', (e) => {
-				if(e.which != 1) return;
-				this.markerShadow.hide()
+				if (e.which != 1) return;
+				this.markerShadow.hide();
 				this.drag = true;
 			});
 
@@ -437,10 +435,10 @@ var Player = function (element, opts) {
 		constructor () {
 			let _self = this;
 
-			this.icon   = $('<div/>')
+			this.icon = $('<div/>')
 				.addClass('control-icon')
 				.append($('<i />')
-				.addClass('fa fa-volume-down'))
+					.addClass('fa fa-volume-down'))
 				.click(function () {
 					_self.toggleMuted();
 				});
@@ -449,7 +447,7 @@ var Player = function (element, opts) {
 
 			this.active = $('<div/>').addClass('volume-active');
 
-			this.line   = $('<div/>')
+			this.line = $('<div/>')
 				.addClass('volume-line')
 				.append(this.active)
 				.append(this.marker)
@@ -465,13 +463,13 @@ var Player = function (element, opts) {
 				.addClass('control control-container')
 				.append(this.icon)
 				.append($('<div />')
-				.addClass('control-inner volume-slider')
-				.append(this.line));
+					.addClass('control-inner volume-slider')
+					.append(this.line));
 
-			this.drag  = false;
+			this.drag = false;
 
 			this.marker.on('mousedown', (e) => {
-				if(e.which != 1) return;
+				if (e.which != 1) return;
 				this.drag = true;
 			});
 
@@ -507,7 +505,7 @@ var Player = function (element, opts) {
 				Cookie.set('volume', value);
 			}
 
-			var p = Math.round(value * 100).toString() + '%';
+			let p = Math.round(value * 100).toString() + '%';
 			this.active.css('height', p);
 			this.marker.css('bottom', p);
 		}
@@ -520,7 +518,7 @@ var Player = function (element, opts) {
 				this.value = 0;
 		}
 
-		getPosition(y) {
+		getPosition (y) {
 			return (y - this.line.offset().top) / this.line.height();
 		}
 
@@ -630,9 +628,9 @@ var Player = function (element, opts) {
 
 	class Controls {
 		constructor () {
-			this.collections			   = {
-				common	 : new ControlCollection('common'),
-				mini	   : new ControlCollection('mini'),
+			this.collections               = {
+				common     : new ControlCollection('common'),
+				mini       : new ControlCollection('mini'),
 				fullscreen : new ControlCollection('fullscreen')
 			};
 			this.collections.common.active = true;
@@ -756,18 +754,18 @@ var Player = function (element, opts) {
 
 		static toggle () {
 			if (this.is()) {
-				if (document.exitFullscreen)				document.exitFullscreen();
-				else if (document.mozCancelFullScreen)	  document.mozCancelFullScreen();
+				if (document.exitFullscreen)                document.exitFullscreen();
+				else if (document.mozCancelFullScreen)      document.mozCancelFullScreen();
 				else if (document.webkitCancelFullScreen)   document.webkitCancelFullScreen();
-				else if (document.msExitFullscreen)		 document.msExitFullscreen();
+				else if (document.msExitFullscreen)         document.msExitFullscreen();
 				this.hideElements(); // @TODO: make this only if fullscreen fired.
 			}
 			else {
 				let containerEl = container[ 0 ];
-				if (containerEl.requestFullScreen)			containerEl.requestFullScreen();
+				if (containerEl.requestFullScreen)            containerEl.requestFullScreen();
 				else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();
-				else if (containerEl.mozRequestFullScreen)	containerEl.mozRequestFullScreen();
-				else if (containerEl.msExitFullscreen)		containerEl.msRequestFullscreen();
+				else if (containerEl.mozRequestFullScreen)    containerEl.mozRequestFullScreen();
+				else if (containerEl.msExitFullscreen)        containerEl.msRequestFullscreen();
 				this.showElements(); // @TODO: make this only if fullscreen fired.
 			}
 		}
@@ -787,8 +785,8 @@ var Player = function (element, opts) {
 
 	var sources   = [];
 	var subtitles = [];
-	var volume	= 0.5;
-	var video	 = null;
+	var volume    = 0.5;
+	var video     = null;
 	var controls  = new Controls();
 
 	/**
@@ -840,9 +838,9 @@ var Player = function (element, opts) {
 		for (let name in options.controls) {
 			if (controls.has(name)) {
 				for (let rowIndex in options.controls[ name ]) {
-					let row		 = options.controls[ name ][ rowIndex ],
-						hasTimeline = false,
-						rowElement  = $('<div />').addClass('leplayer-controls controls-' + name);
+					let row         = options.controls[ name ][ rowIndex ],
+					    hasTimeline = false,
+					    rowElement  = $('<div />').addClass('leplayer-controls controls-' + name);
 
 					for (let i in row) {
 						let controlName = row[ i ];
@@ -872,9 +870,9 @@ var Player = function (element, opts) {
 	};
 
 	var initDom = function () {
-		overlay			= $('<div />').addClass('play-overlay').html('<i class="fa fa-play"></i>');
+		overlay            = $('<div />').addClass('play-overlay').html('<i class="fa fa-play"></i>');
 		var videoContainer = $('<div />').addClass('leplayer-video').append(overlay);
-		container		  = $('<div />').addClass('leplayer-container').append(videoContainer).css('width', element.width() + 'px');
+		container          = $('<div />').addClass('leplayer-container').append(videoContainer).css('width', element.width() + 'px');
 
 		element.before(container);
 		videoContainer.append(element);
@@ -950,12 +948,12 @@ var Player = function (element, opts) {
 	var initSubtitles = function () {
 		element.children('track[kind="subtitles"]').each(function () {
 			var language = $(this).attr('srclang');
-			var title	= $(this).attr('label');
-			var src	  = $(this).attr('src');
+			var title    = $(this).attr('label');
+			var src      = $(this).attr('src');
 			if (title.length > 0 && src.length > 0) {
 				subtitles.push({
-					title	: title,
-					src	  : src,
+					title    : title,
+					src      : src,
 					language : language
 				});
 			}
