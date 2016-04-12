@@ -427,7 +427,6 @@
 				key: 'set',
 				value: function set(index) {
 					var s = this.getByIndex(index);
-					console.log(index);
 					if (s != null) {
 						element.attr('src', s.data('src'));
 						controls.download = s.data('src');
@@ -495,34 +494,69 @@
 
 		var TimelineControl = function () {
 			function TimelineControl() {
+				var _this9 = this;
+
 				_classCallCheck(this, TimelineControl);
 
 				var _self = this;
+
+				this.drag = false;
 
 				this.current = new ControlText('time-current');
 				this.total = new ControlText('time-total');
 
 				this.marker = (0, _jquery2.default)('<div />').addClass('time-marker');
+
 				this.markerShadow = (0, _jquery2.default)('<div />').addClass('time-marker shadow').append().hide();
+
 				this.markerShadowTime = (0, _jquery2.default)('<div />').addClass('time');
 				this.played = (0, _jquery2.default)('<div />').addClass('time-played');
-				this.line = (0, _jquery2.default)('<div />').addClass('timeline').click(function (e) {
-					seek(video.duration * _self.getPosition(e.pageX));
-				}).mousemove(function (e) {
-					var p = _self.getPosition(e.pageX);
-					if (p > 0 && p < 1) {
-						_self.markerShadow.show();
-						_self.markerShadow.css('left', p * 100 + '%');
-						_self.markerShadowTime.html(secondsToTime(video.duration * p));
-					} else _self.markerShadow.hide();
-				}).mouseleave(function () {
-					_self.markerShadow.hide();
+				this.current.text = '00:00';
+				this.line = (0, _jquery2.default)('<div />').addClass('timeline').append(this.marker).append(this.markerShadow.append(this.markerShadowTime)).append(this.played).on({
+					'mousemove': function mousemove(e) {
+						if (_this9.drag) return;
+
+						var p = _this9.getPosition(e.pageX);
+						if (p > 0 && p < 1) {
+							_this9.markerShadow.show();
+							_this9.markerShadow.css('left', p * 100 + '%');
+							_this9.markerShadowTime.html(secondsToTime(video.duration * p));
+						} else _this9.markerShadow.hide();
+					},
+
+					'mouseleave': function mouseleave(e) {
+						if (_this9.drag) return;
+						_this9.markerShadow.hide();
+					},
+
+					'click': function click(e) {
+						if (_this9.drag) return;
+						seek(video.duration * _this9.getPosition(e.pageX));
+					}
 				});
 
-				this.current.text = '00:00';
-
-				this.line.append(this.marker).append(this.markerShadow.append(this.markerShadowTime)).append(this.played);
 				this.element = (0, _jquery2.default)('<div />').addClass('timeline-container').append((0, _jquery2.default)('<div />').addClass('timeline-subcontainer').append(this.current.element).append(this.line).append(this.total.element));
+
+				this.marker.on('mousedown', function (e) {
+					if (e.which != 1) return;
+					_this9.markerShadow.hide();
+					_this9.drag = true;
+				});
+
+				(0, _jquery2.default)(document).on({
+
+					'mousemove': function mousemove(e) {
+						if (!_this9.drag) return;
+						var p = _this9.getPosition(e.pageX);
+						if (p > 0 && p < 1) {
+							seek(video.duration * p);
+						}
+					},
+
+					'mouseup': function mouseup(e) {
+						_this9.drag = false;
+					}
+				});
 			}
 
 			_createClass(TimelineControl, [{
@@ -545,40 +579,49 @@
 
 		var VolumeControl = function () {
 			function VolumeControl() {
+				var _this10 = this;
+
 				_classCallCheck(this, VolumeControl);
 
 				var _self = this;
 
-				this.drag = false;
-				this.range = { bottom: 0, height: 0, top: 0 };
-
-				this.active = (0, _jquery2.default)('<div/>').addClass('volume-active');
-				this.marker = (0, _jquery2.default)('<div/>').addClass('volume-marker').on('mousedown', function (e) {
-					_self.drag = true;
-					_self.range.height = _self.line.height();
-					_self.range.top = _self.line.offset().top;
-					_self.range.bottom = _self.range.top + _self.range.height;
-				});
 				this.icon = (0, _jquery2.default)('<div/>').addClass('control-icon').append((0, _jquery2.default)('<i />').addClass('fa fa-volume-down')).click(function () {
 					_self.toggleMuted();
 				});
-				this.line = (0, _jquery2.default)('<div/>').addClass('volume-line').append(this.active).append(this.marker).click(function (e) {
-					_self.range.height = _self.line.height();
-					_self.range.top = _self.line.offset().top;
-					_self.range.bottom = _self.range.top + _self.range.height;
-					if (e.pageY >= _self.range.top && e.pageY <= _self.range.bottom) {
-						controls.volume = (_self.range.bottom - e.pageY) / _self.range.height;
+
+				this.marker = (0, _jquery2.default)('<div/>').addClass('volume-marker');
+
+				this.active = (0, _jquery2.default)('<div/>').addClass('volume-active');
+
+				this.line = (0, _jquery2.default)('<div/>').addClass('volume-line').append(this.active).append(this.marker).on('click', function (e) {
+					if (_this10.drag) return;
+					var p = _this10.getPosition(e.pageY);
+					if (p >= 0 && p <= 1) {
+						controls.volume = 1 - p;
 					}
 				});
 
 				this.element = (0, _jquery2.default)('<div />').addClass('control control-container').append(this.icon).append((0, _jquery2.default)('<div />').addClass('control-inner volume-slider').append(this.line));
 
-				(0, _jquery2.default)(document).on('mousemove', function (e) {
-					if (_self.drag && e.pageY >= _self.range.top && e.pageY <= _self.range.bottom) {
-						controls.volume = (_self.range.bottom - e.pageY) / _self.range.height;
+				this.drag = false;
+
+				this.marker.on('mousedown', function (e) {
+					if (e.which != 1) return;
+					_this10.drag = true;
+				});
+
+				(0, _jquery2.default)(document).on({
+					'mousemove': function mousemove(e) {
+						if (!_this10.drag) return;
+						var p = _this10.getPosition(e.pageY);
+						if (p >= 0 && p <= 1) {
+							controls.volume = 1 - p;
+						}
+					},
+
+					'mouseup': function mouseup(e) {
+						_this10.drag = false;
 					}
-				}).on('mouseup', function (e) {
-					_self.drag = false;
 				});
 			}
 
@@ -590,9 +633,14 @@
 					} else this.value = 0;
 				}
 			}, {
+				key: 'getPosition',
+				value: function getPosition(y) {
+					return (y - this.line.offset().top) / this.line.height();
+				}
+			}, {
 				key: 'value',
 				set: function set(value) {
-					var icon = this.icon.children('.fa').eq(0);
+					var icon = this.icon.children('.fa').eq(-1);
 					icon.removeClass();
 					if (value < 0.05) {
 						video.muted = true;
