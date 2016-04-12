@@ -129,7 +129,7 @@
   background: rgba(26, 74, 126, 0.8);
   border-right: 1px solid rgba(225, 232, 239, 0.5);
 }
-.leplayer-controls.controls-fullscreen .time-marker.shadow .time {
+.leplayer-controls.controls-fullscreen .time-marker .time {
   background: rgba(118, 138, 167, 0.8);
 }
 .leplayer-controls.controls-fullscreen .time-played {
@@ -287,7 +287,7 @@
   transition: none;
   z-index: 505;
 }
-.leplayer-controls .time-marker.shadow .time {
+.leplayer-controls .time-marker .time {
   background: rgba(118, 138, 167, 0.8);
   border-radius: 1px;
   bottom: 20px;

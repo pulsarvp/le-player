@@ -357,11 +357,14 @@ var Player = function (element, opts) {
 				.hide();
 
 			this.markerShadowTime = $('<div />').addClass('time');
+			this.markerTime       = $('<div />')
+				.addClass('time')
+				.hide();
 			this.played           = $('<div />').addClass('time-played');
 			this.current.text     = '00:00';
 			this.line             = $('<div />')
 				.addClass('timeline')
-				.append(this.marker)
+				.append(this.marker.append(this.markerTime))
 				.append(this.markerShadow.append(this.markerShadowTime))
 				.append(this.played)
 				.on({
@@ -409,11 +412,15 @@ var Player = function (element, opts) {
 					if (!this.drag) return;
 					let p = this.getPosition(e.pageX);
 					if (p > 0 && p < 1) {
+						this.markerTime
+							.show()
+							.html(secondsToTime(video.duration * p))
 						seek(video.duration * p);
 					}
 				},
 
 				'mouseup' : (e) => {
+					this.markerTime.hide()
 					this.drag = false;
 				}
 			});
