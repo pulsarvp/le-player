@@ -1,8 +1,31 @@
-@color-background: #e1e8ef;			// rgb(225, 232, 239)
-@color-background-line: #768aa7;	// rgb(118, 138, 167)
-@color-background-play: #678bae;	// rgb(103, 139, 174)
-@color-disabled: #94a5bc;			// rgb(148, 165, 188)
-@color-primary: #1a4a7e;			// rgb(26, 74, 126)
+@color-primary: #1a4a7e; // rgb(26, 74, 126)
+
+@color-background: #e1e8ef; // rgb(225, 232, 239)
+@color-background-line: #768aa7; // rgb(118, 138, 167)
+@color-background-line-active: rgba(0, 0, 0, 0.25);
+@color-background-play: #678bae; // rgb(103, 139, 174)
+@color-disabled: #94a5bc; // rgb(148, 165, 188)
+@color-inner-item-hover: lighten(@color-primary, 5%);
+@color-marker: @color-primary;
+@color-marker-border: rgba(225, 232, 239, 0.5);
+@color-marker-shadow: rgba(26, 74, 126, 0.8);
+@color-marker-shadow-border: @color-marker-border;
+@color-marker-shadow-time: rgba(118, 138, 167, 0.8);
+@color-text: @color-primary;
+
+@color-fs-background: #465264;
+@color-fs-background-hover: darken(@color-fs-background, 10%);
+@color-fs-background-line: #768496;
+@color-fs-background-line-active: rgba(0, 0, 0, 0.25);
+@color-fs-background-play: #384150;
+@color-fs-disabled: #376aa1;
+@color-fs-inner-item-hover: rgba(0, 0, 0, 0.15);
+@color-fs-marker: #2a313c;
+@color-fs-marker-border: rgba(225, 232, 239, 0.7);
+@color-fs-marker-shadow: rgba(26, 74, 126, 0.8);
+@color-fs-marker-shadow-border: rgba(225, 232, 239, 0.5);
+@color-fs-marker-shadow-time: rgba(118, 138, 167, 0.8);
+@color-fs-text: #e1e8ef;
 
 @control-font-size: 16px;
 @control-text-font-size: 12px;
@@ -11,5 +34,5 @@
 @control-play-width: 60px;
 
 @divider-width: 10px;
-
+@timeline-transition: 0s 0.1s ease-in-out;
 @z-index-base: 500;

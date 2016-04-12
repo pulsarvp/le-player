@@ -2,16 +2,38 @@
 
 .leplayer-container
 {
-	color: @color-primary;
+	color: @color-text;
 	display: inline-block;
 	font-family: "PT Sans", "Open Sans", "Verdana", "Arial", sans-serif;
 	line-height: 0;
 	outline: 0;
 	position: relative;
 
+	&.fullscreen
+	{
+		position: absolute;
+		width: 100% !important;
+		.leplayer-video, video
+		{
+			height: 100% !important;
+			margin: 0 auto;
+			position: fixed;
+			top: 0;
+			width: 100% !important;
+		}
+	}
+
 	video
 	{
 		outline: 0;
+		&::-webkit-media-controls
+		{
+			display: none !important;
+		}
+		&::-webkit-media-controls-enclosure
+		{
+			display: none !important;
+		}
 	}
 
 	.play-overlay
@@ -38,18 +60,136 @@
 		}
 	}
 }
-.leplayer-controls {
+
+.leplayer-controls
+{
 	border-collapse: separate;
 	display: table;
 	height: @control-height;
 	position: relative;
 	width: 100%;
-	&:not(:last-child) {
+	&:not(:last-child)
+	{
 		margin-bottom: 10px;
 	}
-	.control {
+	&.controls-common
+	{
+		margin-top: 10px;
+	}
+	&.controls-fullscreen
+	{
+		bottom: 20px;
+		display: none;
+		left: 20px;
+		position: fixed;
+		right: 20px;
+		width: auto;
+		z-index: @z-index-base + 4;
+		.control
+		{
+			background: @color-fs-background;
+			color: @color-fs-text;
+			&:hover
+			{
+				background: @color-fs-background-hover;
+			}
+			&.disabled
+			{
+				color: @color-fs-disabled;
+				&:hover
+				{
+					background: @color-fs-background;
+					color: @color-fs-disabled;
+				}
+			}
+			&.play
+			{
+				background: @color-fs-background-play;
+				&:hover
+				{
+					background: @color-fs-background-hover;
+				}
+			}
+		}
+		.control-inner
+		{
+			background: @color-fs-background;
+		}
+		.control-text
+		{
+			background: @color-fs-background;
+			color: @color-fs-text;
+		}
+		.inner-item
+		{
+			color: @color-fs-text;
+			&:hover
+			{
+				background: @color-fs-inner-item-hover !important;
+				color: @color-fs-background;
+			}
+			&.active
+			{
+				background: @color-fs-background-play;
+				color: @color-fs-background;
+			}
+		}
+		.timeline
+		{
+			background: @color-fs-background-line;
+			margin: 0;
+			top: -2px;
+		}
+		.timeline-container
+		{
+			background: @color-fs-background;
+			.control-text
+			{
+				height: auto;
+				position: relative;
+				top: -2px;
+			}
+		}
+		.time-marker
+		{
+			background: @color-fs-marker;
+			border-right: 1px solid @color-fs-marker-border;
+			&.shadow
+			{
+				background: @color-fs-marker-shadow;
+				border-right: 1px solid @color-fs-marker-shadow-border;
+				.time
+				{
+					background: @color-fs-marker-shadow-time;
+				}
+			}
+		}
+		.time-played
+		{
+			background: @color-fs-background-line-active;
+		}
+		.volume-active
+		{
+			background: @color-fs-background-line-active;
+		}
+		.volume-slider
+		{
+			height: 144px;
+		}
+		.volume-line
+		{
+			background: @color-fs-background-line;
+		}
+		.volume-marker
+		{
+			background: @color-fs-marker;
+			border-top: 1px solid @color-fs-marker-border;
+		}
+	}
+	.control
+	{
 		background: @color-background;
-		color: @color-primary;
+		color: @color-text;
 		cursor: pointer;
 		display: table-cell;
 		font-size: @control-font-size;
@@ -59,8 +199,9 @@
 		text-align: center;
 		vertical-align: middle;
 		width: 1%;
-		&:hover {
-			background: @color-primary;
+		&:hover
+		{
+			background: @color-text;
 			color: @color-background;
 		}
 		&.disabled
@@ -73,25 +214,30 @@
 				color: @color-disabled;
 			}
 		}
-		&.play {
+		&.play
+		{
 			background: @color-background-play;
 			color: #fff;
 			padding: 0 (@control-play-width - @control-font-size) / 2;
 			width: 1%;
-			&:hover {
-				background: @color-primary;
+			&:hover
+			{
+				background: @color-text;
 				color: @color-background;
 			}
 		}
 	}
-	.control-container {
+	.control-container
+	{
 		display: table-cell;
 		height: @control-height;
 		padding: 0;
 		position: relative;
 		width: 1%;
-		&:hover {
-			.control-inner {
+		&:hover
+		{
+			.control-inner
+			{
 				display: block;
 			}
 		}
@@ -101,7 +247,8 @@
 		line-height: @control-height;
 		padding: 0 (@control-width - @control-font-size) / 2;
 	}
-	.control-inner{
+	.control-inner
+	{
 		background: @color-background;
 		bottom: @control-height;
 		cursor: default;
@@ -112,9 +259,10 @@
 		width: auto;
 		z-index: @z-index-base + 2;
 	}
-	.control-text {
+	.control-text
+	{
 		background: @color-background;
-		color: @color-primary;
+		color: @color-text;
 		display: table-cell;
 		font-size: @control-text-font-size;
 		height: @control-height;
@@ -123,26 +271,29 @@
 		text-align: center;
 		vertical-align: middle;
 	}
-	.divider {
+	.divider
+	{
 		background: none;
 		display: table-cell;
 		padding: 0 @divider-width / 2;
 		width: 0.01%;
 	}
-	.fa {
+	.fa
+	{
 		text-align: center;
 		width: @control-font-size;
 	}
-	.inner-item{
+	.inner-item
+	{
 		display: block;
-		color: @color-primary;
+		color: @color-text;
 		cursor: pointer;
 		font-size: @control-text-font-size;
 		line-height: @control-height;
 		padding: 0 7px;
 		&:hover
 		{
-			background: lighten(@color-primary, 5%) !important;
+			background: @color-inner-item-hover !important;
 			color: @color-background;
 		}
 		&.active
@@ -151,7 +302,8 @@
 			color: @color-background;
 		}
 	}
-	.timeline {
+	.timeline
+	{
 		background: @color-background-line;
 		cursor: pointer;
 		display: block;
@@ -160,7 +312,8 @@
 		position: relative;
 		width: 100%;
 	}
-	.timeline-container {
+	.timeline-container
+	{
 		background: @color-background;
 		display: table-cell;
 		position: relative;
@@ -170,7 +323,6 @@
 	.timeline-subcontainer
 	{
 		display: table;
-		height: 100%;
 		width: 100%;
 	}
 	.time-current, .time-total
@@ -179,24 +331,26 @@
 	}
 	.time-marker
 	{
-		background: @color-primary;
-		border-right: 1px solid rgba(225, 232, 239, 0.7);
+		background: @color-marker;
+		border-right: 1px solid @color-marker-border;
 		cursor: pointer;
 		height: 16px;
 		left: 0;
 		margin-left: -2px;
 		position: absolute;
 		top: -2px;
-		transition: left 0.2s linear;
+		//transition: left @timeline-transition;
 		width: 2px;
+		z-index: @z-index-base + 6;
 		&.shadow
 		{
-			background: rgba(26,74,126, 0.8);
-			border-right: 1px solid rgba(225, 232, 239, 0.5);
+			background: @color-marker-shadow;
+			border-right: 1px solid @color-marker-shadow-border;
 			transition: none;
+			z-index: @z-index-base + 5;
 			.time
 			{
-				background: rgba(118, 138, 167, 0.8);
+				background: @color-marker-shadow-time;
 				border-radius: 1px;
 				bottom: 20px;
 				color: #fff;
@@ -211,26 +365,28 @@
 	}
 	.time-played
 	{
-		background: rgba(0, 0, 0, 0.25);
+		background: @color-background-line-active;
 		bottom: 0;
 		left: 0;
 		position: absolute;
 		top: 0;
-		transition: width 0.2s linear;
+		//transition: width @timeline-transition;
 		width: 0;
 	}
 	.volume-active
 	{
-		background: @color-primary;
+		background: @color-background-line-active;
 		bottom: 0;
 		height: 50%;
 		position: absolute;
 		width: 100%;
 	}
-	.volume-slider {
+	.volume-slider
+	{
 		height: 144px;
 	}
-	.volume-line {
+	.volume-line
+	{
 		background: @color-background-line;
 		bottom: 10px;
 		position: absolute;
@@ -240,9 +396,9 @@
 	}
 	.volume-marker
 	{
-		background: @color-primary;
+		background: @color-marker;
 		bottom: 50%;
-		border-top: 1px solid rgba(225, 232, 239, 0.7);
+		border-top: 1px solid @color-marker-border;
 		cursor: pointer;
 		height: 2px;
 		left: -4px;
@@ -251,6 +407,7 @@
 		position: absolute;
 	}
 }
+
 .leplayer-video
 {
 	display: block;
