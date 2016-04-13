@@ -431,9 +431,12 @@ import $ from 'jquery';
 			}
 
 			move () {
-				var t = (video.currentTime / video.duration * 100).toFixed(2) + '%';
-				this.marker.css('left', t);
-				this.played.css('width', t);
+				var percent = (video.currentTime / video.duration * 100).toFixed(2);
+				if(percent == 100) {
+					controls.pause()
+				}
+				this.marker.css('left', percent + '%');
+				this.played.css('width', percent + '%');
 				this.current.text = secondsToTime(video.currentTime);
 			}
 		}
@@ -462,7 +465,7 @@ import $ from 'jquery';
 						if (this.drag) return;
 						let p = this.getPosition(e.pageY);
 						if (p >= 0 && p <= 1) {
-							controls.volume = 1 - p
+							controls.volume = 1 - p;
 						}
 					});
 
@@ -485,7 +488,7 @@ import $ from 'jquery';
 						if (!this.drag) return;
 						let p = this.getPosition(e.pageY);
 						if (p >= 0 && p <= 1) {
-							controls.volume = 1 - p
+							controls.volume = 1 - p;
 						}
 					},
 
@@ -992,7 +995,12 @@ import $ from 'jquery';
 			if (video.textTracks.length == 0 && subtitles.length > 0) {
 				element.children('track[kind="subtitles"]').remove();
 				for (var i in subtitles) {
-					element.append($('<track/>').attr('label', subtitles[ i ].title).attr('src', subtitles[ i ].src).attr('srclang', subtitles[ i ].language).attr('id', subtitles[ i ].language).attr('kind', 'subtitles'));
+					element.append($('<track/>')
+						.attr('label', subtitles[ i ].title)
+						.attr('src', subtitles[ i ].src)
+						.attr('srclang', subtitles[ i ].language)
+						.attr('id', subtitles[ i ].language)
+						.attr('kind', 'subtitles'));
 				}
 			}
 
