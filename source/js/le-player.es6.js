@@ -49,9 +49,134 @@ import $ from 'jquery';
 			}
 		}, opts);
 
+		class Video {
+			constructor(ctx) {
+				this._ctx = ctx;
+				this._video = ctx[0];
+				// this.fullscreen = new Fullscreen();
+				this.subtitles = [];
+				this.playbackRate = this._video.playbackRate;
+			}
+
+			get currentTime() {
+				return this._video.currentTime;
+			}
+
+			get duration() {
+				return this._video.duration;
+			}
+
+			init() {
+				this._initSubtitles();
+				this._initVideo();
+			}
+
+			decreaseRate(step, min) {
+				if (this._video.playbackRate > min) {
+					this._video.playbackRate -= step
+					return this._video.playbackRate;
+				}
+				return null;
+			}
+
+			increaseRate(step, max) {
+				if (this._video.playbackRate < max) {
+					this._video.playbackRate += step
+					return this._video.playbackRate;
+				}
+				return null;
+			}
+
+			togglePlay() {
+				if (!this._video.played || this._video.paused) {
+					overlay.hide();
+					this.play();
+					controls.play();
+				} else {
+					overlay.show();
+					this.pause();
+					controls.pause();
+				}
+			}
+
+			_initSubtitles() {
+				let _self = this;
+				this._ctx.children('track[kind="subtitles"]').each(function () {
+					var language = $(this).attr('srclang');
+					var title    = $(this).attr('label');
+					var src      = $(this).attr('src');
+					if (title.length > 0 && src.length > 0) {
+						_self.subtitles.push({
+							title    : title,
+							src      : src,
+							language : language
+						});
+					}
+				});
+			}
+
+			_initVideo() {
+				if (this._video.readyState > HTMLMediaElement.HAVE_NOTHING) {
+					this._initVideoEvent();
+				} else {
+					this._video.onloadedmetadata = () => {
+						this._initVideoEvent();
+					};
+				}
+			}
+
+			_initVideoEvent() {
+				let _self = this;
+
+				overlay.css('line-height', this._video.clientHeight + 'px');
+				container.css('width', this._video.clientWidth + 'px');
+
+				this._video.ontimeupdate = function () {
+					controls.moveTimeMarker();
+				};
+
+				// This is generally for Firefox only
+				// because it somehow resets track list
+				// for video element after DOM manipulation.
+
+				if (this._video.textTracks.length == 0 && this.subtitles.length > 0) {
+					this._ctx.children('track[kind="subtitles"]').remove();
+					for (var i in this.subtitles) {
+						if(!this.subtitles.hasOwnProperty(i)) continue;
+						this._ctx
+							.append($('<track/>')
+							.attr('label', this.subtitles[ i ].title)
+							.attr('src', this.subtitles[ i ].src)
+							.attr('srclang', this.subtitles[ i ].language)
+							.attr('id', this.subtitles[ i ].language)
+							.attr('kind', 'subtitles'));
+					}
+				}
+
+				Fullscreen.init();
+				controls.init();
+
+			}
+
+			seek(time) {
+				this._video.currentTime = time
+			}
+
+			play() {
+				return this._video.play()
+			}
+
+			pause() {
+				return this._video.pause()
+			}
+		}
+
 		class Control {
 			constructor (cssClass, iconClass) {
-				this.element = $('<div />').addClass('control ' + cssClass).append($('<i />').addClass('fa fa-' + iconClass));
+				this.element = $('<div />')
+					.addClass('control ' + cssClass)
+					.append($('<i />')
+					.addClass('fa fa-' + iconClass));
 			}
 
 			static divider () {
@@ -113,9 +238,15 @@ import $ from 'jquery';
 			constructor (iconClass) {
 				let _self        = this;
 				this.iconClass   = iconClass;
-				this.icon        = $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-' + iconClass));
+				this.icon        = $('<div />')
+					.addClass('control-icon')
+					.append($('<i />')
+					.addClass('fa fa-' + iconClass));
 				this.listElement = $('<div/>').addClass('control-inner');
-				this.element     = $('<div />').addClass('control control-container').append(this.icon).append(this.listElement);
+				this.element     = $('<div />')
+					.addClass('control control-container')
+					.append(this.icon)
+					.append(this.listElement);
 				this._index      = 0;
 				this.list        = [];
 				this.icon.click(function () { _self.onContainerClick(); });
@@ -179,9 +310,9 @@ import $ from 'jquery';
 				super('backward', 'undo');
 				this.element.click(e => {
 					if (video.currentTime - options.playback.step.medium > 0)
-						seek(video.currentTime - options.playback.step.medium);
+						video.seek(video.currentTime - options.playback.step.medium);
 					else
-						seek(0);
+						video.seek(0);
 				});
 			}
 		}
@@ -216,16 +347,22 @@ import $ from 'jquery';
 			constructor () {
 				super('play', 'play');
 				this.element.click(e => {
-					togglePlay();
+					video.togglePlay();
 				});
 			}
 
 			pause () {
-				this.element.children('.fa').removeClass('fa-pause').addClass('fa-play');
+				this.element
+					.children('.fa')
+					.removeClass('fa-pause')
+					.addClass('fa-play');
 			}
 
 			play () {
-				this.element.children('.fa').removeClass('fa-play').addClass('fa-pause');
+				this.element
+					.children('.fa')
+					.removeClass('fa-play')
+					.addClass('fa-pause');
 			}
 		}
 
@@ -243,35 +380,41 @@ import $ from 'jquery';
 					this.increase();
 				});
 
-				this.element = $('<div />').addClass('control-container').append(this.down.element).append(this.current.element).append(this.up.element);
+				this.element = $('<div />')
+					.addClass('control-container')
+					.append(this.down.element)
+					.append(this.current.element)
+					.append(this.up.element);
 			}
 
 			decrease () {
 				if (video.playbackRate > options.rate.min) {
+					video.decreaseRate(options.rate.min);
+
 					this.up.element.removeClass('disabled');
-					video.playbackRate -= options.rate.step;
-					this.show();
 					Cookie.set('rate', video.playbackRate);
-				}
-				else
+					this.show();
+				} else {
 					this.down.element.addClass('disabled');
+				}
 			}
 
 			load () {
+				/** TODO: Move work with Cookie to the Video class */
 				video.playbackRate = Cookie.get('rate', 1);
 				this.show();
 			}
 
 			show () {
-				this.current.text = '×' + video.playbackRate.toFixed(2);
+				this.current.text = '×' + video.playbackRate.toFixed(2).toString().replace(',', '.');
 			}
 
 			increase () {
 				if (video.playbackRate < options.rate.max) {
 					this.down.element.removeClass('disabled');
 					video.playbackRate += options.rate.step;
-					this.show();
 					Cookie.set('rate', video.playbackRate);
+					this.show();
 				}
 				else
 					this.up.element.addClass('disabled');
@@ -281,6 +424,7 @@ import $ from 'jquery';
 		class SourceControl extends ControlContainer {
 			constructor () {
 				super('bullseye');
+				/** TODO: Move sources to the arguments in constror */
 				if (sources.length > 1) {
 					for (var i in sources) {
 						this.addItem(sources[ i ].title, { src : sources[ i ].src });
@@ -289,6 +433,7 @@ import $ from 'jquery';
 			}
 
 			set (index) {
+				/** TODO: Emit event on set source*/
 				let s = this.getByIndex(index);
 				if (s != null) {
 					element.attr('src', s.data('src'));
@@ -305,9 +450,14 @@ import $ from 'jquery';
 		class SubtitleControl extends ControlContainer {
 			constructor () {
 				super('commenting-o');
-				if (subtitles.length > 0) {
-					for (var i in subtitles) {
-						this.addItem(subtitles[ i ].title, { src : subtitles[ i ].src, language : subtitles[ i ].language });
+				if (video.subtitles.length > 0) {
+					for (var i in video.subtitles) {
+						if(!video.subtitles.hasOwnProperty(i)) continue;
+						let item = video.subtitles[ i ];
+						this.addItem(item.title, {
+							src : item.src,
+							language : item.language
+						});
 					}
 				}
 			}
@@ -342,7 +492,8 @@ import $ from 'jquery';
 
 		class TimelineControl {
 			constructor () {
-				let _self = this;
+				let _self = this,
+					duration = video.duration;
 
 				this.drag = false;
 
@@ -375,7 +526,7 @@ import $ from 'jquery';
 							if (p > 0 && p < 1) {
 								this.markerShadow.show();
 								this.markerShadow.css('left', p * 100 + '%');
-								this.markerShadowTime.html(secondsToTime(video.duration * p));
+								this.markerShadowTime.html(secondsToTime(duration * p));
 							}
 							else
 								this.markerShadow.hide();
@@ -388,7 +539,7 @@ import $ from 'jquery';
 
 						'click' : (e) => {
 							if (this.drag) return;
-							seek(video.duration * this.getPosition(e.pageX));
+							video.seek(video.duration * this.getPosition(e.pageX));
 						}
 					});
 
@@ -414,8 +565,8 @@ import $ from 'jquery';
 						if (p > 0 && p < 1) {
 							this.markerTime
 								.show()
-								.html(secondsToTime(video.duration * p))
-							seek(video.duration * p);
+								.html(secondsToTime(duration * p))
+							video.seek(duration * p);
 						}
 					},
 
@@ -832,12 +983,12 @@ import $ from 'jquery';
 				console.warn('No sources found.');
 				return this;
 			}
+			video = new Video(element);
 
 			initOptions();
 			initDom();
-			initSubtitles();
+			video.init();
 			initControls();
-			initVideo();
 			initHotKeys();
 		};
 

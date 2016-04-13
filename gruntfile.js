@@ -89,7 +89,7 @@ module.exports = function (grunt) {
 			},
 			js  : {
 				files: ['source/js/**/*.js'],
-				tasks: ['webpack:build']
+				tasks: ['webpack:build-dev']
 			}
 		},
 		uglify: {
