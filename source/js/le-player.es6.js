@@ -557,8 +557,9 @@ import $ from 'jquery';
 			}
 
 			set download (value) {
-				if (this.has(C_DOWNLOAD))
+				if (this.has(C_DOWNLOAD)) {
 					this.items.download.link = value;
+				}
 			}
 
 			set source (value) {
@@ -597,7 +598,6 @@ import $ from 'jquery';
 				this.volume = Cookie.get('volume', 0.4);
 				this.initTimeline();
 				this.totalTime = secondsToTime(video.duration);
-				this.download = sources[0].src;
 				this.initRate();
 			}
 
