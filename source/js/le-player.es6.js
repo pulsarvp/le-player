@@ -599,6 +599,7 @@ import $ from 'jquery';
 				this.initTimeline();
 				this.totalTime = secondsToTime(video.duration);
 				this.initRate();
+				this.download = sources[0].src;
 			}
 
 			initRate () {
