@@ -728,6 +728,7 @@
 							this.volume = Cookie.get('volume', 0.4);
 							this.initTimeline();
 							this.totalTime = secondsToTime(video.duration);
+							this.download = sources[0].src;
 							this.initRate();
 						}
 					}, {
@@ -765,9 +766,7 @@
 					}, {
 						key: 'download',
 						set: function set(value) {
-							if (this.has(C_DOWNLOAD)) {
-								this.items.download.link = value;
-							}
+							if (this.has(C_DOWNLOAD)) this.items.download.link = value;
 						}
 					}, {
 						key: 'source',
