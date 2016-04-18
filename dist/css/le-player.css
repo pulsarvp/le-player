@@ -68,7 +68,7 @@
   position: fixed;
   right: 20px;
   width: auto;
-  z-index: 504;
+  z-index: 507;
 }
 .leplayer-controls.controls-fullscreen .control {
   background: #465264;
@@ -337,8 +337,11 @@
   position: absolute;
 }
 .leplayer-video {
+  background: #000;
   display: block;
   outline: 0;
+  left: 0;
   line-height: 0;
   position: relative;
+  z-index: 506;
 }

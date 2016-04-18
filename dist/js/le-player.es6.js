@@ -1,45 +1,51 @@
-import $ from 'jquery';
-{
+(function ($) {
 	'use strict';
 
 	let Player = function (element, opts) {
-		const C_BACKWARD   = 'backward';
-		const C_DIVIDER    = 'divider';
-		const C_DOWNLOAD   = 'download';
-		const C_FORWARD    = 'forward';
+		const C_BACKWARD = 'backward';
+		const C_DIVIDER = 'divider';
+		const C_DOWNLOAD = 'download';
+		const C_FORWARD = 'forward';
 		const C_FULLSCREEN = 'fullscreen';
-		const C_PLAY       = 'play';
-		const C_RATE       = 'rate';
-		const C_SOURCE     = 'source';
-		const C_SUBTITLE   = 'subtitle';
-		const C_TIMELINE   = 'timeline';
-		const C_VOLUME     = 'volume';
+		const C_PLAY = 'play';
+		const C_RATE = 'rate';
+		const C_SOURCE = 'source';
+		const C_SUBTITLE = 'subtitle';
+		const C_TIMELINE = 'timeline';
+		const C_VOLUME = 'volume';
+
+		let env = {
+			volume : {
+				default : 0.4,
+				mutelimit : 0.05
+			}
+		};
 
 		var options = $.extend(true, {
 			autoplay : false,
-			height   : 'auto',
-			loop     : false,
-			muted    : false,
-			preload  : 'metadata',
-			poster   : null,
-			width    : 'auto',
-			rate     : {
+			height : 'auto',
+			loop : false,
+			muted : false,
+			preload : 'metadata',
+			poster : null,
+			width : 'auto',
+			rate : {
 				step : 0.25,
-				min  : 0.5,
-				max  : 4.0
+				min : 0.5,
+				max : 4.0
 			},
 			playback : {
 				step : {
-					short  : 5,
+					short : 5,
 					medium : 30,
-					long   : 60
+					long : 60
 				}
 			},
-			volume   : {
+			volume : {
 				step : 0.1
 			},
 			controls : {
-				common     : [
+				common : [
 					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen' ],
 					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download' ]
 				],
@@ -48,665 +54,6 @@ import $ from 'jquery';
 				]
 			}
 		}, opts);
-
-		class Control {
-			constructor (cssClass, iconClass) {
-				this.element = $('<div />').addClass('control ' + cssClass).append($('<i />').addClass('fa fa-' + iconClass));
-			}
-
-			static divider () {
-				return $('<div />').addClass('divider');
-			}
-
-			static create (name) {
-				switch (name) {
-					case C_BACKWARD:
-						return new BackwardControl();
-
-					case C_DIVIDER:
-						return this.divider();
-
-					case C_DOWNLOAD:
-						return new DownloadControl();
-
-					case C_FORWARD:
-						return new ForwardControl();
-
-					case C_FULLSCREEN:
-						return new FullscreenControl();
-
-					case C_PLAY:
-						return new PlayControl();
-
-					case C_RATE:
-						return new RateControl();
-
-					case C_SOURCE:
-						return new SourceControl();
-
-					case C_SUBTITLE:
-						return new SubtitleControl();
-
-					case C_TIMELINE:
-						return new TimelineControl();
-
-					case C_VOLUME:
-						return new VolumeControl();
-
-					default:
-						return null;
-				}
-			}
-		}
-
-		class ControlText {
-			constructor (classname) {
-				this.element = $('<div />').addClass('control-text ' + classname);
-			}
-
-			set text (value) {
-				this.element.html(value);
-			}
-		}
-
-		class ControlContainer {
-			constructor (iconClass) {
-				let _self        = this;
-				this.iconClass   = iconClass;
-				this.icon        = $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-' + iconClass));
-				this.listElement = $('<div/>').addClass('control-inner');
-				this.element     = $('<div />').addClass('control control-container').append(this.icon).append(this.listElement);
-				this._index      = 0;
-				this.list        = [];
-				this.icon.click(function () { _self.onContainerClick(); });
-			}
-
-			get active () {
-				for (let i in this.list)
-					if (this.list[ i ].hasClass('active'))
-						return this.list[ i ];
-				return null;
-			}
-
-			set active (index) {
-				let hasActive = false;
-				for (let i in this.list) {
-					if (this.list[ i ].data('index') == index) {
-						this.list[ i ].addClass('active');
-						this.icon.html(this.list[ i ].html());
-						hasActive = true;
-					}
-					else
-						this.list[ i ].removeClass('active');
-				}
-				if (!hasActive)
-					this.icon.html($('<i />').addClass('fa fa-' + this.iconClass));
-			}
-
-			addItem (text, data) {
-				let _self = this;
-				var item  = $('<div />').addClass('inner-item').data('index', this._index).html(text).click(function () {
-					_self.onItemClick($(this).data('index'));
-				});
-				if (typeof data == 'object') {
-					for (let k in data)
-						item.data(k, data[ k ]);
-				}
-				this._index++;
-				this.list.push(item);
-				this.listElement.append(item);
-
-				return item;
-			}
-
-			getByIndex (index) {
-				for (let i in this.list)
-					if (this.list[ i ].data('index') == index)
-						return this.list[ i ];
-				return null;
-			}
-
-			onContainerClick () {
-			}
-
-			onItemClick (index) {
-				this.active = index;
-			}
-		}
-
-		class BackwardControl extends Control {
-			constructor () {
-				super('backward', 'undo');
-				this.element.click(e => {
-					if (video.currentTime - options.playback.step.medium > 0)
-						seek(video.currentTime - options.playback.step.medium);
-					else
-						seek(0);
-				});
-			}
-		}
-
-		class DownloadControl extends Control {
-			constructor () {
-				super('', '');
-				this.element = $('<a />').attr('href', '').attr('target', '_blank').attr('download', '').addClass('control download').append($('<i />').addClass('fa fa-download'));
-			}
-
-			set link (value) {
-				this.element.attr('href', value);
-			}
-		}
-
-		class ForwardControl extends Control {
-			constructor () {
-				super('forward', 'redo');
-			}
-		}
-
-		class FullscreenControl extends Control {
-			constructor () {
-				super('fullscreen', 'arrows-alt');
-				this.element.click(e => {
-					Fullscreen.toggle();
-				});
-			}
-		}
-
-		class PlayControl extends Control {
-			constructor () {
-				super('play', 'play');
-				this.element.click(e => {
-					togglePlay();
-				});
-			}
-
-			pause () {
-				this.element.children('.fa').removeClass('fa-pause').addClass('fa-play');
-			}
-
-			play () {
-				this.element.children('.fa').removeClass('fa-play').addClass('fa-pause');
-			}
-		}
-
-		class RateControl {
-			constructor () {
-				this.down    = new Control('rate-down', 'backward');
-				this.up      = new Control('rate-up', 'forward');
-				this.current = new ControlText('rate-current');
-
-				this.down.element.click(e => {
-					this.decrease();
-				});
-
-				this.up.element.click(e => {
-					this.increase();
-				});
-
-				this.element = $('<div />').addClass('control-container').append(this.down.element).append(this.current.element).append(this.up.element);
-			}
-
-			decrease () {
-				if (video.playbackRate > options.rate.min) {
-					this.up.element.removeClass('disabled');
-					video.playbackRate -= options.rate.step;
-					this.show();
-					Cookie.set('rate', video.playbackRate);
-				}
-				else
-					this.down.element.addClass('disabled');
-			}
-
-			load () {
-				video.playbackRate = Cookie.get('rate', 1);
-				this.show();
-			}
-
-			show () {
-				this.current.text = '×' + video.playbackRate.toFixed(2);
-			}
-
-			increase () {
-				if (video.playbackRate < options.rate.max) {
-					this.down.element.removeClass('disabled');
-					video.playbackRate += options.rate.step;
-					this.show();
-					Cookie.set('rate', video.playbackRate);
-				}
-				else
-					this.up.element.addClass('disabled');
-			}
-		}
-
-		class SourceControl extends ControlContainer {
-			constructor () {
-				super('bullseye');
-				if (sources.length > 1) {
-					for (var i in sources) {
-						this.addItem(sources[ i ].title, { src : sources[ i ].src });
-					}
-				}
-			}
-
-			set (index) {
-				let s = this.getByIndex(index);
-				if (s != null) {
-					element.attr('src', s.data('src'));
-					controls.download = s.data('src');
-				}
-			}
-
-			onItemClick (index) {
-				super.onItemClick(index);
-				this.set(index);
-			}
-		}
-
-		class SubtitleControl extends ControlContainer {
-			constructor () {
-				super('commenting-o');
-				if (subtitles.length > 0) {
-					for (var i in subtitles) {
-						this.addItem(subtitles[ i ].title, { src : subtitles[ i ].src, language : subtitles[ i ].language });
-					}
-				}
-			}
-
-			set track (index) {
-				var t = this.getByIndex(index);
-				if (t != null && video.textTracks.length > 0) {
-					let language = t.data('language');
-					for (var i = 0; i < video.textTracks.length; i++) {
-						if (video.textTracks[ i ].language == language)
-							video.textTracks[ i ].mode = 'showing';
-						else
-							video.textTracks[ i ].mode = 'hidden';
-					}
-				}
-			}
-
-			onContainerClick () {
-				super.onContainerClick();
-				super.onItemClick(-1);
-				if (video.textTracks.length > 0) {
-					for (var i = 0; i < video.textTracks.length; i++)
-						video.textTracks[ i ].mode = 'hidden';
-				}
-			}
-
-			onItemClick (index) {
-				super.onItemClick(index);
-				this.track = index;
-			}
-		}
-
-		class TimelineControl {
-			constructor () {
-				let _self = this;
-
-				this.drag = false;
-
-				this.current = new ControlText('time-current');
-				this.total   = new ControlText('time-total');
-
-				this.marker = $('<div />').addClass('time-marker');
-
-				this.markerShadow = $('<div />')
-					.addClass('time-marker shadow')
-					.append()
-					.hide();
-
-				this.markerShadowTime = $('<div />').addClass('time');
-				this.markerTime       = $('<div />')
-					.addClass('time')
-					.hide();
-				this.played           = $('<div />').addClass('time-played');
-				this.current.text     = '00:00';
-				this.line             = $('<div />')
-					.addClass('timeline')
-					.append(this.marker.append(this.markerTime))
-					.append(this.markerShadow.append(this.markerShadowTime))
-					.append(this.played)
-					.on({
-						'mousemove' : (e) => {
-							if (this.drag) return;
-
-							let p = this.getPosition(e.pageX);
-							if (p > 0 && p < 1) {
-								this.markerShadow.show();
-								this.markerShadow.css('left', p * 100 + '%');
-								this.markerShadowTime.html(secondsToTime(video.duration * p));
-							}
-							else
-								this.markerShadow.hide();
-						},
-
-						'mouseleave' : (e) => {
-							if (this.drag) return;
-							this.markerShadow.hide()
-						},
-
-						'click' : (e) => {
-							if (this.drag) return;
-							seek(video.duration * this.getPosition(e.pageX));
-						}
-					});
-
-				this.element = $('<div />')
-					.addClass('timeline-container')
-					.append($('<div />')
-						.addClass('timeline-subcontainer')
-						.append(this.current.element)
-						.append(this.line)
-						.append(this.total.element));
-
-				this.marker.on('mousedown', (e) => {
-					if (e.which != 1) return;
-					this.markerShadow.hide();
-					this.drag = true;
-				});
-
-				$(document).on({
-
-					'mousemove' : (e) => {
-						if (!this.drag) return;
-						let p = this.getPosition(e.pageX);
-						if (p > 0 && p < 1) {
-							this.markerTime
-								.show()
-								.html(secondsToTime(video.duration * p))
-							seek(video.duration * p);
-						}
-					},
-
-					'mouseup' : (e) => {
-						this.markerTime.hide()
-						this.drag = false;
-					}
-				});
-			}
-
-			getPosition (x) {
-				return (x - this.line.offset().left) / this.line.width();
-			}
-
-			move () {
-				var t = (video.currentTime / video.duration * 100).toFixed(2) + '%';
-				this.marker.css('left', t);
-				this.played.css('width', t);
-				this.current.text = secondsToTime(video.currentTime);
-			}
-		}
-
-		class VolumeControl {
-			constructor () {
-				let _self = this;
-
-				this.icon = $('<div/>')
-					.addClass('control-icon')
-					.append($('<i />')
-						.addClass('fa fa-volume-down'))
-					.click(function () {
-						_self.toggleMuted();
-					});
-
-				this.marker = $('<div/>').addClass('volume-marker');
-
-				this.active = $('<div/>').addClass('volume-active');
-
-				this.line = $('<div/>')
-					.addClass('volume-line')
-					.append(this.active)
-					.append(this.marker)
-					.on('click', (e) => {
-						if (this.drag) return;
-						let p = this.getPosition(e.pageY);
-						if (p >= 0 && p <= 1) {
-							controls.volume = 1 - p
-						}
-					});
-
-				this.element = $('<div />')
-					.addClass('control control-container')
-					.append(this.icon)
-					.append($('<div />')
-						.addClass('control-inner volume-slider')
-						.append(this.line));
-
-				this.drag = false;
-
-				this.marker.on('mousedown', (e) => {
-					if (e.which != 1) return;
-					this.drag = true;
-				});
-
-				$(document).on({
-					'mousemove' : (e) => {
-						if (!this.drag) return;
-						let p = this.getPosition(e.pageY);
-						if (p >= 0 && p <= 1) {
-							controls.volume = 1 - p
-						}
-					},
-
-					'mouseup' : (e) => {
-						this.drag = false;
-					}
-				});
-			}
-
-			set value (value) {
-				var icon = this.icon.children('.fa').eq(-1);
-				icon.removeClass();
-				if (value < 0.05) {
-					video.muted = true;
-					icon.addClass('fa fa-volume-off');
-				}
-				else {
-					video.muted  = false;
-					video.volume = value;
-					if (value < 0.5)
-						icon.addClass('fa fa-volume-down');
-					else
-						icon.addClass('fa fa-volume-up');
-					Cookie.set('volume', value);
-				}
-
-				let p = Math.round(value * 100).toString() + '%';
-				this.active.css('height', p);
-				this.marker.css('bottom', p);
-			}
-
-			toggleMuted () {
-				if (video.muted == true) {
-					this.value = Cookie.get('volume', 0.4);
-				}
-				else
-					this.value = 0;
-			}
-
-			getPosition (y) {
-				return (y - this.line.offset().top) / this.line.height();
-			}
-
-		}
-
-		class Cookie {
-			static get (name, dflt) {
-				var cookies = document.cookie.split(';');
-				for (var i in cookies) {
-					var d = cookies[ i ].trim().split('=');
-					if (d[ 0 ] == 'leplayer_' + name)
-						return d[ 1 ];
-				}
-				return dflt;
-			};
-
-			static set (name, value) {
-				var d = new Date();
-				d.setDate(d.year + 1);
-				document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
-			};
-		}
-
-		class ControlCollection {
-			constructor (name, active) {
-				this.items  = [];
-				this.active = active || false;
-				this.name   = name;
-			}
-
-			set download (value) {
-				if (this.has(C_DOWNLOAD)) {
-					this.items.download.link = value;
-				}
-			}
-
-			set source (value) {
-				if (this.has(C_SOURCE))
-					this.items.source.set(value);
-			}
-
-			set totalTime (value) {
-				if (this.has(C_TIMELINE))
-					this.items.timeline.total.text = value;
-			}
-
-			set volume (value) {
-				if (this.has(C_VOLUME))
-					this.items.volume.value = value;
-			}
-
-			add (name) {
-				if (name == C_DIVIDER)
-					return Control.create(name);
-				else {
-					this.items[ name ] = Control.create(name);
-					return this.items[ name ].element;
-				}
-			}
-
-			has (name) {
-				return (typeof this.items[ name ] == 'object');
-			}
-
-			hide () {
-				container.find('.controls-' + this.name).hide();
-			}
-
-			init () {
-				this.volume = Cookie.get('volume', 0.4);
-				this.initTimeline();
-				this.totalTime = secondsToTime(video.duration);
-				this.initRate();
-			}
-
-			initRate () {
-				if (this.has(C_RATE))
-					this.items.rate.load();
-			}
-
-			initTimeline () {
-				if (this.has(C_TIMELINE)) {
-					if (this.items.timeline.element.width() < 20)
-						this.items.timeline.element.hide();
-				}
-			}
-
-			moveTimeMarker () {
-				if (this.has(C_TIMELINE))
-					this.items.timeline.move();
-			}
-
-			pause () {
-				if (this.has(C_PLAY))
-					this.items.play.pause();
-			}
-
-			play () {
-				if (this.has(C_PLAY))
-					this.items.play.play();
-			}
-
-			show () {
-				container.find('.controls-' + this.name).show();
-			}
-		}
-
-		class Controls {
-			constructor () {
-				this.collections               = {
-					common     : new ControlCollection('common'),
-					mini       : new ControlCollection('mini'),
-					fullscreen : new ControlCollection('fullscreen')
-				};
-				this.collections.common.active = true;
-			}
-
-			get common () {
-				return this.collections.common;
-			}
-
-			get fullscreen () {
-				return this.collections.fullscreen;
-			}
-
-			get mini () {
-				return this.collections.mini;
-			}
-
-			set download (value) {
-				for (var i in this.collections) {
-					this.collections[ i ].download = value;
-				}
-			}
-
-			set source (value) {
-				for (var i in this.collections) {
-					this.collections[ i ].source = value;
-				}
-			}
-
-			set totalTime (value) {
-				for (var i in this.collections) {
-					this.collections[ i ].totalTime = value;
-				}
-			}
-
-			set volume (value) {
-				for (var i in this.collections) {
-					this.collections[ i ].volume = value;
-				}
-			}
-
-			has (name) {
-				return (typeof this.collections[ name ] == 'object');
-			}
-
-			init () {
-				for (var i in this.collections) {
-					this.collections[ i ].init();
-				}
-				this.collections.common.show();
-				this.collections.mini.hide();
-				this.collections.fullscreen.hide();
-			}
-
-			moveTimeMarker () {
-				for (var i in this.collections)
-					this.collections[ i ].moveTimeMarker();
-			}
-
-			pause () {
-				for (var i in this.collections)
-					this.collections[ i ].pause();
-			}
-
-			play () {
-				for (var i in this.collections)
-					this.collections[ i ].play();
-			}
-		}
 
 		/**
 		 * This class manages FullScreen API.
@@ -790,18 +137,847 @@ import $ from 'jquery';
 			}
 		}
 
-		var sources   = [];
+		class Video {
+			constructor (ctx) {
+				this._ctx = ctx;
+				this._video = ctx[ 0 ];
+				// this.fullscreen = new Fullscreen();
+				this.subtitles = [];
+				this.playbackRate = this._video.playbackRate;
+			}
+
+			get currentTime () {
+				return this._video.currentTime;
+			}
+
+			get duration () {
+				return this._video.duration;
+			}
+
+			get rate () {
+				return this._video.playbackRate;
+			}
+
+			set rate (value) {
+				this._video.playbackRate = value;
+			}
+
+			set track (value) {
+				for (var i = 0; i < this._video.textTracks.length; i++) {
+					if (this._video.textTracks[ i ].language == value)
+						this._video.textTracks[ i ].mode = 'showing';
+					else
+						this._video.textTracks[ i ].mode = 'hidden';
+				}
+			}
+
+			set volume (value) {
+				this._video.volume = value;
+				this._video.mute = (value < env.volume.mutelimit);
+			}
+
+			decreaseRate () {
+				if (this._video.playbackRate > options.rate.min) {
+					this._video.playbackRate -= options.rate.step;
+					controls.rate = this._video.playbackRate;
+				}
+			}
+
+			increaseRate () {
+				if (this._video.playbackRate < options.rate.max) {
+					this._video.playbackRate += options.rate.step;
+					controls.rate = this._video.playbackRate;
+				}
+			}
+
+			init () {
+				this._initSubtitles();
+				this._initVideo();
+				this._initRate();
+			}
+
+			togglePlay () {
+				if (!this._video.played || this._video.paused) {
+					overlay.hide();
+					this.play();
+					controls.play();
+				} else {
+					overlay.show();
+					this.pause();
+					controls.pause();
+				}
+			}
+
+			seek (time) {
+				this._video.currentTime = time;
+			}
+
+			play () {
+				return this._video.play();
+			}
+
+			pause () {
+				return this._video.pause();
+			}
+
+			_initRate () {
+				this._video.playbackRate = Cookie.get('rate', 1);
+				controls.rate = this._video.playbackRate;
+			}
+
+			_initSubtitles () {
+				let _self = this;
+				this._ctx.children('track[kind="subtitles"]').each(function () {
+					let language = $(this).attr('srclang');
+					let title = $(this).attr('label');
+					let src = $(this).attr('src');
+					if (title.length > 0 && src.length > 0) {
+						_self.subtitles.push({
+							title : title,
+							src : src,
+							language : language
+						});
+					}
+				});
+			}
+
+			_initVideo () {
+				if (this._video.readyState > HTMLMediaElement.HAVE_NOTHING) {
+					this._initVideoEvent();
+				} else {
+					this._video.onloadedmetadata = () => {
+						this._initVideoEvent();
+					};
+				}
+			}
+
+			_initVideoEvent () {
+				let _self = this;
+
+				overlay.css('line-height', this._video.clientHeight + 'px');
+				container.css('width', this._video.clientWidth + 'px');
+
+				this._video.ontimeupdate = function () {
+					controls.moveTimeMarker();
+				};
+
+				// This is generally for Firefox only
+				// because it somehow resets track list
+				// for video element after DOM manipulation.
+
+				if (this._video.textTracks.length == 0 && this.subtitles.length > 0) {
+					this._ctx.children('track[kind="subtitles"]').remove();
+					for (var i in this.subtitles) {
+						if (this.subtitles.hasOwnProperty(i)) {
+							this._ctx
+								.append($('<track/>')
+									.attr('label', this.subtitles[ i ].title)
+									.attr('src', this.subtitles[ i ].src)
+									.attr('srclang', this.subtitles[ i ].language)
+									.attr('id', this.subtitles[ i ].language)
+									.attr('kind', 'subtitles'));
+						}
+					}
+				}
+				Fullscreen.init();
+				controls.init();
+			}
+		}
+
+		class Control {
+			constructor (cssClass, iconClass) {
+				this.element = $('<div />')
+					.addClass('control ' + cssClass)
+					.append($('<i />')
+						.addClass('fa fa-' + iconClass));
+			}
+
+			static divider () {
+				return $('<div />').addClass('divider');
+			}
+
+			static create (name) {
+				switch (name) {
+					case C_BACKWARD:
+						return new BackwardControl();
+
+					case C_DIVIDER:
+						return this.divider();
+
+					case C_DOWNLOAD:
+						return new DownloadControl();
+
+					case C_FORWARD:
+						return new ForwardControl();
+
+					case C_FULLSCREEN:
+						return new FullscreenControl();
+
+					case C_PLAY:
+						return new PlayControl();
+
+					case C_RATE:
+						return new RateControl();
+
+					case C_SOURCE:
+						return new SourceControl();
+
+					case C_SUBTITLE:
+						return new SubtitleControl();
+
+					case C_TIMELINE:
+						return new TimelineControl();
+
+					case C_VOLUME:
+						return new VolumeControl();
+
+					default:
+						return null;
+				}
+			}
+		}
+
+		class ControlText {
+			constructor (classname) {
+				this.element = $('<div />').addClass('control-text ' + classname);
+			}
+
+			set text (value) {
+				this.element.html(value);
+			}
+		}
+
+		class ControlContainer {
+			constructor (iconClass) {
+				let _self = this;
+				this.iconClass = iconClass;
+				this.icon = $('<div />')
+					.addClass('control-icon')
+					.append($('<i />')
+						.addClass('fa fa-' + iconClass));
+				this.listElement = $('<div/>').addClass('control-inner');
+				this.element = $('<div />')
+					.addClass('control control-container')
+					.append(this.icon)
+					.append(this.listElement);
+				this._index = 0;
+				this.list = [];
+				this.icon.click(function () { _self.onContainerClick(); });
+			}
+
+			get active () {
+				for (let i in this.list)
+					if (this.list[ i ].hasClass('active'))
+						return this.list[ i ];
+				return null;
+			}
+
+			set active (index) {
+				let hasActive = false;
+				for (let i in this.list) {
+					if (this.list[ i ].data('index') == index) {
+						this.list[ i ].addClass('active');
+						this.icon.html(this.list[ i ].html());
+						hasActive = true;
+					}
+					else
+						this.list[ i ].removeClass('active');
+				}
+				if (!hasActive)
+					this.icon.html($('<i />').addClass('fa fa-' + this.iconClass));
+			}
+
+			addItem (text, data) {
+				let _self = this;
+				var item = $('<div />').addClass('inner-item').data('index', this._index).html(text).click(function () {
+					_self.onItemClick($(this).data('index'));
+				});
+				if (typeof data == 'object') {
+					for (let k in data)
+						item.data(k, data[ k ]);
+				}
+				this._index++;
+				this.list.push(item);
+				this.listElement.append(item);
+
+				return item;
+			}
+
+			disable () {
+				this.element.addClass('disabled');
+			}
+
+			getByIndex (index) {
+				for (let i in this.list)
+					if (this.list[ i ].data('index') == index)
+						return this.list[ i ];
+				return null;
+			}
+
+			onContainerClick () {
+			}
+
+			onItemClick (index) {
+				this.active = index;
+			}
+		}
+
+		class BackwardControl extends Control {
+			constructor () {
+				super('backward', 'undo');
+				this.element.click(e => {
+					if (video.currentTime - options.playback.step.medium > 0)
+						video.seek(video.currentTime - options.playback.step.medium);
+					else
+						video.seek(0);
+				});
+			}
+		}
+
+		class DownloadControl extends Control {
+			constructor () {
+				super('', '');
+				this.element = $('<a />').attr('href', '').attr('target', '_blank').attr('download', '').addClass('control download').append($('<i />').addClass('fa fa-download'));
+			}
+
+			set link (value) {
+				this.element.attr('href', value);
+			}
+		}
+
+		class ForwardControl extends Control {
+			constructor () {
+				super('forward', 'redo');
+			}
+		}
+
+		class FullscreenControl extends Control {
+			constructor () {
+				super('fullscreen', 'arrows-alt');
+				this.element.click(e => {
+					Fullscreen.toggle();
+				});
+			}
+		}
+
+		class PlayControl extends Control {
+			constructor () {
+				super('play', 'play');
+				this.element.click(e => {
+					video.togglePlay();
+				});
+			}
+
+			pause () {
+				this.element
+					.children('.fa')
+					.removeClass('fa-pause')
+					.addClass('fa-play');
+			}
+
+			play () {
+				this.element
+					.children('.fa')
+					.removeClass('fa-play')
+					.addClass('fa-pause');
+			}
+		}
+
+		class RateControl {
+			constructor () {
+				this.down = new Control('rate-down', 'backward');
+				this.up = new Control('rate-up', 'forward');
+				this.current = new ControlText('rate-current');
+
+				this.down.element.click(e => {
+					video.decreaseRate();
+				});
+
+				this.up.element.click(e => {
+					video.increaseRate();
+				});
+
+				this.element = $('<div />')
+					.addClass('control-container')
+					.append(this.down.element)
+					.append(this.current.element)
+					.append(this.up.element);
+			}
+
+			set (value) {
+				this.up.element.removeClass('disabled');
+				this.down.element.removeClass('disabled');
+				if (video.rate <= options.rate.min)
+					this.down.element.addClass('disabled');
+				else if (video.rate >= options.rate.max)
+					this.up.element.addClass('disabled');
+				this.show();
+			}
+
+			show () {
+				this.current.text = '×' + video.rate.toFixed(2).toString().replace(',', '.');
+			}
+		}
+
+		class SourceControl extends ControlContainer {
+			constructor () {
+				super('bullseye');
+				/** TODO: Move sources to the arguments in constror */
+				if (sources.length > 1) {
+					for (var i in sources) {
+						this.addItem(sources[ i ].title, { src : sources[ i ].src });
+					}
+				}
+				else
+					this.disable();
+			}
+
+			set (index) {
+				/** TODO: Emit event on set source*/
+				let s = this.getByIndex(index);
+				if (s != null) {
+					element.attr('src', s.data('src'));
+					controls.download = s.data('src');
+				}
+			}
+
+			onItemClick (index) {
+				super.onItemClick(index);
+				this.set(index);
+			}
+		}
+
+		class SubtitleControl extends ControlContainer {
+			constructor () {
+				super('commenting-o');
+			}
+
+			init () {
+				if (video.subtitles.length > 0) {
+					for (var i in video.subtitles) {
+						if (video.subtitles.hasOwnProperty(i)) {
+							let item = video.subtitles[ i ];
+							this.addItem(item.title, {
+								src : item.src,
+								language : item.language
+							});
+						}
+					}
+				}
+				else
+					this.disable();
+			}
+
+			onContainerClick () {
+				super.onContainerClick();
+				this.onItemClick(-1);
+			}
+
+			onItemClick (index) {
+				super.onItemClick(index);
+				let t = this.getByIndex(index);
+				if (t != null)
+					video.track = t.data('language');
+				else
+					video.track = -1;
+			}
+		}
+
+		class TimelineControl {
+			constructor () {
+				let _self = this,
+					duration = video.duration;
+
+				this.drag = false;
+
+				this.current = new ControlText('time-current');
+				this.total = new ControlText('time-total');
+
+				this.marker = $('<div />').addClass('time-marker');
+
+				this.markerShadow = $('<div />')
+					.addClass('time-marker shadow')
+					.append()
+					.hide();
+
+				this.markerShadowTime = $('<div />').addClass('time');
+				this.markerTime = $('<div />')
+					.addClass('time')
+					.hide();
+				this.played = $('<div />').addClass('time-played');
+				this.current.text = '00:00';
+				this.line = $('<div />')
+					.addClass('timeline')
+					.append(this.marker.append(this.markerTime))
+					.append(this.markerShadow.append(this.markerShadowTime))
+					.append(this.played)
+					.on({
+						'mousemove' : (e) => {
+							if (this.drag) return;
+
+							let p = this.getPosition(e.pageX);
+							if (p > 0 && p < 1) {
+								this.markerShadow.show();
+								this.markerShadow.css('left', p * 100 + '%');
+								this.markerShadowTime.html(secondsToTime(duration * p));
+							}
+							else
+								this.markerShadow.hide();
+						},
+
+						'mouseleave' : (e) => {
+							if (this.drag) return;
+							this.markerShadow.hide()
+						},
+
+						'click' : (e) => {
+							if (this.drag) return;
+							video.seek(video.duration * this.getPosition(e.pageX));
+						}
+					});
+
+				this.element = $('<div />')
+					.addClass('timeline-container')
+					.append($('<div />')
+						.addClass('timeline-subcontainer')
+						.append(this.current.element)
+						.append(this.line)
+						.append(this.total.element));
+
+				this.marker.on('mousedown', (e) => {
+					if (e.which != 1) return;
+					this.markerShadow.hide();
+					this.drag = true;
+				});
+
+				$(document).on({
+
+					'mousemove' : (e) => {
+						if (!this.drag) return;
+						let p = this.getPosition(e.pageX);
+						if (p > 0 && p < 1) {
+							this.markerTime
+								.show()
+								.html(secondsToTime(duration * p))
+							video.seek(duration * p);
+						}
+					},
+
+					'mouseup' : (e) => {
+						this.markerTime.hide()
+						this.drag = false;
+					}
+				});
+			}
+
+			getPosition (x) {
+				return (x - this.line.offset().left) / this.line.width();
+			}
+
+			move () {
+				var t = (video.currentTime / video.duration * 100).toFixed(2) + '%';
+				this.marker.css('left', t);
+				this.played.css('width', t);
+				this.current.text = secondsToTime(video.currentTime);
+			}
+		}
+
+		class VolumeControl {
+			constructor () {
+				let _self = this;
+
+				this.icon = $('<div/>')
+					.addClass('control-icon')
+					.append($('<i />')
+						.addClass('fa fa-volume-down'))
+					.click(function () {
+						_self.toggleMuted();
+					});
+
+				this.marker = $('<div/>').addClass('volume-marker');
+
+				this.active = $('<div/>').addClass('volume-active');
+
+				this.line = $('<div/>')
+					.addClass('volume-line')
+					.append(this.active)
+					.append(this.marker)
+					.on('click', (e) => {
+						if (this.drag) return;
+						let p = this.getPosition(e.pageY);
+						if (p >= 0 && p <= 1) {
+							controls.volume = 1 - p;
+						}
+					});
+
+				this.element = $('<div />')
+					.addClass('control control-container')
+					.append(this.icon)
+					.append($('<div />')
+						.addClass('control-inner volume-slider')
+						.append(this.line));
+
+				this.drag = false;
+
+				this.marker.on('mousedown', (e) => {
+					if (e.which != 1) return;
+					this.drag = true;
+				});
+
+				$(document).on({
+					'mousemove' : (e) => {
+						if (!this.drag) return;
+						let p = this.getPosition(e.pageY);
+						if (p >= 0 && p <= 1) {
+							controls.volume = 1 - p
+						}
+					},
+
+					'mouseup' : (e) => {
+						this.drag = false;
+					}
+				});
+			}
+
+			set value (value) {
+				var icon = this.icon.children('.fa').eq(-1);
+				icon.removeClass();
+				if (value < env.volume.mutelimit) {
+					icon.addClass('fa fa-volume-off');
+				}
+				else {
+					if (value < 0.5)
+						icon.addClass('fa fa-volume-down');
+					else
+						icon.addClass('fa fa-volume-up');
+				}
+
+				let p = Math.round(value * 100).toString() + '%';
+				this.active.css('height', p);
+				this.marker.css('bottom', p);
+			}
+
+			toggleMuted () {
+				if (video.muted == true) {
+					this.value = Cookie.get('volume', env.volume.default);
+				}
+				else
+					this.value = 0;
+			}
+
+			getPosition (y) {
+				return (y - this.line.offset().top) / this.line.height();
+			}
+
+		}
+
+		class Cookie {
+			static get (name, dflt) {
+				var cookies = document.cookie.split(';');
+				for (var i in cookies) {
+					var d = cookies[ i ].trim().split('=');
+					if (d[ 0 ] == 'leplayer_' + name)
+						return d[ 1 ];
+				}
+				return dflt;
+			};
+
+			static set (name, value) {
+				var d = new Date();
+				d.setDate(d.year + 1);
+				document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
+			};
+		}
+
+		class ControlCollection {
+			constructor (name, active) {
+				this.items = [];
+				this.active = active || false;
+				this.name = name;
+			}
+
+			set download (value) {
+				if (this.has(C_DOWNLOAD)) {
+					this.items.download.link = value;
+				}
+			}
+
+			set rate (value) {
+				if (this.has(C_RATE)) {
+					this.items.rate.set(value);
+				}
+			}
+
+			set source (value) {
+				if (this.has(C_SOURCE)) {
+					this.items.source.set(value);
+				}
+			}
+
+			set totalTime (value) {
+				if (this.has(C_TIMELINE))
+					this.items.timeline.total.text = value;
+			}
+
+			set volume (value) {
+				if (this.has(C_VOLUME))
+					this.items.volume.value = value;
+			}
+
+			add (name) {
+				if (name == C_DIVIDER)
+					return Control.create(name);
+				else {
+					this.items[ name ] = Control.create(name);
+					return this.items[ name ].element;
+				}
+			}
+
+			has (name) {
+				return (typeof this.items[ name ] == 'object');
+			}
+
+			hide () {
+				container.find('.controls-' + this.name).hide();
+			}
+
+			init () {
+				this.volume = Cookie.get('volume', env.volume.default);
+				this.initTimeline();
+				this.totalTime = secondsToTime(video.duration);
+				this.download = sources[ 0 ].src;
+				this.initSubtitles();
+			}
+
+			initSubtitles () {
+				if (this.has(C_SUBTITLE)) {
+					this.items[ C_SUBTITLE ].init();
+				}
+			}
+
+			initTimeline () {
+				if (this.has(C_TIMELINE)) {
+					if (this.items.timeline.element.width() < 20)
+						this.items.timeline.element.hide();
+				}
+			}
+
+			moveTimeMarker () {
+				if (this.has(C_TIMELINE))
+					this.items.timeline.move();
+			}
+
+			pause () {
+				if (this.has(C_PLAY))
+					this.items.play.pause();
+			}
+
+			play () {
+				if (this.has(C_PLAY))
+					this.items.play.play();
+			}
+
+			show () {
+				container.find('.controls-' + this.name).show();
+			}
+		}
+
+		class Controls {
+			constructor () {
+				this.collections = {
+					common : new ControlCollection('common'),
+					mini : new ControlCollection('mini'),
+					fullscreen : new ControlCollection('fullscreen')
+				};
+				this.collections.common.active = true;
+			}
+
+			get common () {
+				return this.collections.common;
+			}
+
+			get fullscreen () {
+				return this.collections.fullscreen;
+			}
+
+			get mini () {
+				return this.collections.mini;
+			}
+
+			set download (value) {
+				for (var i in this.collections) {
+					this.collections[ i ].download = value;
+				}
+			}
+
+			set rate (value) {
+				Cookie.set('rate', value);
+				for (var i in this.collections) {
+					this.collections[ i ].rate = value;
+				}
+			}
+
+			set source (value) {
+				for (var i in this.collections) {
+					this.collections[ i ].source = value;
+				}
+			}
+
+			set totalTime (value) {
+				for (var i in this.collections) {
+					this.collections[ i ].totalTime = value;
+				}
+			}
+
+			set volume (value) {
+				for (var i in this.collections) {
+					this.collections[ i ].volume = value;
+				}
+				video.volume = value;
+				Cookie.set('volume', value);
+			}
+
+			has (name) {
+				return (typeof this.collections[ name ] == 'object');
+			}
+
+			init () {
+				for (var i in this.collections) {
+					this.collections[ i ].init();
+				}
+				this.collections.common.show();
+				this.collections.mini.hide();
+				this.collections.fullscreen.hide();
+			}
+
+			moveTimeMarker () {
+				for (var i in this.collections)
+					this.collections[ i ].moveTimeMarker();
+			}
+
+			pause () {
+				for (var i in this.collections)
+					this.collections[ i ].pause();
+			}
+
+			play () {
+				for (var i in this.collections)
+					this.collections[ i ].play();
+			}
+		}
+
+		var sources = [];
 		var subtitles = [];
-		var volume    = 0.5;
-		var video     = null;
-		var controls  = new Controls();
+		var volume = env.volume.default;
+		var video = null;
+		var controls = new Controls();
 
 		/**
 		 * DOM container to hold video and all other stuff.
 		 * @type object
 		 */
 		var container = null;
-		var overlay   = null;
+		var overlay = null;
 
 		var init = function () {
 			// Check if element is correctly selected.
@@ -811,11 +987,12 @@ import $ from 'jquery';
 			}
 
 			// Set source.
+			// @TODO move this to Video class
 			element.children('source').each(function () {
 				var src = $(this).attr('src');
 				if (src)
 					sources.push({
-						src   : src,
+						src : src,
 						title : $(this).attr('title')
 					});
 			});
@@ -823,7 +1000,7 @@ import $ from 'jquery';
 				var src = element.attr('src');
 				if (src) {
 					sources.push({
-						src   : src,
+						src : src,
 						title : $(this).attr('title') || 'default'
 					});
 				}
@@ -832,12 +1009,13 @@ import $ from 'jquery';
 				console.warn('No sources found.');
 				return this;
 			}
+			video = new Video(element);
 
 			initOptions();
 			initDom();
-			initSubtitles();
 			initControls();
-			initVideo();
+			video.init();
+
 			initHotKeys();
 		};
 
@@ -845,9 +1023,9 @@ import $ from 'jquery';
 			for (let name in options.controls) {
 				if (controls.has(name)) {
 					for (let rowIndex in options.controls[ name ]) {
-						let row         = options.controls[ name ][ rowIndex ],
-						    hasTimeline = false,
-						    rowElement  = $('<div />').addClass('leplayer-controls controls-' + name);
+						let row = options.controls[ name ][ rowIndex ],
+							hasTimeline = false,
+							rowElement = $('<div />').addClass('leplayer-controls controls-' + name);
 
 						for (let i in row) {
 							let controlName = row[ i ];
@@ -877,14 +1055,14 @@ import $ from 'jquery';
 		};
 
 		var initDom = function () {
-			overlay            = $('<div />').addClass('play-overlay').html('<i class="fa fa-play"></i>');
+			overlay = $('<div />').addClass('play-overlay').html('<i class="fa fa-play"></i>');
 			var videoContainer = $('<div />').addClass('leplayer-video').append(overlay);
-			container          = $('<div />').addClass('leplayer-container').append(videoContainer).css('width', element.width() + 'px');
+			container = $('<div />').addClass('leplayer-container').append(videoContainer).css('width', element.width() + 'px');
 
 			element.before(container);
 			videoContainer.append(element);
 			overlay.click(function () {
-				togglePlay();
+				video.togglePlay();
 			});
 		};
 
@@ -893,10 +1071,10 @@ import $ from 'jquery';
 			element.keypress(e => {
 				if (e.charCode == 32) {
 					//e.preventDefault();
-					togglePlay();
+					video.togglePlay();
 				}
 			}).click(function () {
-				togglePlay();
+				video.togglePlay();
 			});
 		};
 
@@ -952,71 +1130,10 @@ import $ from 'jquery';
 			element.attr('preload', options.preload);
 		};
 
-		var initSubtitles = function () {
-			element.children('track[kind="subtitles"]').each(function () {
-				var language = $(this).attr('srclang');
-				var title    = $(this).attr('label');
-				var src      = $(this).attr('src');
-				if (title.length > 0 && src.length > 0) {
-					subtitles.push({
-						title    : title,
-						src      : src,
-						language : language
-					});
-				}
-			});
-		};
-
-		var initVideo = function () {
-			video = element[ 0 ];
-			if (video.readyState > HTMLMediaElement.HAVE_NOTHING)
-				initVideoEvent();
-			else
-				video.onloadedmetadata = function () {
-					initVideoEvent();
-				};
-		};
-
-		var initVideoEvent = function () {
-			overlay.css('line-height', video.clientHeight + 'px');
-			container.css('width', video.clientWidth + 'px');
-
-			video.ontimeupdate = function () {
-				controls.moveTimeMarker();
-			};
-
-			// This is generally for Firefox only
-			// because it somehow resets track list
-			// for video element after DOM manipulation.
-
-			if (video.textTracks.length == 0 && subtitles.length > 0) {
-				element.children('track[kind="subtitles"]').remove();
-				for (var i in subtitles) {
-					element.append($('<track/>').attr('label', subtitles[ i ].title).attr('src', subtitles[ i ].src).attr('srclang', subtitles[ i ].language).attr('id', subtitles[ i ].language).attr('kind', 'subtitles'));
-				}
-			}
-
-			Fullscreen.init();
-			controls.init();
-		};
-
-		var togglePlay = function () {
-			if (!video.played || video.paused) {
-				overlay.hide();
-				video.play();
-				controls.play();
-			}
-			else {
-				overlay.show();
-				video.pause();
-				controls.pause();
-			}
-		};
-
 		var secondsToTime = function (seconds) {
-			var h   = Math.floor(seconds / 3600);
-			var m   = Math.floor(seconds % 3600 / 60);
-			var s   = Math.floor(seconds % 3600 % 60);
+			var h = Math.floor(seconds / 3600);
+			var m = Math.floor(seconds % 3600 / 60);
+			var s = Math.floor(seconds % 3600 % 60);
 			var out = '';
 			if (h > 0)
 				out = h + ':';
@@ -1029,10 +1146,6 @@ import $ from 'jquery';
 			return out;
 		};
 
-		var seek = function (time) {
-			video.currentTime = time;
-		};
-
 		init();
 		return this;
 	};
@@ -1042,4 +1155,4 @@ import $ from 'jquery';
 			Player($(this), options);
 		});
 	};
-}
+}(jQuery));
