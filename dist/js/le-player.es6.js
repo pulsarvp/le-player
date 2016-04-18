@@ -403,6 +403,10 @@
 				return item;
 			}
 
+			disable () {
+				this.element.addClass('disabled');
+			}
+
 			getByIndex (index) {
 				for (let i in this.list)
 					if (this.list[ i ].data('index') == index)
@@ -558,6 +562,8 @@
 						}
 					}
 				}
+				else
+					this.disable();
 			}
 
 			onContainerClick () {
