@@ -528,6 +528,8 @@
 						this.addItem(sources[ i ].title, { src : sources[ i ].src });
 					}
 				}
+				else
+					this.disable();
 			}
 
 			set (index) {
