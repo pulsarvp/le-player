@@ -134,6 +134,7 @@
 				else {
 					this.hideElements();
 				}
+				setOverlaySize();
 			}
 		}
 
@@ -154,12 +155,40 @@
 				return this._video.duration;
 			}
 
+			get height () {
+				return this._video.clientHeight;
+			}
+
 			get rate () {
 				return this._video.playbackRate;
 			}
 
+			get width () {
+				return this._video.clientWidth;
+			}
+
 			set rate (value) {
 				this._video.playbackRate = value;
+			}
+
+			set source (value) {
+				let time = this._video.currentTime;
+				let rate = this._video.playbackRate;
+				let stop = (!this._video.played || this._video.paused);
+				this._ctx.attr('src', value);
+				this._video = this._ctx[ 0 ];
+				this._video.playbackRate = rate;
+				this._video.currentTime = time;
+				if (stop)
+					this.pause();
+				else
+					this.play();
+
+				// @TODO make this right way
+				setTimeout(function () {
+					setOverlaySize();
+				}, 100);
+
 			}
 
 			set track (value) {
@@ -198,13 +227,9 @@
 
 			togglePlay () {
 				if (!this._video.played || this._video.paused) {
-					overlay.hide();
 					this.play();
-					controls.play();
 				} else {
-					overlay.show();
 					this.pause();
-					controls.pause();
 				}
 			}
 
@@ -213,10 +238,14 @@
 			}
 
 			play () {
+				overlay.hide();
+				controls.play();
 				return this._video.play();
 			}
 
 			pause () {
+				overlay.show();
+				controls.pause();
 				return this._video.pause();
 			}
 
@@ -254,7 +283,7 @@
 			_initVideoEvent () {
 				let _self = this;
 
-				overlay.css('line-height', this._video.clientHeight + 'px');
+				setOverlaySize();
 				container.css('width', this._video.clientWidth + 'px');
 
 				this._video.ontimeupdate = function () {
@@ -536,7 +565,7 @@
 				/** TODO: Emit event on set source*/
 				let s = this.getByIndex(index);
 				if (s != null) {
-					element.attr('src', s.data('src'));
+					video.source = s.data('src');
 					controls.download = s.data('src');
 				}
 			}
@@ -1144,6 +1173,10 @@
 				out += '0';
 			out += s;
 			return out;
+		};
+
+		var setOverlaySize = function () {
+			overlay.css('line-height', video.height + 'px');
 		};
 
 		init();
