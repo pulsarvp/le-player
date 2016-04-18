@@ -1054,10 +1054,10 @@
 			element.keypress(e => {
 				if (e.charCode == 32) {
 					//e.preventDefault();
-					togglePlay();
+					video.togglePlay();
 				}
 			}).click(function () {
-				togglePlay();
+				video.togglePlay();
 			});
 		};
 
