@@ -14,6 +14,13 @@
 		const C_TIMELINE = 'timeline';
 		const C_VOLUME = 'volume';
 
+		let env = {
+			volume : {
+				default : 0.4,
+				mutelimit : 0.05
+			}
+		};
+
 		var options = $.extend(true, {
 			autoplay : false,
 			height : 'auto',
@@ -147,6 +154,11 @@
 				return this._video.duration;
 			}
 
+			set volume (value) {
+				this._video.volume = value;
+				this._video.mute = (value < env.volume.mutelimit);
+			}
+
 			decreaseRate (step, min) {
 				if (this._video.playbackRate > min) {
 					this._video.playbackRate -= step;
@@ -178,6 +190,18 @@
 					this.pause();
 					controls.pause();
 				}
+			}
+
+			seek (time) {
+				this._video.currentTime = time;
+			}
+
+			play () {
+				return this._video.play();
+			}
+
+			pause () {
+				return this._video.pause();
 			}
 
 			_initSubtitles () {
@@ -237,18 +261,6 @@
 
 				Fullscreen.init();
 				controls.init();
-			}
-
-			seek (time) {
-				this._video.currentTime = time
-			}
-
-			play () {
-				return this._video.play()
-			}
-
-			pause () {
-				return this._video.pause()
 			}
 		}
 
@@ -694,7 +706,7 @@
 						if (this.drag) return;
 						let p = this.getPosition(e.pageY);
 						if (p >= 0 && p <= 1) {
-							controls.volume = 1 - p
+							controls.volume = 1 - p;
 						}
 					});
 
@@ -730,18 +742,14 @@
 			set value (value) {
 				var icon = this.icon.children('.fa').eq(-1);
 				icon.removeClass();
-				if (value < 0.05) {
-					video.muted = true;
+				if (value < env.volume.mutelimit) {
 					icon.addClass('fa fa-volume-off');
 				}
 				else {
-					video.muted = false;
-					video.volume = value;
 					if (value < 0.5)
 						icon.addClass('fa fa-volume-down');
 					else
 						icon.addClass('fa fa-volume-up');
-					Cookie.set('volume', value);
 				}
 
 				let p = Math.round(value * 100).toString() + '%';
@@ -751,7 +759,7 @@
 
 			toggleMuted () {
 				if (video.muted == true) {
-					this.value = Cookie.get('volume', 0.4);
+					this.value = Cookie.get('volume', env.volume.default);
 				}
 				else
 					this.value = 0;
@@ -827,7 +835,7 @@
 			}
 
 			init () {
-				this.volume = Cookie.get('volume', 0.4);
+				this.volume = Cookie.get('volume', env.volume.default);
 				this.initTimeline();
 				this.totalTime = secondsToTime(video.duration);
 				this.initRate();
@@ -910,6 +918,8 @@
 				for (var i in this.collections) {
 					this.collections[ i ].volume = value;
 				}
+				video.volume = value;
+				Cookie.set('volume', value);
 			}
 
 			has (name) {
@@ -943,7 +953,7 @@
 
 		var sources = [];
 		var subtitles = [];
-		var volume = 0.5;
+		var volume = env.volume.default;
 		var video = null;
 		var controls = new Controls();
 
