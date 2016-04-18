@@ -134,6 +134,7 @@
 				else {
 					this.hideElements();
 				}
+				setOverlaySize();
 			}
 		}
 
@@ -182,7 +183,12 @@
 					this.pause();
 				else
 					this.play();
-				setOverlaySize;
+
+				// @TODO make this right way
+				setTimeout(function () {
+					setOverlaySize();
+				}, 100);
+
 			}
 
 			set track (value) {
