@@ -162,6 +162,15 @@
 				this._video.playbackRate = value;
 			}
 
+			set track (value) {
+				for (var i = 0; i < this._video.textTracks.length; i++) {
+					if (this._video.textTracks[ i ].language == value)
+						this._video.textTracks[ i ].mode = 'showing';
+					else
+						this._video.textTracks[ i ].mode = 'hidden';
+				}
+			}
+
 			set volume (value) {
 				this._video.volume = value;
 				this._video.mute = (value < env.volume.mutelimit);
@@ -219,9 +228,9 @@
 			_initSubtitles () {
 				let _self = this;
 				this._ctx.children('track[kind="subtitles"]').each(function () {
-					var language = $(this).attr('srclang');
-					var title = $(this).attr('label');
-					var src = $(this).attr('src');
+					let language = $(this).attr('srclang');
+					let title = $(this).attr('label');
+					let src = $(this).attr('src');
 					if (title.length > 0 && src.length > 0) {
 						_self.subtitles.push({
 							title : title,
@@ -270,7 +279,6 @@
 						}
 					}
 				}
-
 				Fullscreen.init();
 				controls.init();
 			}
@@ -536,43 +544,34 @@
 		class SubtitleControl extends ControlContainer {
 			constructor () {
 				super('commenting-o');
-				if (video.subtitles.length > 0) {
-					for (var i in video.subtitles) {
-						if (!video.subtitles.hasOwnProperty(i)) continue;
-						let item = video.subtitles[ i ];
-						this.addItem(item.title, {
-							src : item.src,
-							language : item.language
-						});
-					}
-				}
 			}
 
-			set track (index) {
-				var t = this.getByIndex(index);
-				if (t != null && video.textTracks.length > 0) {
-					let language = t.data('language');
-					for (var i = 0; i < video.textTracks.length; i++) {
-						if (video.textTracks[ i ].language == language)
-							video.textTracks[ i ].mode = 'showing';
-						else
-							video.textTracks[ i ].mode = 'hidden';
+			init () {
+				if (video.subtitles.length > 0) {
+					for (var i in video.subtitles) {
+						if (video.subtitles.hasOwnProperty(i)) {
+							let item = video.subtitles[ i ];
+							this.addItem(item.title, {
+								src : item.src,
+								language : item.language
+							});
+						}
 					}
 				}
 			}
 
 			onContainerClick () {
 				super.onContainerClick();
-				super.onItemClick(-1);
-				if (video.textTracks.length > 0) {
-					for (var i = 0; i < video.textTracks.length; i++)
-						video.textTracks[ i ].mode = 'hidden';
-				}
+				this.onItemClick(-1);
 			}
 
 			onItemClick (index) {
 				super.onItemClick(index);
-				this.track = index;
+				let t = this.getByIndex(index);
+				if (t != null)
+					video.track = t.data('language');
+				else
+					video.track = -1;
 			}
 		}
 
@@ -839,6 +838,13 @@
 				this.initTimeline();
 				this.totalTime = secondsToTime(video.duration);
 				this.download = sources[ 0 ].src;
+				this.initSubtitles();
+			}
+
+			initSubtitles () {
+				if (this.has(C_SUBTITLE)) {
+					this.items[ C_SUBTITLE ].init();
+				}
 			}
 
 			initTimeline () {
