@@ -184,6 +184,7 @@
 			init () {
 				this._initSubtitles();
 				this._initVideo();
+				this._initRate();
 			}
 
 			togglePlay () {
@@ -208,6 +209,11 @@
 
 			pause () {
 				return this._video.pause();
+			}
+
+			_initRate () {
+				this._video.playbackRate = Cookie.get('rate', 1);
+				controls.rate = this._video.playbackRate;
 			}
 
 			_initSubtitles () {
@@ -484,12 +490,6 @@
 					.append(this.down.element)
 					.append(this.current.element)
 					.append(this.up.element);
-			}
-
-			load () {
-				video.rate = Cookie.get('rate', 1);
-				console.log(123);
-				this.show();
 			}
 
 			set (value) {
@@ -796,13 +796,15 @@
 			}
 
 			set rate (value) {
-				if (this.has(C_RATE))
+				if (this.has(C_RATE)) {
 					this.items.rate.set(value);
+				}
 			}
 
 			set source (value) {
-				if (this.has(C_SOURCE))
+				if (this.has(C_SOURCE)) {
 					this.items.source.set(value);
+				}
 			}
 
 			set totalTime (value) {
@@ -836,13 +838,7 @@
 				this.volume = Cookie.get('volume', env.volume.default);
 				this.initTimeline();
 				this.totalTime = secondsToTime(video.duration);
-				this.initRate();
 				this.download = sources[ 0 ].src;
-			}
-
-			initRate () {
-				if (this.has(C_RATE))
-					this.items.rate.load();
 			}
 
 			initTimeline () {
@@ -1003,8 +999,9 @@
 
 			initOptions();
 			initDom();
-			video.init();
 			initControls();
+			video.init();
+
 			initHotKeys();
 		};
 
