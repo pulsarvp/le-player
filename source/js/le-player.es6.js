@@ -154,25 +154,31 @@
 				return this._video.duration;
 			}
 
+			get rate () {
+				return this._video.playbackRate;
+			}
+
+			set rate (value) {
+				this._video.playbackRate = value;
+			}
+
 			set volume (value) {
 				this._video.volume = value;
 				this._video.mute = (value < env.volume.mutelimit);
 			}
 
-			decreaseRate (step, min) {
-				if (this._video.playbackRate > min) {
-					this._video.playbackRate -= step;
-					return this._video.playbackRate;
+			decreaseRate () {
+				if (this._video.playbackRate > options.rate.min) {
+					this._video.playbackRate -= options.rate.step;
+					controls.rate = this._video.playbackRate;
 				}
-				return null;
 			}
 
-			increaseRate (step, max) {
-				if (this._video.playbackRate < max) {
-					this._video.playbackRate += step;
-					return this._video.playbackRate;
+			increaseRate () {
+				if (this._video.playbackRate < options.rate.max) {
+					this._video.playbackRate += options.rate.step;
+					controls.rate = this._video.playbackRate;
 				}
-				return null;
 			}
 
 			init () {
@@ -466,11 +472,11 @@
 				this.current = new ControlText('rate-current');
 
 				this.down.element.click(e => {
-					this.decrease();
+					video.decreaseRate();
 				});
 
 				this.up.element.click(e => {
-					this.increase();
+					video.increaseRate();
 				});
 
 				this.element = $('<div />')
@@ -480,37 +486,24 @@
 					.append(this.up.element);
 			}
 
-			decrease () {
-				if (video.playbackRate > options.rate.min) {
-					video.decreaseRate(options.rate.min);
-
-					this.up.element.removeClass('disabled');
-					Cookie.set('rate', video.playbackRate);
-					this.show();
-				} else {
-					this.down.element.addClass('disabled');
-				}
+			load () {
+				video.rate = Cookie.get('rate', 1);
+				console.log(123);
+				this.show();
 			}
 
-			load () {
-				/** TODO: Move work with Cookie to the Video class */
-				video.playbackRate = Cookie.get('rate', 1);
+			set (value) {
+				this.up.element.removeClass('disabled');
+				this.down.element.removeClass('disabled');
+				if (video.rate <= options.rate.min)
+					this.down.element.addClass('disabled');
+				else if (video.rate >= options.rate.max)
+					this.up.element.addClass('disabled');
 				this.show();
 			}
 
 			show () {
-				this.current.text = '×' + video.playbackRate.toFixed(2).toString().replace(',', '.');
-			}
-
-			increase () {
-				if (video.playbackRate < options.rate.max) {
-					this.down.element.removeClass('disabled');
-					video.playbackRate += options.rate.step;
-					Cookie.set('rate', video.playbackRate);
-					this.show();
-				}
-				else
-					this.up.element.addClass('disabled');
+				this.current.text = '×' + video.rate.toFixed(2).toString().replace(',', '.');
 			}
 		}
 
@@ -802,6 +795,11 @@
 				}
 			}
 
+			set rate (value) {
+				if (this.has(C_RATE))
+					this.items.rate.set(value);
+			}
+
 			set source (value) {
 				if (this.has(C_SOURCE))
 					this.items.source.set(value);
@@ -902,6 +900,13 @@
 				}
 			}
 
+			set rate (value) {
+				Cookie.set('rate', value);
+				for (var i in this.collections) {
+					this.collections[ i ].rate = value;
+				}
+			}
+
 			set source (value) {
 				for (var i in this.collections) {
 					this.collections[ i ].source = value;
@@ -972,6 +977,7 @@
 			}
 
 			// Set source.
+			// @TODO move this to Video class
 			element.children('source').each(function () {
 				var src = $(this).attr('src');
 				if (src)
