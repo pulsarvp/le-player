@@ -154,8 +154,16 @@
 				return this._video.duration;
 			}
 
+			get height () {
+				return this._video.clientHeight;
+			}
+
 			get rate () {
 				return this._video.playbackRate;
+			}
+
+			get width () {
+				return this._video.clientWidth;
 			}
 
 			set rate (value) {
@@ -254,7 +262,7 @@
 			_initVideoEvent () {
 				let _self = this;
 
-				overlay.css('line-height', this._video.clientHeight + 'px');
+				setOverlaySize();
 				container.css('width', this._video.clientWidth + 'px');
 
 				this._video.ontimeupdate = function () {
@@ -1144,6 +1152,10 @@
 				out += '0';
 			out += s;
 			return out;
+		};
+
+		var setOverlaySize = function () {
+			overlay.css('line-height', video.height + 'px');
 		};
 
 		init();
