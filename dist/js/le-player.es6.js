@@ -170,6 +170,21 @@
 				this._video.playbackRate = value;
 			}
 
+			set source (value) {
+				let time = this._video.currentTime;
+				let rate = this._video.playbackRate;
+				let stop = (!this._video.played || this._video.paused);
+				this._ctx.attr('src', value);
+				this._video = this._ctx[ 0 ];
+				this._video.playbackRate = rate;
+				this._video.currentTime = time;
+				if (stop)
+					this.pause();
+				else
+					this.play();
+				setOverlaySize;
+			}
+
 			set track (value) {
 				for (var i = 0; i < this._video.textTracks.length; i++) {
 					if (this._video.textTracks[ i ].language == value)
@@ -206,13 +221,9 @@
 
 			togglePlay () {
 				if (!this._video.played || this._video.paused) {
-					overlay.hide();
 					this.play();
-					controls.play();
 				} else {
-					overlay.show();
 					this.pause();
-					controls.pause();
 				}
 			}
 
@@ -221,10 +232,14 @@
 			}
 
 			play () {
+				overlay.hide();
+				controls.play();
 				return this._video.play();
 			}
 
 			pause () {
+				overlay.show();
+				controls.pause();
 				return this._video.pause();
 			}
 
@@ -544,7 +559,7 @@
 				/** TODO: Emit event on set source*/
 				let s = this.getByIndex(index);
 				if (s != null) {
-					element.attr('src', s.data('src'));
+					video.source = s.data('src');
 					controls.download = s.data('src');
 				}
 			}
