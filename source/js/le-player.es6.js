@@ -648,7 +648,7 @@
 							if (p > 0 && p < 1) {
 								this.markerShadow.show();
 								this.markerShadow.css('left', p * 100 + '%');
-								this.markerShadowTime.html(secondsToTime(duration * p));
+								this.markerShadowTime.html(secondsToTime(video.duration * p));
 							}
 							else
 								this.markerShadow.hide();
@@ -659,7 +659,13 @@
 							this.markerShadow.hide()
 						},
 
+						'mousedown' : (e) => {
+						},
+
 						'click' : (e) => {
+							if (e.which !== 1) return;
+							console.log(e)
+							console.log(this.drag);
 							if (this.drag) return;
 							video.seek(video.duration * this.getPosition(e.pageX));
 						}
@@ -674,7 +680,8 @@
 						.append(this.total.element));
 
 				this.marker.on('mousedown', (e) => {
-					if (e.which != 1) return;
+					if (e.which !== 1) return;
+					e.preventDefault();
 					this.markerShadow.hide();
 					this.drag = true;
 				});
@@ -687,8 +694,8 @@
 						if (p > 0 && p < 1) {
 							this.markerTime
 								.show()
-								.html(secondsToTime(duration * p))
-							video.seek(duration * p);
+								.html(secondsToTime(video.duration * p))
+							video.seek(video.duration * p);
 						}
 					},
 
@@ -1042,8 +1049,8 @@
 
 			initOptions();
 			initDom();
-			initControls();
 			video.init();
+			initControls();
 
 			initHotKeys();
 		};
