@@ -282,13 +282,21 @@
 
 			_initVideoEvent () {
 				let _self = this;
+				let mediaElement = $(this._video);
 
 				setOverlaySize();
 				container.css('width', this._video.clientWidth + 'px');
 
-				this._video.ontimeupdate = function () {
-					controls.moveTimeMarker();
-				};
+				mediaElement.on({
+
+					'timeupdate' : () => {
+						controls.moveTimeMarker();
+					},
+
+					'ended' : () => {
+						controls.pause();
+					}
+				})
 
 				// This is generally for Firefox only
 				// because it somehow resets track list
