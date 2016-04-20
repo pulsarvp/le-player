@@ -1188,7 +1188,7 @@
 				if (_isFocused) {
 					$.each(options.keyBinding, (action, binding) => {
 						if( isKeyBinding(e, binding) ) {
-							event.preventDefault();
+							e.preventDefault();
 							binding.fn(video);
 							return false;
 						}
