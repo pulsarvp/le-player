@@ -664,8 +664,6 @@
 
 						'click' : (e) => {
 							if (e.which !== 1) return;
-							console.log(e)
-							console.log(this.drag);
 							if (this.drag) return;
 							video.seek(video.duration * this.getPosition(e.pageX));
 						}
