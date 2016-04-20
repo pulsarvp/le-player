@@ -294,7 +294,7 @@
 					},
 
 					'ended' : () => {
-						controls.pause();
+						this.pause();
 					}
 				})
 
