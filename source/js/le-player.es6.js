@@ -187,6 +187,7 @@
 				// @TODO make this right way
 				setTimeout(function () {
 					setOverlaySize();
+					controls.totalTime = secondsToTime(this._video.duration);
 				}, 100);
 
 			}
@@ -288,11 +289,9 @@
 				container.css('width', this._video.clientWidth + 'px');
 
 				mediaElement.on({
-
 					'timeupdate' : () => {
 						controls.moveTimeMarker();
 					},
-
 					'ended' : () => {
 						this.pause();
 					}
@@ -318,6 +317,7 @@
 				}
 				Fullscreen.init();
 				controls.init();
+				this._video.onloadedmetadata = null;
 			}
 		}
 
