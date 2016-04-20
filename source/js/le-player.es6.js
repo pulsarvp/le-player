@@ -1058,8 +1058,8 @@
 
 			initOptions();
 			initDom();
-			video.init();
 			initControls();
+			video.init();
 
 			initHotKeys();
 		};
