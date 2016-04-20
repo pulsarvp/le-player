@@ -95,7 +95,14 @@
 					fn : (video) => {
 						video.volume -= options.volume.step;
 					}
-				}
+				},
+
+				// test : {
+				// 	key : 82,
+				// 	fn : (video) => {
+				// 		video.fullscreen.hideElements();
+				// 	}
+				// }
 			}
 		}, opts);
 
@@ -107,50 +114,80 @@
 			/**
 			 * @returns {boolean} Whether browser supports fullscreen mode.
 			 */
-			static enabled () {
+
+			constructor () {
+				this.collection = controls.fullscreen;
+			}
+
+			enabled () {
 				return !!(document.fullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled || document.webkitSupportsFullscreen || document.webkitFullscreenEnabled || document.createElement('video').webkitRequestFullScreen);
 			}
 
-			static hideElements () {
+			hideElements () {
 				container.removeClass('fullscreen');
 				controls.fullscreen.hide();
 				controls.common.show();
 				controls.mini.hide();
 			}
 
-			static init () {
-				if (this.enabled()) {
-					// Fullscreen change handlers.
-					document.addEventListener('fullscreenchange', function (e) {
-						Fullscreen.toggleElements(!!(document.fullScreen || document.fullscreenElement));
-					}, false);
-					document.addEventListener('webkitfullscreenchange', function (e) {
-						Fullscreen.toggleElements(!!document.webkitIsFullScreen);
-					}, false);
-					document.addEventListener('mozfullscreenchange', function () {
-						Fullscreen.toggleElements(!!document.mozFullScreen);
-					}, false);
-					document.addEventListener('msfullscreenchange', function () {
-						Fullscreen.toggleElements(!!document.msFullscreenElement);
-					}, false);
+			init () {
+				if (!this.enabled()) {
+					return null;
 				}
+					// Fullscreen change handlers.
+				$(document).on({
+
+					'fullscreenchange' : (e) => {
+						this.toggleElements(!!(document.fullScreen || document.fullscreenElement));
+					},
+
+					'webkitfullscreenchange' : (e) => {
+						this.toggleElements(!!document.webkitIsFullScreen);
+					},
+
+					'mozfullscreenchange' : (e) => {
+						this.toggleElements(!!document.mozFullScreen);
+					},
+
+					'msfullscreenchange' : (e) => {
+						this.toggleElements(!!document.msFullscreenElement);
+					},
+				});
+
+				let timeout = null;
+				$(container).filter('.fullscreen').on({
+					'mousemove' : () => {
+						clearTimeout(timeout);
+						this.collection.element.show();
+						timeout = setTimeout(function () {
+							this.collection.element.hide();
+						}, 7000);
+					},
+
+					'mouseleave' : () => {
+						clearTimeout(timeout);
+						this.collection.element.hide();
+
+					}
+				})
 			}
 
 			/**
 			 * @returns {boolean} Whether browser is in fullscreen mode.
 			 */
-			static is () {
+			is () {
 				return !!(document.fullScreen || document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement);
 			}
 
-			static showElements () {
+			showElements () {
+				console.log(this);
 				container.addClass('fullscreen');
 				controls.fullscreen.show();
 				controls.common.hide();
 				controls.mini.hide();
 			}
 
-			static toggle () {
+			toggle () {
 				if (this.is()) {
 					if (document.exitFullscreen)                document.exitFullscreen();
 					else if (document.mozCancelFullScreen)      document.mozCancelFullScreen();
@@ -160,6 +197,7 @@
 				}
 				else {
 					let containerEl = container[ 0 ];
+					console.log('containerEl',containerEl);
 					if (containerEl.requestFullScreen)            containerEl.requestFullScreen();
 					else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();
 					else if (containerEl.mozRequestFullScreen)    containerEl.mozRequestFullScreen();
@@ -171,7 +209,7 @@
 			/**
 			 * Update DOM structure according to current state.
 			 */
-			static toggleElements (show) {
+			toggleElements (show) {
 				if (!!show) {
 					this.showElements();
 				}
@@ -185,7 +223,7 @@
 			constructor (ctx) {
 				this._ctx = ctx;
 				this._video = ctx[ 0 ];
-				// this.fullscreen = new Fullscreen();
+				this.fullscreen = new Fullscreen();
 				this.subtitles = [];
 				this.playbackRate = this._video.playbackRate;
 			}
@@ -354,7 +392,7 @@
 
 					'dblclick' : () => {
 
-						Fullscreen.toggle();
+						this.fullscreen.toggle();
 					}
 				});
 
@@ -376,7 +414,7 @@
 						}
 					}
 				}
-				Fullscreen.init();
+				video.fullscreen.init();
 				controls.init();
 			}
 		}
@@ -549,7 +587,7 @@
 			constructor () {
 				super('fullscreen', 'arrows-alt');
 				this.element.click(e => {
-					Fullscreen.toggle();
+					video.fullscreen.toggle();
 				});
 			}
 		}
@@ -940,10 +978,11 @@
 			}
 
 			hide () {
-				container.find('.controls-' + this.name).hide();
+				this.element.hide();
 			}
 
 			init () {
+				this.element = container.find(`.controls-${this.name}`)
 				this.initTimeline();
 				this.totalTime = secondsToTime(video.duration);
 				this.download = sources[ 0 ].src;
