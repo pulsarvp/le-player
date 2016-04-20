@@ -282,13 +282,21 @@
 
 			_initVideoEvent () {
 				let _self = this;
+				let mediaElement = $(this._video);
 
 				setOverlaySize();
 				container.css('width', this._video.clientWidth + 'px');
 
-				this._video.ontimeupdate = function () {
-					controls.moveTimeMarker();
-				};
+				mediaElement.on({
+
+					'timeupdate' : () => {
+						controls.moveTimeMarker();
+					},
+
+					'ended' : () => {
+						this.pause();
+					}
+				});
 
 				// This is generally for Firefox only
 				// because it somehow resets track list
@@ -704,9 +712,12 @@
 			}
 
 			move () {
-				var t = (video.currentTime / video.duration * 100).toFixed(2) + '%';
-				this.marker.css('left', t);
-				this.played.css('width', t);
+				var percent = (video.currentTime / video.duration * 100).toFixed(2);
+				if (percent == 100) {
+					controls.pause()
+				}
+				this.marker.css('left', percent + '%');
+				this.played.css('width', percent + '%');
 				this.current.text = secondsToTime(video.currentTime);
 			}
 		}
@@ -758,7 +769,7 @@
 						if (!this.drag) return;
 						let p = this.getPosition(e.pageY);
 						if (p >= 0 && p <= 1) {
-							controls.volume = 1 - p
+							controls.volume = 1 - p;
 						}
 					},
 
