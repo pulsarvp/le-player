@@ -1,45 +1,51 @@
-import $ from 'jquery';
-{
+(function ($) {
 	'use strict';
 
 	let Player = function (element, opts) {
-		const C_BACKWARD   = 'backward';
-		const C_DIVIDER    = 'divider';
-		const C_DOWNLOAD   = 'download';
-		const C_FORWARD    = 'forward';
+		const C_BACKWARD = 'backward';
+		const C_DIVIDER = 'divider';
+		const C_DOWNLOAD = 'download';
+		const C_FORWARD = 'forward';
 		const C_FULLSCREEN = 'fullscreen';
-		const C_PLAY       = 'play';
-		const C_RATE       = 'rate';
-		const C_SOURCE     = 'source';
-		const C_SUBTITLE   = 'subtitle';
-		const C_TIMELINE   = 'timeline';
-		const C_VOLUME     = 'volume';
+		const C_PLAY = 'play';
+		const C_RATE = 'rate';
+		const C_SOURCE = 'source';
+		const C_SUBTITLE = 'subtitle';
+		const C_TIMELINE = 'timeline';
+		const C_VOLUME = 'volume';
+
+		let env = {
+			volume : {
+				default : 0.4,
+				mutelimit : 0.05
+			}
+		};
 
 		var options = $.extend(true, {
 			autoplay : false,
-			height   : 'auto',
-			loop     : false,
-			muted    : false,
-			preload  : 'metadata',
-			poster   : null,
-			width    : 'auto',
-			rate     : {
+			height : 'auto',
+			loop : false,
+			muted : false,
+			preload : 'metadata',
+			poster : null,
+			width : 'auto',
+			rate : {
 				step : 0.25,
-				min  : 0.5,
-				max  : 4.0
+				min : 0.5,
+				max : 4.0
 			},
 			playback : {
 				step : {
-					short  : 5,
+					short : 5,
 					medium : 30,
-					long   : 60
+					long : 60
 				}
 			},
-			volume   : {
+			volume : {
 				step : 0.1
 			},
 			controls : {
-				common     : [
+				common : [
 					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen' ],
 					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download' ]
 				],
@@ -49,9 +55,278 @@ import $ from 'jquery';
 			}
 		}, opts);
 
+		/**
+		 * This class manages FullScreen API.
+		 * @TODO: add fullscreenerror handler.
+		 */
+		class Fullscreen {
+			/**
+			 * @returns {boolean} Whether browser supports fullscreen mode.
+			 */
+			static enabled () {
+				return !!(document.fullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled || document.webkitSupportsFullscreen || document.webkitFullscreenEnabled || document.createElement('video').webkitRequestFullScreen);
+			}
+
+			static hideElements () {
+				container.removeClass('fullscreen');
+				controls.fullscreen.hide();
+				controls.common.show();
+				controls.mini.hide();
+			}
+
+			static init () {
+				if (this.enabled()) {
+					// Fullscreen change handlers.
+					document.addEventListener('fullscreenchange', function (e) {
+						Fullscreen.toggleElements(!!(document.fullScreen || document.fullscreenElement));
+					}, false);
+					document.addEventListener('webkitfullscreenchange', function (e) {
+						Fullscreen.toggleElements(!!document.webkitIsFullScreen);
+					}, false);
+					document.addEventListener('mozfullscreenchange', function () {
+						Fullscreen.toggleElements(!!document.mozFullScreen);
+					}, false);
+					document.addEventListener('msfullscreenchange', function () {
+						Fullscreen.toggleElements(!!document.msFullscreenElement);
+					}, false);
+				}
+			}
+
+			/**
+			 * @returns {boolean} Whether browser is in fullscreen mode.
+			 */
+			static is () {
+				return !!(document.fullScreen || document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement);
+			}
+
+			static showElements () {
+				container.addClass('fullscreen');
+				controls.fullscreen.show();
+				controls.common.hide();
+				controls.mini.hide();
+			}
+
+			static toggle () {
+				if (this.is()) {
+					if (document.exitFullscreen)                document.exitFullscreen();
+					else if (document.mozCancelFullScreen)      document.mozCancelFullScreen();
+					else if (document.webkitCancelFullScreen)   document.webkitCancelFullScreen();
+					else if (document.msExitFullscreen)         document.msExitFullscreen();
+					this.hideElements(); // @TODO: make this only if fullscreen fired.
+				}
+				else {
+					let containerEl = container[ 0 ];
+					if (containerEl.requestFullScreen)            containerEl.requestFullScreen();
+					else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();
+					else if (containerEl.mozRequestFullScreen)    containerEl.mozRequestFullScreen();
+					else if (containerEl.msExitFullscreen)        containerEl.msRequestFullscreen();
+					this.showElements(); // @TODO: make this only if fullscreen fired.
+				}
+			}
+
+			/**
+			 * Update DOM structure according to current state.
+			 */
+			static toggleElements (show) {
+				if (!!show) {
+					this.showElements();
+				}
+				else {
+					this.hideElements();
+				}
+				setOverlaySize();
+			}
+		}
+
+		class Video {
+			constructor (ctx) {
+				this._ctx = ctx;
+				this._video = ctx[ 0 ];
+				// this.fullscreen = new Fullscreen();
+				this.subtitles = [];
+				this.playbackRate = this._video.playbackRate;
+			}
+
+			get currentTime () {
+				return this._video.currentTime;
+			}
+
+			get duration () {
+				return this._video.duration;
+			}
+
+			get height () {
+				return this._video.clientHeight;
+			}
+
+			get rate () {
+				return this._video.playbackRate;
+			}
+
+			get width () {
+				return this._video.clientWidth;
+			}
+
+			set rate (value) {
+				this._video.playbackRate = value;
+			}
+
+			set source (value) {
+				let time = this._video.currentTime;
+				let rate = this._video.playbackRate;
+				let stop = (!this._video.played || this._video.paused);
+				this._ctx.attr('src', value);
+				this._video = this._ctx[ 0 ];
+				this._video.playbackRate = rate;
+				this._video.currentTime = time;
+				if (stop)
+					this.pause();
+				else
+					this.play();
+
+				// @TODO make this right way
+				setTimeout(function () {
+					setOverlaySize();
+				}, 100);
+
+			}
+
+			set track (value) {
+				for (var i = 0; i < this._video.textTracks.length; i++) {
+					if (this._video.textTracks[ i ].language == value)
+						this._video.textTracks[ i ].mode = 'showing';
+					else
+						this._video.textTracks[ i ].mode = 'hidden';
+				}
+			}
+
+			set volume (value) {
+				this._video.volume = value;
+				this._video.mute = (value < env.volume.mutelimit);
+			}
+
+			decreaseRate () {
+				if (this._video.playbackRate > options.rate.min) {
+					this._video.playbackRate -= options.rate.step;
+					controls.rate = this._video.playbackRate;
+				}
+			}
+
+			increaseRate () {
+				if (this._video.playbackRate < options.rate.max) {
+					this._video.playbackRate += options.rate.step;
+					controls.rate = this._video.playbackRate;
+				}
+			}
+
+			init () {
+				this._initSubtitles();
+				this._initVideo();
+				this._initRate();
+			}
+
+			togglePlay () {
+				if (!this._video.played || this._video.paused) {
+					this.play();
+				} else {
+					this.pause();
+				}
+			}
+
+			seek (time) {
+				this._video.currentTime = time;
+			}
+
+			play () {
+				overlay.hide();
+				controls.play();
+				return this._video.play();
+			}
+
+			pause () {
+				overlay.show();
+				controls.pause();
+				return this._video.pause();
+			}
+
+			_initRate () {
+				this._video.playbackRate = Cookie.get('rate', 1);
+				controls.rate = this._video.playbackRate;
+			}
+
+			_initSubtitles () {
+				let _self = this;
+				this._ctx.children('track[kind="subtitles"]').each(function () {
+					let language = $(this).attr('srclang');
+					let title = $(this).attr('label');
+					let src = $(this).attr('src');
+					if (title.length > 0 && src.length > 0) {
+						_self.subtitles.push({
+							title : title,
+							src : src,
+							language : language
+						});
+					}
+				});
+			}
+
+			_initVideo () {
+				if (this._video.readyState > HTMLMediaElement.HAVE_NOTHING) {
+					this._initVideoEvent();
+				} else {
+					this._video.onloadedmetadata = () => {
+						this._initVideoEvent();
+					};
+				}
+			}
+
+			_initVideoEvent () {
+				let _self = this;
+				let mediaElement = $(this._video);
+
+				setOverlaySize();
+				container.css('width', this._video.clientWidth + 'px');
+
+				mediaElement.on({
+
+					'timeupdate' : () => {
+						controls.moveTimeMarker();
+					},
+
+					'ended' : () => {
+						this.pause();
+					}
+				})
+
+				// This is generally for Firefox only
+				// because it somehow resets track list
+				// for video element after DOM manipulation.
+
+				if (this._video.textTracks.length == 0 && this.subtitles.length > 0) {
+					this._ctx.children('track[kind="subtitles"]').remove();
+					for (var i in this.subtitles) {
+						if (this.subtitles.hasOwnProperty(i)) {
+							this._ctx
+								.append($('<track/>')
+									.attr('label', this.subtitles[ i ].title)
+									.attr('src', this.subtitles[ i ].src)
+									.attr('srclang', this.subtitles[ i ].language)
+									.attr('id', this.subtitles[ i ].language)
+									.attr('kind', 'subtitles'));
+						}
+					}
+				}
+				Fullscreen.init();
+				controls.init();
+			}
+		}
+
 		class Control {
 			constructor (cssClass, iconClass) {
-				this.element = $('<div />').addClass('control ' + cssClass).append($('<i />').addClass('fa fa-' + iconClass));
+				this.element = $('<div />')
+					.addClass('control ' + cssClass)
+					.append($('<i />')
+						.addClass('fa fa-' + iconClass));
 			}
 
 			static divider () {
@@ -111,13 +386,19 @@ import $ from 'jquery';
 
 		class ControlContainer {
 			constructor (iconClass) {
-				let _self        = this;
-				this.iconClass   = iconClass;
-				this.icon        = $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-' + iconClass));
+				let _self = this;
+				this.iconClass = iconClass;
+				this.icon = $('<div />')
+					.addClass('control-icon')
+					.append($('<i />')
+						.addClass('fa fa-' + iconClass));
 				this.listElement = $('<div/>').addClass('control-inner');
-				this.element     = $('<div />').addClass('control control-container').append(this.icon).append(this.listElement);
-				this._index      = 0;
-				this.list        = [];
+				this.element = $('<div />')
+					.addClass('control control-container')
+					.append(this.icon)
+					.append(this.listElement);
+				this._index = 0;
+				this.list = [];
 				this.icon.click(function () { _self.onContainerClick(); });
 			}
 
@@ -145,7 +426,7 @@ import $ from 'jquery';
 
 			addItem (text, data) {
 				let _self = this;
-				var item  = $('<div />').addClass('inner-item').data('index', this._index).html(text).click(function () {
+				var item = $('<div />').addClass('inner-item').data('index', this._index).html(text).click(function () {
 					_self.onItemClick($(this).data('index'));
 				});
 				if (typeof data == 'object') {
@@ -157,6 +438,10 @@ import $ from 'jquery';
 				this.listElement.append(item);
 
 				return item;
+			}
+
+			disable () {
+				this.element.addClass('disabled');
 			}
 
 			getByIndex (index) {
@@ -179,9 +464,9 @@ import $ from 'jquery';
 				super('backward', 'undo');
 				this.element.click(e => {
 					if (video.currentTime - options.playback.step.medium > 0)
-						seek(video.currentTime - options.playback.step.medium);
+						video.seek(video.currentTime - options.playback.step.medium);
 					else
-						seek(0);
+						video.seek(0);
 				});
 			}
 		}
@@ -216,82 +501,79 @@ import $ from 'jquery';
 			constructor () {
 				super('play', 'play');
 				this.element.click(e => {
-					togglePlay();
+					video.togglePlay();
 				});
 			}
 
 			pause () {
-				this.element.children('.fa').removeClass('fa-pause').addClass('fa-play');
+				this.element
+					.children('.fa')
+					.removeClass('fa-pause')
+					.addClass('fa-play');
 			}
 
 			play () {
-				this.element.children('.fa').removeClass('fa-play').addClass('fa-pause');
+				this.element
+					.children('.fa')
+					.removeClass('fa-play')
+					.addClass('fa-pause');
 			}
 		}
 
 		class RateControl {
 			constructor () {
-				this.down    = new Control('rate-down', 'backward');
-				this.up      = new Control('rate-up', 'forward');
+				this.down = new Control('rate-down', 'backward');
+				this.up = new Control('rate-up', 'forward');
 				this.current = new ControlText('rate-current');
 
 				this.down.element.click(e => {
-					this.decrease();
+					video.decreaseRate();
 				});
 
 				this.up.element.click(e => {
-					this.increase();
+					video.increaseRate();
 				});
 
-				this.element = $('<div />').addClass('control-container').append(this.down.element).append(this.current.element).append(this.up.element);
+				this.element = $('<div />')
+					.addClass('control-container')
+					.append(this.down.element)
+					.append(this.current.element)
+					.append(this.up.element);
 			}
 
-			decrease () {
-				if (video.playbackRate > options.rate.min) {
-					this.up.element.removeClass('disabled');
-					video.playbackRate -= options.rate.step;
-					this.show();
-					Cookie.set('rate', video.playbackRate);
-				}
-				else
+			set (value) {
+				this.up.element.removeClass('disabled');
+				this.down.element.removeClass('disabled');
+				if (video.rate <= options.rate.min)
 					this.down.element.addClass('disabled');
-			}
-
-			load () {
-				video.playbackRate = Cookie.get('rate', 1);
+				else if (video.rate >= options.rate.max)
+					this.up.element.addClass('disabled');
 				this.show();
 			}
 
 			show () {
-				this.current.text = '×' + video.playbackRate.toFixed(2);
-			}
-
-			increase () {
-				if (video.playbackRate < options.rate.max) {
-					this.down.element.removeClass('disabled');
-					video.playbackRate += options.rate.step;
-					this.show();
-					Cookie.set('rate', video.playbackRate);
-				}
-				else
-					this.up.element.addClass('disabled');
+				this.current.text = '×' + video.rate.toFixed(2).toString().replace(',', '.');
 			}
 		}
 
 		class SourceControl extends ControlContainer {
 			constructor () {
 				super('bullseye');
+				/** TODO: Move sources to the arguments in constror */
 				if (sources.length > 1) {
 					for (var i in sources) {
 						this.addItem(sources[ i ].title, { src : sources[ i ].src });
 					}
 				}
+				else
+					this.disable();
 			}
 
 			set (index) {
+				/** TODO: Emit event on set source*/
 				let s = this.getByIndex(index);
 				if (s != null) {
-					element.attr('src', s.data('src'));
+					video.source = s.data('src');
 					controls.download = s.data('src');
 				}
 			}
@@ -305,49 +587,48 @@ import $ from 'jquery';
 		class SubtitleControl extends ControlContainer {
 			constructor () {
 				super('commenting-o');
-				if (subtitles.length > 0) {
-					for (var i in subtitles) {
-						this.addItem(subtitles[ i ].title, { src : subtitles[ i ].src, language : subtitles[ i ].language });
-					}
-				}
 			}
 
-			set track (index) {
-				var t = this.getByIndex(index);
-				if (t != null && video.textTracks.length > 0) {
-					let language = t.data('language');
-					for (var i = 0; i < video.textTracks.length; i++) {
-						if (video.textTracks[ i ].language == language)
-							video.textTracks[ i ].mode = 'showing';
-						else
-							video.textTracks[ i ].mode = 'hidden';
+			init () {
+				if (video.subtitles.length > 0) {
+					for (var i in video.subtitles) {
+						if (video.subtitles.hasOwnProperty(i)) {
+							let item = video.subtitles[ i ];
+							this.addItem(item.title, {
+								src : item.src,
+								language : item.language
+							});
+						}
 					}
 				}
+				else
+					this.disable();
 			}
 
 			onContainerClick () {
 				super.onContainerClick();
-				super.onItemClick(-1);
-				if (video.textTracks.length > 0) {
-					for (var i = 0; i < video.textTracks.length; i++)
-						video.textTracks[ i ].mode = 'hidden';
-				}
+				this.onItemClick(-1);
 			}
 
 			onItemClick (index) {
 				super.onItemClick(index);
-				this.track = index;
+				let t = this.getByIndex(index);
+				if (t != null)
+					video.track = t.data('language');
+				else
+					video.track = -1;
 			}
 		}
 
 		class TimelineControl {
 			constructor () {
-				let _self = this;
+				let _self = this,
+					duration = video.duration;
 
 				this.drag = false;
 
 				this.current = new ControlText('time-current');
-				this.total   = new ControlText('time-total');
+				this.total = new ControlText('time-total');
 
 				this.marker = $('<div />').addClass('time-marker');
 
@@ -357,12 +638,12 @@ import $ from 'jquery';
 					.hide();
 
 				this.markerShadowTime = $('<div />').addClass('time');
-				this.markerTime       = $('<div />')
+				this.markerTime = $('<div />')
 					.addClass('time')
 					.hide();
-				this.played           = $('<div />').addClass('time-played');
-				this.current.text     = '00:00';
-				this.line             = $('<div />')
+				this.played = $('<div />').addClass('time-played');
+				this.current.text = '00:00';
+				this.line = $('<div />')
 					.addClass('timeline')
 					.append(this.marker.append(this.markerTime))
 					.append(this.markerShadow.append(this.markerShadowTime))
@@ -375,7 +656,7 @@ import $ from 'jquery';
 							if (p > 0 && p < 1) {
 								this.markerShadow.show();
 								this.markerShadow.css('left', p * 100 + '%');
-								this.markerShadowTime.html(secondsToTime(video.duration * p));
+								this.markerShadowTime.html(secondsToTime(duration * p));
 							}
 							else
 								this.markerShadow.hide();
@@ -388,7 +669,7 @@ import $ from 'jquery';
 
 						'click' : (e) => {
 							if (this.drag) return;
-							seek(video.duration * this.getPosition(e.pageX));
+							video.seek(video.duration * this.getPosition(e.pageX));
 						}
 					});
 
@@ -414,8 +695,8 @@ import $ from 'jquery';
 						if (p > 0 && p < 1) {
 							this.markerTime
 								.show()
-								.html(secondsToTime(video.duration * p))
-							seek(video.duration * p);
+								.html(secondsToTime(duration * p))
+							video.seek(duration * p);
 						}
 					},
 
@@ -501,18 +782,14 @@ import $ from 'jquery';
 			set value (value) {
 				var icon = this.icon.children('.fa').eq(-1);
 				icon.removeClass();
-				if (value < 0.05) {
-					video.muted = true;
+				if (value < env.volume.mutelimit) {
 					icon.addClass('fa fa-volume-off');
 				}
 				else {
-					video.muted  = false;
-					video.volume = value;
 					if (value < 0.5)
 						icon.addClass('fa fa-volume-down');
 					else
 						icon.addClass('fa fa-volume-up');
-					Cookie.set('volume', value);
 				}
 
 				let p = Math.round(value * 100).toString() + '%';
@@ -522,7 +799,7 @@ import $ from 'jquery';
 
 			toggleMuted () {
 				if (video.muted == true) {
-					this.value = Cookie.get('volume', 0.4);
+					this.value = Cookie.get('volume', env.volume.default);
 				}
 				else
 					this.value = 0;
@@ -554,9 +831,9 @@ import $ from 'jquery';
 
 		class ControlCollection {
 			constructor (name, active) {
-				this.items  = [];
+				this.items = [];
 				this.active = active || false;
-				this.name   = name;
+				this.name = name;
 			}
 
 			set download (value) {
@@ -565,9 +842,16 @@ import $ from 'jquery';
 				}
 			}
 
+			set rate (value) {
+				if (this.has(C_RATE)) {
+					this.items.rate.set(value);
+				}
+			}
+
 			set source (value) {
-				if (this.has(C_SOURCE))
+				if (this.has(C_SOURCE)) {
 					this.items.source.set(value);
+				}
 			}
 
 			set totalTime (value) {
@@ -598,15 +882,17 @@ import $ from 'jquery';
 			}
 
 			init () {
-				this.volume = Cookie.get('volume', 0.4);
+				this.volume = Cookie.get('volume', env.volume.default);
 				this.initTimeline();
 				this.totalTime = secondsToTime(video.duration);
-				this.initRate();
+				this.download = sources[ 0 ].src;
+				this.initSubtitles();
 			}
 
-			initRate () {
-				if (this.has(C_RATE))
-					this.items.rate.load();
+			initSubtitles () {
+				if (this.has(C_SUBTITLE)) {
+					this.items[ C_SUBTITLE ].init();
+				}
 			}
 
 			initTimeline () {
@@ -638,9 +924,9 @@ import $ from 'jquery';
 
 		class Controls {
 			constructor () {
-				this.collections               = {
-					common     : new ControlCollection('common'),
-					mini       : new ControlCollection('mini'),
+				this.collections = {
+					common : new ControlCollection('common'),
+					mini : new ControlCollection('mini'),
 					fullscreen : new ControlCollection('fullscreen')
 				};
 				this.collections.common.active = true;
@@ -664,6 +950,13 @@ import $ from 'jquery';
 				}
 			}
 
+			set rate (value) {
+				Cookie.set('rate', value);
+				for (var i in this.collections) {
+					this.collections[ i ].rate = value;
+				}
+			}
+
 			set source (value) {
 				for (var i in this.collections) {
 					this.collections[ i ].source = value;
@@ -680,6 +973,8 @@ import $ from 'jquery';
 				for (var i in this.collections) {
 					this.collections[ i ].volume = value;
 				}
+				video.volume = value;
+				Cookie.set('volume', value);
 			}
 
 			has (name) {
@@ -711,100 +1006,18 @@ import $ from 'jquery';
 			}
 		}
 
-		/**
-		 * This class manages FullScreen API.
-		 * @TODO: add fullscreenerror handler.
-		 */
-		class Fullscreen {
-			/**
-			 * @returns {boolean} Whether browser supports fullscreen mode.
-			 */
-			static enabled () {
-				return !!(document.fullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled || document.webkitSupportsFullscreen || document.webkitFullscreenEnabled || document.createElement('video').webkitRequestFullScreen);
-			}
-
-			static hideElements () {
-				container.removeClass('fullscreen');
-				controls.fullscreen.hide();
-				controls.common.show();
-				controls.mini.hide();
-			}
-
-			static init () {
-				if (this.enabled()) {
-					// Fullscreen change handlers.
-					document.addEventListener('fullscreenchange', function (e) {
-						Fullscreen.toggleElements(!!(document.fullScreen || document.fullscreenElement));
-					}, false);
-					document.addEventListener('webkitfullscreenchange', function (e) {
-						Fullscreen.toggleElements(!!document.webkitIsFullScreen);
-					}, false);
-					document.addEventListener('mozfullscreenchange', function () {
-						Fullscreen.toggleElements(!!document.mozFullScreen);
-					}, false);
-					document.addEventListener('msfullscreenchange', function () {
-						Fullscreen.toggleElements(!!document.msFullscreenElement);
-					}, false);
-				}
-			}
-
-			/**
-			 * @returns {boolean} Whether browser is in fullscreen mode.
-			 */
-			static is () {
-				return !!(document.fullScreen || document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement);
-			}
-
-			static showElements () {
-				container.addClass('fullscreen');
-				controls.fullscreen.show();
-				controls.common.hide();
-				controls.mini.hide();
-			}
-
-			static toggle () {
-				if (this.is()) {
-					if (document.exitFullscreen)                document.exitFullscreen();
-					else if (document.mozCancelFullScreen)      document.mozCancelFullScreen();
-					else if (document.webkitCancelFullScreen)   document.webkitCancelFullScreen();
-					else if (document.msExitFullscreen)         document.msExitFullscreen();
-					this.hideElements(); // @TODO: make this only if fullscreen fired.
-				}
-				else {
-					let containerEl = container[ 0 ];
-					if (containerEl.requestFullScreen)            containerEl.requestFullScreen();
-					else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();
-					else if (containerEl.mozRequestFullScreen)    containerEl.mozRequestFullScreen();
-					else if (containerEl.msExitFullscreen)        containerEl.msRequestFullscreen();
-					this.showElements(); // @TODO: make this only if fullscreen fired.
-				}
-			}
-
-			/**
-			 * Update DOM structure according to current state.
-			 */
-			static toggleElements (show) {
-				if (!!show) {
-					this.showElements();
-				}
-				else {
-					this.hideElements();
-				}
-			}
-		}
-
-		var sources   = [];
+		var sources = [];
 		var subtitles = [];
-		var volume    = 0.5;
-		var video     = null;
-		var controls  = new Controls();
+		var volume = env.volume.default;
+		var video = null;
+		var controls = new Controls();
 
 		/**
 		 * DOM container to hold video and all other stuff.
 		 * @type object
 		 */
 		var container = null;
-		var overlay   = null;
+		var overlay = null;
 
 		var init = function () {
 			// Check if element is correctly selected.
@@ -814,11 +1027,12 @@ import $ from 'jquery';
 			}
 
 			// Set source.
+			// @TODO move this to Video class
 			element.children('source').each(function () {
 				var src = $(this).attr('src');
 				if (src)
 					sources.push({
-						src   : src,
+						src : src,
 						title : $(this).attr('title')
 					});
 			});
@@ -826,7 +1040,7 @@ import $ from 'jquery';
 				var src = element.attr('src');
 				if (src) {
 					sources.push({
-						src   : src,
+						src : src,
 						title : $(this).attr('title') || 'default'
 					});
 				}
@@ -835,12 +1049,13 @@ import $ from 'jquery';
 				console.warn('No sources found.');
 				return this;
 			}
+			video = new Video(element);
 
 			initOptions();
 			initDom();
-			initSubtitles();
 			initControls();
-			initVideo();
+			video.init();
+
 			initHotKeys();
 		};
 
@@ -848,9 +1063,9 @@ import $ from 'jquery';
 			for (let name in options.controls) {
 				if (controls.has(name)) {
 					for (let rowIndex in options.controls[ name ]) {
-						let row         = options.controls[ name ][ rowIndex ],
-						    hasTimeline = false,
-						    rowElement  = $('<div />').addClass('leplayer-controls controls-' + name);
+						let row = options.controls[ name ][ rowIndex ],
+							hasTimeline = false,
+							rowElement = $('<div />').addClass('leplayer-controls controls-' + name);
 
 						for (let i in row) {
 							let controlName = row[ i ];
@@ -880,14 +1095,14 @@ import $ from 'jquery';
 		};
 
 		var initDom = function () {
-			overlay            = $('<div />').addClass('play-overlay').html('<i class="fa fa-play"></i>');
+			overlay = $('<div />').addClass('play-overlay').html('<i class="fa fa-play"></i>');
 			var videoContainer = $('<div />').addClass('leplayer-video').append(overlay);
-			container          = $('<div />').addClass('leplayer-container').append(videoContainer).css('width', element.width() + 'px');
+			container = $('<div />').addClass('leplayer-container').append(videoContainer).css('width', element.width() + 'px');
 
 			element.before(container);
 			videoContainer.append(element);
 			overlay.click(function () {
-				togglePlay();
+				video.togglePlay();
 			});
 		};
 
@@ -896,10 +1111,10 @@ import $ from 'jquery';
 			element.keypress(e => {
 				if (e.charCode == 32) {
 					//e.preventDefault();
-					togglePlay();
+					video.togglePlay();
 				}
 			}).click(function () {
-				togglePlay();
+				video.togglePlay();
 			});
 		};
 
@@ -955,6 +1170,7 @@ import $ from 'jquery';
 			element.attr('preload', options.preload);
 		};
 
+<<<<<<< HEAD
 		var initSubtitles = function () {
 			element.children('track[kind="subtitles"]').each(function () {
 				var language = $(this).attr('srclang');
@@ -1021,10 +1237,12 @@ import $ from 'jquery';
 			}
 		};
 
+=======
+>>>>>>> b21798aac8f2e61c25cd7b4579de3c9e7a179396
 		var secondsToTime = function (seconds) {
-			var h   = Math.floor(seconds / 3600);
-			var m   = Math.floor(seconds % 3600 / 60);
-			var s   = Math.floor(seconds % 3600 % 60);
+			var h = Math.floor(seconds / 3600);
+			var m = Math.floor(seconds % 3600 / 60);
+			var s = Math.floor(seconds % 3600 % 60);
 			var out = '';
 			if (h > 0)
 				out = h + ':';
@@ -1037,8 +1255,8 @@ import $ from 'jquery';
 			return out;
 		};
 
-		var seek = function (time) {
-			video.currentTime = time;
+		var setOverlaySize = function () {
+			overlay.css('line-height', video.height + 'px');
 		};
 
 		init();
@@ -1050,4 +1268,4 @@ import $ from 'jquery';
 			Player($(this), options);
 		});
 	};
-}
+}(jQuery));
