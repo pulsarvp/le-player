@@ -245,6 +245,7 @@
 				// @TODO make this right way
 				setTimeout(function () {
 					setOverlaySize();
+					controls.totalTime = secondsToTime(this._video.duration);
 				}, 100);
 
 			}
@@ -341,13 +342,19 @@
 
 			_initVideoEvent () {
 				let _self = this;
+				let mediaElement = $(this._video);
 
 				setOverlaySize();
 				container.css('width', this._video.clientWidth + 'px');
 
-				this._video.ontimeupdate = function () {
-					controls.moveTimeMarker();
-				};
+				mediaElement.on({
+					'timeupdate' : () => {
+						controls.moveTimeMarker();
+					},
+					'ended' : () => {
+						this.pause();
+					}
+				});
 
 				// This is generally for Firefox only
 				// because it somehow resets track list
@@ -369,6 +376,7 @@
 				}
 				Fullscreen.init();
 				controls.init();
+				this._video.onloadedmetadata = null;
 			}
 		}
 
@@ -704,7 +712,7 @@
 							if (p > 0 && p < 1) {
 								this.markerShadow.show();
 								this.markerShadow.css('left', p * 100 + '%');
-								this.markerShadowTime.html(secondsToTime(duration * p));
+								this.markerShadowTime.html(secondsToTime(video.duration * p));
 							}
 							else
 								this.markerShadow.hide();
@@ -715,7 +723,11 @@
 							this.markerShadow.hide()
 						},
 
+						'mousedown' : (e) => {
+						},
+
 						'click' : (e) => {
+							if (e.which !== 1) return;
 							if (this.drag) return;
 							video.seek(video.duration * this.getPosition(e.pageX));
 						}
@@ -730,7 +742,8 @@
 						.append(this.total.element));
 
 				this.marker.on('mousedown', (e) => {
-					if (e.which != 1) return;
+					if (e.which !== 1) return;
+					e.preventDefault();
 					this.markerShadow.hide();
 					this.drag = true;
 				});
@@ -743,8 +756,8 @@
 						if (p > 0 && p < 1) {
 							this.markerTime
 								.show()
-								.html(secondsToTime(duration * p))
-							video.seek(duration * p);
+								.html(secondsToTime(video.duration * p))
+							video.seek(video.duration * p);
 						}
 					},
 
@@ -760,9 +773,12 @@
 			}
 
 			move () {
-				var t = (video.currentTime / video.duration * 100).toFixed(2) + '%';
-				this.marker.css('left', t);
-				this.played.css('width', t);
+				var percent = (video.currentTime / video.duration * 100).toFixed(2);
+				if (percent == 100) {
+					controls.pause()
+				}
+				this.marker.css('left', percent + '%');
+				this.played.css('width', percent + '%');
 				this.current.text = secondsToTime(video.currentTime);
 			}
 		}
