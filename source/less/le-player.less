@@ -38,20 +38,20 @@
 
 	.play-overlay
 	{
+		display: flex;
+		align-items: center;
+		align-content: center;
+		justify-content: center;
 		background: rgba(0, 0, 0, 0.5);
-		bottom: 0;
 		color: @color-disabled;
 		cursor: pointer;
-		height: 100%;
-		font-size: 80px;
-		left: 0;
-		outline: 0;
 		position: absolute;
-		right: 0;
+		height: 100%;
+		width: 100%;
+		font-size: 80px;
+		outline: 0;
 		text-align: center;
 		text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-		top: 0;
-		width: 100%;
 		z-index: @z-index-base + 1;
 		&:hover
 		{

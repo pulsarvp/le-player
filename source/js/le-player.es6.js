@@ -178,7 +178,6 @@
 				else {
 					this.hideElements();
 				}
-				setOverlaySize();
 			}
 		}
 
@@ -243,8 +242,7 @@
 					this.play();
 
 				// @TODO make this right way
-				setTimeout(function () {
-					setOverlaySize();
+				setTimeout(() => {
 					controls.totalTime = secondsToTime(this._video.duration);
 				}, 100);
 
@@ -334,9 +332,9 @@
 				if (this._video.readyState > HTMLMediaElement.HAVE_NOTHING) {
 					this._initVideoEvent();
 				} else {
-					this._video.onloadedmetadata = () => {
+					$(this._video).one('loadedmetadata', (e) => {
 						this._initVideoEvent();
-					};
+					});
 				}
 			}
 
@@ -344,7 +342,6 @@
 				let _self = this;
 				let mediaElement = $(this._video);
 
-				setOverlaySize();
 				container.css('width', this._video.clientWidth + 'px');
 
 				mediaElement.on({
@@ -353,6 +350,11 @@
 					},
 					'ended' : () => {
 						this.pause();
+					},
+
+					'dblclick' : () => {
+
+						Fullscreen.toggle();
 					}
 				});
 
@@ -376,7 +378,6 @@
 				}
 				Fullscreen.init();
 				controls.init();
-				this._video.onloadedmetadata = null;
 			}
 		}
 
@@ -1269,9 +1270,6 @@
 			return out;
 		};
 
-		var setOverlaySize = function () {
-			overlay.css('line-height', video.height + 'px');
-		};
 
 		var isFocused = function () {
 			let focused = $(container).find(':focus');
