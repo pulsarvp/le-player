@@ -296,7 +296,7 @@
 					'ended' : () => {
 						this.pause();
 					}
-				})
+				});
 
 				// This is generally for Firefox only
 				// because it somehow resets track list
@@ -713,7 +713,7 @@
 
 			move () {
 				var percent = (video.currentTime / video.duration * 100).toFixed(2);
-				if(percent == 100) {
+				if (percent == 100) {
 					controls.pause()
 				}
 				this.marker.css('left', percent + '%');
@@ -1170,75 +1170,6 @@
 			element.attr('preload', options.preload);
 		};
 
-<<<<<<< HEAD
-		var initSubtitles = function () {
-			element.children('track[kind="subtitles"]').each(function () {
-				var language = $(this).attr('srclang');
-				var title    = $(this).attr('label');
-				var src      = $(this).attr('src');
-				if (title.length > 0 && src.length > 0) {
-					subtitles.push({
-						title    : title,
-						src      : src,
-						language : language
-					});
-				}
-			});
-		};
-
-		var initVideo = function () {
-			video = element[ 0 ];
-			if (video.readyState > HTMLMediaElement.HAVE_NOTHING)
-				initVideoEvent();
-			else
-				video.onloadedmetadata = function () {
-					initVideoEvent();
-				};
-		};
-
-		var initVideoEvent = function () {
-			overlay.css('line-height', video.clientHeight + 'px');
-			container.css('width', video.clientWidth + 'px');
-
-			video.ontimeupdate = function () {
-				controls.moveTimeMarker();
-			};
-
-			// This is generally for Firefox only
-			// because it somehow resets track list
-			// for video element after DOM manipulation.
-
-			if (video.textTracks.length == 0 && subtitles.length > 0) {
-				element.children('track[kind="subtitles"]').remove();
-				for (var i in subtitles) {
-					element.append($('<track/>')
-						.attr('label', subtitles[ i ].title)
-						.attr('src', subtitles[ i ].src)
-						.attr('srclang', subtitles[ i ].language)
-						.attr('id', subtitles[ i ].language)
-						.attr('kind', 'subtitles'));
-				}
-			}
-
-			Fullscreen.init();
-			controls.init();
-		};
-
-		var togglePlay = function () {
-			if (!video.played || video.paused) {
-				overlay.hide();
-				video.play();
-				controls.play();
-			}
-			else {
-				overlay.show();
-				video.pause();
-				controls.pause();
-			}
-		};
-
-=======
->>>>>>> b21798aac8f2e61c25cd7b4579de3c9e7a179396
 		var secondsToTime = function (seconds) {
 			var h = Math.floor(seconds / 3600);
 			var m = Math.floor(seconds % 3600 / 60);
