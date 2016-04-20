@@ -14,13 +14,6 @@
 		const C_TIMELINE = 'timeline';
 		const C_VOLUME = 'volume';
 
-		let env = {
-			volume : {
-				default : 0.4,
-				mutelimit : 0.05
-			}
-		};
-
 		var options = $.extend(true, {
 			autoplay : false,
 			height : 'auto',
@@ -32,7 +25,8 @@
 			rate : {
 				step : 0.25,
 				min : 0.5,
-				max : 4.0
+				max : 4.0,
+				default : 1
 			},
 			playback : {
 				step : {
@@ -40,9 +34,6 @@
 					medium : 30,
 					long : 60
 				}
-			},
-			volume : {
-				step : 0.1
 			},
 			controls : {
 				common : [
@@ -52,6 +43,59 @@
 				fullscreen : [
 					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'fullscreen' ]
 				]
+			},
+			volume : {
+				default : 0.4,
+				mutelimit : 0.05,
+				step : 0.1
+			},
+			keyBinding : {
+				play : {
+					key : 32,
+					fn : (video) => {
+						video.togglePlay();
+					}
+				},
+				backwardMedium : {
+					key : 37,
+					fn : (video) => {
+						video.currentTime -= options.playback.step.medium;
+					}
+				},
+				forwardMedium : {
+					key : 39,
+					fn : (video) => {
+						video.currentTime += options.playback.step.medium;
+					}
+				},
+				backwardShort : {
+					shiftKey : true,
+					key : 37,
+					fn : (video) => {
+						video.currentTime -= options.playback.step.short;
+					}
+				},
+				forwardShort : {
+					shiftKey : true,
+					key : 39,
+					fn : (video) => {
+						video.currentTime += options.playback.step.short;
+					}
+				},
+
+				volumeUp : {
+					key : 38,
+					fn : (video) => {
+						video.volume += options.volume.step;
+					}
+				},
+
+				volumeDown : {
+					key : 40,
+					fn : (video) => {
+						video.volume -= options.volume.step;
+					}
+				}
 			}
 		}, opts);
 
@@ -151,6 +195,16 @@
 				return this._video.currentTime;
 			}
 
+			set currentTime (value) {
+				if (value > this.duration) {
+					this._video.currentTime = this.duration
+				} else if (value < 0 ) {
+					this._video.currentTime = 0
+				} else {
+					this._video.currentTime = value;
+				}
+			}
+
 			get duration () {
 				return this._video.duration;
 			}
@@ -168,7 +222,11 @@
 			}
 
 			set rate (value) {
-				this._video.playbackRate = value;
+				if ( value <= options.rate.max && value >= options.rate.min ) {
+					this._video.playbackRate = value;
+				}
+				/** TODO: Chanche controls.rate in event handler */
+				controls.rate = this._video.playbackRate;
 			}
 
 			set source (value) {
@@ -200,29 +258,27 @@
 				}
 			}
 
+			get volume () {
+				return this._video.volume;
+			}
+
 			set volume (value) {
-				this._video.volume = value;
-				this._video.mute = (value < env.volume.mutelimit);
-			}
-
-			decreaseRate () {
-				if (this._video.playbackRate > options.rate.min) {
-					this._video.playbackRate -= options.rate.step;
-					controls.rate = this._video.playbackRate;
+				if (value > 1) {
+					this._video.volume = 1;
+				} else if (value < options.volume.mutelimit) {
+					this._video.volume = 0;
+				} else {
+					this._video.volume = value;
 				}
-			}
-
-			increaseRate () {
-				if (this._video.playbackRate < options.rate.max) {
-					this._video.playbackRate += options.rate.step;
-					controls.rate = this._video.playbackRate;
-				}
+				this._video.mute = (value < options.volume.mutelimit);
+				controls.volume = this._video.volume;
 			}
 
 			init () {
 				this._initSubtitles();
 				this._initVideo();
 				this._initRate();
+				this._initVolume();
 			}
 
 			togglePlay () {
@@ -250,8 +306,11 @@
 			}
 
 			_initRate () {
-				this._video.playbackRate = Cookie.get('rate', 1);
-				controls.rate = this._video.playbackRate;
+				this.rate = Cookie.get('rate', options.rate.default);
+			}
+
+			_initVolume () {
+				this.volume = Cookie.get('volume', options.volume.default);
 			}
 
 			_initSubtitles () {
@@ -455,10 +514,7 @@
 			constructor () {
 				super('backward', 'undo');
 				this.element.click(e => {
-					if (video.currentTime - options.playback.step.medium > 0)
-						video.seek(video.currentTime - options.playback.step.medium);
-					else
-						video.seek(0);
+					video.currentTime -= options.playback.step.medium;
 				});
 			}
 		}
@@ -519,11 +575,11 @@
 				this.current = new ControlText('rate-current');
 
 				this.down.element.click(e => {
-					video.decreaseRate();
+					video.rate -= options.rate.step;
 				});
 
 				this.up.element.click(e => {
-					video.increaseRate();
+					video.rate += options.rate.step;
 				});
 
 				this.element = $('<div />')
@@ -735,7 +791,7 @@
 						if (this.drag) return;
 						let p = this.getPosition(e.pageY);
 						if (p >= 0 && p <= 1) {
-							controls.volume = 1 - p;
+							video.volume = 1 - p;
 						}
 					});
 
@@ -758,7 +814,7 @@
 						if (!this.drag) return;
 						let p = this.getPosition(e.pageY);
 						if (p >= 0 && p <= 1) {
-							controls.volume = 1 - p
+							video.volume = 1 - p
 						}
 					},
 
@@ -771,7 +827,7 @@
 			set value (value) {
 				var icon = this.icon.children('.fa').eq(-1);
 				icon.removeClass();
-				if (value < env.volume.mutelimit) {
+				if (value < options.volume.mutelimit) {
 					icon.addClass('fa fa-volume-off');
 				}
 				else {
@@ -788,7 +844,7 @@
 
 			toggleMuted () {
 				if (video.muted == true) {
-					this.value = Cookie.get('volume', env.volume.default);
+					this.value = Cookie.get('volume', options.volume.default);
 				}
 				else
 					this.value = 0;
@@ -871,7 +927,6 @@
 			}
 
 			init () {
-				this.volume = Cookie.get('volume', env.volume.default);
 				this.initTimeline();
 				this.totalTime = secondsToTime(video.duration);
 				this.download = sources[ 0 ].src;
@@ -962,7 +1017,6 @@
 				for (var i in this.collections) {
 					this.collections[ i ].volume = value;
 				}
-				video.volume = value;
 				Cookie.set('volume', value);
 			}
 
@@ -997,7 +1051,7 @@
 
 		var sources = [];
 		var subtitles = [];
-		var volume = env.volume.default;
+		var volume = options.volume.default;
 		var video = null;
 		var controls = new Controls();
 
@@ -1084,25 +1138,49 @@
 		};
 
 		var initDom = function () {
-			overlay = $('<div />').addClass('play-overlay').html('<i class="fa fa-play"></i>');
-			var videoContainer = $('<div />').addClass('leplayer-video').append(overlay);
-			container = $('<div />').addClass('leplayer-container').append(videoContainer).css('width', element.width() + 'px');
+			overlay = $('<div />')
+				.addClass('play-overlay')
+				.html('<i class="fa fa-play"></i>');
+			var videoContainer = $('<div />')
+				.addClass('leplayer-video')
+				.append(overlay);
+			container = $('<div />')
+				.addClass('leplayer-container')
+				.append(videoContainer)
+				.attr('tabindex', 0)
+				.css('width', element.width() + 'px');
 
 			element.before(container);
 			videoContainer.append(element);
-			overlay.click(function () {
+			overlay.on('click',function () {
+				container.focus();
 				video.togglePlay();
 			});
 		};
 
 		var initHotKeys = function () {
-			// Space.
-			element.keypress(e => {
-				if (e.charCode == 32) {
-					//e.preventDefault();
-					video.togglePlay();
+
+			let isKeyBinding = (e, binding) => {
+				return ((e.which === binding.key) || (e.key === binding.key)) &&
+						(!!binding.shiftKey == e.shiftKey) &&
+						(!!binding.ctrlKey == e.ctrlKey)
+			}
+
+			$(document).bind('keydown', (e) => {
+				let _isFocused = isFocused();
+				if (_isFocused) {
+					$.each(options.keyBinding, (action, binding) => {
+						if( isKeyBinding(e, binding) ) {
+							event.preventDefault();
+							binding.fn(video);
+							return false;
+						}
+					})
 				}
-			}).click(function () {
+			})
+
+			/** TODO: Click event handler should not be in initHotKeys funct */
+			element.click(function () {
 				video.togglePlay();
 			});
 		};
@@ -1179,7 +1257,14 @@
 			overlay.css('line-height', video.height + 'px');
 		};
 
+		var isFocused = function () {
+			let focused = $(container).find(':focus');
+			return (focused.length > 0) || $(container).is(':focus');
+		}
+
 		init();
+
+
 		return this;
 	};
 
