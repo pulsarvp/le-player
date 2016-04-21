@@ -382,6 +382,7 @@
 
 			_initVideoEvent () {
 				let _self = this;
+				let timerId = null;
 				let mediaElement = $(this._video);
 
 				container.css('width', this._video.clientWidth + 'px');
@@ -395,9 +396,18 @@
 					},
 
 					'dblclick' : () => {
-
+						clearTimeout(timerId);
 						this.fullscreen.toggle();
+					},
+
+					'click' : () => {
+						clearTimeout(timerId);
+						timerId = setTimeout(() => {
+							container.focus()
+							this.togglePlay();
+						}, 300);
 					}
+
 				});
 
 				// This is generally for Firefox only
@@ -1198,10 +1208,11 @@
 		};
 
 		var initDom = function () {
+			var videoContainer;
 			overlay = $('<div />')
 				.addClass('play-overlay')
 				.html('<i class="fa fa-play"></i>');
-			var videoContainer = $('<div />')
+			videoContainer = $('<div />')
 				.addClass('leplayer-video')
 				.append(overlay);
 			container = $('<div />')
@@ -1212,9 +1223,9 @@
 
 			element.before(container);
 			videoContainer.append(element);
-			overlay.on('click',function () {
-				container.focus();
-				video.togglePlay();
+			overlay.on({
+				'click'    : (e) => { element.trigger('click'); },
+				'dblclick' : (e) => { element.trigger('dblclick'); }
 			});
 		};
 
@@ -1238,11 +1249,6 @@
 					})
 				}
 			})
-
-			/** TODO: Click event handler should not be in initHotKeys funct */
-			element.click(function () {
-				video.togglePlay();
-			});
 		};
 
 		var initOptions = function () {
