@@ -22,6 +22,9 @@
 			preload : 'metadata',
 			poster : null,
 			width : 'auto',
+			fullscreen : {
+				hideTimelineTime : 7000
+			},
 			rate : {
 				step : 0.25,
 				min : 0.5,
@@ -96,13 +99,6 @@
 						video.volume -= options.volume.step;
 					}
 				},
-
-				// test : {
-				// 	key : 82,
-				// 	fn : (video) => {
-				// 		video.fullscreen.hideElements();
-				// 	}
-				// }
 			}
 		}, opts);
 
@@ -111,23 +107,17 @@
 		 * @TODO: add fullscreenerror handler.
 		 */
 		class Fullscreen {
+
+			constructor () {
+				this._collection = controls.fullscreen;
+				this._hideTimeout = null;
+			}
+
 			/**
 			 * @returns {boolean} Whether browser supports fullscreen mode.
 			 */
-
-			constructor () {
-				this.collection = controls.fullscreen;
-			}
-
 			enabled () {
 				return !!(document.fullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled || document.webkitSupportsFullscreen || document.webkitFullscreenEnabled || document.createElement('video').webkitRequestFullScreen);
-			}
-
-			hideElements () {
-				container.removeClass('fullscreen');
-				controls.fullscreen.hide();
-				controls.common.show();
-				controls.mini.hide();
 			}
 
 			init () {
@@ -154,22 +144,7 @@
 					},
 				});
 
-				let timeout = null;
-				$(container).filter('.fullscreen').on({
-					'mousemove' : () => {
-						clearTimeout(timeout);
-						this.collection.element.show();
-						timeout = setTimeout(function () {
-							this.collection.element.hide();
-						}, 7000);
-					},
 
-					'mouseleave' : () => {
-						clearTimeout(timeout);
-						this.collection.element.hide();
-
-					}
-				})
 			}
 
 			/**
@@ -180,11 +155,41 @@
 			}
 
 			showElements () {
-				console.log(this);
 				container.addClass('fullscreen');
 				controls.fullscreen.show();
 				controls.common.hide();
 				controls.mini.hide();
+
+				clearTimeout(this._hideTimeout);
+				this._hideTimeout = setTimeout(() => {
+					this._collection.element.hide();
+				}, options.fullscreen.hideTimelineTime);
+
+				$(container).on({
+					'mousemove.le-player-fullscreen-hide-timeline' : (e) => {
+						if (!$(e.currentTarget).hasClass('fullscreen')) return false;
+						clearTimeout(this._hideTimeout);
+						this._collection.element.show();
+						this._hideTimeout = setTimeout(() => {
+							this._collection.element.hide();
+						}, options.fullscreen.hideTimelineTime);
+					},
+					'mouseleave.le-player-fullscreen-hide-timeline' : (e) => {
+						if (!$(e.currentTarget).hasClass('fullscreen')) return false;
+						clearTimeout(this._hideTimeout);
+						this._collection.element.hide();
+
+					}
+				})
+			}
+
+			hideElements () {
+				container.removeClass('fullscreen');
+				controls.fullscreen.hide();
+				controls.common.show();
+				controls.mini.hide();
+				clearTimeout(this._hideTimeout);
+				$(container).off('.le-player-fullscreen-hide-timeline');
 			}
 
 			toggle () {
@@ -197,7 +202,6 @@
 				}
 				else {
 					let containerEl = container[ 0 ];
-					console.log('containerEl',containerEl);
 					if (containerEl.requestFullScreen)            containerEl.requestFullScreen();
 					else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();
 					else if (containerEl.mozRequestFullScreen)    containerEl.mozRequestFullScreen();
@@ -1222,7 +1226,7 @@
 						(!!binding.ctrlKey == e.ctrlKey)
 			}
 
-			$(document).bind('keydown', (e) => {
+			$(container).bind('keydown.le-player-hotkey', (e) => {
 				let _isFocused = isFocused();
 				if (_isFocused) {
 					$.each(options.keyBinding, (action, binding) => {
