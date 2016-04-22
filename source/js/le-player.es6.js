@@ -385,7 +385,9 @@
 				let timerId = null;
 				let mediaElement = $(this._video);
 
-				container.css('width', this._video.clientWidth + 'px');
+				container
+					.css('width', '100%')
+					.css('max-width', this._video.clientWidth + 'px');
 
 				mediaElement.on({
 					'timeupdate' : () => {
