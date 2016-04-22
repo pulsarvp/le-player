@@ -20,6 +20,12 @@
 			position: fixed;
 			top: 0;
 			width: 100% !important;
+			z-index: @z-index-fullscreen + 6;
+		}
+
+		.play-overlay
+		{
+			z-index: @z-index-fullscreen + 1;
 		}
 	}
 
@@ -84,7 +90,7 @@
 		position: fixed;
 		right: 20px;
 		width: auto;
-		z-index: @z-index-base + 7;
+		z-index: @z-index-fullscreen + 7;
 		.control
 		{
 			background: @color-fs-background;
@@ -114,6 +120,7 @@
 		.control-inner
 		{
 			background: @color-fs-background;
+			z-index: @z-index-fullscreen + 8;
 		}
 		.control-text
 		{
@@ -154,14 +161,17 @@
 		{
 			background: @color-fs-marker;
 			border-right: 1px solid @color-fs-marker-border;
+			z-index: @z-index-fullscreen + 7;
 			&.shadow
 			{
 				background: @color-fs-marker-shadow;
 				border-right: 1px solid @color-fs-marker-shadow-border;
+				z-index: @z-index-fullscreen + 6;
 			}
 			.time
 			{
 				background: @color-fs-marker-shadow-time;
+				z-index: @z-index-fullscreen + 3;
 			}
 		}
 		.time-played
