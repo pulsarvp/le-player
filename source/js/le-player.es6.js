@@ -783,7 +783,6 @@
 					.append(this.played)
 					.on({
 						'mousemove' : (e) => {
-							console.log('mousemove');
 							if (this.drag) return;
 
 							let p = this.getPosition(e.pageX);
@@ -811,7 +810,6 @@
 						},
 
 						'touchmove' : (e) => {
-							console.log('touchmove');
 						}
 					});
 
