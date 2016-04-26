@@ -1197,6 +1197,23 @@
 		var container = null;
 		var overlay = null;
 
+		let _createNotification = (opt) => {
+			let notification, closeButton;
+			notification = $('<div />')
+				.addClass('leplayer-notification')
+				.append(opt.text);
+			return notification;
+		}
+
+		var _showNotification = (msg) => {
+			let notification = _createNotification({ text: msg });
+			notification = $('<div />')
+				.addClass('leplayer-notification')
+				.append(msg);
+			container.append(notification);
+
+		}
+
 		var init = function () {
 			// Check if element is correctly selected.
 			if (element.prop('tagName').toLowerCase() != 'video') {

@@ -12,7 +12,12 @@
 	&.fullscreen
 	{
 		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
 		width: 100% !important;
+		max-width: none !important;
 		.leplayer-video, video
 		{
 			height: 100% !important;
@@ -427,4 +432,28 @@
 	line-height: 0;
 	position: relative;
 	z-index: @z-index-base + 6;
+}
+
+.leplayer-notification
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	background: pink;
+	width: 100%;
+	height: 30px;
+	line-height: 30px;
+	text-align: center;
+	font-size: 15px;
+	z-index: @z-index-base + 7;
+}
+
+
+.leplayer-container.fullscreen
+{
+	.leplayer-notification
+	{
+		z-index: @z-index-fullscreen + 7;
+	}
 }
