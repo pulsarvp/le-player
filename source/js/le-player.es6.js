@@ -29,7 +29,7 @@
 				step : 0.25,
 				min : 0.5,
 				max : 4.0,
-				default : 1
+				'default' : 1
 			},
 			playback : {
 				step : {
@@ -185,7 +185,7 @@
 				}, options.fullscreen.hideTimelineTime);
 
 				$(container).on({
-					'mousemove.le-player-fullscreen-hide-timeline' : (e) => {
+					'mousemove.le-player.fullscreen-hide-timeline' : (e) => {
 						if (!$(e.currentTarget).hasClass('fullscreen')) return false;
 						clearTimeout(this._hideTimeout);
 						this._collection.element.show();
@@ -193,7 +193,7 @@
 							this._collection.element.hide();
 						}, options.fullscreen.hideTimelineTime);
 					},
-					'mouseleave.le-player-fullscreen-hide-timeline' : (e) => {
+					'mouseleave.le-player.fullscreen-hide-timeline' : (e) => {
 						if (!$(e.currentTarget).hasClass('fullscreen')) return false;
 						clearTimeout(this._hideTimeout);
 						this._collection.element.hide();
@@ -208,7 +208,7 @@
 				controls.common.show();
 				controls.mini.hide();
 				clearTimeout(this._hideTimeout);
-				$(container).off('.le-player-fullscreen-hide-timeline');
+				$(container).off('.le-player.fullscreen-hide-timeline');
 			}
 
 			toggle () {
@@ -342,6 +342,8 @@
 				this._initVideo();
 				this._initRate();
 				this._initVolume();
+				this._initHtmlEvents();
+				this._initCustomEvents();
 			}
 
 			togglePlay () {
@@ -366,6 +368,10 @@
 				overlay.show();
 				controls.pause();
 				return this._video.pause();
+			}
+
+			trigger (eventName, ...args) {
+				$(this._video).trigger.call($(this._video), `${eventName}.le-player`, ...args);
 			}
 
 			_initRate () {
@@ -394,45 +400,20 @@
 
 			_initVideo () {
 				if (this._video.readyState > HTMLMediaElement.HAVE_NOTHING) {
-					this._initVideoEvent();
+					this._onLoadedMetaData();
 				} else {
 					$(this._video).one('loadedmetadata', (e) => {
-						this._initVideoEvent();
+						this._onLoadedMetaData();
 					});
 				}
 			}
 
-			_initVideoEvent () {
+			_onLoadedMetaData () {
 				let _self = this;
-				let timerId = null;
-				let mediaElement = $(this._video);
 
 				container
 					.css('width', '100%')
 					.css('max-width', this._video.clientWidth + 'px');
-
-				mediaElement.on({
-					'timeupdate' : () => {
-						controls.moveTimeMarker();
-					},
-					'ended' : () => {
-						this.pause();
-					},
-
-					'dblclick' : () => {
-						clearTimeout(timerId);
-						this.fullscreen.toggle();
-					},
-
-					'click' : () => {
-						clearTimeout(timerId);
-						timerId = setTimeout(() => {
-							container.focus()
-							this.togglePlay();
-						}, 300);
-					},
-
-				});
 
 				// This is generally for Firefox only
 				// because it somehow resets track list
@@ -452,8 +433,61 @@
 						}
 					}
 				}
-				video.fullscreen.init();
+				this.fullscreen.init();
 				controls.init();
+				this.trigger('loadedmetadata')
+			}
+
+			_initHtmlEvents () {
+				let mediaElement = $(this._video);
+				let timerId = null;
+
+				mediaElement.on({
+
+					'timeupdate' : () => {
+						controls.moveTimeMarker();
+					},
+
+					'ended' : () => {
+						this.pause();
+					},
+
+					'dblclick' : () => {
+						clearTimeout(timerId);
+						this.fullscreen.toggle();
+					},
+
+					'click' : () => {
+						clearTimeout(timerId);
+						timerId = setTimeout(() => {
+							container.focus()
+							this.togglePlay();
+						}, 300);
+					},
+
+					'canplay' : (e) => {
+						// console.log(e);
+					},
+
+					'canplaythrough' : (e) => {
+						// console.log(e);
+					},
+
+					'error' : (e) => {
+						console.log(e);
+					},
+
+				});
+			}
+
+			_initCustomEvents () {
+				let mediaElement = $(this._video);
+
+				mediaElement.on({
+					'inited.le-player' : (e) => {
+						console.log(this._video.readyState);
+					}
+				})
 			}
 		}
 
@@ -1195,12 +1229,15 @@
 			}
 			video = new Video(element);
 
+			/** TODO: Use promise to async run this */
 			initOptions();
 			initDom();
 			initControls();
 			video.init();
-
 			initHotKeys();
+
+			video.trigger(`inited`);
+
 		};
 
 		var initControls = function () {
@@ -1356,6 +1393,7 @@
 			return (focused.length > 0) || $(container).is(':focus');
 		}
 
+
 		init();
 
 
@@ -1364,7 +1402,7 @@
 
 	window.$.fn.lePlayer = function (options) {
 		return this.each(function () {
-			Player($(this), options);
+			return new Player($(this), options);
 		});
 	};
 }(jQuery));
