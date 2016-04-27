@@ -21,6 +21,7 @@
 			muted : false,
 			preload : 'metadata',
 			poster : null,
+			svgPath : '../dist/svg/svg-defs.svg',
 			width : 'auto',
 			fullscreen : {
 				hideTimelineTime : 7000
@@ -338,12 +339,21 @@
 			}
 
 			init () {
+				let dfd = $.Deferred()
 				this._initSubtitles();
-				this._initVideo();
-				this._initRate();
-				this._initVolume();
-				this._initHtmlEvents();
+				this._initVideo()
+					.done(() => {
+						this.fullscreen.init();
+						controls.init();
+						this._initRate();
+						this._initVolume();
+						dfd.resolve();
+					});
 				this._initCustomEvents();
+				this._initHtmlEvents();
+
+				dfd.notify();
+				return dfd.promise();
 			}
 
 			togglePlay () {
@@ -404,13 +414,18 @@
 			}
 
 			_initVideo () {
+				let dfd = $.Deferred();
 				if (this._video.readyState > HTMLMediaElement.HAVE_NOTHING) {
+					dfd.resolve()
 					this._onLoadedMetaData();
 				} else {
 					$(this._video).one('loadedmetadata', (e) => {
+						dfd.resolve()
 						this._onLoadedMetaData();
 					});
 				}
+				dfd.notify();
+				return dfd.promise()
 			}
 
 			_onLoadedMetaData () {
@@ -438,8 +453,6 @@
 						}
 					}
 				}
-				this.fullscreen.init();
-				controls.init();
 				this.trigger('loadedmetadata')
 			}
 
@@ -468,19 +481,7 @@
 							container.focus()
 							this.togglePlay();
 						}, 300);
-					},
-
-					'canplay' : (e) => {
-						// console.log(e);
-					},
-
-					'canplaythrough' : (e) => {
-						// console.log(e);
-					},
-
-					'error' : (e) => {
-						console.log(e);
-					},
+					}
 
 				});
 			}
@@ -490,7 +491,6 @@
 
 				mediaElement.on({
 					'inited.le-player' : (e) => {
-						console.log(this._video.readyState);
 					}
 				})
 			}
@@ -498,10 +498,10 @@
 
 		class Control {
 			constructor (cssClass, iconClass) {
+				this.icon = new Icon(iconClass);
 				this.element = $('<div />')
 					.addClass('control ' + cssClass)
-					.append($('<i />')
-						.addClass('fa fa-' + iconClass));
+					.append(this.icon.element);
 			}
 
 			static divider () {
@@ -547,7 +547,19 @@
 						return null;
 				}
 			}
+
+			static createIcon(iconClass) {
+				let useTag = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+				let svgTag = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+				useTag.setAttributeNS('http://www.w3.org/1999/xlink', 'href', `${options.svgPath}#leplayer-icon-${iconClass}`)
+				svgTag.appendChild(useTag);
+				svgTag = $(svgTag).addClass('leplayer-icon')
+				return svgTag
+			}
+
 		}
+
 
 		class ControlText {
 			constructor (classname) {
@@ -563,18 +575,15 @@
 			constructor (iconClass) {
 				let _self = this;
 				this.iconClass = iconClass;
-				this.icon = $('<div />')
-					.addClass('control-icon')
-					.append($('<i />')
-						.addClass('fa fa-' + iconClass));
+				this.icon = new Icon(iconClass);
 				this.listElement = $('<div/>').addClass('control-inner');
 				this.element = $('<div />')
 					.addClass('control control-container')
-					.append(this.icon)
+					.append(this.icon.element)
 					.append(this.listElement);
 				this._index = 0;
 				this.list = [];
-				this.icon.click(function () { _self.onContainerClick(); });
+				this.icon.element.click(function () { _self.onContainerClick(); });
 			}
 
 			get active () {
@@ -589,14 +598,14 @@
 				for (let i in this.list) {
 					if (this.list[ i ].data('index') == index) {
 						this.list[ i ].addClass('active');
-						this.icon.html(this.list[ i ].html());
+						this.icon.element.html(this.list[ i ].html());
 						hasActive = true;
 					}
 					else
 						this.list[ i ].removeClass('active');
 				}
 				if (!hasActive)
-					this.icon.html($('<i />').addClass('fa fa-' + this.iconClass));
+					this.icon.iconName = this.iconClass
 			}
 
 			addItem (text, data) {
@@ -646,7 +655,13 @@
 		class DownloadControl extends Control {
 			constructor () {
 				super('', '');
-				this.element = $('<a />').attr('href', '').attr('target', '_blank').attr('download', '').addClass('control download').append($('<i />').addClass('fa fa-download'));
+				let icon = new Icon('download');
+				this.element = $('<a />')
+				.attr('href', '')
+				.attr('target', '_blank')
+				.attr('download', '')
+				.addClass('control download')
+				.append(icon.element);
 			}
 
 			set link (value) {
@@ -678,17 +693,11 @@
 			}
 
 			pause () {
-				this.element
-					.children('.fa')
-					.removeClass('fa-pause')
-					.addClass('fa-play');
+				this.icon.iconName = 'play';
 			}
 
 			play () {
-				this.element
-					.children('.fa')
-					.removeClass('fa-play')
-					.addClass('fa-pause');
+				this.icon.iconName = 'pause';
 			}
 		}
 
@@ -906,13 +915,10 @@
 			constructor () {
 				let _self = this;
 
-				this.icon = $('<div/>')
-					.addClass('control-icon')
-					.append($('<i />')
-						.addClass('fa fa-volume-down'))
-					.click(function () {
-						_self.toggleMuted();
-					});
+				this.icon = new Icon('volume-down');
+				this.icon.element.on('click', () => {
+					this.toggleMuted();
+				});
 
 				this.marker = $('<div/>').addClass('volume-marker');
 
@@ -932,7 +938,7 @@
 
 				this.element = $('<div />')
 					.addClass('control control-container')
-					.append(this.icon)
+					.append(this.icon.element)
 					.append($('<div />')
 						.addClass('control-inner volume-slider')
 						.append(this.line));
@@ -960,16 +966,14 @@
 			}
 
 			set value (value) {
-				var icon = this.icon.children('.fa').eq(-1);
-				icon.removeClass();
 				if (value < options.volume.mutelimit) {
-					icon.addClass('fa fa-volume-off');
+					this.icon.iconName = 'volume-off';
 				}
 				else {
 					if (value < 0.5)
-						icon.addClass('fa fa-volume-down');
+						this.icon.iconName = 'volume-down';
 					else
-						icon.addClass('fa fa-volume-up');
+						this.icon.iconName = 'volume-up';
 				}
 
 				let p = Math.round(value * 100).toString() + '%';
@@ -988,7 +992,6 @@
 			getPosition (y) {
 				return (y - this.line.offset().top) / this.line.height();
 			}
-
 		}
 
 		class Cookie {
@@ -1189,6 +1192,30 @@
 			}
 		}
 
+		class Icon {
+			constructor(iconName) {
+				this._useTag = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+				this._svgTag = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+				this.iconName = this._iconName = iconName;
+				this._svgTag.appendChild(this._useTag);
+				this.element = $('<div />')
+					.addClass('leplayer-icon')
+					.append($(this._svgTag));
+			}
+
+			set iconName(iconName) {
+				let attrNS = ['http://www.w3.org/1999/xlink', 'href']
+				this._useTag.removeAttributeNS(...attrNS, `${options.svgPath}#leplayer-icon-${this.iconName}`)
+				this._useTag.setAttributeNS(...attrNS, `${options.svgPath}#leplayer-icon-${iconName}`)
+				this._iconName = iconName;
+			}
+
+			get iconName () {
+				return this._iconName;
+			}
+		}
+
 		var sources = [];
 		var subtitles = [];
 		var volume = options.volume.default;
@@ -1255,44 +1282,43 @@
 			initOptions();
 			initDom();
 			initControls();
-			video.init();
+			video.init().done(() => { video.trigger('inited')});
 			initHotKeys();
 
-			video.trigger(`inited`);
+			// video.trigger(`inited`);
 
 		};
 
 		var initControls = function () {
 			for (let name in options.controls) {
-				if (controls.has(name)) {
-					for (let rowIndex in options.controls[ name ]) {
-						let row = options.controls[ name ][ rowIndex ],
-							hasTimeline = false,
-							rowElement = $('<div />').addClass('leplayer-controls controls-' + name);
+				if (!controls.has(name)) continue;
+				for (let rowIndex in options.controls[ name ]) {
+					let row = options.controls[ name ][ rowIndex ],
+						hasTimeline = false,
+						rowElement = $('<div />').addClass('leplayer-controls controls-' + name);
 
-						for (let i in row) {
-							let controlName = row[ i ];
+					for (let i in row) {
+						let controlName = row[ i ];
 
-							if (controlName == C_DIVIDER || !controls.collections[ name ].has(controlName)) {
-								// Create control only if divider or does not exist yet.
-								var c = controls.collections[ name ].add(controlName);
-								if (c != null) {
-									rowElement.append(c);
-									if (controlName == C_TIMELINE)
-										hasTimeline = true;
-								}
-								else
-									console.warn('Cannot create ' + controlName + ' control for collection ' + name + '.');
+						if (controlName == C_DIVIDER || !controls.collections[ name ].has(controlName)) {
+							// Create control only if divider or does not exist yet.
+							var c = controls.collections[ name ].add(controlName);
+							if (c != null) {
+								rowElement.append(c);
+								if (controlName == C_TIMELINE)
+									hasTimeline = true;
 							}
+							else
+								console.warn('Cannot create ' + controlName + ' control for collection ' + name + '.');
 						}
-
-						if (!hasTimeline)
-							rowElement.css('width', '1px');
-
-						rowElement.find('.divider + .divider').remove();
-
-						container.append(rowElement);
 					}
+
+					if (!hasTimeline)
+						rowElement.css('width', '1px');
+
+					rowElement.find('.divider + .divider').remove();
+
+					container.append(rowElement);
 				}
 			}
 		};
@@ -1342,51 +1368,47 @@
 		};
 
 		var initOptions = function () {
-			// Controls.
+			let height, width, poster, attrs, preload;
 			element.removeAttr('controls');
 
-			// Height.
-			var h = element.attr('height');
-			if (h) {
-				options.height = h + 'px';
+			height = element.attr('height');
+			if (height) {
+				options.height = height + 'px';
 				element.removeAttr('height');
 			}
 			element.css('height', options.height);
 
-			// Width.
-			var w = element.attr('width');
-			if (w) {
-				options.width = w + 'px';
+			width = element.attr('width');
+			if (width) {
+				options.width = width + 'px';
 				element.removeAttr('width');
 			}
 			element.css('width', options.width);
 
-			// Poster.
-			var p = element.attr('poster');
-			if (p)
-				options.poster = p;
+			poster = element.attr('poster');
+			if (poster)
+				options.poster = poster;
 			else if (options.poster)
 				element.attr('poster', options.poster);
 
-			// Autoplay, loop, muted.
-			var attrs = [ 'autoplay', 'loop', 'muted' ];
-			for (var i in attrs) {
-				var a = element.attr(attrs[ i ]);
-				if (a)
-					options[ attrs[ i ] ] = true;
-				else if (options[ attrs[ i ] ])
-					element.attr(attrs[ i ], '');
-				else
-					element.removeAttr(attrs[ i ]);
-				element.prop(attrs[ i ], options[ attrs[ i ] ]);
-			}
+			attrs = [ 'autoplay', 'loop', 'muted' ];
+			attrs.forEach((item) => {
+				var a = element.attr(item);
+				if (a) {
+					options[ item ] = true;
+				} else if (options[ item ]) {
+					element.attr(item, '');
+				} else {
+					element.removeAttr(item);
+				}
+				element.prop(item, options[ item ]);
+			})
 
-			// Preload.
-			var r = element.attr('preload');
-			if (r) {
-				r = r.toLowerCase();
-				if (r == 'none' || r == 'metadata')
-					options.preload = r;
+			preload = element.attr('preload');
+			if (preload) {
+				preload = preload.toLowerCase();
+				if (preload == 'none' || preload == 'metadata')
+					options.preload = preload;
 				else
 					options.preload = 'auto';
 			}
