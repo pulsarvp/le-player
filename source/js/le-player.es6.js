@@ -347,6 +347,11 @@
 			}
 
 			togglePlay () {
+				if (this._video.readyState < 2) {
+					overlay.hide();
+					_showNotification('Error!');
+					return;
+				}
 				if (!this._video.played || this._video.paused) {
 					this.play();
 				} else {
@@ -1322,7 +1327,7 @@
 						(!!binding.ctrlKey == e.ctrlKey)
 			}
 
-			$(container).bind('keydown.le-player-hotkey', (e) => {
+			$(container).bind('keydown.le-player.hotkey', (e) => {
 				let _isFocused = isFocused();
 				if (_isFocused) {
 					$.each(options.keyBinding, (action, binding) => {
