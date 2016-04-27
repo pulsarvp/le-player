@@ -24,7 +24,7 @@
 			svgPath : '../dist/svg/svg-defs.svg',
 			width : 'auto',
 			fullscreen : {
-				hideTimelineTime : 7000
+				hideTimelineTime : 70000
 			},
 			rate : {
 				step : 0.25,
@@ -498,10 +498,12 @@
 
 		class Control {
 			constructor (cssClass, iconClass) {
-				this.icon = new Icon(iconClass);
+				iconClass && (this.icon = new Icon(iconClass));
 				this.element = $('<div />')
 					.addClass('control ' + cssClass)
-					.append(this.icon.element);
+					.append(this.icon && this.icon.element)
+					.on('click', this._onControlClick.bind(this));
+
 			}
 
 			static divider () {
@@ -548,14 +550,16 @@
 				}
 			}
 
-			static createIcon(iconClass) {
-				let useTag = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-				let svgTag = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+			disable () {
+				this.disabled = true
+				this.element.addClass('disabled');
+			}
 
-				useTag.setAttributeNS('http://www.w3.org/1999/xlink', 'href', `${options.svgPath}#leplayer-icon-${iconClass}`)
-				svgTag.appendChild(useTag);
-				svgTag = $(svgTag).addClass('leplayer-icon')
-				return svgTag
+			_onControlClick (e) {
+				console.log('click on',this)
+				if (this.disabled) {
+					return false;
+				}
 			}
 
 		}
@@ -571,19 +575,15 @@
 			}
 		}
 
-		class ControlContainer {
-			constructor (iconClass) {
-				let _self = this;
+		class ControlContainer extends Control {
+			constructor (name, iconClass) {
+				super(name, iconClass)
 				this.iconClass = iconClass;
-				this.icon = new Icon(iconClass);
 				this.listElement = $('<div/>').addClass('control-inner');
-				this.element = $('<div />')
-					.addClass('control control-container')
-					.append(this.icon.element)
+				this.element.addClass('control-container')
 					.append(this.listElement);
 				this._index = 0;
 				this.list = [];
-				this.icon.element.click(function () { _self.onContainerClick(); });
 			}
 
 			get active () {
@@ -610,9 +610,13 @@
 
 			addItem (text, data) {
 				let _self = this;
-				var item = $('<div />').addClass('inner-item').data('index', this._index).html(text).click(function () {
-					_self.onItemClick($(this).data('index'));
-				});
+				var item = $('<div />')
+					.addClass('inner-item')
+					.data('index', this._index)
+					.html(text)
+					.on('click', () => {
+						this.onItemClick($(this).data('index'));
+					});
 				if (typeof data == 'object') {
 					for (let k in data)
 						item.data(k, data[ k ]);
@@ -635,20 +639,21 @@
 				return null;
 			}
 
-			onContainerClick () {
-			}
-
 			onItemClick (index) {
 				this.active = index;
 			}
 		}
 
 		class BackwardControl extends Control {
+
 			constructor () {
 				super('backward', 'undo');
-				this.element.click(e => {
-					video.currentTime -= options.playback.step.medium;
-				});
+			}
+
+			_onControlClick (e) {
+				super._onControlClick(e);
+				console.log(this);
+				video.currentTime -= options.playback.step.medium;
 			}
 		}
 
@@ -657,11 +662,11 @@
 				super('', '');
 				let icon = new Icon('download');
 				this.element = $('<a />')
-				.attr('href', '')
-				.attr('target', '_blank')
-				.attr('download', '')
-				.addClass('control download')
-				.append(icon.element);
+					.attr('href', '')
+					.attr('target', '_blank')
+					.attr('download', '')
+					.addClass('control download')
+					.append(icon.element);
 			}
 
 			set link (value) {
@@ -678,18 +683,17 @@
 		class FullscreenControl extends Control {
 			constructor () {
 				super('fullscreen', 'arrows-alt');
-				this.element.click(e => {
-					video.fullscreen.toggle();
-				});
+			}
+
+			_onControlClick (e) {
+				super._onControlClick(e)
+				video.fullscreen.toggle();
 			}
 		}
 
 		class PlayControl extends Control {
 			constructor () {
 				super('play', 'play');
-				this.element.click(e => {
-					video.togglePlay();
-				});
 			}
 
 			pause () {
@@ -699,10 +703,16 @@
 			play () {
 				this.icon.iconName = 'pause';
 			}
+
+			_onControlClick(e) {
+				super._onControlClick(e);
+				video.togglePlay();
+			}
 		}
 
-		class RateControl {
+		class RateControl extends Control {
 			constructor () {
+				super();
 				this.down = new Control('rate-down', 'backward');
 				this.up = new Control('rate-up', 'forward');
 				this.current = new ControlText('rate-current');
@@ -735,11 +745,16 @@
 			show () {
 				this.current.text = '×' + video.rate.toFixed(2).toString().replace(',', '.');
 			}
+
+			disable() {
+				this.down.disable.apply(this.down, arguments);
+				this.up.disable.apply(this.up, arguments);
+			}
 		}
 
 		class SourceControl extends ControlContainer {
 			constructor () {
-				super('bullseye');
+				super('source-control', 'bullseye');
 				/** TODO: Move sources to the arguments in constror */
 				if (sources.length > 1) {
 					for (var i in sources) {
@@ -767,27 +782,26 @@
 
 		class SubtitleControl extends ControlContainer {
 			constructor () {
-				super('commenting-o');
+				super('subtitle-control', 'commenting-o');
 			}
 
 			init () {
 				if (video.subtitles.length > 0) {
 					for (var i in video.subtitles) {
-						if (video.subtitles.hasOwnProperty(i)) {
-							let item = video.subtitles[ i ];
-							this.addItem(item.title, {
-								src : item.src,
-								language : item.language
-							});
-						}
+						if (!video.subtitles.hasOwnProperty(i)) continue;
+						let item = video.subtitles[ i ];
+						this.addItem(item.title, {
+							src : item.src,
+							language : item.language
+						});
 					}
 				}
 				else
 					this.disable();
 			}
 
-			onContainerClick () {
-				super.onContainerClick();
+			_onControlClick (e) {
+				super._onControlClick(e);
 				this.onItemClick(-1);
 			}
 
@@ -801,8 +815,9 @@
 			}
 		}
 
-		class TimelineControl {
+		class TimelineControl extends Control {
 			constructor () {
+				super('timeline');
 				let _self = this,
 					duration = video.duration;
 
@@ -861,8 +876,7 @@
 						}
 					});
 
-				this.element = $('<div />')
-					.addClass('timeline-container')
+				this.element.addClass('timeline-container')
 					.append($('<div />')
 						.addClass('timeline-subcontainer')
 						.append(this.current.element)
@@ -911,14 +925,10 @@
 			}
 		}
 
-		class VolumeControl {
+		class VolumeControl extends Control {
 			constructor () {
+				super('volume-control', 'volume-down');
 				let _self = this;
-
-				this.icon = new Icon('volume-down');
-				this.icon.element.on('click', () => {
-					this.toggleMuted();
-				});
 
 				this.marker = $('<div/>').addClass('volume-marker');
 
@@ -936,9 +946,7 @@
 						}
 					});
 
-				this.element = $('<div />')
-					.addClass('control control-container')
-					.append(this.icon.element)
+				this.element.addClass('control-container')
 					.append($('<div />')
 						.addClass('control-inner volume-slider')
 						.append(this.line));
@@ -992,6 +1000,11 @@
 			getPosition (y) {
 				return (y - this.line.offset().top) / this.line.height();
 			}
+
+			_onControlClick (e) {
+				super._onControlClick(e);
+				this.toggleMuted();
+			}
 		}
 
 		class Cookie {
@@ -1018,7 +1031,7 @@
 
 		class ControlCollection {
 			constructor (name, active) {
-				this.items = [];
+				this.items = {};
 				this.active = active || false;
 				this.name = name;
 			}
@@ -1049,6 +1062,18 @@
 			set volume (value) {
 				if (this.has(C_VOLUME))
 					this.items.volume.value = value;
+			}
+
+			disable () {
+				console.log(this.items);
+				for (let i in this.items) {
+					if (!this.items.hasOwnProperty(i)) {
+						console.log(this.items[ i ]);
+						continue;
+					}
+					console.log(this.items[ i ]);
+					this.items[ i ].disable();
+				}
 			}
 
 			add (name) {
@@ -1163,6 +1188,12 @@
 				Cookie.set('volume', value);
 			}
 
+			disable () {
+				for (var i in this.collections) {
+					this.collections[ i ].disable();
+				}
+			}
+
 			has (name) {
 				return (typeof this.collections[ name ] == 'object');
 			}
@@ -1174,6 +1205,7 @@
 				this.collections.common.show();
 				this.collections.mini.hide();
 				this.collections.fullscreen.hide();
+				this.disable();
 			}
 
 			moveTimeMarker () {
@@ -1324,10 +1356,11 @@
 		};
 
 		var initDom = function () {
-			var videoContainer;
+			let videoContainer;
+			let icon = new Icon('play');
 			overlay = $('<div />')
 				.addClass('play-overlay')
-				.html('<i class="fa fa-play"></i>');
+				.append(icon.element);
 			videoContainer = $('<div />')
 				.addClass('leplayer-video')
 				.append(overlay);

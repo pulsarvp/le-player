@@ -30,7 +30,7 @@
 
 		.play-overlay
 		{
-			z-index: @z-index-fullscreen + 1;
+			z-index: @z-index-fullscreen + 7;
 		}
 	}
 
@@ -63,7 +63,7 @@
 		outline: 0;
 		text-align: center;
 		text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-		z-index: @z-index-base + 1;
+		z-index: @z-index-base + 7;
 		&:hover
 		{
 			background: rgba(0, 0, 0, 0.2);
@@ -150,7 +150,6 @@
 		{
 			background: @color-fs-background-line;
 			margin: 0;
-			top: -2px;
 		}
 		.timeline-container
 		{
@@ -160,6 +159,10 @@
 				height: auto;
 				position: relative;
 				top: -2px;
+			}
+			&:hover
+			{
+				background: @color-fs-background;
 			}
 		}
 		.time-marker
@@ -332,7 +335,12 @@
 		display: table-cell;
 		position: relative;
 		white-space: nowrap;
-		width: 100%
+		width: 100%;
+
+		&:hover
+		{
+			background: @color-background;
+		}
 	}
 	.timeline-subcontainer
 	{
@@ -461,7 +469,7 @@
 	display: block;
 	svg {
 		display: block;
-		width: 16px;
-		height: 16px;
+		width: 1em;
+		height: 1em;
 	}
 }
