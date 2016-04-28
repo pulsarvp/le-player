@@ -498,19 +498,20 @@
 
 		class Control {
 			constructor (cssClass, iconClass) {
-				iconClass && (this.icon = new Icon(iconClass));
+				if (iconClass) {
+					this.icon = new Icon(iconClass);
+					this.icon.element.on({
+						'click' : this._onIconClick.bind(this),
+						'leplayer_icon_click' : this.onIconClick.bind(this)
+					})
+				}
 				this.element = $('<div />')
 					.addClass('control ' + cssClass)
 					.append(this.icon && this.icon.element)
 					.on({
-						'click' : this._onControlClick.bind(this),
-						'leplayer_control_click' : this.onControlClick.bind(this)
+						'click' : this._onClick.bind(this),
+						'leplayer_click' : this.onClick.bind(this)
 					});
-				this.icon.element.on({
-					'click' : this._onIconClick.bind(this),
-					'leplayer_control_icon_click' : this.onIconClick.bind(this)
-
-				})
 
 			}
 
@@ -563,14 +564,25 @@
 				this.element.addClass('disabled');
 			}
 
-			_onControlClick (e) {
+			_onClick (e) {
 				if (this.disabled) {
 					return false;
 				}
-				this.element.trigger('leplayer_control_click');
+				this.element.trigger('leplayer_click');
 			}
 
-			onControlClick (e) {
+			_onIconClick (e) {
+				if (this.disabled) {
+					return false;
+				}
+				this.icon.element.trigger('leplayer_icon_click')
+			}
+
+			onClick (e) {
+				e.preventDefault();
+			}
+
+			onIconClick (e) {
 				e.preventDefault();
 			}
 
@@ -626,8 +638,9 @@
 					.addClass('inner-item')
 					.data('index', this._index)
 					.html(text)
+					/** TODO: Refactor this callback and event */
 					.on('click', () => {
-						this.onItemClick($(this).data('index'));
+						this.onItemClick(item.data('index'));
 					});
 				if (typeof data == 'object') {
 					for (let k in data)
@@ -658,8 +671,8 @@
 				super('backward', 'undo');
 			}
 
-			onControlClick (e) {
-				super.onControlClick(e);
+			onClick (e) {
+				super.onClick(e);
 				video.currentTime -= options.playback.step.medium;
 			}
 		}
@@ -692,8 +705,8 @@
 				super('fullscreen', 'arrows-alt');
 			}
 
-			onControlClick (e) {
-				super.onControlClick(e)
+			onClick (e) {
+				super.onClick(e)
 				video.fullscreen.toggle();
 			}
 		}
@@ -711,8 +724,8 @@
 				this.icon.iconName = 'pause';
 			}
 
-			onControlClick(e) {
-				super.onControlClick(e);
+			onClick(e) {
+				super.onClick(e);
 				video.togglePlay();
 			}
 		}
@@ -822,7 +835,7 @@
 			}
 
 			onIconClick (e) {
-				super.onControlClick(e);
+				super.onIconClick(e);
 				this.onItemClick(-1);
 			}
 
@@ -1023,7 +1036,8 @@
 			}
 
 			onIconClick (e) {
-				this.toggleMuted()
+				super.onIconClick(e);
+				this.toggleMuted();
 			}
 		}
 
@@ -1085,9 +1099,8 @@
 			}
 
 			disable () {
-					if (!this.items.hasOwnProperty(i)) {
-						continue;
-					}
+				for (let i in this.items) {
+					if (!this.items.hasOwnProperty(i)) continue;
 					this.items[ i ].disable();
 				}
 			}
