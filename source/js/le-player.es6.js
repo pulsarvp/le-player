@@ -505,7 +505,12 @@
 					.on({
 						'click' : this._onControlClick.bind(this),
 						'leplayer_control_click' : this.onControlClick.bind(this)
-					})
+					});
+				this.icon.element.on({
+					'click' : this._onIconClick.bind(this),
+					'leplayer_control_icon_click' : this.onIconClick.bind(this)
+
+				})
 
 			}
 
@@ -816,7 +821,7 @@
 					this.disable();
 			}
 
-			onControlClick (e) {
+			onIconClick (e) {
 				super.onControlClick(e);
 				this.onItemClick(-1);
 			}
@@ -1017,9 +1022,8 @@
 				return (y - this.line.offset().top) / this.line.height();
 			}
 
-			onControlClick (e) {
-				super.onControlClick(e);
-				this.toggleMuted();
+			onIconClick (e) {
+				this.toggleMuted()
 			}
 		}
 
@@ -1081,7 +1085,6 @@
 			}
 
 			disable () {
-				for (let i in this.items) {
 					if (!this.items.hasOwnProperty(i)) {
 						continue;
 					}
