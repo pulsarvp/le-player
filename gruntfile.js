@@ -99,12 +99,35 @@ module.exports = function (grunt) {
 			js : {
 				files : [ 'source/js/**/*.js' ],
 				tasks : [ 'concat:js', 'webpack:build-dev' ]
+			},
+
+			svgstore : {
+				files : [ 'source/svg/*.svg' ],
+				tasks : [ 'svgstore' ]
 			}
+
 		},
 		uglify : {
 			js : {
 				src : 'dist/js/<%= pkg.name %>.js',
 				dest : 'dist/js/<%= pkg.name %>.min.js'
+			}
+		},
+		svgstore : {
+			options : {
+				prefix : 'leplayer-icon-',
+				svg : {
+					xmlns : 'http://www.w3.org/2000/svg',
+				},
+				symbol : {
+					fill : 'currentColor',
+					viewBox : '0 0 16 16'
+				}
+			},
+			default : {
+				files: {
+					'dist/svg/svg-defs.svg': ['source/svg/*.svg'],
+				}
 			}
 		}
 	});
@@ -116,7 +139,8 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-postcss');
+	grunt.loadNpmTasks('grunt-svgstore');
 
-	grunt.registerTask('default', [ 'less', 'postcss', 'webpack:build-dev', 'concat', 'watch' ]);
+	grunt.registerTask('default', [ 'less', 'postcss', 'webpack:build-dev', 'concat', 'svgstore', 'watch' ]);
 	grunt.registerTask('production', [ 'clean', 'less', 'postcss', 'concat', 'webpack:build', 'uglify' ]);
 };
