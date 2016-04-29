@@ -142,5 +142,5 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-svgstore');
 
 	grunt.registerTask('default', [ 'less', 'postcss', 'webpack:build-dev', 'concat', 'svgstore', 'watch' ]);
-	grunt.registerTask('production', [ 'clean', 'less', 'postcss', 'concat', 'webpack:build', 'uglify' ]);
+	grunt.registerTask('production', [ 'clean', 'less', 'postcss', 'concat', 'svgstore', 'webpack:build', 'uglify' ]);
 };
