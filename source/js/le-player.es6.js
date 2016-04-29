@@ -21,6 +21,7 @@
 			muted : false,
 			preload : 'metadata',
 			poster : null,
+			svgPath : '../dist/svg/svg-defs.svg',
 			width : 'auto',
 			fullscreen : {
 				hideTimelineTime : 7000
@@ -29,7 +30,7 @@
 				step : 0.25,
 				min : 0.5,
 				max : 4.0,
-				default : 1
+				'default' : 1
 			},
 			playback : {
 				step : {
@@ -111,13 +112,19 @@
 			constructor () {
 				this._collection = controls.fullscreen;
 				this._hideTimeout = null;
+				this.fullscreenEnabled = false;
 			}
 
 			/**
 			 * @returns {boolean} Whether browser supports fullscreen mode.
 			 */
 			enabled () {
-				return !!(document.fullscreenEnabled || document.mozFullScreenEnabled || document.msFullscreenEnabled || document.webkitSupportsFullscreen || document.webkitFullscreenEnabled || document.createElement('video').webkitRequestFullScreen);
+				return !!(document.fullscreenEnabled
+					|| document.mozFullScreenEnabled
+					|| document.msFullscreenEnabled
+					|| document.webkitSupportsFullscreen
+					|| document.webkitFullscreenEnabled
+					|| document.createElement('video').webkitRequestFullScreen);
 			}
 
 			init () {
@@ -142,6 +149,14 @@
 					'msfullscreenchange' : (e) => {
 						this.toggleElements(!!document.msFullscreenElement);
 					},
+
+					'webkitbeginfullscreen' : (e) => {
+						this.toggleElements(true)
+					},
+
+					'webkitendfullscreen' : (e) => {
+						this.toggleElements(false)
+					}
 				});
 
 
@@ -151,7 +166,12 @@
 			 * @returns {boolean} Whether browser is in fullscreen mode.
 			 */
 			is () {
-				return !!(document.fullScreen || document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement);
+				return !!(document.fullScreen
+					|| document.webkitIsFullScreen
+					|| document.mozFullScreen
+					|| document.msFullscreenElement
+					|| document.fullscreenElement
+					|| this.fullscreenEnabled);
 			}
 
 			showElements () {
@@ -166,7 +186,7 @@
 				}, options.fullscreen.hideTimelineTime);
 
 				$(container).on({
-					'mousemove.le-player-fullscreen-hide-timeline' : (e) => {
+					'mousemove.leplayer.fullscreen-hide-timeline' : (e) => {
 						if (!$(e.currentTarget).hasClass('fullscreen')) return false;
 						clearTimeout(this._hideTimeout);
 						this._collection.element.show();
@@ -174,7 +194,7 @@
 							this._collection.element.hide();
 						}, options.fullscreen.hideTimelineTime);
 					},
-					'mouseleave.le-player-fullscreen-hide-timeline' : (e) => {
+					'mouseleave.leplayer.fullscreen-hide-timeline' : (e) => {
 						if (!$(e.currentTarget).hasClass('fullscreen')) return false;
 						clearTimeout(this._hideTimeout);
 						this._collection.element.hide();
@@ -189,24 +209,27 @@
 				controls.common.show();
 				controls.mini.hide();
 				clearTimeout(this._hideTimeout);
-				$(container).off('.le-player-fullscreen-hide-timeline');
+				$(container).off('.leplayer.fullscreen-hide-timeline');
 			}
 
 			toggle () {
+				let containerEl = container[ 0 ];
 				if (this.is()) {
 					if (document.exitFullscreen)                document.exitFullscreen();
 					else if (document.mozCancelFullScreen)      document.mozCancelFullScreen();
 					else if (document.webkitCancelFullScreen)   document.webkitCancelFullScreen();
 					else if (document.msExitFullscreen)         document.msExitFullscreen();
+					else if (document.webkitExitFullscreen)     document.webkitExitFullscreen();
 					this.hideElements(); // @TODO: make this only if fullscreen fired.
+					this.fullscreenEnabled = false;
 				}
 				else {
-					let containerEl = container[ 0 ];
 					if (containerEl.requestFullScreen)            containerEl.requestFullScreen();
 					else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();
 					else if (containerEl.mozRequestFullScreen)    containerEl.mozRequestFullScreen();
 					else if (containerEl.msExitFullscreen)        containerEl.msRequestFullscreen();
 					this.showElements(); // @TODO: make this only if fullscreen fired.
+					this.fullscreEnabled = true;
 				}
 			}
 
@@ -316,13 +339,29 @@
 			}
 
 			init () {
+				let dfd = $.Deferred()
 				this._initSubtitles();
-				this._initVideo();
-				this._initRate();
-				this._initVolume();
+				this._initVideo()
+					.done(() => {
+						this.fullscreen.init();
+						controls.init();
+						this._initRate();
+						this._initVolume();
+						dfd.resolve();
+					});
+				this._initCustomEvents();
+				this._initHtmlEvents();
+
+				dfd.notify();
+				return dfd.promise();
 			}
 
 			togglePlay () {
+				if (this._video.readyState < 2) {
+					overlay.hide();
+					_showNotification('Error!');
+					return;
+				}
 				if (!this._video.played || this._video.paused) {
 					this.play();
 				} else {
@@ -344,6 +383,10 @@
 				overlay.show();
 				controls.pause();
 				return this._video.pause();
+			}
+
+			trigger (eventName, ...args) {
+				$(this._video).trigger.call($(this._video), `${eventName}.leplayer`, ...args);
 			}
 
 			_initRate () {
@@ -371,44 +414,26 @@
 			}
 
 			_initVideo () {
+				let dfd = $.Deferred();
 				if (this._video.readyState > HTMLMediaElement.HAVE_NOTHING) {
-					this._initVideoEvent();
+					dfd.resolve()
+					this._onLoadedMetaData();
 				} else {
 					$(this._video).one('loadedmetadata', (e) => {
-						this._initVideoEvent();
+						dfd.resolve()
+						this._onLoadedMetaData();
 					});
 				}
+				dfd.notify();
+				return dfd.promise()
 			}
 
-			_initVideoEvent () {
+			_onLoadedMetaData () {
 				let _self = this;
-				let timerId = null;
-				let mediaElement = $(this._video);
 
-				container.css('width', this._video.clientWidth + 'px');
-
-				mediaElement.on({
-					'timeupdate' : () => {
-						controls.moveTimeMarker();
-					},
-					'ended' : () => {
-						this.pause();
-					},
-
-					'dblclick' : () => {
-						clearTimeout(timerId);
-						this.fullscreen.toggle();
-					},
-
-					'click' : () => {
-						clearTimeout(timerId);
-						timerId = setTimeout(() => {
-							container.focus()
-							this.togglePlay();
-						}, 300);
-					}
-
-				});
+				container
+					.css('width', '100%')
+					.css('max-width', this._video.clientWidth + 'px');
 
 				// This is generally for Firefox only
 				// because it somehow resets track list
@@ -428,17 +453,66 @@
 						}
 					}
 				}
-				video.fullscreen.init();
-				controls.init();
+				this.trigger('loadedmetadata')
+			}
+
+			_initHtmlEvents () {
+				let mediaElement = $(this._video);
+				let timerId = null;
+
+				mediaElement.on({
+
+					'timeupdate' : () => {
+						controls.moveTimeMarker();
+					},
+
+					'ended' : () => {
+						this.pause();
+					},
+
+					'dblclick' : () => {
+						clearTimeout(timerId);
+						this.fullscreen.toggle();
+					},
+
+					'click' : () => {
+						clearTimeout(timerId);
+						timerId = setTimeout(() => {
+							container.focus()
+							this.togglePlay();
+						}, 300);
+					}
+
+				});
+			}
+
+			_initCustomEvents () {
+				let mediaElement = $(this._video);
+
+				mediaElement.on({
+					'inited.leplayer' : (e) => {
+					}
+				})
 			}
 		}
 
 		class Control {
 			constructor (cssClass, iconClass) {
+				if (iconClass) {
+					this.icon = new Icon(iconClass);
+					this.icon.element.on({
+						'click' : this._onIconClick.bind(this),
+						'leplayer_icon_click' : this.onIconClick.bind(this)
+					})
+				}
 				this.element = $('<div />')
 					.addClass('control ' + cssClass)
-					.append($('<i />')
-						.addClass('fa fa-' + iconClass));
+					.append(this.icon && this.icon.element)
+					.on({
+						'click' : this._onClick.bind(this),
+						'leplayer_click' : this.onClick.bind(this)
+					});
+
 			}
 
 			static divider () {
@@ -484,7 +558,36 @@
 						return null;
 				}
 			}
+
+			disable () {
+				this.disabled = true
+				this.element.addClass('disabled');
+			}
+
+			_onClick (e) {
+				if (this.disabled) {
+					return false;
+				}
+				this.element.trigger('leplayer_click');
+			}
+
+			_onIconClick (e) {
+				if (this.disabled) {
+					return false;
+				}
+				this.icon.element.trigger('leplayer_icon_click')
+			}
+
+			onClick (e) {
+				e.preventDefault();
+			}
+
+			onIconClick (e) {
+				e.preventDefault();
+			}
+
 		}
+
 
 		class ControlText {
 			constructor (classname) {
@@ -496,22 +599,15 @@
 			}
 		}
 
-		class ControlContainer {
-			constructor (iconClass) {
-				let _self = this;
+		class ControlContainer extends Control {
+			constructor (name, iconClass) {
+				super(name, iconClass)
 				this.iconClass = iconClass;
-				this.icon = $('<div />')
-					.addClass('control-icon')
-					.append($('<i />')
-						.addClass('fa fa-' + iconClass));
 				this.listElement = $('<div/>').addClass('control-inner');
-				this.element = $('<div />')
-					.addClass('control control-container')
-					.append(this.icon)
+				this.element.addClass('control-container')
 					.append(this.listElement);
 				this._index = 0;
 				this.list = [];
-				this.icon.click(function () { _self.onContainerClick(); });
 			}
 
 			get active () {
@@ -526,21 +622,26 @@
 				for (let i in this.list) {
 					if (this.list[ i ].data('index') == index) {
 						this.list[ i ].addClass('active');
-						this.icon.html(this.list[ i ].html());
+						this.icon.element.html(this.list[ i ].html());
 						hasActive = true;
 					}
 					else
 						this.list[ i ].removeClass('active');
 				}
 				if (!hasActive)
-					this.icon.html($('<i />').addClass('fa fa-' + this.iconClass));
+					this.icon.iconName = this.iconClass
 			}
 
 			addItem (text, data) {
 				let _self = this;
-				var item = $('<div />').addClass('inner-item').data('index', this._index).html(text).click(function () {
-					_self.onItemClick($(this).data('index'));
-				});
+				var item = $('<div />')
+					.addClass('inner-item')
+					.data('index', this._index)
+					.html(text)
+					/** TODO: Refactor this callback and event */
+					.on('click', () => {
+						this.onItemClick(item.data('index'));
+					});
 				if (typeof data == 'object') {
 					for (let k in data)
 						item.data(k, data[ k ]);
@@ -552,18 +653,11 @@
 				return item;
 			}
 
-			disable () {
-				this.element.addClass('disabled');
-			}
-
 			getByIndex (index) {
 				for (let i in this.list)
 					if (this.list[ i ].data('index') == index)
 						return this.list[ i ];
 				return null;
-			}
-
-			onContainerClick () {
 			}
 
 			onItemClick (index) {
@@ -572,18 +666,27 @@
 		}
 
 		class BackwardControl extends Control {
+
 			constructor () {
 				super('backward', 'undo');
-				this.element.click(e => {
-					video.currentTime -= options.playback.step.medium;
-				});
+			}
+
+			onClick (e) {
+				super.onClick(e);
+				video.currentTime -= options.playback.step.medium;
 			}
 		}
 
 		class DownloadControl extends Control {
 			constructor () {
 				super('', '');
-				this.element = $('<a />').attr('href', '').attr('target', '_blank').attr('download', '').addClass('control download').append($('<i />').addClass('fa fa-download'));
+				let icon = new Icon('download');
+				this.element = $('<a />')
+					.attr('href', '')
+					.attr('target', '_blank')
+					.attr('download', '')
+					.addClass('control download')
+					.append(icon.element);
 			}
 
 			set link (value) {
@@ -600,37 +703,36 @@
 		class FullscreenControl extends Control {
 			constructor () {
 				super('fullscreen', 'arrows-alt');
-				this.element.click(e => {
-					video.fullscreen.toggle();
-				});
+			}
+
+			onClick (e) {
+				super.onClick(e)
+				video.fullscreen.toggle();
 			}
 		}
 
 		class PlayControl extends Control {
 			constructor () {
 				super('play', 'play');
-				this.element.click(e => {
-					video.togglePlay();
-				});
 			}
 
 			pause () {
-				this.element
-					.children('.fa')
-					.removeClass('fa-pause')
-					.addClass('fa-play');
+				this.icon.iconName = 'play';
 			}
 
 			play () {
-				this.element
-					.children('.fa')
-					.removeClass('fa-play')
-					.addClass('fa-pause');
+				this.icon.iconName = 'pause';
+			}
+
+			onClick(e) {
+				super.onClick(e);
+				video.togglePlay();
 			}
 		}
 
-		class RateControl {
+		class RateControl extends Control {
 			constructor () {
+				super();
 				this.down = new Control('rate-down', 'backward');
 				this.up = new Control('rate-up', 'forward');
 				this.current = new ControlText('rate-current');
@@ -651,6 +753,9 @@
 			}
 
 			set (value) {
+				if (this.disabled) {
+					return false;
+				}
 				this.up.element.removeClass('disabled');
 				this.down.element.removeClass('disabled');
 				if (video.rate <= options.rate.min)
@@ -660,14 +765,30 @@
 				this.show();
 			}
 
-			show () {
-				this.current.text = '×' + video.rate.toFixed(2).toString().replace(',', '.');
+			init () {
+				let rate = Cookie.get('rate', options.rate.default);
+				this.show(rate);
+			}
+
+			show (value) {
+				value = value || video.rate;
+				value = parseFloat(value)
+					.toFixed(2)
+					.toString()
+					.replace(/,/g, '.');
+				this.current.text = '×' + value;
+			}
+
+			disable() {
+				this.disabled = true;
+				this.down.disable.apply(this.down, arguments);
+				this.up.disable.apply(this.up, arguments);
 			}
 		}
 
 		class SourceControl extends ControlContainer {
 			constructor () {
-				super('bullseye');
+				super('source-control', 'bullseye');
 				/** TODO: Move sources to the arguments in constror */
 				if (sources.length > 1) {
 					for (var i in sources) {
@@ -695,27 +816,26 @@
 
 		class SubtitleControl extends ControlContainer {
 			constructor () {
-				super('commenting-o');
+				super('subtitle-control', 'commenting-o');
 			}
 
 			init () {
 				if (video.subtitles.length > 0) {
 					for (var i in video.subtitles) {
-						if (video.subtitles.hasOwnProperty(i)) {
-							let item = video.subtitles[ i ];
-							this.addItem(item.title, {
-								src : item.src,
-								language : item.language
-							});
-						}
+						if (!video.subtitles.hasOwnProperty(i)) continue;
+						let item = video.subtitles[ i ];
+						this.addItem(item.title, {
+							src : item.src,
+							language : item.language
+						});
 					}
 				}
 				else
 					this.disable();
 			}
 
-			onContainerClick () {
-				super.onContainerClick();
+			onIconClick (e) {
+				super.onIconClick(e);
 				this.onItemClick(-1);
 			}
 
@@ -729,8 +849,9 @@
 			}
 		}
 
-		class TimelineControl {
+		class TimelineControl extends Control {
 			constructor () {
+				super('timeline');
 				let _self = this,
 					duration = video.duration;
 
@@ -783,11 +904,13 @@
 							if (e.which !== 1) return;
 							if (this.drag) return;
 							video.seek(video.duration * this.getPosition(e.pageX));
+						},
+
+						'touchmove' : (e) => {
 						}
 					});
 
-				this.element = $('<div />')
-					.addClass('timeline-container')
+				this.element.addClass('timeline-container')
 					.append($('<div />')
 						.addClass('timeline-subcontainer')
 						.append(this.current.element)
@@ -836,17 +959,10 @@
 			}
 		}
 
-		class VolumeControl {
+		class VolumeControl extends Control {
 			constructor () {
+				super('volume-control', 'volume-down');
 				let _self = this;
-
-				this.icon = $('<div/>')
-					.addClass('control-icon')
-					.append($('<i />')
-						.addClass('fa fa-volume-down'))
-					.click(function () {
-						_self.toggleMuted();
-					});
 
 				this.marker = $('<div/>').addClass('volume-marker');
 
@@ -864,9 +980,7 @@
 						}
 					});
 
-				this.element = $('<div />')
-					.addClass('control control-container')
-					.append(this.icon)
+				this.element.addClass('control-container')
 					.append($('<div />')
 						.addClass('control-inner volume-slider')
 						.append(this.line));
@@ -894,16 +1008,14 @@
 			}
 
 			set value (value) {
-				var icon = this.icon.children('.fa').eq(-1);
-				icon.removeClass();
 				if (value < options.volume.mutelimit) {
-					icon.addClass('fa fa-volume-off');
+					this.icon.iconName = 'volume-off';
 				}
 				else {
 					if (value < 0.5)
-						icon.addClass('fa fa-volume-down');
+						this.icon.iconName = 'volume-down';
 					else
-						icon.addClass('fa fa-volume-up');
+						this.icon.iconName = 'volume-up';
 				}
 
 				let p = Math.round(value * 100).toString() + '%';
@@ -923,6 +1035,10 @@
 				return (y - this.line.offset().top) / this.line.height();
 			}
 
+			onIconClick (e) {
+				super.onIconClick(e);
+				this.toggleMuted();
+			}
 		}
 
 		class Cookie {
@@ -943,9 +1059,13 @@
 			};
 		}
 
+		class UserAgent {
+
+		}
+
 		class ControlCollection {
 			constructor (name, active) {
-				this.items = [];
+				this.items = {};
 				this.active = active || false;
 				this.name = name;
 			}
@@ -978,6 +1098,13 @@
 					this.items.volume.value = value;
 			}
 
+			disable () {
+				for (let i in this.items) {
+					if (!this.items.hasOwnProperty(i)) continue;
+					this.items[ i ].disable();
+				}
+			}
+
 			add (name) {
 				if (name == C_DIVIDER)
 					return Control.create(name);
@@ -997,16 +1124,13 @@
 
 			init () {
 				this.element = container.find(`.controls-${this.name}`)
+				for (let i in this.items) {
+					if (!this.items.hasOwnProperty(i)) continue;
+					$.isFunction(this.items[i].init) && this.items[i].init();
+				}
 				this.initTimeline();
 				this.totalTime = secondsToTime(video.duration);
 				this.download = sources[ 0 ].src;
-				this.initSubtitles();
-			}
-
-			initSubtitles () {
-				if (this.has(C_SUBTITLE)) {
-					this.items[ C_SUBTITLE ].init();
-				}
 			}
 
 			initTimeline () {
@@ -1090,6 +1214,12 @@
 				Cookie.set('volume', value);
 			}
 
+			disable () {
+				for (var i in this.collections) {
+					this.collections[ i ].disable();
+				}
+			}
+
 			has (name) {
 				return (typeof this.collections[ name ] == 'object');
 			}
@@ -1119,6 +1249,30 @@
 			}
 		}
 
+		class Icon {
+			constructor(iconName) {
+				this._useTag = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+				this._svgTag = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+				this.iconName = this._iconName = iconName;
+				this._svgTag.appendChild(this._useTag);
+				this.element = $('<div />')
+					.addClass('leplayer-icon')
+					.append($(this._svgTag));
+			}
+
+			set iconName(iconName) {
+				let attrNS = ['http://www.w3.org/1999/xlink', 'href']
+				this._useTag.removeAttributeNS(...attrNS, `${options.svgPath}#leplayer-icon-${this.iconName}`)
+				this._useTag.setAttributeNS(...attrNS, `${options.svgPath}#leplayer-icon-${iconName}`)
+				this._iconName = iconName;
+			}
+
+			get iconName () {
+				return this._iconName;
+			}
+		}
+
 		var sources = [];
 		var subtitles = [];
 		var volume = options.volume.default;
@@ -1131,6 +1285,23 @@
 		 */
 		var container = null;
 		var overlay = null;
+
+		let _createNotification = (opt) => {
+			let notification, closeButton;
+			notification = $('<div />')
+				.addClass('leplayer-notification')
+				.append(opt.text);
+			return notification;
+		}
+
+		var _showNotification = (msg) => {
+			let notification = _createNotification({ text: msg });
+			notification = $('<div />')
+				.addClass('leplayer-notification')
+				.append(msg);
+			container.append(notification);
+
+		}
 
 		var init = function () {
 			// Check if element is correctly selected.
@@ -1164,54 +1335,57 @@
 			}
 			video = new Video(element);
 
+			/** TODO: Use promise to async run this */
 			initOptions();
 			initDom();
 			initControls();
-			video.init();
-
+			video.init().done(() => { video.trigger('inited')});
 			initHotKeys();
+
+			// video.trigger(`inited`);
+
 		};
 
 		var initControls = function () {
 			for (let name in options.controls) {
-				if (controls.has(name)) {
-					for (let rowIndex in options.controls[ name ]) {
-						let row = options.controls[ name ][ rowIndex ],
-							hasTimeline = false,
-							rowElement = $('<div />').addClass('leplayer-controls controls-' + name);
+				if (!controls.has(name)) continue;
+				for (let rowIndex in options.controls[ name ]) {
+					let row = options.controls[ name ][ rowIndex ],
+						hasTimeline = false,
+						rowElement = $('<div />').addClass('leplayer-controls controls-' + name);
 
-						for (let i in row) {
-							let controlName = row[ i ];
+					for (let i in row) {
+						let controlName = row[ i ];
 
-							if (controlName == C_DIVIDER || !controls.collections[ name ].has(controlName)) {
-								// Create control only if divider or does not exist yet.
-								var c = controls.collections[ name ].add(controlName);
-								if (c != null) {
-									rowElement.append(c);
-									if (controlName == C_TIMELINE)
-										hasTimeline = true;
-								}
-								else
-									console.warn('Cannot create ' + controlName + ' control for collection ' + name + '.');
+						if (controlName == C_DIVIDER || !controls.collections[ name ].has(controlName)) {
+							// Create control only if divider or does not exist yet.
+							var c = controls.collections[ name ].add(controlName);
+							if (c != null) {
+								rowElement.append(c);
+								if (controlName == C_TIMELINE)
+									hasTimeline = true;
 							}
+							else
+								console.warn('Cannot create ' + controlName + ' control for collection ' + name + '.');
 						}
-
-						if (!hasTimeline)
-							rowElement.css('width', '1px');
-
-						rowElement.find('.divider + .divider').remove();
-
-						container.append(rowElement);
 					}
+
+					if (!hasTimeline)
+						rowElement.css('width', '1px');
+
+					rowElement.find('.divider + .divider').remove();
+
+					container.append(rowElement);
 				}
 			}
 		};
 
 		var initDom = function () {
-			var videoContainer;
+			let videoContainer;
+			let icon = new Icon('play');
 			overlay = $('<div />')
 				.addClass('play-overlay')
-				.html('<i class="fa fa-play"></i>');
+				.append(icon.element);
 			videoContainer = $('<div />')
 				.addClass('leplayer-video')
 				.append(overlay);
@@ -1237,7 +1411,7 @@
 						(!!binding.ctrlKey == e.ctrlKey)
 			}
 
-			$(container).bind('keydown.le-player-hotkey', (e) => {
+			$(container).bind('keydown.leplayer.hotkey', (e) => {
 				let _isFocused = isFocused();
 				if (_isFocused) {
 					$.each(options.keyBinding, (action, binding) => {
@@ -1252,51 +1426,47 @@
 		};
 
 		var initOptions = function () {
-			// Controls.
+			let height, width, poster, attrs, preload;
 			element.removeAttr('controls');
 
-			// Height.
-			var h = element.attr('height');
-			if (h) {
-				options.height = h + 'px';
+			height = element.attr('height');
+			if (height) {
+				options.height = height + 'px';
 				element.removeAttr('height');
 			}
 			element.css('height', options.height);
 
-			// Width.
-			var w = element.attr('width');
-			if (w) {
-				options.width = w + 'px';
+			width = element.attr('width');
+			if (width) {
+				options.width = width + 'px';
 				element.removeAttr('width');
 			}
 			element.css('width', options.width);
 
-			// Poster.
-			var p = element.attr('poster');
-			if (p)
-				options.poster = p;
+			poster = element.attr('poster');
+			if (poster)
+				options.poster = poster;
 			else if (options.poster)
 				element.attr('poster', options.poster);
 
-			// Autoplay, loop, muted.
-			var attrs = [ 'autoplay', 'loop', 'muted' ];
-			for (var i in attrs) {
-				var a = element.attr(attrs[ i ]);
-				if (a)
-					options[ attrs[ i ] ] = true;
-				else if (options[ attrs[ i ] ])
-					element.attr(attrs[ i ], '');
-				else
-					element.removeAttr(attrs[ i ]);
-				element.prop(attrs[ i ], options[ attrs[ i ] ]);
-			}
+			attrs = [ 'autoplay', 'loop', 'muted' ];
+			attrs.forEach((item) => {
+				var a = element.attr(item);
+				if (a) {
+					options[ item ] = true;
+				} else if (options[ item ]) {
+					element.attr(item, '');
+				} else {
+					element.removeAttr(item);
+				}
+				element.prop(item, options[ item ]);
+			})
 
-			// Preload.
-			var r = element.attr('preload');
-			if (r) {
-				r = r.toLowerCase();
-				if (r == 'none' || r == 'metadata')
-					options.preload = r;
+			preload = element.attr('preload');
+			if (preload) {
+				preload = preload.toLowerCase();
+				if (preload == 'none' || preload == 'metadata')
+					options.preload = preload;
 				else
 					options.preload = 'auto';
 			}
@@ -1325,6 +1495,7 @@
 			return (focused.length > 0) || $(container).is(':focus');
 		}
 
+
 		init();
 
 
@@ -1333,7 +1504,7 @@
 
 	window.$.fn.lePlayer = function (options) {
 		return this.each(function () {
-			Player($(this), options);
+			return new Player($(this), options);
 		});
 	};
 }(jQuery));
