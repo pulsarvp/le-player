@@ -14,7 +14,7 @@
 		const C_TIMELINE = 'timeline';
 		const C_VOLUME = 'volume';
 
-		var options = $.extend(true, {
+		var options = $.extend({}, {
 			autoplay : false,
 			height : 'auto',
 			loop : false,
@@ -1310,6 +1310,7 @@
 				return this;
 			}
 
+			initOptions();
 			// Set source.
 			// @TODO move this to Video class
 			element.children('source').each(function () {
@@ -1336,7 +1337,6 @@
 			video = new Video(element);
 
 			/** TODO: Use promise to async run this */
-			initOptions();
 			initDom();
 			initControls();
 			video.init().done(() => { video.trigger('inited')});
@@ -1469,6 +1469,24 @@
 					options.preload = preload;
 				else
 					options.preload = 'auto';
+			}
+
+			if (options.sources) {
+				if (Array.isArray(options.sources)) {
+					options.sources.forEach((item) => {
+						console.log(item);
+						let source = $('<source />');
+						if (typeof item === 'string') {
+							source.attr('src', item)
+						} else {
+							source.attr('src', item.src)
+						}
+						source.attr('title', item.title || 'default');
+						element.append(source);
+					})
+				} else if (typeof options.sources === 'string') {
+					element.attr('src', options.sources)
+				}
 			}
 			element.attr('preload', options.preload);
 		};
