@@ -357,11 +357,12 @@
 			}
 
 			togglePlay () {
-				if (this._video.readyState < 2) {
-					overlay.hide();
-					_showNotification('Error!');
-					return;
-				}
+				/** In safari it doesn't work */
+				// if (this._video.readyState < 2) {
+				// 	overlay.hide();
+				// 	_showNotification('Error!');
+				// 	return;
+				// }
 				if (!this._video.played || this._video.paused) {
 					this.play();
 				} else {
