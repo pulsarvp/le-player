@@ -74,13 +74,14 @@
 			var C_TIMELINE = 'timeline';
 			var C_VOLUME = 'volume';
 
-			var options = $.extend(true, {
+			var options = $.extend({}, {
 				autoplay: false,
 				height: 'auto',
 				loop: false,
 				muted: false,
 				preload: 'metadata',
 				poster: null,
+				svgPath: '../dist/svg/svg-defs.svg',
 				width: 'auto',
 				fullscreen: {
 					hideTimelineTime: 7000
@@ -89,7 +90,7 @@
 					step: 0.25,
 					min: 0.5,
 					max: 4.0,
-					default: 1
+					'default': 1
 				},
 				playback: {
 					step: {
@@ -168,6 +169,7 @@
 
 					this._collection = controls.fullscreen;
 					this._hideTimeout = null;
+					this.fullscreenEnabled = false;
 				}
 
 				/**
@@ -205,6 +207,14 @@
 
 							'msfullscreenchange': function msfullscreenchange(e) {
 								_this.toggleElements(!!document.msFullscreenElement);
+							},
+
+							'webkitbeginfullscreen': function webkitbeginfullscreen(e) {
+								_this.toggleElements(true);
+							},
+
+							'webkitendfullscreen': function webkitendfullscreen(e) {
+								_this.toggleElements(false);
 							}
 						});
 					}
@@ -216,7 +226,7 @@
 				}, {
 					key: 'is',
 					value: function is() {
-						return !!(document.fullScreen || document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement);
+						return !!(document.fullScreen || document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement || this.fullscreenEnabled);
 					}
 				}, {
 					key: 'showElements',
@@ -234,7 +244,7 @@
 						}, options.fullscreen.hideTimelineTime);
 
 						$(container).on({
-							'mousemove.le-player-fullscreen-hide-timeline': function mousemoveLePlayerFullscreenHideTimeline(e) {
+							'mousemove.leplayer.fullscreen-hide-timeline': function mousemoveLeplayerFullscreenHideTimeline(e) {
 								if (!$(e.currentTarget).hasClass('fullscreen')) return false;
 								clearTimeout(_this2._hideTimeout);
 								_this2._collection.element.show();
@@ -242,7 +252,7 @@
 									_this2._collection.element.hide();
 								}, options.fullscreen.hideTimelineTime);
 							},
-							'mouseleave.le-player-fullscreen-hide-timeline': function mouseleaveLePlayerFullscreenHideTimeline(e) {
+							'mouseleave.leplayer.fullscreen-hide-timeline': function mouseleaveLeplayerFullscreenHideTimeline(e) {
 								if (!$(e.currentTarget).hasClass('fullscreen')) return false;
 								clearTimeout(_this2._hideTimeout);
 								_this2._collection.element.hide();
@@ -257,19 +267,21 @@
 						controls.common.show();
 						controls.mini.hide();
 						clearTimeout(this._hideTimeout);
-						$(container).off('.le-player-fullscreen-hide-timeline');
+						$(container).off('.leplayer.fullscreen-hide-timeline');
 					}
 				}, {
 					key: 'toggle',
 					value: function toggle() {
+						var containerEl = container[0];
 						if (this.is()) {
-							if (document.exitFullscreen) document.exitFullscreen();else if (document.mozCancelFullScreen) document.mozCancelFullScreen();else if (document.webkitCancelFullScreen) document.webkitCancelFullScreen();else if (document.msExitFullscreen) document.msExitFullscreen();
+							if (document.exitFullscreen) document.exitFullscreen();else if (document.mozCancelFullScreen) document.mozCancelFullScreen();else if (document.webkitCancelFullScreen) document.webkitCancelFullScreen();else if (document.msExitFullscreen) document.msExitFullscreen();else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
 							this.hideElements(); // @TODO: make this only if fullscreen fired.
+							this.fullscreenEnabled = false;
 						} else {
-								var containerEl = container[0];
-								if (containerEl.requestFullScreen) containerEl.requestFullScreen();else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();else if (containerEl.mozRequestFullScreen) containerEl.mozRequestFullScreen();else if (containerEl.msExitFullscreen) containerEl.msRequestFullscreen();
-								this.showElements(); // @TODO: make this only if fullscreen fired.
-							}
+							if (containerEl.requestFullScreen) containerEl.requestFullScreen();else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();else if (containerEl.mozRequestFullScreen) containerEl.mozRequestFullScreen();else if (containerEl.msExitFullscreen) containerEl.msRequestFullscreen();
+							this.showElements(); // @TODO: make this only if fullscreen fired.
+							this.fullscreEnabled = true;
+						}
 					}
 
 					/**
@@ -304,14 +316,31 @@
 				_createClass(Video, [{
 					key: 'init',
 					value: function init() {
+						var _this3 = this;
+
+						var dfd = $.Deferred();
 						this._initSubtitles();
-						this._initVideo();
-						this._initRate();
-						this._initVolume();
+						this._initVideo().done(function () {
+							_this3.fullscreen.init();
+							controls.init();
+							_this3._initRate();
+							_this3._initVolume();
+							dfd.resolve();
+						});
+						this._initCustomEvents();
+						this._initHtmlEvents();
+
+						dfd.notify();
+						return dfd.promise();
 					}
 				}, {
 					key: 'togglePlay',
 					value: function togglePlay() {
+						if (this._video.readyState < 2) {
+							overlay.hide();
+							_showNotification('Error!');
+							return;
+						}
 						if (!this._video.played || this._video.paused) {
 							this.play();
 						} else {
@@ -336,6 +365,17 @@
 						overlay.show();
 						controls.pause();
 						return this._video.pause();
+					}
+				}, {
+					key: 'trigger',
+					value: function trigger(eventName) {
+						var _$$trigger;
+
+						for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+							args[_key - 1] = arguments[_key];
+						}
+
+						(_$$trigger = $(this._video).trigger).call.apply(_$$trigger, [$(this._video), eventName + '.leplayer'].concat(args));
 					}
 				}, {
 					key: '_initRate',
@@ -367,49 +407,27 @@
 				}, {
 					key: '_initVideo',
 					value: function _initVideo() {
-						var _this3 = this;
-
-						if (this._video.readyState > HTMLMediaElement.HAVE_NOTHING) {
-							this._initVideoEvent();
-						} else {
-							$(this._video).one('loadedmetadata', function (e) {
-								_this3._initVideoEvent();
-							});
-						}
-					}
-				}, {
-					key: '_initVideoEvent',
-					value: function _initVideoEvent() {
 						var _this4 = this;
 
+						var dfd = $.Deferred();
+						if (this._video.readyState > HTMLMediaElement.HAVE_NOTHING) {
+							dfd.resolve();
+							this._onLoadedMetaData();
+						} else {
+							$(this._video).one('loadedmetadata', function (e) {
+								dfd.resolve();
+								_this4._onLoadedMetaData();
+							});
+						}
+						dfd.notify();
+						return dfd.promise();
+					}
+				}, {
+					key: '_onLoadedMetaData',
+					value: function _onLoadedMetaData() {
 						var _self = this;
-						var timerId = null;
-						var mediaElement = $(this._video);
 
-						container.css('width', this._video.clientWidth + 'px');
-
-						mediaElement.on({
-							'timeupdate': function timeupdate() {
-								controls.moveTimeMarker();
-							},
-							'ended': function ended() {
-								_this4.pause();
-							},
-
-							'dblclick': function dblclick() {
-								clearTimeout(timerId);
-								_this4.fullscreen.toggle();
-							},
-
-							'click': function click() {
-								clearTimeout(timerId);
-								timerId = setTimeout(function () {
-									container.focus();
-									_this4.togglePlay();
-								}, 300);
-							}
-
-						});
+						container.css('width', '100%').css('max-width', this._video.clientWidth + 'px');
 
 						// This is generally for Firefox only
 						// because it somehow resets track list
@@ -423,8 +441,49 @@
 								}
 							}
 						}
-						video.fullscreen.init();
-						controls.init();
+						this.trigger('loadedmetadata');
+					}
+				}, {
+					key: '_initHtmlEvents',
+					value: function _initHtmlEvents() {
+						var _this5 = this;
+
+						var mediaElement = $(this._video);
+						var timerId = null;
+
+						mediaElement.on({
+
+							'timeupdate': function timeupdate() {
+								controls.moveTimeMarker();
+							},
+
+							'ended': function ended() {
+								_this5.pause();
+							},
+
+							'dblclick': function dblclick() {
+								clearTimeout(timerId);
+								_this5.fullscreen.toggle();
+							},
+
+							'click': function click() {
+								clearTimeout(timerId);
+								timerId = setTimeout(function () {
+									container.focus();
+									_this5.togglePlay();
+								}, 300);
+							}
+
+						});
+					}
+				}, {
+					key: '_initCustomEvents',
+					value: function _initCustomEvents() {
+						var mediaElement = $(this._video);
+
+						mediaElement.on({
+							'inited.leplayer': function initedLeplayer(e) {}
+						});
 					}
 				}, {
 					key: 'currentTime',
@@ -470,7 +529,7 @@
 				}, {
 					key: 'source',
 					set: function set(value) {
-						var _this5 = this;
+						var _this6 = this;
 
 						var time = this._video.currentTime;
 						var rate = this._video.playbackRate;
@@ -483,7 +542,7 @@
 
 						// @TODO make this right way
 						setTimeout(function () {
-							controls.totalTime = secondsToTime(_this5._video.duration);
+							controls.totalTime = secondsToTime(_this6._video.duration);
 						}, 100);
 					}
 				}, {
@@ -518,10 +577,52 @@
 				function Control(cssClass, iconClass) {
 					_classCallCheck(this, Control);
 
-					this.element = $('<div />').addClass('control ' + cssClass).append($('<i />').addClass('fa fa-' + iconClass));
+					if (iconClass) {
+						this.icon = new Icon(iconClass);
+						this.icon.element.on({
+							'click': this._onIconClick.bind(this),
+							'leplayer_icon_click': this.onIconClick.bind(this)
+						});
+					}
+					this.element = $('<div />').addClass('control ' + cssClass).append(this.icon && this.icon.element).on({
+						'click': this._onClick.bind(this),
+						'leplayer_click': this.onClick.bind(this)
+					});
 				}
 
-				_createClass(Control, null, [{
+				_createClass(Control, [{
+					key: 'disable',
+					value: function disable() {
+						this.disabled = true;
+						this.element.addClass('disabled');
+					}
+				}, {
+					key: '_onClick',
+					value: function _onClick(e) {
+						if (this.disabled) {
+							return false;
+						}
+						this.element.trigger('leplayer_click');
+					}
+				}, {
+					key: '_onIconClick',
+					value: function _onIconClick(e) {
+						if (this.disabled) {
+							return false;
+						}
+						this.icon.element.trigger('leplayer_icon_click');
+					}
+				}, {
+					key: 'onClick',
+					value: function onClick(e) {
+						e.preventDefault();
+					}
+				}, {
+					key: 'onIconClick',
+					value: function onIconClick(e) {
+						e.preventDefault();
+					}
+				}], [{
 					key: 'divider',
 					value: function divider() {
 						return $('<div />').addClass('divider');
@@ -589,28 +690,32 @@
 				return ControlText;
 			}();
 
-			var ControlContainer = function () {
-				function ControlContainer(iconClass) {
+			var ControlContainer = function (_Control) {
+				_inherits(ControlContainer, _Control);
+
+				function ControlContainer(name, iconClass) {
 					_classCallCheck(this, ControlContainer);
 
-					var _self = this;
-					this.iconClass = iconClass;
-					this.icon = $('<div />').addClass('control-icon').append($('<i />').addClass('fa fa-' + iconClass));
-					this.listElement = $('<div/>').addClass('control-inner');
-					this.element = $('<div />').addClass('control control-container').append(this.icon).append(this.listElement);
-					this._index = 0;
-					this.list = [];
-					this.icon.click(function () {
-						_self.onContainerClick();
-					});
+					var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(ControlContainer).call(this, name, iconClass));
+
+					_this7.iconClass = iconClass;
+					_this7.listElement = $('<div/>').addClass('control-inner');
+					_this7.element.addClass('control-container').append(_this7.listElement);
+					_this7._index = 0;
+					_this7.list = [];
+					return _this7;
 				}
 
 				_createClass(ControlContainer, [{
 					key: 'addItem',
 					value: function addItem(text, data) {
+						var _this8 = this;
+
 						var _self = this;
-						var item = $('<div />').addClass('inner-item').data('index', this._index).html(text).click(function () {
-							_self.onItemClick($(this).data('index'));
+						var item = $('<div />').addClass('inner-item').data('index', this._index).html(text)
+						/** TODO: Refactor this callback and event */
+						.on('click', function () {
+							_this8.onItemClick(item.data('index'));
 						});
 						if ((typeof data === 'undefined' ? 'undefined' : _typeof(data)) == 'object') {
 							for (var k in data) {
@@ -624,20 +729,12 @@
 						return item;
 					}
 				}, {
-					key: 'disable',
-					value: function disable() {
-						this.element.addClass('disabled');
-					}
-				}, {
 					key: 'getByIndex',
 					value: function getByIndex(index) {
 						for (var i in this.list) {
 							if (this.list[i].data('index') == index) return this.list[i];
 						}return null;
 					}
-				}, {
-					key: 'onContainerClick',
-					value: function onContainerClick() {}
 				}, {
 					key: 'onItemClick',
 					value: function onItemClick(index) {
@@ -655,44 +752,48 @@
 						for (var i in this.list) {
 							if (this.list[i].data('index') == index) {
 								this.list[i].addClass('active');
-								this.icon.html(this.list[i].html());
+								this.icon.element.html(this.list[i].html());
 								hasActive = true;
 							} else this.list[i].removeClass('active');
 						}
-						if (!hasActive) this.icon.html($('<i />').addClass('fa fa-' + this.iconClass));
+						if (!hasActive) this.icon.iconName = this.iconClass;
 					}
 				}]);
 
 				return ControlContainer;
-			}();
+			}(Control);
 
-			var BackwardControl = function (_Control) {
-				_inherits(BackwardControl, _Control);
+			var BackwardControl = function (_Control2) {
+				_inherits(BackwardControl, _Control2);
 
 				function BackwardControl() {
 					_classCallCheck(this, BackwardControl);
 
-					var _this6 = _possibleConstructorReturn(this, Object.getPrototypeOf(BackwardControl).call(this, 'backward', 'undo'));
-
-					_this6.element.click(function (e) {
-						video.currentTime -= options.playback.step.medium;
-					});
-					return _this6;
+					return _possibleConstructorReturn(this, Object.getPrototypeOf(BackwardControl).call(this, 'backward', 'undo'));
 				}
+
+				_createClass(BackwardControl, [{
+					key: 'onClick',
+					value: function onClick(e) {
+						_get(Object.getPrototypeOf(BackwardControl.prototype), 'onClick', this).call(this, e);
+						video.currentTime -= options.playback.step.medium;
+					}
+				}]);
 
 				return BackwardControl;
 			}(Control);
 
-			var DownloadControl = function (_Control2) {
-				_inherits(DownloadControl, _Control2);
+			var DownloadControl = function (_Control3) {
+				_inherits(DownloadControl, _Control3);
 
 				function DownloadControl() {
 					_classCallCheck(this, DownloadControl);
 
-					var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(DownloadControl).call(this, '', ''));
+					var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(DownloadControl).call(this, '', ''));
 
-					_this7.element = $('<a />').attr('href', '').attr('target', '_blank').attr('download', '').addClass('control download').append($('<i />').addClass('fa fa-download'));
-					return _this7;
+					var icon = new Icon('download');
+					_this10.element = $('<a />').attr('href', '').attr('target', '_blank').attr('download', '').addClass('control download').append(icon.element);
+					return _this10;
 				}
 
 				_createClass(DownloadControl, [{
@@ -705,8 +806,8 @@
 				return DownloadControl;
 			}(Control);
 
-			var ForwardControl = function (_Control3) {
-				_inherits(ForwardControl, _Control3);
+			var ForwardControl = function (_Control4) {
+				_inherits(ForwardControl, _Control4);
 
 				function ForwardControl() {
 					_classCallCheck(this, ForwardControl);
@@ -717,88 +818,115 @@
 				return ForwardControl;
 			}(Control);
 
-			var FullscreenControl = function (_Control4) {
-				_inherits(FullscreenControl, _Control4);
+			var FullscreenControl = function (_Control5) {
+				_inherits(FullscreenControl, _Control5);
 
 				function FullscreenControl() {
 					_classCallCheck(this, FullscreenControl);
 
-					var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(FullscreenControl).call(this, 'fullscreen', 'arrows-alt'));
-
-					_this9.element.click(function (e) {
-						video.fullscreen.toggle();
-					});
-					return _this9;
+					return _possibleConstructorReturn(this, Object.getPrototypeOf(FullscreenControl).call(this, 'fullscreen', 'arrows-alt'));
 				}
+
+				_createClass(FullscreenControl, [{
+					key: 'onClick',
+					value: function onClick(e) {
+						_get(Object.getPrototypeOf(FullscreenControl.prototype), 'onClick', this).call(this, e);
+						video.fullscreen.toggle();
+					}
+				}]);
 
 				return FullscreenControl;
 			}(Control);
 
-			var PlayControl = function (_Control5) {
-				_inherits(PlayControl, _Control5);
+			var PlayControl = function (_Control6) {
+				_inherits(PlayControl, _Control6);
 
 				function PlayControl() {
 					_classCallCheck(this, PlayControl);
 
-					var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(PlayControl).call(this, 'play', 'play'));
-
-					_this10.element.click(function (e) {
-						video.togglePlay();
-					});
-					return _this10;
+					return _possibleConstructorReturn(this, Object.getPrototypeOf(PlayControl).call(this, 'play', 'play'));
 				}
 
 				_createClass(PlayControl, [{
 					key: 'pause',
 					value: function pause() {
-						this.element.children('.fa').removeClass('fa-pause').addClass('fa-play');
+						this.icon.iconName = 'play';
 					}
 				}, {
 					key: 'play',
 					value: function play() {
-						this.element.children('.fa').removeClass('fa-play').addClass('fa-pause');
+						this.icon.iconName = 'pause';
+					}
+				}, {
+					key: 'onClick',
+					value: function onClick(e) {
+						_get(Object.getPrototypeOf(PlayControl.prototype), 'onClick', this).call(this, e);
+						video.togglePlay();
 					}
 				}]);
 
 				return PlayControl;
 			}(Control);
 
-			var RateControl = function () {
+			var RateControl = function (_Control7) {
+				_inherits(RateControl, _Control7);
+
 				function RateControl() {
 					_classCallCheck(this, RateControl);
 
-					this.down = new Control('rate-down', 'backward');
-					this.up = new Control('rate-up', 'forward');
-					this.current = new ControlText('rate-current');
+					var _this14 = _possibleConstructorReturn(this, Object.getPrototypeOf(RateControl).call(this));
 
-					this.down.element.click(function (e) {
+					_this14.down = new Control('rate-down', 'backward');
+					_this14.up = new Control('rate-up', 'forward');
+					_this14.current = new ControlText('rate-current');
+
+					_this14.down.element.click(function (e) {
 						video.rate -= options.rate.step;
 					});
 
-					this.up.element.click(function (e) {
+					_this14.up.element.click(function (e) {
 						video.rate += options.rate.step;
 					});
 
-					this.element = $('<div />').addClass('control-container').append(this.down.element).append(this.current.element).append(this.up.element);
+					_this14.element = $('<div />').addClass('control-container').append(_this14.down.element).append(_this14.current.element).append(_this14.up.element);
+					return _this14;
 				}
 
 				_createClass(RateControl, [{
 					key: 'set',
 					value: function set(value) {
+						if (this.disabled) {
+							return false;
+						}
 						this.up.element.removeClass('disabled');
 						this.down.element.removeClass('disabled');
 						if (video.rate <= options.rate.min) this.down.element.addClass('disabled');else if (video.rate >= options.rate.max) this.up.element.addClass('disabled');
 						this.show();
 					}
 				}, {
+					key: 'init',
+					value: function init() {
+						var rate = Cookie.get('rate', options.rate.default);
+						this.show(rate);
+					}
+				}, {
 					key: 'show',
-					value: function show() {
-						this.current.text = '×' + video.rate.toFixed(2).toString().replace(',', '.');
+					value: function show(value) {
+						value = value || video.rate;
+						value = parseFloat(value).toFixed(2).toString().replace(/,/g, '.');
+						this.current.text = '×' + value;
+					}
+				}, {
+					key: 'disable',
+					value: function disable() {
+						this.disabled = true;
+						this.down.disable.apply(this.down, arguments);
+						this.up.disable.apply(this.up, arguments);
 					}
 				}]);
 
 				return RateControl;
-			}();
+			}(Control);
 
 			var SourceControl = function (_ControlContainer) {
 				_inherits(SourceControl, _ControlContainer);
@@ -808,14 +936,14 @@
 
 					/** TODO: Move sources to the arguments in constror */
 
-					var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf(SourceControl).call(this, 'bullseye'));
+					var _this15 = _possibleConstructorReturn(this, Object.getPrototypeOf(SourceControl).call(this, 'source-control', 'bullseye'));
 
 					if (sources.length > 1) {
 						for (var i in sources) {
-							_this11.addItem(sources[i].title, { src: sources[i].src });
+							_this15.addItem(sources[i].title, { src: sources[i].src });
 						}
-					} else _this11.disable();
-					return _this11;
+					} else _this15.disable();
+					return _this15;
 				}
 
 				_createClass(SourceControl, [{
@@ -845,7 +973,7 @@
 				function SubtitleControl() {
 					_classCallCheck(this, SubtitleControl);
 
-					return _possibleConstructorReturn(this, Object.getPrototypeOf(SubtitleControl).call(this, 'commenting-o'));
+					return _possibleConstructorReturn(this, Object.getPrototypeOf(SubtitleControl).call(this, 'subtitle-control', 'commenting-o'));
 				}
 
 				_createClass(SubtitleControl, [{
@@ -853,20 +981,19 @@
 					value: function init() {
 						if (video.subtitles.length > 0) {
 							for (var i in video.subtitles) {
-								if (video.subtitles.hasOwnProperty(i)) {
-									var item = video.subtitles[i];
-									this.addItem(item.title, {
-										src: item.src,
-										language: item.language
-									});
-								}
+								if (!video.subtitles.hasOwnProperty(i)) continue;
+								var item = video.subtitles[i];
+								this.addItem(item.title, {
+									src: item.src,
+									language: item.language
+								});
 							}
 						} else this.disable();
 					}
 				}, {
-					key: 'onContainerClick',
-					value: function onContainerClick() {
-						_get(Object.getPrototypeOf(SubtitleControl.prototype), 'onContainerClick', this).call(this);
+					key: 'onIconClick',
+					value: function onIconClick(e) {
+						_get(Object.getPrototypeOf(SubtitleControl.prototype), 'onIconClick', this).call(this, e);
 						this.onItemClick(-1);
 					}
 				}, {
@@ -881,79 +1008,84 @@
 				return SubtitleControl;
 			}(ControlContainer);
 
-			var TimelineControl = function () {
-				function TimelineControl() {
-					var _this13 = this;
+			var TimelineControl = function (_Control8) {
+				_inherits(TimelineControl, _Control8);
 
+				function TimelineControl() {
 					_classCallCheck(this, TimelineControl);
 
-					var _self = this,
+					var _this17 = _possibleConstructorReturn(this, Object.getPrototypeOf(TimelineControl).call(this, 'timeline'));
+
+					var _self = _this17,
 					    duration = video.duration;
 
-					this.drag = false;
+					_this17.drag = false;
 
-					this.current = new ControlText('time-current');
-					this.total = new ControlText('time-total');
+					_this17.current = new ControlText('time-current');
+					_this17.total = new ControlText('time-total');
 
-					this.marker = $('<div />').addClass('time-marker');
+					_this17.marker = $('<div />').addClass('time-marker');
 
-					this.markerShadow = $('<div />').addClass('time-marker shadow').append().hide();
+					_this17.markerShadow = $('<div />').addClass('time-marker shadow').append().hide();
 
-					this.markerShadowTime = $('<div />').addClass('time');
-					this.markerTime = $('<div />').addClass('time').hide();
-					this.played = $('<div />').addClass('time-played');
-					this.current.text = '00:00';
-					this.line = $('<div />').addClass('timeline').append(this.marker.append(this.markerTime)).append(this.markerShadow.append(this.markerShadowTime)).append(this.played).on({
+					_this17.markerShadowTime = $('<div />').addClass('time');
+					_this17.markerTime = $('<div />').addClass('time').hide();
+					_this17.played = $('<div />').addClass('time-played');
+					_this17.current.text = '00:00';
+					_this17.line = $('<div />').addClass('timeline').append(_this17.marker.append(_this17.markerTime)).append(_this17.markerShadow.append(_this17.markerShadowTime)).append(_this17.played).on({
 						'mousemove': function mousemove(e) {
-							if (_this13.drag) return;
+							if (_this17.drag) return;
 
-							var p = _this13.getPosition(e.pageX);
+							var p = _this17.getPosition(e.pageX);
 							if (p > 0 && p < 1) {
-								_this13.markerShadow.show();
-								_this13.markerShadow.css('left', p * 100 + '%');
-								_this13.markerShadowTime.html(secondsToTime(video.duration * p));
-							} else _this13.markerShadow.hide();
+								_this17.markerShadow.show();
+								_this17.markerShadow.css('left', p * 100 + '%');
+								_this17.markerShadowTime.html(secondsToTime(video.duration * p));
+							} else _this17.markerShadow.hide();
 						},
 
 						'mouseleave': function mouseleave(e) {
-							if (_this13.drag) return;
-							_this13.markerShadow.hide();
+							if (_this17.drag) return;
+							_this17.markerShadow.hide();
 						},
 
 						'mousedown': function mousedown(e) {},
 
 						'click': function click(e) {
 							if (e.which !== 1) return;
-							if (_this13.drag) return;
-							video.seek(video.duration * _this13.getPosition(e.pageX));
-						}
+							if (_this17.drag) return;
+							video.seek(video.duration * _this17.getPosition(e.pageX));
+						},
+
+						'touchmove': function touchmove(e) {}
 					});
 
-					this.element = $('<div />').addClass('timeline-container').append($('<div />').addClass('timeline-subcontainer').append(this.current.element).append(this.line).append(this.total.element));
+					_this17.element.addClass('timeline-container').append($('<div />').addClass('timeline-subcontainer').append(_this17.current.element).append(_this17.line).append(_this17.total.element));
 
-					this.marker.on('mousedown', function (e) {
+					_this17.marker.on('mousedown', function (e) {
 						if (e.which !== 1) return;
 						e.preventDefault();
-						_this13.markerShadow.hide();
-						_this13.drag = true;
+						_this17.markerShadow.hide();
+						_this17.drag = true;
 					});
 
 					$(document).on({
 
 						'mousemove': function mousemove(e) {
-							if (!_this13.drag) return;
-							var p = _this13.getPosition(e.pageX);
+							if (!_this17.drag) return;
+							var p = _this17.getPosition(e.pageX);
 							if (p > 0 && p < 1) {
-								_this13.markerTime.show().html(secondsToTime(video.duration * p));
+								_this17.markerTime.show().html(secondsToTime(video.duration * p));
 								video.seek(video.duration * p);
 							}
 						},
 
 						'mouseup': function mouseup(e) {
-							_this13.markerTime.hide();
-							_this13.drag = false;
+							_this17.markerTime.hide();
+							_this17.drag = false;
 						}
 					});
+					return _this17;
 				}
 
 				_createClass(TimelineControl, [{
@@ -975,54 +1107,53 @@
 				}]);
 
 				return TimelineControl;
-			}();
+			}(Control);
 
-			var VolumeControl = function () {
+			var VolumeControl = function (_Control9) {
+				_inherits(VolumeControl, _Control9);
+
 				function VolumeControl() {
-					var _this14 = this;
-
 					_classCallCheck(this, VolumeControl);
 
-					var _self = this;
+					var _this18 = _possibleConstructorReturn(this, Object.getPrototypeOf(VolumeControl).call(this, 'volume-control', 'volume-down'));
 
-					this.icon = $('<div/>').addClass('control-icon').append($('<i />').addClass('fa fa-volume-down')).click(function () {
-						_self.toggleMuted();
-					});
+					var _self = _this18;
 
-					this.marker = $('<div/>').addClass('volume-marker');
+					_this18.marker = $('<div/>').addClass('volume-marker');
 
-					this.active = $('<div/>').addClass('volume-active');
+					_this18.active = $('<div/>').addClass('volume-active');
 
-					this.line = $('<div/>').addClass('volume-line').append(this.active).append(this.marker).on('click', function (e) {
-						if (_this14.drag) return;
-						var p = _this14.getPosition(e.pageY);
+					_this18.line = $('<div/>').addClass('volume-line').append(_this18.active).append(_this18.marker).on('click', function (e) {
+						if (_this18.drag) return;
+						var p = _this18.getPosition(e.pageY);
 						if (p >= 0 && p <= 1) {
 							video.volume = 1 - p;
 						}
 					});
 
-					this.element = $('<div />').addClass('control control-container').append(this.icon).append($('<div />').addClass('control-inner volume-slider').append(this.line));
+					_this18.element.addClass('control-container').append($('<div />').addClass('control-inner volume-slider').append(_this18.line));
 
-					this.drag = false;
+					_this18.drag = false;
 
-					this.marker.on('mousedown', function (e) {
+					_this18.marker.on('mousedown', function (e) {
 						if (e.which != 1) return;
-						_this14.drag = true;
+						_this18.drag = true;
 					});
 
 					$(document).on({
 						'mousemove': function mousemove(e) {
-							if (!_this14.drag) return;
-							var p = _this14.getPosition(e.pageY);
+							if (!_this18.drag) return;
+							var p = _this18.getPosition(e.pageY);
 							if (p >= 0 && p <= 1) {
 								video.volume = 1 - p;
 							}
 						},
 
 						'mouseup': function mouseup(e) {
-							_this14.drag = false;
+							_this18.drag = false;
 						}
 					});
+					return _this18;
 				}
 
 				_createClass(VolumeControl, [{
@@ -1038,14 +1169,18 @@
 						return (y - this.line.offset().top) / this.line.height();
 					}
 				}, {
+					key: 'onIconClick',
+					value: function onIconClick(e) {
+						_get(Object.getPrototypeOf(VolumeControl.prototype), 'onIconClick', this).call(this, e);
+						this.toggleMuted();
+					}
+				}, {
 					key: 'value',
 					set: function set(value) {
-						var icon = this.icon.children('.fa').eq(-1);
-						icon.removeClass();
 						if (value < options.volume.mutelimit) {
-							icon.addClass('fa fa-volume-off');
+							this.icon.iconName = 'volume-off';
 						} else {
-							if (value < 0.5) icon.addClass('fa fa-volume-down');else icon.addClass('fa fa-volume-up');
+							if (value < 0.5) this.icon.iconName = 'volume-down';else this.icon.iconName = 'volume-up';
 						}
 
 						var p = Math.round(value * 100).toString() + '%';
@@ -1055,7 +1190,7 @@
 				}]);
 
 				return VolumeControl;
-			}();
+			}(Control);
 
 			var Cookie = function () {
 				function Cookie() {
@@ -1084,16 +1219,28 @@
 				return Cookie;
 			}();
 
+			var UserAgent = function UserAgent() {
+				_classCallCheck(this, UserAgent);
+			};
+
 			var ControlCollection = function () {
 				function ControlCollection(name, active) {
 					_classCallCheck(this, ControlCollection);
 
-					this.items = [];
+					this.items = {};
 					this.active = active || false;
 					this.name = name;
 				}
 
 				_createClass(ControlCollection, [{
+					key: 'disable',
+					value: function disable() {
+						for (var i in this.items) {
+							if (!this.items.hasOwnProperty(i)) continue;
+							this.items[i].disable();
+						}
+					}
+				}, {
 					key: 'add',
 					value: function add(name) {
 						if (name == C_DIVIDER) return Control.create(name);else {
@@ -1115,17 +1262,13 @@
 					key: 'init',
 					value: function init() {
 						this.element = container.find('.controls-' + this.name);
+						for (var i in this.items) {
+							if (!this.items.hasOwnProperty(i)) continue;
+							$.isFunction(this.items[i].init) && this.items[i].init();
+						}
 						this.initTimeline();
 						this.totalTime = secondsToTime(video.duration);
 						this.download = sources[0].src;
-						this.initSubtitles();
-					}
-				}, {
-					key: 'initSubtitles',
-					value: function initSubtitles() {
-						if (this.has(C_SUBTITLE)) {
-							this.items[C_SUBTITLE].init();
-						}
 					}
 				}, {
 					key: 'initTimeline',
@@ -1203,6 +1346,13 @@
 				}
 
 				_createClass(Controls, [{
+					key: 'disable',
+					value: function disable() {
+						for (var i in this.collections) {
+							this.collections[i].disable();
+						}
+					}
+				}, {
 					key: 'has',
 					value: function has(name) {
 						return _typeof(this.collections[name]) == 'object';
@@ -1295,6 +1445,36 @@
 				return Controls;
 			}();
 
+			var Icon = function () {
+				function Icon(iconName) {
+					_classCallCheck(this, Icon);
+
+					this._useTag = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+					this._svgTag = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+
+					this.iconName = this._iconName = iconName;
+					this._svgTag.appendChild(this._useTag);
+					this.element = $('<div />').addClass('leplayer-icon').append($(this._svgTag));
+				}
+
+				_createClass(Icon, [{
+					key: 'iconName',
+					set: function set(iconName) {
+						var _useTag, _useTag2;
+
+						var attrNS = ['http://www.w3.org/1999/xlink', 'href'];
+						(_useTag = this._useTag).removeAttributeNS.apply(_useTag, attrNS.concat([options.svgPath + '#leplayer-icon-' + this.iconName]));
+						(_useTag2 = this._useTag).setAttributeNS.apply(_useTag2, attrNS.concat([options.svgPath + '#leplayer-icon-' + iconName]));
+						this._iconName = iconName;
+					},
+					get: function get() {
+						return this._iconName;
+					}
+				}]);
+
+				return Icon;
+			}();
+
 			var sources = [];
 			var subtitles = [];
 			var volume = options.volume.default;
@@ -1308,6 +1488,19 @@
 			var container = null;
 			var overlay = null;
 
+			var _createNotification = function _createNotification(opt) {
+				var notification = void 0,
+				    closeButton = void 0;
+				notification = $('<div />').addClass('leplayer-notification').append(opt.text);
+				return notification;
+			};
+
+			var _showNotification = function _showNotification(msg) {
+				var notification = _createNotification({ text: msg });
+				notification = $('<div />').addClass('leplayer-notification').append(msg);
+				container.append(notification);
+			};
+
 			var init = function init() {
 				// Check if element is correctly selected.
 				if (element.prop('tagName').toLowerCase() != 'video') {
@@ -1315,6 +1508,7 @@
 					return this;
 				}
 
+				initOptions();
 				// Set source.
 				// @TODO move this to Video class
 				element.children('source').each(function () {
@@ -1339,48 +1533,51 @@
 				}
 				video = new Video(element);
 
-				initOptions();
+				/** TODO: Use promise to async run this */
 				initDom();
 				initControls();
-				video.init();
-
+				video.init().done(function () {
+					video.trigger('inited');
+				});
 				initHotKeys();
+
+				// video.trigger(`inited`);
 			};
 
 			var initControls = function initControls() {
 				for (var name in options.controls) {
-					if (controls.has(name)) {
-						for (var rowIndex in options.controls[name]) {
-							var row = options.controls[name][rowIndex],
-							    hasTimeline = false,
-							    rowElement = $('<div />').addClass('leplayer-controls controls-' + name);
+					if (!controls.has(name)) continue;
+					for (var rowIndex in options.controls[name]) {
+						var row = options.controls[name][rowIndex],
+						    hasTimeline = false,
+						    rowElement = $('<div />').addClass('leplayer-controls controls-' + name);
 
-							for (var i in row) {
-								var controlName = row[i];
+						for (var i in row) {
+							var controlName = row[i];
 
-								if (controlName == C_DIVIDER || !controls.collections[name].has(controlName)) {
-									// Create control only if divider or does not exist yet.
-									var c = controls.collections[name].add(controlName);
-									if (c != null) {
-										rowElement.append(c);
-										if (controlName == C_TIMELINE) hasTimeline = true;
-									} else console.warn('Cannot create ' + controlName + ' control for collection ' + name + '.');
-								}
+							if (controlName == C_DIVIDER || !controls.collections[name].has(controlName)) {
+								// Create control only if divider or does not exist yet.
+								var c = controls.collections[name].add(controlName);
+								if (c != null) {
+									rowElement.append(c);
+									if (controlName == C_TIMELINE) hasTimeline = true;
+								} else console.warn('Cannot create ' + controlName + ' control for collection ' + name + '.');
 							}
-
-							if (!hasTimeline) rowElement.css('width', '1px');
-
-							rowElement.find('.divider + .divider').remove();
-
-							container.append(rowElement);
 						}
+
+						if (!hasTimeline) rowElement.css('width', '1px');
+
+						rowElement.find('.divider + .divider').remove();
+
+						container.append(rowElement);
 					}
 				}
 			};
 
 			var initDom = function initDom() {
-				var videoContainer;
-				overlay = $('<div />').addClass('play-overlay').html('<i class="fa fa-play"></i>');
+				var videoContainer = void 0;
+				var icon = new Icon('play');
+				overlay = $('<div />').addClass('play-overlay').append(icon.element);
 				videoContainer = $('<div />').addClass('leplayer-video').append(overlay);
 				container = $('<div />').addClass('leplayer-container').append(videoContainer).attr('tabindex', 0).css('width', element.width() + 'px');
 
@@ -1402,7 +1599,7 @@
 					return (e.which === binding.key || e.key === binding.key) && !!binding.shiftKey == e.shiftKey && !!binding.ctrlKey == e.ctrlKey;
 				};
 
-				$(container).bind('keydown.le-player-hotkey', function (e) {
+				$(container).bind('keydown.leplayer.hotkey', function (e) {
 					var _isFocused = isFocused();
 					if (_isFocused) {
 						$.each(options.keyBinding, function (action, binding) {
@@ -1417,42 +1614,65 @@
 			};
 
 			var initOptions = function initOptions() {
-				// Controls.
+				var height = void 0,
+				    width = void 0,
+				    poster = void 0,
+				    attrs = void 0,
+				    preload = void 0;
 				element.removeAttr('controls');
 
-				// Height.
-				var h = element.attr('height');
-				if (h) {
-					options.height = h + 'px';
+				height = element.attr('height');
+				if (height) {
+					options.height = height + 'px';
 					element.removeAttr('height');
 				}
 				element.css('height', options.height);
 
-				// Width.
-				var w = element.attr('width');
-				if (w) {
-					options.width = w + 'px';
+				width = element.attr('width');
+				if (width) {
+					options.width = width + 'px';
 					element.removeAttr('width');
 				}
 				element.css('width', options.width);
 
-				// Poster.
-				var p = element.attr('poster');
-				if (p) options.poster = p;else if (options.poster) element.attr('poster', options.poster);
+				poster = element.attr('poster');
+				if (poster) options.poster = poster;else if (options.poster) element.attr('poster', options.poster);
 
-				// Autoplay, loop, muted.
-				var attrs = ['autoplay', 'loop', 'muted'];
-				for (var i in attrs) {
-					var a = element.attr(attrs[i]);
-					if (a) options[attrs[i]] = true;else if (options[attrs[i]]) element.attr(attrs[i], '');else element.removeAttr(attrs[i]);
-					element.prop(attrs[i], options[attrs[i]]);
+				attrs = ['autoplay', 'loop', 'muted'];
+				attrs.forEach(function (item) {
+					var a = element.attr(item);
+					if (a) {
+						options[item] = true;
+					} else if (options[item]) {
+						element.attr(item, '');
+					} else {
+						element.removeAttr(item);
+					}
+					element.prop(item, options[item]);
+				});
+
+				preload = element.attr('preload');
+				if (preload) {
+					preload = preload.toLowerCase();
+					if (preload == 'none' || preload == 'metadata') options.preload = preload;else options.preload = 'auto';
 				}
 
-				// Preload.
-				var r = element.attr('preload');
-				if (r) {
-					r = r.toLowerCase();
-					if (r == 'none' || r == 'metadata') options.preload = r;else options.preload = 'auto';
+				if (options.sources) {
+					if (Array.isArray(options.sources)) {
+						options.sources.forEach(function (item) {
+							console.log(item);
+							var source = $('<source />');
+							if (typeof item === 'string') {
+								source.attr('src', item);
+							} else {
+								source.attr('src', item.src);
+							}
+							source.attr('title', item.title || 'default');
+							element.append(source);
+						});
+					} else if (typeof options.sources === 'string') {
+						element.attr('src', options.sources);
+					}
 				}
 				element.attr('preload', options.preload);
 			};
@@ -1482,7 +1702,7 @@
 
 		window.$.fn.lePlayer = function (options) {
 			return this.each(function () {
-				Player($(this), options);
+				return new Player($(this), options);
 			});
 		};
 	})(jQuery);

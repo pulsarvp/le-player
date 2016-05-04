@@ -8,7 +8,12 @@
 }
 .leplayer-container.fullscreen {
   position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   width: 100% !important;
+  max-width: none !important;
 }
 .leplayer-container.fullscreen .leplayer-video,
 .leplayer-container.fullscreen video {
@@ -17,6 +22,10 @@
   position: fixed;
   top: 0;
   width: 100% !important;
+  z-index: 1006;
+}
+.leplayer-container.fullscreen .play-overlay {
+  z-index: 1007;
 }
 .leplayer-container video {
   outline: 0;
@@ -50,7 +59,7 @@
   outline: 0;
   text-align: center;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-  z-index: 501;
+  z-index: 507;
 }
 .leplayer-container .play-overlay:hover {
   background: rgba(0, 0, 0, 0.2);
@@ -76,7 +85,7 @@
   position: fixed;
   right: 20px;
   width: auto;
-  z-index: 507;
+  z-index: 1007;
 }
 .leplayer-controls.controls-fullscreen .control {
   background: #465264;
@@ -100,6 +109,7 @@
 }
 .leplayer-controls.controls-fullscreen .control-inner {
   background: #465264;
+  z-index: 1008;
 }
 .leplayer-controls.controls-fullscreen .control-text {
   background: #465264;
@@ -119,7 +129,6 @@
 .leplayer-controls.controls-fullscreen .timeline {
   background: #768496;
   margin: 0;
-  top: -2px;
 }
 .leplayer-controls.controls-fullscreen .timeline-container {
   background: #465264;
@@ -129,16 +138,22 @@
   position: relative;
   top: -2px;
 }
+.leplayer-controls.controls-fullscreen .timeline-container:hover {
+  background: #465264;
+}
 .leplayer-controls.controls-fullscreen .time-marker {
   background: #2a313c;
   border-right: 1px solid rgba(225, 232, 239, 0.7);
+  z-index: 1007;
 }
 .leplayer-controls.controls-fullscreen .time-marker.shadow {
   background: rgba(26, 74, 126, 0.8);
   border-right: 1px solid rgba(225, 232, 239, 0.5);
+  z-index: 1006;
 }
 .leplayer-controls.controls-fullscreen .time-marker .time {
   background: rgba(118, 138, 167, 0.8);
+  z-index: 1003;
 }
 .leplayer-controls.controls-fullscreen .time-played {
   background: rgba(0, 0, 0, 0.25);
@@ -194,12 +209,14 @@
 .leplayer-controls .control-container {
   display: table-cell;
   height: 32px;
-  padding: 0;
   position: relative;
   width: 1%;
 }
 .leplayer-controls .control-container:hover .control-inner {
   display: block;
+}
+.leplayer-controls .control-container.disabled:hover .control-inner {
+  display: none;
 }
 .leplayer-controls .control-icon {
   line-height: 32px;
@@ -268,6 +285,9 @@
   position: relative;
   white-space: nowrap;
   width: 100%;
+}
+.leplayer-controls .timeline-container:hover {
+  background: #e1e8ef;
 }
 .leplayer-controls .timeline-subcontainer {
   display: table;
@@ -352,4 +372,28 @@
   line-height: 0;
   position: relative;
   z-index: 506;
+}
+.leplayer-notification {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: pink;
+  width: 100%;
+  height: 30px;
+  line-height: 30px;
+  text-align: center;
+  font-size: 15px;
+  z-index: 507;
+}
+.leplayer-container.fullscreen .leplayer-notification {
+  z-index: 1007;
+}
+.leplayer-icon {
+  display: block;
+}
+.leplayer-icon svg {
+  display: block;
+  width: 1em;
+  height: 1em;
 }
