@@ -28,20 +28,28 @@
   display: none !important;
 }
 .leplayer-container .play-overlay {
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-align-content: center;
+      -ms-flex-line-pack: center;
+          align-content: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   background: rgba(0, 0, 0, 0.5);
-  bottom: 0;
   color: #94a5bc;
   cursor: pointer;
-  height: 100%;
-  font-size: 80px;
-  left: 0;
-  outline: 0;
   position: absolute;
-  right: 0;
+  height: 100%;
+  width: 100%;
+  font-size: 80px;
+  outline: 0;
   text-align: center;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-  top: 0;
-  width: 100%;
   z-index: 501;
 }
 .leplayer-container .play-overlay:hover {
@@ -206,7 +214,7 @@
   min-width: 100%;
   position: absolute;
   width: auto;
-  z-index: 506;
+  z-index: 508;
 }
 .leplayer-controls .control-text {
   background: #e1e8ef;

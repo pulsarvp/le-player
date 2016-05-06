@@ -1,0 +1,44 @@
+@color-primary: #0069b3; // rgb(26, 74, 126) hsl(59,66%,30%)
+
+@h-primary: hue(@color-primary);
+@s-primary: saturation(@color-primary);
+@l-primary: lightness(@color-primary);
+
+// hsl(211,30%,90%)
+// rgb(225, 232, 239)
+@color-background: desaturate(lighten(@color-primary, 60%), 35%);
+
+// hsl(211,22%,56%)
+// rgb(118, 138, 167)
+@color-background-line: desaturate(lighten(@color-primary, 10%), 45%);
+
+@color-background-line-active: rgba(0, 0, 0, 0.25);
+
+// hsl(211, 30%, 54%)
+// rgb(103, 139, 174)
+@color-background-play: desaturate(lighten(@color-primary, 10%), 35%);
+
+// hsl(211,23%,66%)
+// rgb(148, 165, 188)
+@color-disabled: desaturate(lighten(@color-primary, 35%), 45%);
+
+@color-inner-item-hover: lighten(@color-primary, 5%);
+
+@color-marker: @color-primary;
+
+// hsla(211, 30%, 90%, 0.5)
+// rgba(225, 232, 239, 0.5)
+@color-marker-border: fade(desaturate(lighten(@color-primary, 60%), 35%), 50%);
+@color-marker-shadow-border: @color-marker-border;
+
+@color-marker-shadow: fade(@color-primary, 80%);
+
+// rgba(118, 138, 167, 0.8)
+// hsla(211, 20, 55, 0.5)
+@color-marker-shadow-time: fade(desaturate(lighten(@color-primary, 25%), 45%), 80%);
+
+@color-text: @color-primary;
+
+lol {
+	color : @color-primary
+}

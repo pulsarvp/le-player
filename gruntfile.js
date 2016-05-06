@@ -29,10 +29,14 @@ module.exports = function (grunt) {
 					"paths" : [
 						"bower_components"
 					],
-					cleancss : true,
-					strictUnits : true
+					sourceMapFileInline : true
+
 				},
-				files : { 'dist/css/<%= pkg.name %>.css' : 'source/less/<%= pkg.name %>.less' }
+				expand : true,
+				cwd : 'source/less/',
+				src : '**/le-player.less',
+				ext : '.css',
+				dest : 'dist/css/'
 			},
 			production : {
 				options : {
@@ -45,28 +49,21 @@ module.exports = function (grunt) {
 					optimization : 2,
 					sourceMap : true
 				},
-				files : { 'dist/css/<%= pkg.name %>.min.css' : 'source/less/<%= pkg.name %>.less' }
+				expand : true,
+				cwd : 'source/less/',
+				src : '**/le-player.less',
+				ext : '.min.css',
+				dest : 'dist/css/'
 			}
 		},
-		sass : {
-			development : {
-				options : {
-					precision : 3,
-					style : 'expanded',
-					sourcemap : 'none'
-				},
-				files : {
-					'dist/css/<%= pkg.name %>.css' : 'source/sass/<%= pkg.name %>.scss'
-				}
+		postcss : {
+			options : {
+				processors : [
+					require('autoprefixer')({ browsers : 'last 2 versions' })
+				]
 			},
-			production : {
-				options : {
-					precision : 3,
-					style : 'compressed'
-				},
-				files : {
-					'dist/css/<%= pkg.name %>.min.css' : 'source/sass/<%= pkg.name %>.scss'
-				}
+			dist : {
+				src : 'dist/css/**/le-player.css'
 			}
 		},
 		concat : {
@@ -80,7 +77,7 @@ module.exports = function (grunt) {
 		watch : {
 			less : {
 				files : [ 'source/less/**/*' ],
-				tasks : [ 'less:development' ]
+				tasks : [ 'less:development', 'postcss' ]
 			},
 			// sass : {
 			// 	files : [ 'source/sass/**/*' ],
@@ -89,12 +86,35 @@ module.exports = function (grunt) {
 			js : {
 				files : [ 'source/js/**/*.js' ],
 				tasks : [ 'concat:js', 'webpack:build-dev' ]
+			},
+
+			svgstore : {
+				files : [ 'source/svg/*.svg' ],
+				tasks : [ 'svgstore' ]
 			}
+
 		},
 		uglify : {
 			js : {
 				src : 'dist/js/<%= pkg.name %>.js',
 				dest : 'dist/js/<%= pkg.name %>.min.js'
+			}
+		},
+		svgstore : {
+			options : {
+				prefix : 'leplayer-icon-',
+				svg : {
+					xmlns : 'http://www.w3.org/2000/svg',
+				},
+				symbol : {
+					fill : 'currentColor',
+					viewBox : '0 0 16 16'
+				}
+			},
+			default : {
+				files: {
+					'dist/svg/svg-defs.svg': ['source/svg/*.svg'],
+				}
 			}
 		}
 	});
@@ -105,7 +125,9 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-postcss');
+	grunt.loadNpmTasks('grunt-svgstore');
 
-	grunt.registerTask('default', [ 'less', 'webpack:build-dev', 'concat', 'watch' ]);
-	grunt.registerTask('production', [ 'clean', 'less', 'concat', 'webpack:build', 'uglify' ]);
+	grunt.registerTask('default', [ 'less:development', 'webpack:build-dev', 'concat', 'svgstore', 'watch' ]);
+	grunt.registerTask('production', [ 'clean', 'less', 'postcss', 'concat', 'svgstore', 'webpack:build', 'uglify' ]);
 };
