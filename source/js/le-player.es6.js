@@ -252,6 +252,7 @@
 				this._video = ctx[ 0 ];
 				this.fullscreen = new Fullscreen();
 				this.subtitles = [];
+				this.bufferRanges = [];
 				this.playbackRate = this._video.playbackRate;
 			}
 
@@ -482,6 +483,18 @@
 							container.focus()
 							this.togglePlay();
 						}, 300);
+					},
+
+					'progress' : (e) => {
+						let media = this._video;
+						for (var i = 0; i < media.buffered.length; i++) {
+							this.bufferRanges.push([
+								media.buffered.start(i),
+								media.buffered.end(i)
+							]);
+						}
+						console.log(this.bufferRanges);
+						this.trigger('progress');
 					}
 
 				});
