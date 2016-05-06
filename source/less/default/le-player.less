@@ -1,4 +1,4 @@
-@import "import.less";
+@import "variables.less";
 
 .leplayer-container
 {
@@ -31,6 +31,11 @@
 		.play-overlay
 		{
 			z-index: @z-index-fullscreen + 7;
+			color:  @color-fs-active;
+			&:hover
+			{
+				color: @color-fs-active;
+			}
 		}
 	}
 
@@ -67,7 +72,7 @@
 		&:hover
 		{
 			background: rgba(0, 0, 0, 0.2);
-			color: #fff;
+			color: @color-active;
 		}
 	}
 }
@@ -116,6 +121,7 @@
 			&.play
 			{
 				background: @color-fs-background-play;
+				color:  @color-fs-active;
 				&:hover
 				{
 					background: @color-fs-background-hover;
@@ -235,7 +241,7 @@
 		&.play
 		{
 			background: @color-background-play;
-			color: #fff;
+			color: @color-active;
 			padding: 0 (@control-play-width - @control-font-size) / 2;
 			width: 1%;
 			&:hover
@@ -384,7 +390,7 @@
 			background: @color-marker-shadow-time;
 			border-radius: 1px;
 			bottom: 20px;
-			color: #fff;
+			color: @color-active;
 			font-size: @control-text-font-size;
 			line-height: @control-text-font-size + 6px;
 			margin-left: -18px;

@@ -29,10 +29,14 @@ module.exports = function (grunt) {
 					"paths" : [
 						"bower_components"
 					],
-					cleancss : true,
-					strictUnits : true
+					sourceMapFileInline : true
+
 				},
-				files : { 'dist/css/<%= pkg.name %>.css' : 'source/less/<%= pkg.name %>.less' }
+				expand : true,
+				cwd : 'source/less/',
+				src : '**/le-player.less',
+				ext : '.css',
+				dest : 'dist/css/'
 			},
 			production : {
 				options : {
@@ -45,28 +49,11 @@ module.exports = function (grunt) {
 					optimization : 2,
 					sourceMap : true
 				},
-				files : { 'dist/css/<%= pkg.name %>.min.css' : 'source/less/<%= pkg.name %>.less' }
-			}
-		},
-		sass : {
-			development : {
-				options : {
-					precision : 3,
-					style : 'expanded',
-					sourcemap : 'none'
-				},
-				files : {
-					'dist/css/<%= pkg.name %>.css' : 'source/sass/<%= pkg.name %>.scss'
-				}
-			},
-			production : {
-				options : {
-					precision : 3,
-					style : 'compressed'
-				},
-				files : {
-					'dist/css/<%= pkg.name %>.min.css' : 'source/sass/<%= pkg.name %>.scss'
-				}
+				expand : true,
+				cwd : 'source/less/',
+				src : '**/le-player.less',
+				ext : '.min.css',
+				dest : 'dist/css/'
 			}
 		},
 		postcss : {
@@ -76,7 +63,7 @@ module.exports = function (grunt) {
 				]
 			},
 			dist : {
-				src : 'dist/css/*.css'
+				src : 'dist/css/**/le-player.css'
 			}
 		},
 		concat : {
@@ -141,6 +128,6 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-postcss');
 	grunt.loadNpmTasks('grunt-svgstore');
 
-	grunt.registerTask('default', [ 'less', 'postcss', 'webpack:build-dev', 'concat', 'svgstore', 'watch' ]);
+	grunt.registerTask('default', [ 'less:development', 'webpack:build-dev', 'concat', 'svgstore', 'watch' ]);
 	grunt.registerTask('production', [ 'clean', 'less', 'postcss', 'concat', 'svgstore', 'webpack:build', 'uglify' ]);
 };
