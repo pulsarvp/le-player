@@ -339,6 +339,10 @@
 				controls.volume = this._video.volume;
 			}
 
+			get buffered () {
+				return this._video.buffered;
+			}
+
 			init () {
 				let dfd = $.Deferred()
 				this._initSubtitles();
@@ -388,7 +392,7 @@
 			}
 
 			trigger (eventName, ...args) {
-				$(this._video).trigger.call($(this._video), `${eventName}.leplayer`, ...args);
+				$(this._video).trigger.call($(this._video), `leplayer_${eventName}`, ...args);
 			}
 
 			_initRate () {
@@ -455,7 +459,7 @@
 						}
 					}
 				}
-				this.trigger('loadedmetadata')
+				// this.trigger('loadedmetadata')
 			}
 
 			_initHtmlEvents () {
@@ -464,7 +468,7 @@
 
 				mediaElement.on({
 
-					'timeupdate' : () => {
+					'timeupdate' : (e) => {
 						controls.moveTimeMarker();
 					},
 
@@ -486,14 +490,6 @@
 					},
 
 					'progress' : (e) => {
-						let media = this._video;
-						for (var i = 0; i < media.buffered.length; i++) {
-							this.bufferRanges.push([
-								media.buffered.start(i),
-								media.buffered.end(i)
-							]);
-						}
-						console.log(this.bufferRanges);
 						this.trigger('progress');
 					}
 
@@ -866,8 +862,7 @@
 		class TimelineControl extends Control {
 			constructor () {
 				super('timeline');
-				let _self = this,
-					duration = video.duration;
+				let duration = video.duration;
 
 				this.drag = false;
 
@@ -886,12 +881,14 @@
 					.addClass('time')
 					.hide();
 				this.played = $('<div />').addClass('time-played');
+				this.buffered = $('<div />')
 				this.current.text = '00:00';
 				this.line = $('<div />')
 					.addClass('timeline')
 					.append(this.marker.append(this.markerTime))
 					.append(this.markerShadow.append(this.markerShadowTime))
 					.append(this.played)
+					.append(this.buffered)
 					.on({
 						'mousemove' : (e) => {
 							if (this.drag) return;
@@ -917,6 +914,7 @@
 						'click' : (e) => {
 							if (e.which !== 1) return;
 							if (this.drag) return;
+							this.hardMove(this.getPosition(e.pageX));
 							video.seek(video.duration * this.getPosition(e.pageX));
 						},
 
@@ -956,20 +954,46 @@
 						this.drag = false;
 					}
 				});
+
+				$(video._video).on('leplayer_progress', e => {
+					let i;
+					if (video.duration <= 0) {
+						return false;
+					}
+					let result = $('');
+					for(i = 0; i < video.buffered.length; i++) {
+						let newItem = $('<div />').addClass('time-buffered');
+
+						let start = video.buffered.start(i);
+						let end = video.buffered.end(i);
+						newItem.css({
+							'left' : start / video.duration * 100 + '%',
+							'width' : (end - start) / video.duration * 100 + '%'
+						});
+						result = result.add(newItem);
+					}
+					this.buffered.html(result);
+				})
 			}
 
 			getPosition (x) {
 				return (x - this.line.offset().left) / this.line.width();
 			}
 
-			move () {
-				var percent = (video.currentTime / video.duration * 100).toFixed(2);
-				if (percent == 100) {
-					controls.pause()
-				}
+			hardMove (percent) {
+				let currentTime = video.duration * percent;
+				percent = percent * 100;
 				this.marker.css('left', percent + '%');
 				this.played.css('width', percent + '%');
-				this.current.text = secondsToTime(video.currentTime);
+				this.current.text = secondsToTime(currentTime);
+			}
+
+			move () {
+				let percent = (video.currentTime / video.duration * 100).toFixed(2);
+				let currentTime = video.currentTime;
+								this.marker.css('left', percent + '%');
+				this.played.css('width', percent + '%');
+				this.current.text = secondsToTime(currentTime);
 			}
 		}
 
@@ -1488,7 +1512,6 @@
 			if (options.sources) {
 				if (Array.isArray(options.sources)) {
 					options.sources.forEach((item) => {
-						console.log(item);
 						let source = $('<source />');
 						if (typeof item === 'string') {
 							source.attr('src', item)

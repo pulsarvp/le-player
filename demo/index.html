@@ -4,10 +4,8 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>LePlayer Demo Page</title>
-		<script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 		<link id="linkPlayerTheme" rel="stylesheet" href="../dist/css/default/le-player.css">
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+		<link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css">
 		<style>
 
 		body {
@@ -40,7 +38,7 @@
 			<video id="video1" src="sample1.mp4" height="200"></video>
 			<h2>Multiple videos</h2>
 			<video id="video2">
-				<source src="sample1.mp4" title="320p">
+				<source src="http://sms.video.mipt.ru/video/original/0003/h1l9hf9cbu.mp4" title="320p">
 				<source src="sample2.mp4" title="1280">
 				<track label="EN" srclang="en" src="subs_en.vtt" kind="subtitles">
 				<track label="RU" srclang="ru" src="subs_ru.vtt" kind="subtitles">
@@ -52,7 +50,8 @@
 
 		</div>
 	</body>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" charset="utf-8"></script>
+	<script src="../bower_components/jquery/dist/jquery.min.js"></script>
+	<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js" charset="utf-8"></script>
 	<script src="index.js" charset="utf-8"></script>
 	<script src="../dist/js/le-player.js"></script>
 	<script>
