@@ -193,12 +193,6 @@
 						this._hideTimeout = setTimeout(() => {
 							this._collection.element.hide();
 						}, options.fullscreen.hideTimelineTime);
-					},
-					'mouseleave.leplayer.fullscreen-hide-timeline' : (e) => {
-						if (!$(e.currentTarget).hasClass('fullscreen')) return false;
-						clearTimeout(this._hideTimeout);
-						this._collection.element.hide();
-
 					}
 				})
 			}
