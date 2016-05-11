@@ -10,7 +10,8 @@
 // rgb(118, 138, 167)
 @color-background-line: desaturate(lighten(@color-primary, 25%), 45%);
 
-@color-background-line-active: rgba(0, 0, 0, 0.25);
+@color-background-line-active: fade(@color-primary, 60%);;
+@color-background-line-buffered: fade(red, 40%);
 
 // hsl(211, 30%, 54%)
 // rgb(103, 139, 174)
@@ -42,6 +43,7 @@
 @color-fs-background-hover: darken(@color-fs-background, 10%);
 @color-fs-background-line: #768496;
 @color-fs-background-line-active: rgba(0, 0, 0, 0.25);
+@color-fs-background-line-buffered: fade(red, 40%);
 @color-fs-background-play: #384150;
 @color-fs-disabled: #4b6b9b;
 @color-fs-inner-item-hover: rgba(0, 0, 0, 0.15);

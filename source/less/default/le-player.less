@@ -191,6 +191,12 @@
 		.time-played
 		{
 			background: @color-fs-background-line-active;
+			z-index: @z-index-fullscreen + 5;
+		}
+		.time-buffered
+		{
+			background-color: @color-fs-background-line-buffered;
+			z-index: @z-index-fullscreen + 4;
 		}
 		.volume-active
 		{
@@ -408,6 +414,17 @@
 		top: 0;
 		//transition: width @timeline-transition;
 		width: 0;
+		z-index: @z-index-base + 5;
+	}
+	.time-buffered
+	{
+		background-color: @color-background-line-buffered;
+		bottom: 0;
+		left: 0;
+		position: absolute;
+		top: 0;
+		width: 0;
+		z-index: @z-index-base + 4;
 	}
 	.volume-active
 	{
@@ -481,6 +498,8 @@
 
 .leplayer-icon {
 	display: block;
+	min-width: 1em;
+	min-height: 1em;
 	svg {
 		display: block;
 		width: 1em;
