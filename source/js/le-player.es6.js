@@ -14,7 +14,7 @@
 		const C_TIMELINE = 'timeline';
 		const C_VOLUME = 'volume';
 
-		var options = $.extend(true, {
+		var options = $.extend({}, {
 			autoplay : false,
 			height : 'auto',
 			loop : false,
@@ -252,6 +252,7 @@
 				this._video = ctx[ 0 ];
 				this.fullscreen = new Fullscreen();
 				this.subtitles = [];
+				this.bufferRanges = [];
 				this.playbackRate = this._video.playbackRate;
 			}
 
@@ -338,8 +339,39 @@
 				controls.volume = this._video.volume;
 			}
 
+			get buffered () {
+				return this._video.buffered;
+			}
+
+			get loaded () {
+				let loaded = [];
+				let media = this._video;
+				/** FF4+, Chrome */
+				if (
+					media.buffered &&
+					media.buffered.end &&
+					media.duration > 0
+				) {
+					for (let i = 0; i < media.buffered.length; i++) {
+						let start = media.buffered.start(i) / media.duration;
+						let end = media.buffered.end(i) / media.duration;
+						let segment = [start, end];
+						loaded.push(segment);
+					}
+				}
+				/** Safari 5, Webkit head, FF3.6, Chrome 6, IE 7/8 */
+				else if (
+					media.bytesTotal != null &&
+					media.bytesTotal > 0 &&
+					media.bufferedBytes != null
+				) {
+					loaded.push([0, media.bufferedBytes / media.bytesTotal]);
+				}
+				return loaded;
+			}
+
 			init () {
-				let dfd = $.Deferred()
+				let dfd = $.Deferred();
 				this._initSubtitles();
 				this._initVideo()
 					.done(() => {
@@ -357,11 +389,12 @@
 			}
 
 			togglePlay () {
-				if (this._video.readyState < 2) {
-					overlay.hide();
-					_showNotification('Error!');
-					return;
-				}
+				/** In safari it doesn't work */
+				// if (this._video.readyState < 2) {
+				// 	overlay.hide();
+				// 	_showNotification('Error!');
+				// 	return;
+				// }
 				if (!this._video.played || this._video.paused) {
 					this.play();
 				} else {
@@ -386,7 +419,7 @@
 			}
 
 			trigger (eventName, ...args) {
-				$(this._video).trigger.call($(this._video), `${eventName}.leplayer`, ...args);
+				$(this._video).trigger.call($(this._video), `leplayer_${eventName}`, ...args);
 			}
 
 			_initRate () {
@@ -453,7 +486,7 @@
 						}
 					}
 				}
-				this.trigger('loadedmetadata')
+				// this.trigger('loadedmetadata')
 			}
 
 			_initHtmlEvents () {
@@ -462,12 +495,13 @@
 
 				mediaElement.on({
 
-					'timeupdate' : () => {
+					'timeupdate' : (e) => {
 						controls.moveTimeMarker();
 					},
 
 					'ended' : () => {
 						this.pause();
+						this.trigger('ended');
 					},
 
 					'dblclick' : () => {
@@ -852,8 +886,7 @@
 		class TimelineControl extends Control {
 			constructor () {
 				super('timeline');
-				let _self = this,
-					duration = video.duration;
+				let duration = video.duration;
 
 				this.drag = false;
 
@@ -872,12 +905,14 @@
 					.addClass('time')
 					.hide();
 				this.played = $('<div />').addClass('time-played');
+				this.buffered = $('<div />')
 				this.current.text = '00:00';
 				this.line = $('<div />')
 					.addClass('timeline')
 					.append(this.marker.append(this.markerTime))
 					.append(this.markerShadow.append(this.markerShadowTime))
 					.append(this.played)
+					.append(this.buffered)
 					.on({
 						'mousemove' : (e) => {
 							if (this.drag) return;
@@ -903,6 +938,7 @@
 						'click' : (e) => {
 							if (e.which !== 1) return;
 							if (this.drag) return;
+							this.hardMove(this.getPosition(e.pageX));
 							video.seek(video.duration * this.getPosition(e.pageX));
 						},
 
@@ -942,20 +978,56 @@
 						this.drag = false;
 					}
 				});
+
+				/** TODO: Solve problem with open events api */
+				$(video._video).on('leplayer_ended', e => {
+					clearInterval(this.watchBufferInterval);
+				})
+
+				this._initWatchBuffer();
 			}
 
 			getPosition (x) {
 				return (x - this.line.offset().left) / this.line.width();
 			}
 
-			move () {
-				var percent = (video.currentTime / video.duration * 100).toFixed(2);
-				if (percent == 100) {
-					controls.pause()
-				}
+			hardMove (percent) {
+				let currentTime = video.duration * percent;
+				percent = percent * 100;
 				this.marker.css('left', percent + '%');
 				this.played.css('width', percent + '%');
-				this.current.text = secondsToTime(video.currentTime);
+				this.current.text = secondsToTime(currentTime);
+			}
+
+			move () {
+				let percent = (video.currentTime / video.duration * 100).toFixed(2);
+				let currentTime = video.currentTime;
+								this.marker.css('left', percent + '%');
+				this.played.css('width', percent + '%');
+				this.current.text = secondsToTime(currentTime);
+			}
+
+			_initWatchBuffer () {
+				clearInterval(this.watchBufferInterval);
+				let updateProgressBar = () => {
+					const END = 1;
+					const START = 0;
+					let result = $('');
+					video.loaded.forEach(item => {
+						let domItem = $('<div />').addClass('time-buffered');
+						domItem.css({
+							'left' : item[START] * 100 + '%',
+							'width' : (item[END] - item[START]) * 100 + '%'
+						});
+						result = result.add(domItem);
+					});
+					this.buffered.html(result);
+
+					if (video.loaded[0] && (1 - video.loaded[0][END]) <= 0.05) {
+						clearInterval(this.watchBufferInterval);
+					}
+				}
+				this.watchBufferInterval = setInterval(updateProgressBar, 500);
 			}
 		}
 
@@ -1310,6 +1382,7 @@
 				return this;
 			}
 
+			initOptions();
 			// Set source.
 			// @TODO move this to Video class
 			element.children('source').each(function () {
@@ -1336,7 +1409,6 @@
 			video = new Video(element);
 
 			/** TODO: Use promise to async run this */
-			initOptions();
 			initDom();
 			initControls();
 			video.init().done(() => { video.trigger('inited')});
@@ -1469,6 +1541,23 @@
 					options.preload = preload;
 				else
 					options.preload = 'auto';
+			}
+
+			if (options.sources) {
+				if (Array.isArray(options.sources)) {
+					options.sources.forEach((item) => {
+						let source = $('<source />');
+						if (typeof item === 'string') {
+							source.attr('src', item)
+						} else {
+							source.attr('src', item.src)
+						}
+						source.attr('title', item.title || 'default');
+						element.append(source);
+					})
+				} else if (typeof options.sources === 'string') {
+					element.attr('src', options.sources)
+				}
 			}
 			element.attr('preload', options.preload);
 		};

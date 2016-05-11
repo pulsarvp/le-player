@@ -1,4 +1,4 @@
-@import "import.less";
+@import "variables.less";
 
 .leplayer-container
 {
@@ -31,6 +31,11 @@
 		.play-overlay
 		{
 			z-index: @z-index-fullscreen + 7;
+			color:  @color-fs-active;
+			&:hover
+			{
+				color: @color-fs-active;
+			}
 		}
 	}
 
@@ -67,7 +72,7 @@
 		&:hover
 		{
 			background: rgba(0, 0, 0, 0.2);
-			color: #fff;
+			color: @color-active;
 		}
 	}
 }
@@ -116,6 +121,7 @@
 			&.play
 			{
 				background: @color-fs-background-play;
+				color:  @color-fs-active;
 				&:hover
 				{
 					background: @color-fs-background-hover;
@@ -185,6 +191,12 @@
 		.time-played
 		{
 			background: @color-fs-background-line-active;
+			z-index: @z-index-fullscreen + 5;
+		}
+		.time-buffered
+		{
+			background-color: @color-fs-background-line-buffered;
+			z-index: @z-index-fullscreen + 4;
 		}
 		.volume-active
 		{
@@ -235,7 +247,7 @@
 		&.play
 		{
 			background: @color-background-play;
-			color: #fff;
+			color: @color-active;
 			padding: 0 (@control-play-width - @control-font-size) / 2;
 			width: 1%;
 			&:hover
@@ -384,7 +396,7 @@
 			background: @color-marker-shadow-time;
 			border-radius: 1px;
 			bottom: 20px;
-			color: #fff;
+			color: @color-active;
 			font-size: @control-text-font-size;
 			line-height: @control-text-font-size + 6px;
 			margin-left: -18px;
@@ -402,6 +414,17 @@
 		top: 0;
 		//transition: width @timeline-transition;
 		width: 0;
+		z-index: @z-index-base + 5;
+	}
+	.time-buffered
+	{
+		background-color: @color-background-line-buffered;
+		bottom: 0;
+		left: 0;
+		position: absolute;
+		top: 0;
+		width: 0;
+		z-index: @z-index-base + 4;
 	}
 	.volume-active
 	{
@@ -475,6 +498,8 @@
 
 .leplayer-icon {
 	display: block;
+	min-width: 1em;
+	min-height: 1em;
 	svg {
 		display: block;
 		width: 1em;
