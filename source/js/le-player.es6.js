@@ -343,8 +343,35 @@
 				return this._video.buffered;
 			}
 
+			get loaded () {
+				let loaded = [];
+				let media = this._video;
+				/** FF4+, Chrome */
+				if (
+					media.buffered &&
+					media.buffered.end &&
+					media.duration > 0
+				) {
+					for (let i = 0; i < media.buffered.length; i++) {
+						let start = media.buffered.start(i) / media.duration;
+						let end = media.buffered.end(i) / media.duration;
+						let segment = [start, end];
+						loaded.push(segment);
+					}
+				}
+				/** Safari 5, Webkit head, FF3.6, Chrome 6, IE 7/8 */
+				else if (
+					media.bytesTotal != null &&
+					media.bytesTotal > 0 &&
+					media.bufferedBytes != null
+				) {
+					loaded.push([0, media.bufferedBytes / media.bytesTotal]);
+				}
+				return loaded;
+			}
+
 			init () {
-				let dfd = $.Deferred()
+				let dfd = $.Deferred();
 				this._initSubtitles();
 				this._initVideo()
 					.done(() => {
@@ -474,6 +501,7 @@
 
 					'ended' : () => {
 						this.pause();
+						this.trigger('ended');
 					},
 
 					'dblclick' : () => {
@@ -487,10 +515,6 @@
 							container.focus()
 							this.togglePlay();
 						}, 300);
-					},
-
-					'progress' : (e) => {
-						this.trigger('progress');
 					}
 
 				});
@@ -955,25 +979,12 @@
 					}
 				});
 
-				$(video._video).on('leplayer_progress', e => {
-					let i;
-					if (video.duration <= 0) {
-						return false;
-					}
-					let result = $('');
-					for(i = 0; i < video.buffered.length; i++) {
-						let newItem = $('<div />').addClass('time-buffered');
-
-						let start = video.buffered.start(i);
-						let end = video.buffered.end(i);
-						newItem.css({
-							'left' : start / video.duration * 100 + '%',
-							'width' : (end - start) / video.duration * 100 + '%'
-						});
-						result = result.add(newItem);
-					}
-					this.buffered.html(result);
+				/** TODO: Solve problem with open events api */
+				$(video._video).on('leplayer_ended', e => {
+					clearInterval(this.watchBufferInterval);
 				})
+
+				this._initWatchBuffer();
 			}
 
 			getPosition (x) {
@@ -994,6 +1005,29 @@
 								this.marker.css('left', percent + '%');
 				this.played.css('width', percent + '%');
 				this.current.text = secondsToTime(currentTime);
+			}
+
+			_initWatchBuffer () {
+				clearInterval(this.watchBufferInterval);
+				let updateProgressBar = () => {
+					const END = 1;
+					const START = 0;
+					let result = $('');
+					video.loaded.forEach(item => {
+						let domItem = $('<div />').addClass('time-buffered');
+						domItem.css({
+							'left' : item[START] * 100 + '%',
+							'width' : (item[END] - item[START]) * 100 + '%'
+						});
+						result = result.add(domItem);
+					});
+					this.buffered.html(result);
+
+					if (video.loaded[0] && (1 - video.loaded[0][END]) <= 0.05) {
+						clearInterval(this.watchBufferInterval);
+					}
+				}
+				this.watchBufferInterval = setInterval(updateProgressBar, 500);
 			}
 		}
 
