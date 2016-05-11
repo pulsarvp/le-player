@@ -525,9 +525,10 @@
 		}
 
 		class Control {
-			constructor (cssClass, iconClass) {
+			constructor (cssClass, iconClass, title) {
 				if (iconClass) {
-					this.icon = new Icon(iconClass);
+					this.title = title
+					this.icon = new Icon(iconClass, this.title);
 					this.icon.element.on({
 						'click' : this._onIconClick.bind(this),
 						'leplayer_icon_click' : this.onIconClick.bind(this)
@@ -696,7 +697,7 @@
 		class BackwardControl extends Control {
 
 			constructor () {
-				super('backward', 'undo');
+				super('backward', 'undo', `Отмотать назад на ${options.playback.step.medium} секунд.`);
 			}
 
 			onClick (e) {
@@ -713,6 +714,7 @@
 					.attr('href', '')
 					.attr('target', '_blank')
 					.attr('download', '')
+					.attr('title', 'Скачать видео.')
 					.addClass('control download')
 					.append(icon.element);
 			}
@@ -724,13 +726,13 @@
 
 		class ForwardControl extends Control {
 			constructor () {
-				super('forward', 'redo');
+				super('forward', 'redo', `Отмотать вперед на ${options.playback.step.medium} секунд.`);
 			}
 		}
 
 		class FullscreenControl extends Control {
 			constructor () {
-				super('fullscreen', 'arrows-alt');
+				super('fullscreen', 'arrows-alt', `Развернуть/свернуть на полный экран`);
 			}
 
 			onClick (e) {
@@ -741,15 +743,17 @@
 
 		class PlayControl extends Control {
 			constructor () {
-				super('play', 'play');
+				super('play', 'play', 'Воспроизвести видео');
 			}
 
 			pause () {
 				this.icon.iconName = 'play';
+				this.element.attr('title', 'Воспроизвести видео');
 			}
 
 			play () {
 				this.icon.iconName = 'pause';
+				this.element.attr('title', 'Поставить на паузу');
 			}
 
 			onClick(e) {
@@ -761,8 +765,8 @@
 		class RateControl extends Control {
 			constructor () {
 				super();
-				this.down = new Control('rate-down', 'backward');
-				this.up = new Control('rate-up', 'forward');
+				this.down = new Control('rate-down', 'backward', 'Уменьшить скорость проигрывания.');
+				this.up = new Control('rate-up', 'forward', 'Увеличить скоросить проигрывания.');
 				this.current = new ControlText('rate-current');
 
 				this.down.element.click(e => {
@@ -816,7 +820,7 @@
 
 		class SourceControl extends ControlContainer {
 			constructor () {
-				super('source-control', 'bullseye');
+				super('source-control', 'bullseye', 'Качество');
 				/** TODO: Move sources to the arguments in constror */
 				if (sources.length > 1) {
 					for (var i in sources) {
@@ -844,7 +848,7 @@
 
 		class SubtitleControl extends ControlContainer {
 			constructor () {
-				super('subtitle-control', 'commenting-o');
+				super('subtitle-control', 'commenting-o', 'Субтитры');
 			}
 
 			init () {
@@ -1316,7 +1320,7 @@
 		}
 
 		class Icon {
-			constructor(iconName) {
+			constructor(iconName, title) {
 				this._useTag = document.createElementNS('http://www.w3.org/2000/svg', 'use');
 				this._svgTag = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
@@ -1324,6 +1328,7 @@
 				this._svgTag.appendChild(this._useTag);
 				this.element = $('<div />')
 					.addClass('leplayer-icon')
+					.attr('title', title)
 					.append($(this._svgTag));
 			}
 
