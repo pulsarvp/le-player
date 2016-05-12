@@ -516,11 +516,6 @@
 
 			_initCustomEvents () {
 				let mediaElement = $(this._video);
-
-				mediaElement.on({
-					'inited.leplayer' : (e) => {
-					}
-				})
 			}
 		}
 
@@ -528,7 +523,7 @@
 			constructor (cssClass, iconClass, title) {
 				if (iconClass) {
 					this.title = title
-					this.icon = new Icon(iconClass, this.title);
+					this.icon = new Icon(iconClass);
 					this.icon.element.on({
 						'click' : this._onIconClick.bind(this),
 						'leplayer_icon_click' : this.onIconClick.bind(this)
@@ -537,6 +532,7 @@
 				this.element = $('<div />')
 					.addClass('control ' + cssClass)
 					.append(this.icon && this.icon.element)
+					.attr('title', this.title)
 					.on({
 						'click' : this._onClick.bind(this),
 						'leplayer_click' : this.onClick.bind(this)
@@ -629,8 +625,8 @@
 		}
 
 		class ControlContainer extends Control {
-			constructor (name, iconClass) {
-				super(name, iconClass)
+			constructor (name, iconClass, title) {
+				super(name, iconClass, title)
 				this.iconClass = iconClass;
 				this.listElement = $('<div/>').addClass('control-inner');
 				this.element.addClass('control-container')
@@ -697,7 +693,7 @@
 		class BackwardControl extends Control {
 
 			constructor () {
-				super('backward', 'undo', `Отмотать назад на ${options.playback.step.medium} секунд.`);
+				super('backward', 'undo', `Отмотать назад на ${options.playback.step.medium} секунд`);
 			}
 
 			onClick (e) {
@@ -714,7 +710,7 @@
 					.attr('href', '')
 					.attr('target', '_blank')
 					.attr('download', '')
-					.attr('title', 'Скачать видео.')
+					.attr('title', 'Скачать видео')
 					.addClass('control download')
 					.append(icon.element);
 			}
@@ -726,7 +722,7 @@
 
 		class ForwardControl extends Control {
 			constructor () {
-				super('forward', 'redo', `Отмотать вперед на ${options.playback.step.medium} секунд.`);
+				super('forward', 'redo', `Отмотать вперед на ${options.playback.step.medium} секунд`);
 			}
 		}
 
@@ -765,8 +761,8 @@
 		class RateControl extends Control {
 			constructor () {
 				super();
-				this.down = new Control('rate-down', 'backward', 'Уменьшить скорость проигрывания.');
-				this.up = new Control('rate-up', 'forward', 'Увеличить скоросить проигрывания.');
+				this.down = new Control('rate-down', 'backward', 'Уменьшить скорость проигрывания');
+				this.up = new Control('rate-up', 'forward', 'Увеличить скоросить проигрывания');
 				this.current = new ControlText('rate-current');
 
 				this.down.element.click(e => {
@@ -1055,6 +1051,8 @@
 						.addClass('control-inner volume-slider')
 						.append(this.line));
 
+				this.icon.element.attr('title', 'Отключить звук');
+
 				this.drag = false;
 
 				this.marker.on('mousedown', (e) => {
@@ -1080,12 +1078,10 @@
 			set value (value) {
 				if (value < options.volume.mutelimit) {
 					this.icon.iconName = 'volume-off';
-				}
-				else {
-					if (value < 0.5)
-						this.icon.iconName = 'volume-down';
-					else
-						this.icon.iconName = 'volume-up';
+				} else if (value < 0.5) {
+					this.icon.iconName = 'volume-down';
+				} else {
+					this.icon.iconName = 'volume-up';
 				}
 
 				let p = Math.round(value * 100).toString() + '%';
@@ -1096,9 +1092,10 @@
 			toggleMuted () {
 				if (video.muted == true) {
 					this.value = Cookie.get('volume', options.volume.default);
-				}
-				else
+				} else {
 					this.value = 0;
+				}
+
 			}
 
 			getPosition (y) {
