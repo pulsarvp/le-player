@@ -364,6 +364,16 @@
 				return loaded;
 			}
 
+			get loadedSize () {
+				const START = 0;
+				const END = 1;
+				let sum = 0
+				this.loaded.forEach(item => {
+					sum += item[END] - item[START];
+				});
+				return sum;
+			}
+
 			init () {
 				let dfd = $.Deferred();
 				this._initSubtitles();
@@ -974,9 +984,6 @@
 				});
 
 				/** TODO: Solve problem with open events api */
-				$(video._video).on('leplayer_ended', e => {
-					clearInterval(this.watchBufferInterval);
-				})
 
 				this._initWatchBuffer();
 			}
@@ -1003,6 +1010,7 @@
 
 			_initWatchBuffer () {
 				clearInterval(this.watchBufferInterval);
+				let arr = [];
 				let updateProgressBar = () => {
 					const END = 1;
 					const START = 0;
@@ -1016,8 +1024,7 @@
 						result = result.add(domItem);
 					});
 					this.buffered.html(result);
-
-					if (video.loaded[0] && (1 - video.loaded[0][END]) <= 0.05) {
+					if (video.loaded.length && (1 - video.loadedSize) <= 0.05) {
 						clearInterval(this.watchBufferInterval);
 					}
 				}
