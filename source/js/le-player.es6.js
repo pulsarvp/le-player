@@ -526,6 +526,16 @@
 
 					'volumechange' : (e) => {
 						this.trigger('volumechange');
+					},
+
+					'canplay' : (e) => {
+						loader.hide();
+						this.trigger('canplay');
+					},
+
+					'waiting' : (e) => {
+						loader.show();
+						this.trigger('waiting');
 					}
 
 				});
@@ -1335,15 +1345,19 @@
 		}
 
 		class Icon {
-			constructor(iconName, title) {
+			constructor(iconName, opt) {
+				opt = $.extend({}, {
+					className: '',
+					title: ''
+				}, opt);
 				this._useTag = document.createElementNS('http://www.w3.org/2000/svg', 'use');
 				this._svgTag = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 
 				this.iconName = this._iconName = iconName;
 				this._svgTag.appendChild(this._useTag);
 				this.element = $('<div />')
-					.addClass('leplayer-icon')
-					.attr('title', title)
+					.addClass(`leplayer-icon ${opt.className}`)
+					.attr('title', opt.title)
 					.append($(this._svgTag));
 			}
 
@@ -1371,6 +1385,7 @@
 		 */
 		var container = null;
 		var overlay = null;
+		var loader = null;
 
 		let _createNotification = (opt) => {
 			let notification, closeButton;
@@ -1468,13 +1483,20 @@
 
 		var initDom = function () {
 			let videoContainer;
-			let icon = new Icon('play');
 			overlay = $('<div />')
 				.addClass('play-overlay')
-				.append(icon.element);
+				.append(new Icon('play').element);
+
+			loader = $('<div />')
+				.addClass('leplayer-loader-container')
+				.append(new Icon('refresh', {
+					className : 'leplayer-icon-spin'
+				}).element)
+				.hide();
 			videoContainer = $('<div />')
 				.addClass('leplayer-video')
-				.append(overlay);
+				.append(overlay)
+				.append(loader);
 			container = $('<div />')
 				.addClass('leplayer-container')
 				.append(videoContainer)

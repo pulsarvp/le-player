@@ -496,13 +496,42 @@
 	}
 }
 
-.leplayer-icon {
+.leplayer-icon
+{
 	display: block;
 	min-width: 1em;
 	min-height: 1em;
-	svg {
+	svg
+	{
 		display: block;
 		width: 1em;
 		height: 1em;
+	}
+}
+
+.leplayer-icon-spin
+{
+	animation: leplayer-spin 2s infinite linear;
+}
+
+
+@keyframes leplayer-spin
+{
+	100%
+	{
+		transform: rotate(360deg);
+	}
+}
+
+
+.leplayer-loader-container
+{
+	&:extend(.leplayer-container .play-overlay);
+}
+
+.fullscreen {
+	.leplayer-loader-container
+	{
+		&:extend(.leplayer-container.fullscreen .play-overlay);
 	}
 }
