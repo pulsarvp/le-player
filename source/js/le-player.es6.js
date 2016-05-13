@@ -330,7 +330,6 @@
 					this._video.volume = value;
 				}
 				this._video.mute = (value < options.volume.mutelimit);
-				controls.volume = this._video.volume;
 			}
 
 			get buffered () {
@@ -426,6 +425,10 @@
 				$(this._video).trigger.call($(this._video), `leplayer_${eventName}`, ...args);
 			}
 
+			on (eventName, ...args) {
+				$(this._video).on.call($(this._video), `leplayer_${eventName}`, ...args);
+			}
+
 			_initRate () {
 				this.rate = Cookie.get('rate', options.rate.default);
 			}
@@ -519,6 +522,10 @@
 							container.focus()
 							this.togglePlay();
 						}, 300);
+					},
+
+					'volumechange' : (e) => {
+						this.trigger('volumechange');
 					}
 
 				});
@@ -1305,6 +1312,10 @@
 				this.collections.common.show();
 				this.collections.mini.hide();
 				this.collections.fullscreen.hide();
+
+				video.on('volumechange', (e) => {
+					this.volume = video.volume;
+				});
 			}
 
 			moveTimeMarker () {
