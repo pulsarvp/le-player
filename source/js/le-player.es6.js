@@ -243,6 +243,9 @@
 
 		class Video {
 			constructor (ctx) {
+				this.player = player;
+
+
 				this._ctx = ctx;
 				this._video = ctx[ 0 ];
 				this.fullscreen = new Fullscreen();
@@ -423,7 +426,7 @@
 			}
 
 			trigger (eventName, ...args) {
-				$(this._video).trigger.call($(this._video), `leplayer_${eventName}`, ...args);
+				this.player.trigger.call($(this._video), `leplayer_${eventName}`, ...args);
 			}
 
 			on (eventName, ...args) {
@@ -509,7 +512,8 @@
 
 					'ended' : () => {
 						this.pause();
-						this.trigger('ended');
+						this.player.trigger('ended');
+
 					},
 
 					'dblclick' : () => {
@@ -526,17 +530,17 @@
 					},
 
 					'volumechange' : (e) => {
-						this.trigger('volumechange');
+						this.player.trigger('volumechange', this.volume);
 					},
 
 					'canplay' : (e) => {
 						loader.hide();
-						this.trigger('canplay');
+						this.player.trigger('canplay');
 					},
 
 					'waiting' : (e) => {
 						loader.show();
-						this.trigger('waiting');
+						this.player.trigger('waiting');
 					}
 
 				});
@@ -551,6 +555,7 @@
 			constructor (cssClass, iconClass, title) {
 				if (iconClass) {
 					this.title = title
+					this.player = player;
 					this.icon = new Icon(iconClass);
 					this.icon.element.on({
 						'click' : this._onIconClick.bind(this),
@@ -1083,10 +1088,15 @@
 
 				this.drag = false;
 
+				this.player.on('volumechange', (e) => {
+					this.value = video.volume;
+				})
+
 				this.marker.on('mousedown', (e) => {
 					if (e.which != 1) return;
 					this.drag = true;
 				});
+
 
 				$(document).on({
 					'mousemove' : (e) => {
@@ -1144,7 +1154,7 @@
 
 			onClick(e) {
 				super.onClick(e);
-				console.log('Click');
+				this.player.trigger('section_toggle');
 			}
 		}
 
@@ -1335,9 +1345,6 @@
 				this.collections.mini.hide();
 				this.collections.fullscreen.hide();
 
-				video.on('volumechange', (e) => {
-					this.volume = video.volume;
-				});
 			}
 
 			moveTimeMarker () {
@@ -1389,10 +1396,11 @@
 			constructor(items) {
 				this.element = $('<div />').addClass('leplayer-sections');
 				// element.hasClass('leplayer-sections') || element.addClass'leplayer-sections');
+				this.player = player;
 				let result = '';
 				items.forEach((section, index) => {
 					let item = `
-						<div class="leplayer-section">
+						<div class="leplayer-section" data-time="${section.begin}">
 							<div class="leplayer-section-time">${secondsToTime(section.begin)}</div>
 							<div class="leplayer-section-info">
 								<div class="leplayer-section-title">${section.title}</div>
@@ -1403,6 +1411,15 @@
 					result += item;
 				})
 				this.element.append(result);
+				this.element.find('.leplayer-section').on('click', this.onSectionClick.bind(this));
+				this.player.on('section_toggle', (e) => {
+					this.element.toggle();
+				})
+			}
+
+			onSectionClick(e) {
+				let section = $(e.target).closest('.leplayer-section');
+				video.currentTime = section.attr('data-time');
 			}
 		}
 
@@ -1411,6 +1428,7 @@
 		var volume = options.volume.default;
 		var video = null;
 		var controls = new Controls();
+		var player = this;
 
 		/**
 		 * DOM container to hold video and all other stuff.
@@ -1474,7 +1492,7 @@
 			/** TODO: Use promise to async run this */
 			initDom();
 			initControls();
-			video.init().done(() => { video.trigger('inited')});
+			video.init().done(() => { player.trigger('inited')});
 			initHotKeys();
 
 			// video.trigger(`inited`);
@@ -1548,7 +1566,7 @@
 				'dblclick' : (e) => { element.trigger('dblclick'); }
 			});
 
-			options.dataUrl && getData().done((data) => {
+			options.dataUrl && player.getData().done((data) => {
 				let section = new Sections(data.sections);
 
 				if (sectionContainer) {
@@ -1668,14 +1686,20 @@
 			return (focused.length > 0) || $(container).is(':focus');
 		}
 
-		let getData = () => {
+		this.getData = () => {
 			return $.ajax({
 				url: options.dataUrl,
 				method: 'GET'
 			}).promise()
 		}
 
+		this.trigger = (eventName, ...args) => {
+			$(element).trigger.call($(element), `leplayer_${eventName}`, ...args);
+		}
 
+		this.on = (eventName, ...args) => {
+			$(element).on.call($(element), `leplayer_${eventName}`, ...args);
+		}
 		init();
 
 
