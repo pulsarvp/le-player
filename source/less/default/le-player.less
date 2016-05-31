@@ -535,3 +535,74 @@
 		&:extend(.leplayer-container.fullscreen .play-overlay);
 	}
 }
+
+.leplayer-sections
+{
+	position: absolute;
+	display: flex;
+	top: 0;
+	right: 0;
+	flex-direction: column;
+	height: 100%;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	width: 260px;
+	line-height: 1em;
+	// z-index: @z-index-base + 8;
+}
+
+.leplayer-video
+{
+	.leplayer-section
+	{
+
+		background: fade(white, 80%);
+		&:nth-child(2n)
+		{
+			background: fade(@color-background,80%);
+		}
+		&:hover
+		{
+			background: fade(@color-primary,80%);
+		}
+	}
+}
+
+.leplayer-section
+{
+	cursor: pointer;
+	padding: 5px 0;
+	background: white;
+	&:nth-child(2n)
+	{
+		background: @color-background;
+	}
+	&:hover
+	{
+		background: @color-primary;
+	}
+}
+
+.leplayer-section-time
+{
+	color: #555;
+	display: block;
+	float: left;
+	font-size: 12px;
+	font-weight: 400;
+	text-align: right;
+	width: 45px;
+}
+
+.leplayer-section-info
+{
+	display: block;
+	float: left;
+	padding-left: 10px;
+	padding-right: 7px;
+	width: 213px;
+}
+.leplayer-section-title
+{
+
+}

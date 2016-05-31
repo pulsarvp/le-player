@@ -47,6 +47,12 @@
 			<video id="video3">
 				<source src="corrupted.mp4">
 			</video>
+			<div id="video3section" style="
+				position: relative;
+				width: 300px;
+				height: 300px;
+				float: left;
+			"></div>
 
 		</div>
 	</body>
@@ -61,8 +67,15 @@
 			$('#video1').lePlayer({
 				poster : 'poster.jpg'
 			});
-			$('#video2').lePlayer({ width: 500 });
-			$('#video3').lePlayer({ width: 300 });
+			$('#video2').lePlayer({
+				width: 500,
+				dataUrl : './data.json'
+			});
+			$('#video3').lePlayer({
+				width: 300,
+				dataUrl : './data.json',
+				sectionContainer: '#video3section'
+			});
 		});
 	</script>
 </html>

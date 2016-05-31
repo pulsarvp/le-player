@@ -13,6 +13,7 @@
 		const C_SUBTITLE = 'subtitle';
 		const C_TIMELINE = 'timeline';
 		const C_VOLUME = 'volume';
+		const C_SECTION = "section"
 
 		var options = $.extend({}, {
 			autoplay : false,
@@ -41,7 +42,7 @@
 			},
 			controls : {
 				common : [
-					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen' ],
+					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'section', 'divider', 'fullscreen' ],
 					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download' ]
 				],
 				fullscreen : [
@@ -606,6 +607,9 @@
 					case C_VOLUME:
 						return new VolumeControl();
 
+					case C_SECTION:
+						return new SectionControl();
+
 					default:
 						return null;
 				}
@@ -1132,6 +1136,18 @@
 			}
 		}
 
+		class SectionControl extends Control {
+
+			constructor() {
+				super('', 'list-ul', 'Показать/скрыть секции');
+			}
+
+			onClick(e) {
+				super.onClick(e);
+				console.log('Click');
+			}
+		}
+
 		class Cookie {
 			static get (name, dflt) {
 				var cookies = document.cookie.split(';');
@@ -1148,10 +1164,6 @@
 				d.setDate(d.year + 1);
 				document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
 			};
-		}
-
-		class UserAgent {
-
 		}
 
 		class ControlCollection {
@@ -1373,6 +1385,27 @@
 			}
 		}
 
+		class Sections {
+			constructor(items) {
+				this.element = $('<div />').addClass('leplayer-sections');
+				// element.hasClass('leplayer-sections') || element.addClass'leplayer-sections');
+				let result = '';
+				items.forEach((section, index) => {
+					let item = `
+						<div class="leplayer-section">
+							<div class="leplayer-section-time">${secondsToTime(section.begin)}</div>
+							<div class="leplayer-section-info">
+								<div class="leplayer-section-title">${section.title}</div>
+								<div class="leplayer-section-description">${section.description}</div>
+							</div>
+						</div>
+					`
+					result += item;
+				})
+				this.element.append(result);
+			}
+		}
+
 		var sources = [];
 		var subtitles = [];
 		var volume = options.volume.default;
@@ -1386,6 +1419,7 @@
 		var container = null;
 		var overlay = null;
 		var loader = null;
+		var sectionContainer = null;
 
 		let _createNotification = (opt) => {
 			let notification, closeButton;
@@ -1503,11 +1537,25 @@
 				.attr('tabindex', 0)
 				.css('width', element.width() + 'px');
 
+			if(options.sectionContainer) {
+				sectionContainer = $(options.sectionContainer).addClass('leplayer-section-container');
+			}
+
 			element.before(container);
 			videoContainer.append(element);
 			overlay.on({
 				'click'    : (e) => { element.trigger('click'); },
 				'dblclick' : (e) => { element.trigger('dblclick'); }
+			});
+
+			options.dataUrl && getData().done((data) => {
+				let section = new Sections(data.sections);
+
+				if (sectionContainer) {
+					sectionContainer.append(section.element);
+				} else {
+					videoContainer.append(section.element);
+				}
 			});
 		};
 
@@ -1618,6 +1666,13 @@
 		var isFocused = function () {
 			let focused = $(container).find(':focus');
 			return (focused.length > 0) || $(container).is(':focus');
+		}
+
+		let getData = () => {
+			return $.ajax({
+				url: options.dataUrl,
+				method: 'GET'
+			}).promise()
 		}
 
 
