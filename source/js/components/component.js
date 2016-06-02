@@ -16,7 +16,6 @@ class Component {
 	constructor(player, options) {
 		options = this.options = $.extend({}, this.options, options);
 		this.player = player;
-		console.log('player', this.player)
 
 		if (options.element) {
 			this.element = options.element;

@@ -34,7 +34,7 @@ class SourceControl extends ControlContainer {
 		let s = this.getByIndex(index);
 		if (s != null) {
 			this.player.video.source = s.data('src');
-			controls.download = s.data('src');
+			this.player.controls.download = s.data('src');
 		}
 	}
 
