@@ -4,7 +4,7 @@
 {
 	color: @color-text;
 	display: inline-block;
-	font-family: "PT Sans", "Open Sans", "Verdana", "Arial", sans-serif;
+	font-family: "Fira Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
 	line-height: 0;
 	outline: 0;
 	position: relative;
@@ -559,11 +559,15 @@
 		background: fade(white, 80%);
 		&:nth-child(2n)
 		{
-			background: fade(@color-background,80%);
+			background: fade(@color-section-2n,80%);
 		}
 		&:hover
 		{
-			background: fade(@color-primary,80%);
+			background: fade(@color-section-hover,80%);
+		}
+		.leplayer-section--active
+		{
+			background: fade(@color-section-active, 80%);
 		}
 	}
 }
@@ -573,13 +577,19 @@
 	cursor: pointer;
 	padding: 5px 0;
 	background: white;
+	color: @color-dark;
+	box-sizing: content-box;
 	&:nth-child(2n)
 	{
-		background: @color-background;
+		background: @color-section-2n;
 	}
 	&:hover
 	{
-		background: @color-primary;
+		background: @color-section-hover;
+	}
+	.leplayer-section--active
+	{
+		background: @color-active;
 	}
 }
 
@@ -604,5 +614,11 @@
 }
 .leplayer-section-title
 {
+	font-size: 12px;
+	font-weight: 500;
+}
 
+.leplayer-section-description
+{
+	font-size: 12px;
 }

@@ -1,6 +1,7 @@
 // rgb(26, 74, 126)
 @color-primary: hsl(211, 65%, 30%);
 @color-active: white;
+@color-dark: black;
 
 // hsl(211,30%,90%)
 // rgb(225, 232, 239)
@@ -53,6 +54,14 @@
 @color-fs-marker-shadow-border: rgba(225, 232, 239, 0.5);
 @color-fs-marker-shadow-time: rgba(118, 138, 167, 0.8);
 @color-fs-text: #e1e8ef;
+
+@color-section-active: @color-disabled;
+
+// hsl(211,23%,70%)
+// rgb(157, 178, 200)
+@color-section-hover: desaturate(lighten(@color-primary, 40%), 35%);
+
+@color-section-2n: desaturate(lighten(@color-primary, 60%), 32%);
 
 @control-font-size: 16px;
 @control-text-font-size: 12px;
