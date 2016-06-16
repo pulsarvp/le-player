@@ -41,18 +41,10 @@
   display: none !important;
 }
 .leplayer-container .play-overlay {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-align-content: center;
-      -ms-flex-line-pack: center;
-          align-content: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
   background: rgba(0, 0, 0, 0.5);
   color: #7fa9c7;
   cursor: pointer;
