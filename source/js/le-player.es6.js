@@ -116,7 +116,7 @@ import Cookie from './utils/cookie';
 		class Fullscreen {
 
 			constructor () {
-                this.player = player;
+				this.player = player;
 				this._collection = controls.fullscreen;
 				this._hideTimeout = null;
 				this.fullscreenEnabled = false;
@@ -180,7 +180,7 @@ import Cookie from './utils/cookie';
 			}
 
 			showElements () {
-                this.player.trigger('fullscreenchange');
+				this.player.trigger('fullscreenchange');
 				container.addClass('fullscreen');
 				controls.fullscreen.show();
 				controls.common.hide();
@@ -204,7 +204,7 @@ import Cookie from './utils/cookie';
 			}
 
 			hideElements () {
-                this.player.trigger('fullscreenchange');
+				this.player.trigger('fullscreenchange');
 				container.removeClass('fullscreen');
 				controls.fullscreen.hide();
 				controls.common.show();
@@ -216,19 +216,19 @@ import Cookie from './utils/cookie';
 			toggle () {
 				let containerEl = container[ 0 ];
 				if (this.is()) {
-					if (document.exitFullscreen)                document.exitFullscreen();
-					else if (document.mozCancelFullScreen)      document.mozCancelFullScreen();
+					if (document.exitFullscreen)				document.exitFullscreen();
+					else if (document.mozCancelFullScreen)	  document.mozCancelFullScreen();
 					else if (document.webkitCancelFullScreen)   document.webkitCancelFullScreen();
-					else if (document.msExitFullscreen)         document.msExitFullscreen();
-					else if (document.webkitExitFullscreen)     document.webkitExitFullscreen();
+					else if (document.msExitFullscreen)		 document.msExitFullscreen();
+					else if (document.webkitExitFullscreen)	 document.webkitExitFullscreen();
 					this.hideElements(); // @TODO: make this only if fullscreen fired.
 					this.fullscreenEnabled = false;
 				}
 				else {
-					if (containerEl.requestFullScreen)            containerEl.requestFullScreen();
+					if (containerEl.requestFullScreen)			containerEl.requestFullScreen();
 					else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();
-					else if (containerEl.mozRequestFullScreen)    containerEl.mozRequestFullScreen();
-					else if (containerEl.msExitFullscreen)        containerEl.msRequestFullscreen();
+					else if (containerEl.mozRequestFullScreen)	containerEl.mozRequestFullScreen();
+					else if (containerEl.msExitFullscreen)		containerEl.msRequestFullscreen();
 					this.showElements(); // @TODO: make this only if fullscreen fired.
 					this.fullscreEnabled = true;
 				}
@@ -764,7 +764,8 @@ import Cookie from './utils/cookie';
 				this.element.append(this._createSections(items));
 				this.element.find('.leplayer-section').on('click', this.onSectionClick.bind(this));
 
-				this.activeSection = 0
+				this._activeSection = this.getSectionByIndex(0);
+				this.setActiveByIndex(0);
 
 				this.player.trigger('sectionsinit', { items : this.items });
 
@@ -776,7 +777,7 @@ import Cookie from './utils/cookie';
 					}
 				})
 
-				//this.player.on('timeupdate', this.onTimeUpdate.bind(this));
+				this.player.on('timeupdate', this.onTimeUpdate.bind(this));
 			}
 
 
@@ -785,7 +786,8 @@ import Cookie from './utils/cookie';
 				let result = '';
 				items.forEach((section, index) => {
 					let item = `
-						<div class="leplayer-section" data-time="${section.begin}">
+						<div class="leplayer-section ${!index ? 'leplayer-section--active' : ''}"
+							data-time="${section.begin}" data-index="${index}">
 							<div class="leplayer-section-time">${secondsToTime(section.begin)}</div>
 							<div class="leplayer-section-info">
 								<div class="leplayer-section-title">${section.title}</div>
@@ -803,17 +805,33 @@ import Cookie from './utils/cookie';
 				video.currentTime = section.attr('data-time');
 			}
 
+			setActiveByIndex(index) {
+				if (this._activeSection.attr('data-index') == index) {
+					return
+				}
+				this._activeSection.removeClass('leplayer-section--active');
+
+				this._activeSection = this.getSectionByIndex(index);
+				this._activeSection.addClass('leplayer-section--active');
+				this.element.animate({
+					scrollTop : this._activeSection.position().top
+				}, 1000)
+			}
+
+			getSectionByIndex(index) {
+				return this.element.find(`.leplayer-section[data-index="${index}"]`);
+			}
+
 			onTimeUpdate(e, data) {
 				let currentTime = data.time;
-				this.items.reduce((section, nextSection, index) => {
-					if (i != 0) {
-						let currentIndex = i - 1;
-						let nextIndex = i;
-						if (currentTime < nextSection.begin) {
-							this.setActiveSection(currentIndex);
-						}
+
+				for (let i = 0; i < this.items.length; i++) {
+					let section = this.items[i];
+					if (currentTime <= section.end) {
+						this.setActiveByIndex(i);
+						break;
 					}
-				})
+				}
 			}
 		}
 
@@ -930,7 +948,7 @@ import Cookie from './utils/cookie';
 			}
 		};
 
-        var initSections = function() {
+		var initSections = function() {
 			options.dataUrl && player.getData().done((data) => {
 				let section = new Sections(data.sections);
 
@@ -940,7 +958,7 @@ import Cookie from './utils/cookie';
 					videoContainer.append(section.element);
 				}
 			});
-        }
+		}
 
 		var initDom = function () {
 			overlay = $('<div />')
@@ -949,7 +967,7 @@ import Cookie from './utils/cookie';
 			loader = $('<div />')
 				.addClass('leplayer-loader-container')
 				.append(new Icon(player, {
-					iconName : 'refresh', 
+					iconName : 'refresh',
 					className : 'leplayer-icon-spin'
 					}).element)
 				.hide();
@@ -970,7 +988,7 @@ import Cookie from './utils/cookie';
 			element.before(container);
 			videoContainer.append(element);
 			overlay.on({
-				'click'    : (e) => { element.trigger('click'); },
+				'click'	: (e) => { element.trigger('click'); },
 				'dblclick' : (e) => { element.trigger('dblclick'); }
 			});
 		};

@@ -587,6 +587,7 @@
 	{
 
 		background: fade(white, 80%);
+
 		&:nth-child(2n)
 		{
 			background: fade(@color-section-2n,80%);
@@ -595,7 +596,7 @@
 		{
 			background: fade(@color-section-hover,80%);
 		}
-		.leplayer-section--active
+		&.leplayer-section--active
 		{
 			background: fade(@color-section-active, 80%);
 		}
@@ -617,9 +618,14 @@
 	{
 		background: @color-section-hover;
 	}
-	.leplayer-section--active
+	&.leplayer-section--active
 	{
-		background: @color-active;
+		background: @color-section-hover;
+
+		.leplayer-section-description
+		{
+			display: block;
+		}
 	}
 }
 
@@ -651,5 +657,5 @@
 .leplayer-section-description
 {
 	font-size: 12px;
+	display: none;
 }
-
