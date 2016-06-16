@@ -8,7 +8,7 @@
 @color-background: desaturate(lighten(@color-primary, 60%), 35%);
 
 // hsl(211,22%,56%)
-// rgb(118, 138, 167)
+// rgb(118, 142, 167)
 @color-background-line: desaturate(lighten(@color-primary, 25%), 45%);
 
 @color-background-line-active: fade(@color-primary, 60%);;
@@ -36,6 +36,15 @@
 // rgba(118, 138, 167, 0.8)
 // hsla(211, 20, 55, 0.5)
 @color-marker-shadow-time: fade(desaturate(lighten(@color-primary, 25%), 45%), 80%);
+
+
+// hsl(211, 25, 25)
+// rgb(48, 63, 80)
+@color-timeline-section-even: desaturate(darken(@color-primary, 5%), 40%);
+
+// hsl(211, 22, 56)
+// rgb(118, 142, 167)
+@color-timeline-section-odd: desaturate(lighten(@color-primary, 25%), 45%);
 
 @color-text: @color-primary;
 

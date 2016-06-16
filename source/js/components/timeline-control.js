@@ -21,6 +21,7 @@ class TimelineControl extends Control {
 			className : 'timeline timeline-container'
 		}, options);
 		super(player, options);
+		this.player.on('sectionsinit', this._onSectionsInit.bind(this));
 	}
 
 	createElement() {
@@ -99,7 +100,6 @@ class TimelineControl extends Control {
 			this.drag = true;
 		});
 
-		this.player.on('sectionsinit', this._onSectionsInit.bind(this));
 
 		$(document).on({
 
@@ -125,18 +125,18 @@ class TimelineControl extends Control {
 		let sections = data.items;
 		let video = this.player.video;
 		let duration = video.duration;
-		sections.reduce((section, nextSection, i) => {
-			if (i != 0) {
-				let length = ( nextSection.begin - section.begin );
-				let item = $('<div />')
-					.addClass('timeline-section')
-					.css({
-						width: length / duration + '%',
-						left: section.begin / duration + '%'
-					})
-			}
-			return nextSection;
-		}, {});
+		let result = $('<div />');
+		sections.forEach((section) => {
+			let length = (section.end - section.begin);
+			let item = $('<div />')
+				.addClass('timeline-section')
+				.css({
+					width: length / duration * 100 + '%',
+					left: section.begin / duration * 100 + '%'
+				});
+			result.append(item);
+		})
+        this.line.append(result);
 	}
 
 	getPosition (x) {

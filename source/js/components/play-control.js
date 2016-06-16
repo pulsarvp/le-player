@@ -34,7 +34,6 @@ class PlayControl extends Control {
 
 	onClick(e) {
 		//super.onClick(e);
-		console.log('click');
 		this.player.video.togglePlay();
 	}
 }

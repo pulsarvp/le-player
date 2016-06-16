@@ -512,6 +512,7 @@ import Cookie from './utils/cookie';
 
 					'timeupdate' : (e) => {
 						controls.moveTimeMarker();
+						this.player.trigger('timeupdate', { time : video.currentTime });
 					},
 
 					'ended' : () => {
@@ -534,7 +535,7 @@ import Cookie from './utils/cookie';
 					},
 
 					'volumechange' : (e) => {
-						this.player.trigger('volumechange', this.volume);
+						this.player.trigger('volumechange', { volume : this.volume });
 					},
 
 					'canplay' : (e) => {
@@ -598,7 +599,6 @@ import Cookie from './utils/cookie';
 			}
 
 			add (name) {
-				console.log(player, 'in le-player.js');
 				if (name == C_DIVIDER) {
 					return controlFactory(player, name);
 				} else {
@@ -745,9 +745,38 @@ import Cookie from './utils/cookie';
 
 		class Sections {
 			constructor(items) {
-				this.element = $('<div />').addClass('leplayer-sections');
-				// element.hasClass('leplayer-sections') || element.addClass'leplayer-sections');
 				this.player = player;
+
+				this.items = items;
+				for ( let i = 0; i < this.items.length; i++) {
+					let endSection;
+					if (i < (this.items.length - 1)) {
+						endSection = this.items[i+1].begin
+					} else {
+						endSection = video.duration;
+					}
+					this.items[i].end = endSection;
+				}
+
+				this.player.on({
+					'section_toggle' : (e) => {
+						this.element.toggle();
+					},
+					'timeupdate' : this.onTimeUpdate.bind(this)
+				})
+
+				this.element = $('<div />').addClass('leplayer-sections');
+				this.element.append(this._createSections(items));
+				this.element.find('.leplayer-section').on('click', this.onSectionClick.bind(this));
+
+				this.activeSection = 0
+
+				this.player.trigger('sectionsinit', { items : this.items });
+			}
+
+
+
+			_createSections(items) {
 				let result = '';
 				items.forEach((section, index) => {
 					let item = `
@@ -760,18 +789,26 @@ import Cookie from './utils/cookie';
 						</div>
 					`
 					result += item;
-				})
-				this.element.append(result);
-				this.element.find('.leplayer-section').on('click', this.onSectionClick.bind(this));
-				this.player.on('section_toggle', (e) => {
-					this.element.toggle();
-				})
-				this.player.trigger('sectionsinit', { items });
+				});
+				return result;
 			}
 
 			onSectionClick(e) {
 				let section = $(e.target).closest('.leplayer-section');
 				video.currentTime = section.attr('data-time');
+			}
+
+			onTimeUpdate(e, data) {
+				let currentTime = data.time;
+				this.items.reduce((section, nextSection, index) => {
+					if (i != 0) {
+						let currentIndex = i - 1;
+						let nextIndex = i;
+						if (currentTime < nextSection.begin) {
+							this.setActiveSection(currentIndex);
+						}
+					}
+				})
 			}
 		}
 
@@ -790,6 +827,7 @@ import Cookie from './utils/cookie';
 		var overlay = null;
 		var loader = null;
 		var sectionContainer = null;
+		let videoContainer = null;
 
 		let _createNotification = (opt) => {
 			let notification, closeButton;
@@ -844,10 +882,12 @@ import Cookie from './utils/cookie';
 			/** TODO: Use promise to async run this */
 			initDom();
 			initControls();
-			video.init().done(() => { player.trigger('inited')});
+			video.init().done(() => {
+				initSections();
+				player.trigger('inited');
+			});
 			initHotKeys();
 
-			// video.trigger(`inited`);
 
 		};
 
@@ -885,8 +925,19 @@ import Cookie from './utils/cookie';
 			}
 		};
 
+        var initSections = function() {
+			options.dataUrl && player.getData().done((data) => {
+				let section = new Sections(data.sections);
+
+				if (sectionContainer) {
+					sectionContainer.append(section.element);
+				} else {
+					videoContainer.append(section.element);
+				}
+			});
+        }
+
 		var initDom = function () {
-			let videoContainer;
 			overlay = $('<div />')
 				.addClass('play-overlay')
 				.append(new Icon(player, { iconName : 'play' }).element);
@@ -916,16 +967,6 @@ import Cookie from './utils/cookie';
 			overlay.on({
 				'click'    : (e) => { element.trigger('click'); },
 				'dblclick' : (e) => { element.trigger('dblclick'); }
-			});
-
-			options.dataUrl && player.getData().done((data) => {
-				let section = new Sections(data.sections);
-
-				if (sectionContainer) {
-					sectionContainer.append(section.element);
-				} else {
-					videoContainer.append(section.element);
-				}
 			});
 		};
 

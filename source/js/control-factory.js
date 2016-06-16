@@ -46,7 +46,6 @@ export default function controlFactory(player, name) {
 			return new FullscreenControl(player);
 
 		case C_PLAY:
-			//console.log(new PlayControl());
 			return new PlayControl(player);
 
 		case C_RATE:

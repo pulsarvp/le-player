@@ -416,6 +416,21 @@
 		width: 0;
 		z-index: @z-index-base + 5;
 	}
+	.timeline-section
+	{
+		background: @color-timeline-section-odd;
+		bottom: 0;
+		left: 0;
+		position: absolute;
+		top: 0;
+		//transition: width @timeline-transition;
+		width: 0;
+		z-index: @z-index-base + 5;
+	}
+	.timeline-section:nth-child(2n)
+	{
+		background: @color-timeline-section-even;
+	}
 	.time-buffered
 	{
 		background-color: @color-background-line-buffered;
@@ -622,3 +637,4 @@
 {
 	font-size: 12px;
 }
+

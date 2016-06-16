@@ -21,7 +21,6 @@ class VolumeControl extends Control {
 			iconName : 'volume-down',
 			className : 'volume-control'
 		}, options);
-		console.log('volume', player)
 		super(player, options);
 	}
 
