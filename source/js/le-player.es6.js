@@ -815,7 +815,7 @@ import Cookie from './utils/cookie';
 		var sources = this.sources =[];
 		var subtitles = [];
 		var volume = options.volume.default;
-		var controls = new Controls();
+		var controls = this.controls = new Controls();
 		var player = this;
 		var video = null;
 

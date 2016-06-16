@@ -46,7 +46,7 @@ class SubtitleControl extends ControlContainer {
 	onItemClick (index) {
 		super.onItemClick(index);
 		let t = this.getByIndex(index);
-		let video = this.video.player;
+		let video = this.player.video;
 		if (t != null)
 			video.track = t.data('language');
 		else

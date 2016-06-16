@@ -19,13 +19,18 @@ class VolumeControl extends Control {
 	constructor (player, options={}) {
 		options = $.extend({}, {
 			iconName : 'volume-down',
-			className : 'volume-control'
+			className : 'volume-control control-container'
 		}, options);
 		super(player, options);
+        this.player.on('volumechange', (e, data) => {
+            this.value = data.volume;
+        })
 	}
 
 	createElement() {
 		super.createElement();
+		let drag = false;
+
 		this.marker = $('<div/>').addClass('volume-marker');
 
 		this.active = $('<div/>').addClass('volume-active');
@@ -42,14 +47,13 @@ class VolumeControl extends Control {
 				}
 			});
 
-		this.element.addClass('control-container')
+		this.element
 			.append($('<div />')
 				.addClass('control-inner volume-slider')
 				.append(this.line));
 
 		this.icon.element.attr('title', 'Отключить звук');
 
-		let drag = false;
 		this.marker.on('mousedown', (e) => {
 			if (e.which != 1) return;
 			drag = true;
@@ -68,11 +72,12 @@ class VolumeControl extends Control {
 				drag = false;
 			}
 		});
+        return this.element;
 	}
 
 
 	set value (value) {
-		if (value < options.volume.mutelimit) {
+		if (value < this.player.options.volume.mutelimit) {
 			this.icon.iconName = 'volume-off';
 		} else if (value < 0.5) {
 			this.icon.iconName = 'volume-down';
