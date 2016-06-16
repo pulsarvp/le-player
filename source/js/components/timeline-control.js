@@ -22,6 +22,7 @@ class TimelineControl extends Control {
 		}, options);
 		super(player, options);
 		this.player.on('sectionsinit', this._onSectionsInit.bind(this));
+        this._initWatchBuffer()
 	}
 
 	createElement() {

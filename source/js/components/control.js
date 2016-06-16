@@ -73,6 +73,7 @@ class Control extends Component {
 		if (this.disabled) {
 			return false;
 		}
+		this._onClick(e);
 		this.icon.element.trigger('leplayer_click');
 	}
 	/**

@@ -425,7 +425,7 @@
 		top: 0;
 		//transition: width @timeline-transition;
 		width: 0;
-		z-index: @z-index-base + 5;
+		z-index: @z-index-base + 4;
 	}
 	.timeline-section:nth-child(2n)
 	{
@@ -563,7 +563,22 @@
 	overflow-y: scroll;
 	width: 260px;
 	line-height: 1em;
-	// z-index: @z-index-base + 8;
+	z-index: @z-index-base + 6;
+
+}
+
+.leplayer-sections--hidden
+{
+	display: none;
+}
+
+.leplayer-container.fullscreen
+{
+
+	.leplayer-sections
+	{
+		z-index: @z-index-fullscreen + 6;
+	}
 }
 
 .leplayer-video

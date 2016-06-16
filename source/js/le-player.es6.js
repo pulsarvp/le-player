@@ -431,10 +431,12 @@ import Cookie from './utils/cookie';
 
 			trigger (eventName, ...args) {
 				this.player.trigger.call($(this._video), `leplayer_${eventName}`, ...args);
+				return this;
 			}
 
 			on (eventName, ...args) {
 				$(this._video).on.call($(this._video), `leplayer_${eventName}`, ...args);
+				return this;
 			}
 
 			_initRate () {
@@ -758,13 +760,6 @@ import Cookie from './utils/cookie';
 					this.items[i].end = endSection;
 				}
 
-				this.player.on({
-					'section_toggle' : (e) => {
-						this.element.toggle();
-					},
-					'timeupdate' : this.onTimeUpdate.bind(this)
-				})
-
 				this.element = $('<div />').addClass('leplayer-sections');
 				this.element.append(this._createSections(items));
 				this.element.find('.leplayer-section').on('click', this.onSectionClick.bind(this));
@@ -772,6 +767,16 @@ import Cookie from './utils/cookie';
 				this.activeSection = 0
 
 				this.player.trigger('sectionsinit', { items : this.items });
+
+				this.player.on('section_toggle', (e) => {
+					if (this.element.hasClass('leplayer-sections--hidden')) {
+						this.element.removeClass('leplayer-sections--hidden');
+					} else {
+						this.element.addClass('leplayer-sections--hidden');
+					}
+				})
+
+				//this.player.on('timeupdate', this.onTimeUpdate.bind(this));
 			}
 
 
