@@ -80,7 +80,7 @@ class TimelineControl extends Control {
 					if (e.which !== 1) return;
 					if (this.drag) return;
 					this.hardMove(this.getPosition(e.pageX));
-					video.seek(video.duration * this.getPosition(e.pageX));
+					video.currentTime = (video.duration * this.getPosition(e.pageX));
 				},
 
 				'touchmove' : (e) => {
