@@ -25,7 +25,7 @@ class Control extends Component {
 
 		this.options.iconName && this.icon.element.on({
 			'click' : this._onIconClick.bind(this),
-			'leplayer_icon_click' : this.onIconClick.bind(this)
+			'leplayer_click' : this.onIconClick.bind(this)
 		});
 	}
 
@@ -70,10 +70,12 @@ class Control extends Component {
 	}
 
 	_onIconClick (e) {
+		event.stopPropagation();
+		event.preventDefault();
 		if (this.disabled) {
 			return false;
 		}
-		this.icon.element.trigger('leplayer_icon_click');
+		this.icon.element.trigger('leplayer_click');
 	}
 	/**
 	 *

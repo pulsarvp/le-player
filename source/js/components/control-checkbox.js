@@ -24,6 +24,7 @@ class ControlCheckbox extends Control {
 		val = !!val;
 		this._checked = val
 		this.element.toggleClass('control-checkbox--checked', val);
+		this.element.trigger('leplayer_checked', { checked  : val });
 	}
 
 	get checked () {
