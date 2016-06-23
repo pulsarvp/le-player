@@ -1,5 +1,10 @@
 @import "variables.less";
 
+
+.undefined {
+	background-color: red !important;
+}
+
 .leplayer-container
 {
 	color: @color-text;
@@ -244,6 +249,7 @@
 				color: @color-disabled;
 			}
 		}
+
 		&.play
 		{
 			background: @color-background-play;
@@ -255,6 +261,14 @@
 				background: @color-text;
 				color: @color-background;
 			}
+		}
+	}
+	.control-checkbox
+	{
+		&.control-checkbox--checked
+		{
+			background: @color-text;
+			color: @color-background;
 		}
 	}
 	.control-container

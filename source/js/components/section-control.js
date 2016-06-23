@@ -6,24 +6,26 @@
  */
 
 import $ from 'jquery';
-import Control from './control';
+import ControlCheckbox from './control-checkbox';
 
 /**
  * @param {Player} player Main player
  * @class SectionControl
  */
-class SectionControl extends Control {
+class SectionControl extends ControlCheckbox {
 	constructor (player, options={}) {
 		options = $.extend({}, {
 			iconName : 'list-ul',
-			title : 'Показать/скрыть секции'
+			className : 'control--type_section',
+			title : 'Показать/скрыть секции',
+			checked : true
 		}, options);
 		super(player, options);
 	}
 
 	onClick(e) {
 		super.onClick(e);
-		this.player.trigger('section_toggle');
+		this.player.trigger('section_toggle', { checked : this.checked });
 	}
 }
 
