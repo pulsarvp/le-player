@@ -30,7 +30,7 @@ import Cookie from './utils/cookie';
 			svgPath : '../dist/svg/svg-defs.svg',
 			width : 'auto',
 			fullscreen : {
-				hideTimelineTime : 7000
+				hideTimelineTime : 700000
 			},
 			rate : {
 				step : 0.25,
@@ -51,7 +51,7 @@ import Cookie from './utils/cookie';
 					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO ]
 				],
 				fullscreen : [
-					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO, 'divider', 'fullscreen' ]
+					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', C_KEYBINDING_INFO,  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'fullscreen' ]
 				]
 			},
 			volume : {

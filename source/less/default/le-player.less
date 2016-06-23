@@ -138,6 +138,18 @@
 			background: @color-fs-background;
 			z-index: @z-index-fullscreen + 8;
 		}
+		.info-control
+		{
+			&__content
+			{
+				background: fade(@color-fs-background, 80%);
+				color: white;
+			}
+
+			&__item
+			{
+			}
+		}
 		.control-text
 		{
 			background: @color-fs-background;
@@ -325,6 +337,11 @@
 	}
 	.control-container
 	{
+		display: table-cell;
+		height: 32px;
+		position: relative;
+		width: 1%;
+
 		&__item
 		{
 			display: block;
