@@ -624,7 +624,7 @@ import Cookie from './utils/cookie';
 					$.isFunction(this.items[i].init) && this.items[i].init();
 				}
 				this.initTimeline();
-				this.totalTime = secondsToTime(video.duration);
+				//this.totalTime = secondsToTime(video.duration);
 				this.download = sources[ 0 ].src;
 			}
 
@@ -905,11 +905,11 @@ import Cookie from './utils/cookie';
 			/** TODO: Use promise to async run this */
 			initDom();
 			initControls();
+			initHotKeys();
 			video.init().done(() => {
 				initSections();
 				player.trigger('inited');
 			});
-			initHotKeys();
 
 
 		};

@@ -21,8 +21,9 @@ class TimelineControl extends Control {
 			className : 'timeline timeline-container'
 		}, options);
 		super(player, options);
+		this.player.on('inited', this._onPlayerInited.bind(this));
 		this.player.on('sectionsinit', this._onSectionsInit.bind(this));
-        this._initWatchBuffer()
+		this._initWatchBuffer()
 	}
 
 	createElement() {
@@ -122,6 +123,14 @@ class TimelineControl extends Control {
 		});
 	}
 
+	_onPlayerInited(e) {
+		let video = this.player.video;
+		this.totalTime.text = secondsToTime(video.duration);
+		this.currentTime.element.css({
+			'width' : this.totalTime.element.width()
+		})
+	}
+
 	_onSectionsInit(e, data) {
 		let sections = data.items;
 		let video = this.player.video;
@@ -137,7 +146,7 @@ class TimelineControl extends Control {
 				});
 			result.append(item);
 		})
-        this.line.append(result);
+		this.line.append(result);
 	}
 
 	getPosition (x) {
