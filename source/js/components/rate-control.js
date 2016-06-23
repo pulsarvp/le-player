@@ -40,7 +40,7 @@ class RateControl extends Control {
 		this.upControl = new Control(this.player, {
 			className : 'rate-up',
 			iconName : 'forward',
-			title : 'Увеличить скоросить проигрывания'
+			title : 'Увеличить скорость проигрывания'
 		});
 		this.currentRate = new ControlText({ className : 'rate-current'});
 
