@@ -16,24 +16,27 @@ import Icon from './icon';
 class DownloadControl extends Control {
 	constructor (player, options={}) {
 		options = $.extend({
-			title : 'Скачать видео'
+			title : 'Скачать видео',
+			className : 'download',
 		}, options);
 		super(player, options);
 	}
 
 	createElement() {
+		/** TODO: Доопределить этот метод, а не переопредлеить */
 		this.element = $('<a />')
 			.attr({
 				href : '',
 				target : '_blank',
 				download : true,
-				title : this.options.title
+				title : this.options.title,
 			})
-			.append(new Icon(this.player, 'download').element);
+			.addClass(this.buildCSSClass())
+			.append(new Icon(this.player, { iconName : 'download' } ).element);
 	}
 
 	buildCSSClass() {
-		return `${super.buildCSSClass()} donwload`;
+		return `${super.buildCSSClass()}`;
 	}
 
 	set link (value) {

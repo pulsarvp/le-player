@@ -6,7 +6,7 @@
  */
 
 import $ from 'jquery';
-import Control from './control';
+import ControlDropdown from './control-dropdown';
 import Icon from './icon';
 import Cookie from '../utils/cookie';
 
@@ -14,17 +14,18 @@ import Cookie from '../utils/cookie';
  * @param {Player} player Main player
  * @class Control
  */
-class VolumeControl extends Control {
+class VolumeControl extends ControlDropdown {
 
 	constructor (player, options={}) {
 		options = $.extend({}, {
 			iconName : 'volume-down',
-			className : 'volume-control control-container'
+			className : 'volume-control'
 		}, options);
 		super(player, options);
-        this.player.on('volumechange', (e, data) => {
-            this.value = data.volume;
-        })
+
+		this.player.on('volumechange', (e, data) => {
+			this.value = data.volume;
+		})
 	}
 
 	createElement() {
@@ -47,10 +48,9 @@ class VolumeControl extends Control {
 				}
 			});
 
-		this.element
-			.append($('<div />')
-				.addClass('control-inner volume-slider')
-				.append(this.line));
+		this.dropdownContent
+			.addClass('volume-slider')
+			.append(this.line);
 
 		this.icon.element.attr('title', 'Отключить звук');
 
@@ -72,7 +72,7 @@ class VolumeControl extends Control {
 				drag = false;
 			}
 		});
-        return this.element;
+		return this.element;
 	}
 
 

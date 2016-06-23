@@ -1,7 +1,7 @@
 'use strict';
 import Control from './components/control';
 import Icon from './components/icon';
-import controlFactory from './control-factory';
+import controlFactory, { C_KEYBINDING_INFO } from './control-factory';
 import Cookie from './utils/cookie';
 
 (function ($) {
@@ -48,10 +48,10 @@ import Cookie from './utils/cookie';
 			controls : {
 				common : [
 					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'section', 'divider', 'fullscreen' ],
-					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download' ]
+					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO ]
 				],
 				fullscreen : [
-					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'fullscreen' ]
+					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO, 'divider', 'fullscreen' ]
 				]
 			},
 			volume : {
@@ -62,24 +62,32 @@ import Cookie from './utils/cookie';
 			keyBinding : {
 				play : {
 					key : 32,
+					info : ['Space'],
+					description : 'Включить/выключить видео',
 					fn : (video) => {
 						video.togglePlay();
 					}
 				},
 				backwardMedium : {
 					key : 37,
+					info : ['←'],
+					description : 'Описание стрелки влево',
 					fn : (video) => {
 						video.currentTime -= options.playback.step.medium;
 					}
 				},
 				forwardMedium : {
 					key : 39,
+					info : ['→'],
+					description : 'Описание стрелки вправо',
 					fn : (video) => {
 						video.currentTime += options.playback.step.medium;
 					}
 				},
 				backwardShort : {
 					shiftKey : true,
+					info : ['Shift', '←'],
+					description : 'Описание стрелки влево + shitf',
 					key : 37,
 					fn : (video) => {
 						video.currentTime -= options.playback.step.short;
@@ -88,6 +96,8 @@ import Cookie from './utils/cookie';
 				forwardShort : {
 					shiftKey : true,
 					key : 39,
+					info : ['Shift', '→'],
+					description : 'Описание стрелки вправо + shitf',
 					fn : (video) => {
 						video.currentTime += options.playback.step.short;
 					}
@@ -95,6 +105,8 @@ import Cookie from './utils/cookie';
 
 				volumeUp : {
 					key : 38,
+					info : ['↑'],
+					description : 'Стрелка вврех',
 					fn : (video) => {
 						video.volume += options.volume.step;
 					}
@@ -102,6 +114,8 @@ import Cookie from './utils/cookie';
 
 				volumeDown : {
 					key : 40,
+					info : ['↓'],
+					description : 'Стрелка вниз',
 					fn : (video) => {
 						video.volume -= options.volume.step;
 					}

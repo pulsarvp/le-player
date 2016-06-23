@@ -6,79 +6,74 @@
  */
 
 import $ from 'jquery';
-import Control from './control';
+import ControlDropdown from './control-dropdown';
 
 /**
  * @param {Player} player Main player
  * @class ControlContainer
  */
-class ControlContainer extends Control {
+class ControlContainer extends ControlDropdown {
 
 	constructor(player, options) {
 		super(player, options);
-		this._index = 0;
+		this._active = null;
 		this.list = [];
 	}
 
-	createElement() {
-		super.createElement();
-		this.listElement = $('<div />').addClass('control-inner');
-		this.element.append(this.listElement);
+	getByIndex(index) {
+		return this.list[index];
+	}
+
+	setActiveByIndex(index) {
+		if (this.active) {
+			this.active.removeClass('control-container__item--active');
+		}
+		this._active = this.list[index].addClass('control-container__item--active');
+		return this._active;
 	}
 
 
 	get active () {
-		for (let i in this.list)
-			if (this.list[ i ].hasClass('active'))
-				return this.list[ i ];
-		return null;
-	}
-
-	set active (index) {
-		let hasActive = false;
-		for (let i in this.list) {
-			if (this.list[ i ].data('index') == index) {
-				this.list[ i ].addClass('active');
-				this.icon.element.html(this.list[ i ].html());
-				hasActive = true;
+		if (this._active && this._active.length > 0 ) {
+			return this._active;
+		}
+		this.list.forEach(item => {
+			if (item.hasClass('control-container__item--active')) {
+				this._active = item;
 			}
-			else
-				this.list[ i ].removeClass('active');
-		}
-		if (!hasActive)
-			this.icon.iconName = this.iconClass
+		})
+		return this._active;
 	}
 
-	addItem (text, data) {
-		let _self = this;
-		var item = $('<div />')
-			.addClass('inner-item')
-			.data('index', this._index)
-			.html(text)
-			/** TODO: Refactor this callback and event */
-			.on('click', () => {
-				this.onItemClick(item.data('index'));
-			});
-		if (typeof data == 'object') {
-			for (let k in data)
-				item.data(k, data[ k ]);
+	set active (element) {
+		if (this.active) {
+			this.active.removeClass('control-container__item--active');
 		}
-		this._index++;
+		if (element) {
+			$(element).addClass('control-container__item--active');
+		}
+		this._active = element;
+		return this._active
+	}
+
+
+	addItem (content, data) {
+		let item = $('<div />')
+			.addClass('control-container__item')
+			.data(data)
+			.on('click', this.onItemClick.bind(this))
+			.append(content);
 		this.list.push(item);
-		this.listElement.append(item);
+
+		this.dropdownContent.append(item);
 
 		return item;
 	}
 
-	getByIndex (index) {
-		for (let i in this.list)
-			if (this.list[ i ].data('index') == index)
-				return this.list[ i ];
-		return null;
-	}
-
-	onItemClick (index) {
-		this.active = index;
+	onItemClick (e) {
+		//console.log(e.currentTarget, e.target)
+		console.log(this.active);
+		this.active = e.currentTarget;
 	}
 
 	buildCSSClass() {

@@ -1,6 +1,6 @@
 'use strict';
 /**
- * @file control.js
+ * @file control-checkbox.js
  *
  * Control
  */

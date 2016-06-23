@@ -14,6 +14,7 @@ import BackwardControl from './components/backward-control';
 import SourceControl from './components/source-control';
 import SubtitleControl from './components/subtitle-control';
 import DownloadControl from './components/download-control';
+import KeyBindingInfoControl from './components/keybinding-info-control';
 
 export const C_BACKWARD = 'backward';
 export const C_DIVIDER = 'divider';
@@ -27,6 +28,7 @@ export const C_SUBTITLE = 'subtitle';
 export const C_TIMELINE = 'timeline';
 export const C_VOLUME = 'volume';
 export const C_SECTION = 'section';
+export const C_KEYBINDING_INFO = 'keybinding info';
 
 export default function controlFactory(player, name) {
 	switch (name) {
@@ -65,6 +67,9 @@ export default function controlFactory(player, name) {
 
 		case C_SECTION:
 			return new SectionControl(player);
+
+		case C_KEYBINDING_INFO:
+			return new KeyBindingInfoControl(player);
 
 		default:
 			return null;

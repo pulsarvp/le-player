@@ -40,17 +40,18 @@ class SubtitleControl extends ControlContainer {
 
 	onIconClick (e) {
 		super.onIconClick(e);
-		this.onItemClick(-1);
+		let video = this.player.video;
+		this.active = null
+		video.track = -1;
 	}
 
-	onItemClick (index) {
-		super.onItemClick(index);
-		let t = this.getByIndex(index);
+	onItemClick (e) {
+		super.onItemClick(e);
+		let item = $(e.target)
 		let video = this.player.video;
-		if (t != null)
-			video.track = t.data('language');
-		else
-			video.track = -1;
+		if (item.data('language')) {
+			video.track = item.data('language');
+		}
 	}
 }
 
