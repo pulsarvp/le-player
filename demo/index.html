@@ -55,6 +55,18 @@
 				float: left;
 			"></div>
 
+			<h2> Contorls in one lines </h2>
+			<p>
+			<button class="btn btn-hide-divider" data-video-id="videoControlsOnLine"> Скрыть отустпы </button>
+			</p>
+			<video id="videoControlsOnLine">
+
+				<source src="sample2.mp4" title="1280">
+				<track label="EN" srclang="en" src="subs_en.vtt" kind="subtitles">
+				<track label="RU" srclang="ru" src="subs_ru.vtt" kind="subtitles">
+
+			</video>
+
 		</div>
 	</body>
 	<script src="../bower_components/jquery/dist/jquery.min.js"></script>
@@ -76,6 +88,34 @@
 				width: 500,
 				dataUrl : './data.json',
 				sectionContainer: '#video3section'
+			});
+			$('#videoControlsOnLine').lePlayer({
+				width: 1000,
+				controls : {
+					common : [
+						[
+							'play',
+							'volume',
+							'divider',
+							'rate',
+							'divider',
+							'timeline',
+							'divider',
+							'backward',
+							'divider',
+							'source',
+							'divider',
+							'subtitle',
+							'divider',
+							'download',
+							'divider',
+							'keybinding info',
+							'divider',
+							'fullscreen',
+						]
+					]
+				}
+				//dataUrl : './data.json'
 			});
 		});
 	</script>
