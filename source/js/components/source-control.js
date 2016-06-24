@@ -9,8 +9,9 @@ import $ from 'jquery';
 import ControlContainer from './control-container';
 
 /**
- * @param {Player} player Main player
  * @class SourceControl
+ * @param {Player} player Main player
+ * @extends ControlConainer
  */
 class SourceControl extends ControlContainer {
 	constructor (player, options={}) {
@@ -38,6 +39,9 @@ class SourceControl extends ControlContainer {
 		}
 	}
 
+	/**
+	 * @override
+	 */
 	onItemClick (index) {
 		super.onItemClick(index);
 		this.set(index);

@@ -13,6 +13,9 @@ import { secondsToTime } from '../utils/time';
 /**
  * @param {Player} player Main player
  * @class TimelineControl
+ * @property {ControlText} currentTime Current time's text
+ * @property {ControlText} totalTime Total time
+ * @property {jQuery} line
  * @extends Control
  */
 class TimelineControl extends Control {
@@ -154,6 +157,11 @@ class TimelineControl extends Control {
 		return (x - this.line.offset().left) / this.line.width();
 	}
 
+	/**
+	 * Move marker on timeline without change video.currentTime
+	 *
+	 * @param {Number} percent The percent which you want to move marker on timeline
+	 */
 	hardMove (percent) {
 		let currentTime = this.player.video.duration * percent;
 		percent = percent * 100;

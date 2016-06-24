@@ -10,7 +10,10 @@ import Component from './component';
 
 /**
  * @param {Player} player Main player
+ * @param {Object} [options] Icon's options
+ * @param {String} [options.iconName=''] Icon's name. If use svgsprite icons, iconName it's id in sprite
  * @class Icon
+ * @extends Component
  */
 class Icon extends Component {
 
@@ -24,6 +27,9 @@ class Icon extends Component {
 
 	}
 
+	/**
+	 * @override
+	 */
 	createElement() {
 		this._useTag = document.createElementNS('http://www.w3.org/2000/svg', 'use');
 		this._svgTag = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -37,10 +43,17 @@ class Icon extends Component {
 		return this.element;
 	}
 
+	/**
+	 * @override
+	 */
 	buildCSSClass() {
 		return `${super.buildCSSClass()} leplayer-icon ${this.options.className}`
 	}
 
+	/**
+	 * Setter of iconName field
+	 * @param {String} iconName
+	 */
 	set iconName(iconName) {
 		let attrNS = ['http://www.w3.org/1999/xlink', 'href']
 		this._useTag.removeAttributeNS(...attrNS, `${this.player.options.svgPath}#leplayer-icon-${this.iconName}`)
@@ -48,6 +61,10 @@ class Icon extends Component {
 		this._iconName = iconName;
 	}
 
+	/**
+	 * Getter of iconName field
+	 * @return {String} Icon's name
+	 */
 	get iconName () {
 		return this._iconName;
 	}

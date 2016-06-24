@@ -6,6 +6,37 @@ import Cookie from './utils/cookie';
 
 (function ($) {
 
+	/**
+	 * @class Player
+	 * @param {jQuery} element Element when player will init
+	 * @param {Object} [options]
+	 * @param {Boolean} [options.autoplay=false]
+	 * @param {String|Number} [options.height='auto']
+	 * @param {String} [options.width='auto']
+	 * @param {Boolean} [options.loop=false]
+	 * @param {Boolean} [options.muted=false]
+	 * @param {String} [options.preload='metadata'] Can be ('auto'|'metadata'|'none')
+	 * @param {String} [options.poster] Path of image
+	 * @param {String} [options.svgPath] Path for svg sprite
+	 * @param {Number} [options.fullscreen.hideTimelineTime=7000]
+	 * @param {Object} [options.rate]
+	 * @param {Number} [options.rate.step=0.25]
+	 * @param {Number} [options.rate.min=0.5] Min of rate
+	 * @param {Number} [options.rate.max=4.0] Max of rate
+	 * @param {Number} [options.rate.default=1]
+	 * @param {Object} [options.playback.step]
+	 * @param {Nubmer} [options.playback.step.short=5]
+	 * @param {Nubmer} [options.playback.step.medium=30]
+	 * @param {Nubmer} [options.playback.step.long=60]
+	 * @param {Obejct} [options.controls] Object of controls
+	 * @param {String[]} [options.controls.common] Array of controls for default view
+	 * @param {String[]} [options.controls.fullscreen] Array of control for fullsreen view
+	 * @param {Object} [options.volume] Volume's options
+	 * @param {Number} [options.volume.default=0.4] Default volume
+	 * @param {Number} [options.volume.mutelimit=0.05] Delta when volume is muted
+	 * @param {Number} [options.volume.step=0.05]
+	 * @param {Object} [options.keybinding]
+	 */
 	let Player = function (element, opts) {
 		const C_BACKWARD = 'backward';
 		const C_DIVIDER = 'divider';
@@ -30,7 +61,7 @@ import Cookie from './utils/cookie';
 			svgPath : '../dist/svg/svg-defs.svg',
 			width : 'auto',
 			fullscreen : {
-				hideTimelineTime : 700000
+				hideTimelineTime : 7000
 			},
 			rate : {
 				step : 0.25,

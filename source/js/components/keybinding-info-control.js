@@ -12,6 +12,7 @@ import ControlDropdown from './control-dropdown';
 /**
  * @param {Player} player Main player
  * @class KeyBindingInfoControl
+ * @extends ControlDropdown
  */
 class KeyBindingInfoControl extends ControlDropdown {
 

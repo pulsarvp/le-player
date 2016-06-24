@@ -11,8 +11,13 @@ import ControlText from './control-text';
 import Cookie from '../utils/cookie';
 
 /**
- * @param {Player} player Main player
  * @class RateControl
+ * @param {Player} player Main player
+ * @param {Object} [options]
+ * @property {Control} downControl  Down rate control
+ * @property {Control} upControl  Up rate control
+ * @property {ControlText} currentRate Control of cuurent rate
+ * @extends Control
  */
 class RateControl extends Control {
 	constructor (player, options={}) {
@@ -30,6 +35,9 @@ class RateControl extends Control {
 		});
 	}
 
+	/**
+	 * @override
+	 */
 	createElement() {
 		super.createElement();
 		this.downControl = new Control(this.player, {
@@ -50,6 +58,9 @@ class RateControl extends Control {
 			.append(this.upControl.element);
 	}
 
+	/**
+	 * @override
+	 */
 	buildCSSClass() {
 		return this.options.className;
 	}

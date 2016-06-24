@@ -10,11 +10,13 @@ import Component from './component';
 import Icon from './icon';
 
 /**
+ * @class Control
  * @param {Player} player Main player
  * @param {Object} [options] Control's options
  * @param {String} [options.iconName] Name of control's icon. If empty, control will not have a icon
  * @param {String} [options.className]
- * @class Control
+ * @param {String} [options.title] Contorl's tooltip, title attr
+ * @property {Icon} icon Icon in control, if it is exist
  * @extends Component
  */
 class Control extends Component {

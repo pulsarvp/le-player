@@ -9,8 +9,9 @@ import $ from 'jquery';
 import Control from './control';
 
 /**
- * @param {Player} player Main player
  * @class PlayControl
+ * @param {Player} player Main player
+ * @extends Control
  */
 class PlayControl extends Control {
 	constructor (player, options={}) {
@@ -22,16 +23,25 @@ class PlayControl extends Control {
 		super(player, options);
 	}
 
+	/**
+	 * Pause the video
+	 */
 	pause () {
 		this.icon.iconName = 'play';
 		this.element.attr('title', this.options.title);
 	}
 
+	/**
+	 * Play the video
+	 */
 	play () {
 		this.icon.iconName = 'pause';
 		this.element.attr('title', 'Поставить на паузу');
 	}
 
+	/**
+	 * @override
+	 */
 	onClick(e) {
 		//super.onClick(e);
 		this.player.video.togglePlay();

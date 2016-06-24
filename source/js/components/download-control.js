@@ -11,7 +11,9 @@ import Icon from './icon';
 
 /**
  * @param {Player} player Main player
+ * @param {Object} [options]
  * @class DownloadControl
+ * @exnteds Control
  */
 class DownloadControl extends Control {
 	constructor (player, options={}) {
@@ -22,8 +24,12 @@ class DownloadControl extends Control {
 		super(player, options);
 	}
 
+
+	/**
+	 * @override
+	 */
 	createElement() {
-		/** TODO: Доопределить этот метод, а не переопредлеить */
+		// TODO: Доопределить этот метод, а не переопредлеить
 		this.element = $('<a />')
 			.attr({
 				href : '',
@@ -35,10 +41,19 @@ class DownloadControl extends Control {
 			.append(new Icon(this.player, { iconName : 'download' } ).element);
 	}
 
+	/**
+	 * @override
+	 */
 	buildCSSClass() {
 		return `${super.buildCSSClass()}`;
 	}
 
+
+	/**
+	 * Setter of link field
+	 * @public
+	 * @param {String} value Path for video
+	 */
 	set link (value) {
 		this.element.attr('href', value);
 	}

@@ -11,6 +11,8 @@ import $ from 'jquery';
  * @param {Player} player Main player
  * @param {Object} [options] Options of component
  * @param {jQuery} [options.element] Элемент на котором можно иницилизовать класс.
+ * @property {Object} options
+ * @property {jQuery} element
  * @class Component
  */
 class Component {
@@ -34,7 +36,7 @@ class Component {
 	}
 
 	/**
-	 *
+	 * @abstract
 	 */
 	buildCSSClass() {
 		return ''

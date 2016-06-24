@@ -9,8 +9,11 @@ import $ from 'jquery';
 import ControlCheckbox from './control-checkbox';
 
 /**
- * @param {Player} player Main player
  * @class SectionControl
+ * @param {Player} player Main player
+ * @param {Object} [options]
+ * @param {Boolean} [options.checked=true]
+ * @extends ControlCheckbox
  */
 class SectionControl extends ControlCheckbox {
 	constructor (player, options={}) {
@@ -23,6 +26,9 @@ class SectionControl extends ControlCheckbox {
 		super(player, options);
 	}
 
+	/**
+	 * @override
+	 */
 	onClick(e) {
 		super.onClick(e);
 		this.player.trigger('section_toggle', { checked : this.checked });

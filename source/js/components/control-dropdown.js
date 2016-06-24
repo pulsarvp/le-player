@@ -10,9 +10,10 @@ import $ from 'jquery';
 import Control from './control';
 
 /**
+ * @class ControlDropdown
  * @param {Player} player Main player
  * @param {Object} [options]
- * @class ControlDropdown
+ * @property {jQuery} dropdownContent Content of popup
  * @extends Control
  */
 class ControlDropdown extends Control {
