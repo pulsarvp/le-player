@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "NODE_ENV=development grunt",
-    "docs": "jsdoc -c docs/conf.json -d docs/out -t ./node_modules/ink-docstrap/template"
+    "docs": "jsdoc -c docs/conf.json -d docs/out -t ./node_modules/minami"
   },
   "repository": {
     "type": "git",
@@ -44,8 +44,8 @@
     "grunt-postcss": "github:ndmitry/grunt-postcss",
     "grunt-svgstore": "^1.0.0",
     "grunt-webpack": "^1.0.11",
-    "ink-docstrap": "^1.2.1",
     "jsdoc": "^3.4.0",
+    "minami": "^1.1.1",
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1"
   }
