@@ -11,19 +11,38 @@ import ControlDropdown from './control-dropdown';
 /**
  * @param {Player} player Main player
  * @class ControlContainer
+ * @extends ControlDropdown
  */
 class ControlContainer extends ControlDropdown {
 
 	constructor(player, options) {
 		super(player, options);
 		this._active = null;
+		/**
+		 * List of items
+		 *
+		 * @public
+		 * @type {Array}
+		 */
 		this.list = [];
 	}
 
+	/**
+	 * Get item of container by index
+	 *
+	 * @public
+	 * @param {number} index
+	 */
 	getByIndex(index) {
 		return this.list[index];
 	}
 
+	/**
+	 * Set item active by index
+	 *
+	 * @public
+	 * @param {number} index
+	 */
 	setActiveByIndex(index) {
 		if (this.active) {
 			this.active.removeClass('control-container__item--active');
@@ -33,6 +52,12 @@ class ControlContainer extends ControlDropdown {
 	}
 
 
+	/**
+	 * Getter of active field
+	 *
+	 * @public
+	 * @type {jQuery}
+	 */
 	get active () {
 		if (this._active && this._active.length > 0 ) {
 			return this._active;
@@ -45,6 +70,12 @@ class ControlContainer extends ControlDropdown {
 		return this._active;
 	}
 
+	/**
+	 * Setter of active field
+	 *
+	 * @public
+	 * @param {jQuery} Item of container
+	 */
 	set active (element) {
 		if (this.active) {
 			this.active.removeClass('control-container__item--active');
@@ -57,6 +88,11 @@ class ControlContainer extends ControlDropdown {
 	}
 
 
+	/**
+	 * @public
+	 * @param {String|jQuery} Content of item
+	 * @param {Object} Data of item
+	 */
 	addItem (content, data) {
 		let item = $('<div />')
 			.addClass('control-container__item')
@@ -70,12 +106,18 @@ class ControlContainer extends ControlDropdown {
 		return item;
 	}
 
+	/**
+	 * On item click event handler
+	 * @public
+	 * @param {Event} e
+	 */
 	onItemClick (e) {
-		//console.log(e.currentTarget, e.target)
-		console.log(this.active);
 		this.active = e.currentTarget;
 	}
 
+	/**
+	 * @override
+	 */
 	buildCSSClass() {
 		return `${super.buildCSSClass()} control-container`
 	}

@@ -2,6 +2,7 @@
 /**
  * @file time.js
  *
+ * @module time
  */
 
 /**

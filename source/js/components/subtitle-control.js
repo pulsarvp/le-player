@@ -11,6 +11,7 @@ import ControlContainer from './control-container';
 /**
  * @param {Player} player Main player
  * @class SubtitleControl
+ * @extends ControlContainer
  */
 class SubtitleControl extends ControlContainer {
 	constructor (player, options={}) {

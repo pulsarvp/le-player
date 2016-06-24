@@ -12,7 +12,8 @@ import Cookie from '../utils/cookie';
 
 /**
  * @param {Player} player Main player
- * @class Control
+ * @class VolumeControl
+ * @extends ControlDropdown
  */
 class VolumeControl extends ControlDropdown {
 

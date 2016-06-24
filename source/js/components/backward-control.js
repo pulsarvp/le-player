@@ -10,7 +10,9 @@ import Control from './control';
 
 /**
  * @param {Player} player Main player
+ * @param {Object} [options={}] Options
  * @class BackwardControl
+ * @extends Control
  */
 class BackwardControl extends Control {
 	constructor (player, options={}) {
@@ -22,6 +24,9 @@ class BackwardControl extends Control {
 		super(player, options);
 	}
 
+	/**
+	 * @override
+	 */
 	onClick(e) {
 		super.onClick(e);
 		this.player.video.currentTime -= options.playback.step.medium;

@@ -12,7 +12,8 @@ import { secondsToTime } from '../utils/time';
 
 /**
  * @param {Player} player Main player
- * @class Control
+ * @class TimelineControl
+ * @extends Control
  */
 class TimelineControl extends Control {
 

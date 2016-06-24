@@ -11,7 +11,11 @@ import Icon from './icon';
 
 /**
  * @param {Player} player Main player
+ * @param {Object} [options] Control's options
+ * @param {String} [options.iconName] Name of control's icon. If empty, control will not have a icon
+ * @param {String} [options.className]
  * @class Control
+ * @extends Component
  */
 class Control extends Component {
 
@@ -30,7 +34,7 @@ class Control extends Component {
 	}
 
 	/**
-	 * @method createElement
+	 * @override
 	 */
 	createElement() {
 		if (this.options.iconName) {
@@ -51,7 +55,7 @@ class Control extends Component {
 	}
 
 	/**
-	 * @method buildCSSClass
+	 * @override
 	 */
 	buildCSSClass() {
 		return `control ${this.options.className} ${super.buildCSSClass()}`
@@ -79,7 +83,7 @@ class Control extends Component {
 	}
 	/**
 	 *
-	 * @method onClick On click event handler
+	 * On click event handler
 	 * @abstact
 	 */
 	onClick (e) {
@@ -87,7 +91,7 @@ class Control extends Component {
 	}
 
 	/**
-	 * @method onClick On icon click event handler
+	 * On icon click event handler
 	 * @abstact
 	 */
 	onIconClick (e) {

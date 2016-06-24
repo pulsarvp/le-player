@@ -2,9 +2,16 @@
 /**
  * @file cookie-control.js
  *
- * Cookie
+ * @clas Cookie
  */
 class Cookie {
+	/**
+	 * @public
+	 *
+	 * @param {String} name Name of cookie
+	 * @param {String} [dflt] Return default value if this field is empty
+	 *
+	 */
 	static get (name, dflt) {
 		var cookies = document.cookie.split(';');
 		for (let i in cookies) {
@@ -15,6 +22,12 @@ class Cookie {
 		return dflt;
 	};
 
+	/**
+	 * @public
+	 *
+	 * @param {String} name Key
+	 * @param {String} value Value
+	 */
 	static set (name, value) {
 		var d = new Date();
 		d.setDate(d.year + 1);

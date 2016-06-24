@@ -9,6 +9,8 @@ import $ from 'jquery';
 
 /**
  * @param {Player} player Main player
+ * @param {Object} [options] Options of component
+ * @param {jQuery} [options.element] Элемент на котором можно иницилизовать класс.
  * @class Component
  */
 class Component {
@@ -26,7 +28,6 @@ class Component {
 
 	/**
 	 * @abstract
-	 * @method createElement
 	 */
 	createElement() {
 		return '';
