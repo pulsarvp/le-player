@@ -9,7 +9,7 @@
 {
 	color: @color-text;
 	display: inline-block;
-	font-family: "Fira Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-family: @font-main;
 	line-height: 0;
 	outline: 0;
 	position: relative;
@@ -321,9 +321,9 @@
 	{
 		&__content
 		{
-            box-shadow:0px  0px 3px 0px rgba(0,0,0,0.4);
-            white-space: nowrap;
-            text-align: left;
+			box-shadow:0px  0px 3px 0px rgba(0,0,0,0.4);
+			white-space: nowrap;
+			text-align: left;
 			background: fade(@color-background, 85%);
 			padding: 10px;
 			color: black;
@@ -612,7 +612,8 @@
 
 .leplayer-sections
 {
-	font-family: "Fira Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-family: @font-main;
+	font-size: 13px;
 	position: absolute;
 	display: flex;
 	top: 0;
@@ -710,23 +711,21 @@
 }
 .leplayer-section-title
 {
-	font-size: 12px;
-	font-weight: 500;
+	font-weight: bold;
 }
 
 .leplayer-section-description
 {
-	font-size: 12px;
 	display: none;
 }
 
 .leplayer-key
 {
-    box-shadow: 1px 1px 0 1px rgba(120,120,120,0.5);
-    background: #eee;
-    border-radius: 2px;
-    color: #000;
-    display: inline-block;
-    margin: 4.25px 2px 4.25px 0;
-    padding: 4px;
+	box-shadow: 1px 1px 0 1px rgba(120,120,120,0.5);
+	background: #eee;
+	border-radius: 2px;
+	color: #000;
+	display: inline-block;
+	margin: 4.25px 2px 4.25px 0;
+	padding: 4px;
 }
