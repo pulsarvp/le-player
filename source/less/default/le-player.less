@@ -142,7 +142,7 @@
 		{
 			&__content
 			{
-				background: fade(@color-fs-background, 80%);
+				background: fade(@color-fs-background, 85%);
 				color: white;
 			}
 
@@ -321,13 +321,16 @@
 	{
 		&__content
 		{
-			background: fade(@color-background, 80%);
+            box-shadow:0px  0px 3px 0px rgba(0,0,0,0.4);
+            white-space: nowrap;
+            text-align: left;
+			background: fade(@color-background, 85%);
 			padding: 10px;
 			color: black;
 			font-size: 12px;
 			left: 50%;
 			bottom: @control-height + 5px;
-			width: 300px;
+			max-width: 300px;
 			transform: translateX(-50%);
 		}
 
