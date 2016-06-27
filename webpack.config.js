@@ -6,20 +6,20 @@ module.exports = {
     entry: './source/js/le-player.es6.js',
 
     output: {
-        path: path.join(__dirname, 'dist/js'),
+        path: path.join(__dirname, 'dist', 'js'),
         filename: 'le-player.js',
     },
 
     module: {
         loaders: [
             {
-                test: /(\es6.js)$/,
+                test: /(\.js)$/,
                 loader: 'babel',
                 exclude: /(node_modules|bower_components|jquery)/,
+                include: path.join(__dirname, 'source', 'js'),
                 query: {
-                    presets: ['es2015']
+                    presets: ['es2015', 'stage-0']
                 }
-
             }
         ]
     },

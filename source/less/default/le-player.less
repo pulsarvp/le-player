@@ -1,10 +1,15 @@
 @import "variables.less";
 
+
+.undefined {
+	background-color: red !important;
+}
+
 .leplayer-container
 {
 	color: @color-text;
 	display: inline-block;
-	font-family: "PT Sans", "Open Sans", "Verdana", "Arial", sans-serif;
+	font-family: "Fira Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
 	line-height: 0;
 	outline: 0;
 	position: relative;
@@ -128,17 +133,29 @@
 				}
 			}
 		}
-		.control-inner
+		.control-dropdown__content
 		{
 			background: @color-fs-background;
 			z-index: @z-index-fullscreen + 8;
+		}
+		.info-control
+		{
+			&__content
+			{
+				background: fade(@color-fs-background, 80%);
+				color: white;
+			}
+
+			&__item
+			{
+			}
 		}
 		.control-text
 		{
 			background: @color-fs-background;
 			color: @color-fs-text;
 		}
-		.inner-item
+		.control-container__item
 		{
 			color: @color-fs-text;
 			&:hover
@@ -146,7 +163,7 @@
 				background: @color-fs-inner-item-hover !important;
 				color: @color-fs-background;
 			}
-			&.active
+			&--active
 			{
 				background: @color-fs-background-play;
 				color: @color-fs-background;
@@ -244,6 +261,7 @@
 				color: @color-disabled;
 			}
 		}
+
 		&.play
 		{
 			background: @color-background-play;
@@ -257,25 +275,90 @@
 			}
 		}
 	}
-	.control-container
+	.control-checkbox
 	{
-		display: table-cell;
-		height: @control-height;
+		&.control-checkbox--checked
+		{
+			background: @color-text;
+			color: @color-background;
+		}
+	}
+	.control-dropdown
+	{
 		position: relative;
-		width: 1%;
+		&__content
+		{
+			display: none;
+			position: absolute;
+			background: @color-background;
+			bottom: @control-height;
+			cursor: default;
+			display: none;
+			left: 0;
+			min-width: 100%;
+			position: absolute;
+			z-index: @z-index-base + 8;
+		}
+
 		&:hover
 		{
-			.control-inner
+			.control-dropdown__content
 			{
 				display: block;
 			}
 		}
-
 		&.disabled:hover
 		{
-			.control-inner
+			.control-dropdown__content
 			{
 				display: none;
+				color: inherit;
+			}
+
+		}
+	}
+	.info-control
+	{
+		&__content
+		{
+			background: fade(@color-background, 80%);
+			padding: 10px;
+			color: black;
+			font-size: 12px;
+			left: 50%;
+			bottom: @control-height + 5px;
+			width: 300px;
+			transform: translateX(-50%);
+		}
+
+		&__item
+		{
+		}
+	}
+	.control-container
+	{
+		display: table-cell;
+		height: 32px;
+		position: relative;
+		width: 1%;
+
+		&__item
+		{
+			display: block;
+			color: @color-text;
+			cursor: pointer;
+			font-size: @control-text-font-size;
+			line-height: @control-height;
+			padding: 0 7px;
+			&:hover
+			{
+				background: @color-inner-item-hover !important;
+				color: @color-background;
+			}
+			&--active
+			{
+				background: @color-background-play;
+				color: @color-background;
 			}
 		}
 	}
@@ -284,24 +367,13 @@
 		line-height: @control-height;
 		padding: 0 (@control-width - @control-font-size) / 2;
 	}
-	.control-inner
-	{
-		background: @color-background;
-		bottom: @control-height;
-		cursor: default;
-		display: none;
-		left: 0;
-		min-width: 100%;
-		position: absolute;
-		width: auto;
-		z-index: @z-index-base + 8;
-	}
 	.control-text
 	{
 		background: @color-background;
 		color: @color-text;
 		display: table-cell;
 		font-size: @control-text-font-size;
+		box-sizing: content-box;
 		height: @control-height;
 		line-height: 100%;
 		padding: 0 5px;
@@ -322,22 +394,6 @@
 	}
 	.inner-item
 	{
-		display: block;
-		color: @color-text;
-		cursor: pointer;
-		font-size: @control-text-font-size;
-		line-height: @control-height;
-		padding: 0 7px;
-		&:hover
-		{
-			background: @color-inner-item-hover !important;
-			color: @color-background;
-		}
-		&.active
-		{
-			background: @color-background-play;
-			color: @color-background;
-		}
 	}
 	.timeline
 	{
@@ -415,6 +471,21 @@
 		//transition: width @timeline-transition;
 		width: 0;
 		z-index: @z-index-base + 5;
+	}
+	.timeline-section
+	{
+		background: @color-timeline-section-odd;
+		bottom: 0;
+		left: 0;
+		position: absolute;
+		top: 0;
+		//transition: width @timeline-transition;
+		width: 0;
+		z-index: @z-index-base + 4;
+	}
+	.timeline-section:nth-child(2n)
+	{
+		background: @color-timeline-section-even;
 	}
 	.time-buffered
 	{
@@ -496,13 +567,163 @@
 	}
 }
 
-.leplayer-icon {
+.leplayer-icon
+{
 	display: block;
 	min-width: 1em;
 	min-height: 1em;
-	svg {
+	svg
+	{
 		display: block;
 		width: 1em;
 		height: 1em;
 	}
+}
+
+.leplayer-icon-spin
+{
+	animation: leplayer-spin 2s infinite linear;
+}
+
+
+@keyframes leplayer-spin
+{
+	100%
+	{
+		transform: rotate(360deg);
+	}
+}
+
+
+.leplayer-loader-container
+{
+	&:extend(.leplayer-container .play-overlay);
+}
+
+.fullscreen {
+	.leplayer-loader-container
+	{
+		&:extend(.leplayer-container.fullscreen .play-overlay);
+	}
+}
+
+.leplayer-sections
+{
+	font-family: "Fira Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+	position: absolute;
+	display: flex;
+	top: 0;
+	right: 0;
+	flex-direction: column;
+	height: 100%;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	width: 260px;
+	line-height: 1em;
+	z-index: @z-index-base + 6;
+
+}
+
+.leplayer-sections--hidden
+{
+	display: none;
+}
+
+.leplayer-container.fullscreen
+{
+
+	.leplayer-sections
+	{
+		z-index: @z-index-fullscreen + 6;
+	}
+}
+
+.leplayer-video
+{
+	.leplayer-section
+	{
+
+		background: fade(white, 80%);
+
+		&:nth-child(2n)
+		{
+			background: fade(@color-section-2n,80%);
+		}
+		&:hover
+		{
+			background: fade(@color-section-hover,80%);
+		}
+		&.leplayer-section--active
+		{
+			background: fade(@color-section-active, 80%);
+		}
+	}
+}
+
+.leplayer-section
+{
+	cursor: pointer;
+	padding: 5px 0;
+	background: white;
+	color: @color-dark;
+	box-sizing: content-box;
+	&:nth-child(2n)
+	{
+		background: @color-section-2n;
+	}
+	&:hover
+	{
+		background: @color-section-hover;
+	}
+	&.leplayer-section--active
+	{
+		background: @color-section-hover;
+
+		.leplayer-section-description
+		{
+			display: block;
+		}
+	}
+}
+
+.leplayer-section-time
+{
+	color: #555;
+	display: block;
+	float: left;
+	font-size: 12px;
+	font-weight: 400;
+	text-align: right;
+	width: 45px;
+}
+
+.leplayer-section-info
+{
+	display: block;
+	float: left;
+	padding-left: 10px;
+	padding-right: 7px;
+	width: 213px;
+}
+.leplayer-section-title
+{
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.leplayer-section-description
+{
+	font-size: 12px;
+	display: none;
+}
+
+.leplayer-key
+{
+    box-shadow: 1px 1px 0 1px rgba(120,120,120,0.5);
+    background: #eee;
+    border-radius: 2px;
+    color: #000;
+    display: inline-block;
+    margin: 4.25px 2px 4.25px 0;
+    padding: 4px;
 }

@@ -16,6 +16,7 @@
 		</style>
 	</head>
 	<body>
+<div id="debug"></div>
 		<div class="warning-subtitle alert alert-danger" role="alert" style="display: none;">
 			<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 			Note that for subtitles to work you need to run this page under
@@ -38,14 +39,32 @@
 			<video id="video1" src="sample1.mp4" height="200"></video>
 			<h2>Multiple videos</h2>
 			<video id="video2">
-				<source src="http://sms.video.mipt.ru/video/original/0004/g8nykj6zyg.mp4" title="320p">
+				<!--<source src="http://sms.video.mipt.ru/video/original/0004/g8nykj6zyg.mp4" title="320p">-->
 				<source src="sample2.mp4" title="1280">
 				<track label="EN" srclang="en" src="subs_en.vtt" kind="subtitles">
 				<track label="RU" srclang="ru" src="subs_ru.vtt" kind="subtitles">
 			</video>
 			<h2>Corrupted</h2>
 			<video id="video3">
-				<source src="corrupted.mp4">
+				<source src="http://lectoriy.mipt.ru/cdn/videosh264/Physics-Electricity-L09-Kozel-131001.01.mp4">
+			</video>
+			<div id="video3section" style="
+				position: relative;
+				width: 300px;
+				height: 300px;
+				float: left;
+			"></div>
+
+			<h2> Contorls in one lines </h2>
+			<p>
+			<button class="btn btn-hide-divider" data-video-id="videoControlsOnLine"> Скрыть отустпы </button>
+			</p>
+			<video id="videoControlsOnLine">
+
+				<source src="sample2.mp4" title="1280">
+				<track label="EN" srclang="en" src="subs_en.vtt" kind="subtitles">
+				<track label="RU" srclang="ru" src="subs_ru.vtt" kind="subtitles">
+
 			</video>
 
 		</div>
@@ -61,8 +80,43 @@
 			$('#video1').lePlayer({
 				poster : 'poster.jpg'
 			});
-			$('#video2').lePlayer({ width: 500 });
-			$('#video3').lePlayer({ width: 300 });
+			$('#video2').lePlayer({
+				width: 500,
+				//dataUrl : './data.json'
+			});
+			$('#video3').lePlayer({
+				width: 500,
+				dataUrl : './data.json',
+				sectionContainer: '#video3section'
+			});
+			$('#videoControlsOnLine').lePlayer({
+				width: 1000,
+				controls : {
+					common : [
+						[
+							'play',
+							'volume',
+							'divider',
+							'rate',
+							'divider',
+							'timeline',
+							'divider',
+							'backward',
+							'divider',
+							'source',
+							'divider',
+							'subtitle',
+							'divider',
+							'download',
+							'divider',
+							'keybinding info',
+							'divider',
+							'fullscreen',
+						]
+					]
+				}
+				//dataUrl : './data.json'
+			});
 		});
 	</script>
 </html>

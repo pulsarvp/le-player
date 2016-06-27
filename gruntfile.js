@@ -85,7 +85,7 @@ module.exports = function (grunt) {
 			// },
 			js : {
 				files : [ 'source/js/**/*.js' ],
-				tasks : [ 'concat:js', 'webpack:build-dev' ]
+				tasks : ['webpack:build-dev']
 			},
 
 			svgstore : {
