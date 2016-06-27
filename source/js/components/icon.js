@@ -20,12 +20,12 @@ class Icon extends Component {
 	constructor (player, options={}) {
 		options = $.extend({}, {
 			className : '',
-			title : '',
 			iconName : ''
 		}, options)
 		super(player, options);
 
 	}
+
 
 	/**
 	 * @override
