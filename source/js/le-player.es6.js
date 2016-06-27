@@ -94,7 +94,7 @@ import Cookie from './utils/cookie';
 				play : {
 					key : 32,
 					info : ['Space'],
-					description : 'Включить/выключить видео',
+					description : 'Начать проигрывание / поставить на паузу',
 					fn : (video) => {
 						video.togglePlay();
 					}
@@ -102,7 +102,7 @@ import Cookie from './utils/cookie';
 				backwardMedium : {
 					key : 37,
 					info : ['←'],
-					description : 'Описание стрелки влево',
+					description : 'Перемотать на 30 секунд назад',
 					fn : (video) => {
 						video.currentTime -= options.playback.step.medium;
 					}
@@ -110,7 +110,7 @@ import Cookie from './utils/cookie';
 				forwardMedium : {
 					key : 39,
 					info : ['→'],
-					description : 'Описание стрелки вправо',
+					description : 'Перемотать на 30 секунд вперёд',
 					fn : (video) => {
 						video.currentTime += options.playback.step.medium;
 					}
@@ -118,7 +118,7 @@ import Cookie from './utils/cookie';
 				backwardShort : {
 					shiftKey : true,
 					info : ['Shift', '←'],
-					description : 'Описание стрелки влево + shitf',
+					description : 'Перемотать на 5 секунд назад',
 					key : 37,
 					fn : (video) => {
 						video.currentTime -= options.playback.step.short;
@@ -128,7 +128,7 @@ import Cookie from './utils/cookie';
 					shiftKey : true,
 					key : 39,
 					info : ['Shift', '→'],
-					description : 'Описание стрелки вправо + shitf',
+					description : 'Перемотать на 5 секунд назад',
 					fn : (video) => {
 						video.currentTime += options.playback.step.short;
 					}
@@ -137,7 +137,7 @@ import Cookie from './utils/cookie';
 				volumeUp : {
 					key : 38,
 					info : ['↑'],
-					description : 'Стрелка вврех',
+					description : 'Увеличить громкость',
 					fn : (video) => {
 						video.volume += options.volume.step;
 					}
@@ -146,7 +146,7 @@ import Cookie from './utils/cookie';
 				volumeDown : {
 					key : 40,
 					info : ['↓'],
-					description : 'Стрелка вниз',
+					description : 'Уменьшить громкость',
 					fn : (video) => {
 						video.volume -= options.volume.step;
 					}
