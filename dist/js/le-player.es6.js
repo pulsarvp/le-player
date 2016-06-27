@@ -1,6 +1,42 @@
-(function ($) {
-	'use strict';
+'use strict';
+import Control from './components/control';
+import Icon from './components/icon';
+import controlFactory, { C_KEYBINDING_INFO } from './control-factory';
+import Cookie from './utils/cookie';
 
+(function ($) {
+
+	/**
+	 * @class Player
+	 * @param {jQuery} element Element when player will init
+	 * @param {Object} [options]
+	 * @param {Boolean} [options.autoplay=false]
+	 * @param {String|Number} [options.height='auto']
+	 * @param {String} [options.width='auto']
+	 * @param {Boolean} [options.loop=false]
+	 * @param {Boolean} [options.muted=false]
+	 * @param {String} [options.preload='metadata'] Can be ('auto'|'metadata'|'none')
+	 * @param {String} [options.poster] Path of image
+	 * @param {String} [options.svgPath] Path for svg sprite
+	 * @param {Number} [options.fullscreen.hideTimelineTime=7000]
+	 * @param {Object} [options.rate]
+	 * @param {Number} [options.rate.step=0.25]
+	 * @param {Number} [options.rate.min=0.5] Min of rate
+	 * @param {Number} [options.rate.max=4.0] Max of rate
+	 * @param {Number} [options.rate.default=1]
+	 * @param {Object} [options.playback.step]
+	 * @param {Nubmer} [options.playback.step.short=5]
+	 * @param {Nubmer} [options.playback.step.medium=30]
+	 * @param {Nubmer} [options.playback.step.long=60]
+	 * @param {Obejct} [options.controls] Object of controls
+	 * @param {String[]} [options.controls.common] Array of controls for default view
+	 * @param {String[]} [options.controls.fullscreen] Array of control for fullsreen view
+	 * @param {Object} [options.volume] Volume's options
+	 * @param {Number} [options.volume.default=0.4] Default volume
+	 * @param {Number} [options.volume.mutelimit=0.05] Delta when volume is muted
+	 * @param {Number} [options.volume.step=0.05]
+	 * @param {Object} [options.keybinding]
+	 */
 	let Player = function (element, opts) {
 		const C_BACKWARD = 'backward';
 		const C_DIVIDER = 'divider';
@@ -13,8 +49,9 @@
 		const C_SUBTITLE = 'subtitle';
 		const C_TIMELINE = 'timeline';
 		const C_VOLUME = 'volume';
+		const C_SECTION = "section"
 
-		var options = $.extend({}, {
+		var options = this.options = $.extend({}, {
 			autoplay : false,
 			height : 'auto',
 			loop : false,
@@ -41,11 +78,11 @@
 			},
 			controls : {
 				common : [
-					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen' ],
-					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download' ]
+					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'section', 'divider', 'fullscreen' ],
+					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO ]
 				],
 				fullscreen : [
-					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'fullscreen' ]
+					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', C_KEYBINDING_INFO,  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'fullscreen' ]
 				]
 			},
 			volume : {
@@ -56,24 +93,32 @@
 			keyBinding : {
 				play : {
 					key : 32,
+					info : ['Space'],
+					description : 'Начать проигрывание / поставить на паузу',
 					fn : (video) => {
 						video.togglePlay();
 					}
 				},
 				backwardMedium : {
 					key : 37,
+					info : ['←'],
+					description : 'Перемотать на 30 секунд назад',
 					fn : (video) => {
 						video.currentTime -= options.playback.step.medium;
 					}
 				},
 				forwardMedium : {
 					key : 39,
+					info : ['→'],
+					description : 'Перемотать на 30 секунд вперёд',
 					fn : (video) => {
 						video.currentTime += options.playback.step.medium;
 					}
 				},
 				backwardShort : {
 					shiftKey : true,
+					info : ['Shift', '←'],
+					description : 'Перемотать на 5 секунд назад',
 					key : 37,
 					fn : (video) => {
 						video.currentTime -= options.playback.step.short;
@@ -82,6 +127,8 @@
 				forwardShort : {
 					shiftKey : true,
 					key : 39,
+					info : ['Shift', '→'],
+					description : 'Перемотать на 5 секунд назад',
 					fn : (video) => {
 						video.currentTime += options.playback.step.short;
 					}
@@ -89,6 +136,8 @@
 
 				volumeUp : {
 					key : 38,
+					info : ['↑'],
+					description : 'Увеличить громкость',
 					fn : (video) => {
 						video.volume += options.volume.step;
 					}
@@ -96,6 +145,8 @@
 
 				volumeDown : {
 					key : 40,
+					info : ['↓'],
+					description : 'Уменьшить громкость',
 					fn : (video) => {
 						video.volume -= options.volume.step;
 					}
@@ -110,6 +161,7 @@
 		class Fullscreen {
 
 			constructor () {
+				this.player = player;
 				this._collection = controls.fullscreen;
 				this._hideTimeout = null;
 				this.fullscreenEnabled = false;
@@ -158,8 +210,6 @@
 						this.toggleElements(false)
 					}
 				});
-
-
 			}
 
 			/**
@@ -175,6 +225,7 @@
 			}
 
 			showElements () {
+				this.player.trigger('fullscreenchange');
 				container.addClass('fullscreen');
 				controls.fullscreen.show();
 				controls.common.hide();
@@ -193,17 +244,12 @@
 						this._hideTimeout = setTimeout(() => {
 							this._collection.element.hide();
 						}, options.fullscreen.hideTimelineTime);
-					},
-					'mouseleave.leplayer.fullscreen-hide-timeline' : (e) => {
-						if (!$(e.currentTarget).hasClass('fullscreen')) return false;
-						clearTimeout(this._hideTimeout);
-						this._collection.element.hide();
-
 					}
 				})
 			}
 
 			hideElements () {
+				this.player.trigger('fullscreenchange');
 				container.removeClass('fullscreen');
 				controls.fullscreen.hide();
 				controls.common.show();
@@ -215,19 +261,19 @@
 			toggle () {
 				let containerEl = container[ 0 ];
 				if (this.is()) {
-					if (document.exitFullscreen)                document.exitFullscreen();
-					else if (document.mozCancelFullScreen)      document.mozCancelFullScreen();
+					if (document.exitFullscreen)				document.exitFullscreen();
+					else if (document.mozCancelFullScreen)	  document.mozCancelFullScreen();
 					else if (document.webkitCancelFullScreen)   document.webkitCancelFullScreen();
-					else if (document.msExitFullscreen)         document.msExitFullscreen();
-					else if (document.webkitExitFullscreen)     document.webkitExitFullscreen();
+					else if (document.msExitFullscreen)		 document.msExitFullscreen();
+					else if (document.webkitExitFullscreen)	 document.webkitExitFullscreen();
 					this.hideElements(); // @TODO: make this only if fullscreen fired.
 					this.fullscreenEnabled = false;
 				}
 				else {
-					if (containerEl.requestFullScreen)            containerEl.requestFullScreen();
+					if (containerEl.requestFullScreen)			containerEl.requestFullScreen();
 					else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();
-					else if (containerEl.mozRequestFullScreen)    containerEl.mozRequestFullScreen();
-					else if (containerEl.msExitFullscreen)        containerEl.msRequestFullscreen();
+					else if (containerEl.mozRequestFullScreen)	containerEl.mozRequestFullScreen();
+					else if (containerEl.msExitFullscreen)		containerEl.msRequestFullscreen();
 					this.showElements(); // @TODO: make this only if fullscreen fired.
 					this.fullscreEnabled = true;
 				}
@@ -248,6 +294,7 @@
 
 		class Video {
 			constructor (ctx) {
+				this.player = player;
 				this._ctx = ctx;
 				this._video = ctx[ 0 ];
 				this.fullscreen = new Fullscreen();
@@ -336,7 +383,6 @@
 					this._video.volume = value;
 				}
 				this._video.mute = (value < options.volume.mutelimit);
-				controls.volume = this._video.volume;
 			}
 
 			get buffered () {
@@ -368,6 +414,16 @@
 					loaded.push([0, media.bufferedBytes / media.bytesTotal]);
 				}
 				return loaded;
+			}
+
+			get loadedSize () {
+				const START = 0;
+				const END = 1;
+				let sum = 0
+				this.loaded.forEach(item => {
+					sum += item[END] - item[START];
+				});
+				return sum;
 			}
 
 			init () {
@@ -419,7 +475,13 @@
 			}
 
 			trigger (eventName, ...args) {
-				$(this._video).trigger.call($(this._video), `leplayer_${eventName}`, ...args);
+				this.player.trigger.call($(this._video), `leplayer_${eventName}`, ...args);
+				return this;
+			}
+
+			on (eventName, ...args) {
+				$(this._video).on.call($(this._video), `leplayer_${eventName}`, ...args);
+				return this;
 			}
 
 			_initRate () {
@@ -497,11 +559,13 @@
 
 					'timeupdate' : (e) => {
 						controls.moveTimeMarker();
+						this.player.trigger('timeupdate', { time : video.currentTime });
 					},
 
 					'ended' : () => {
 						this.pause();
-						this.trigger('ended');
+						this.player.trigger('ended');
+
 					},
 
 					'dblclick' : () => {
@@ -515,6 +579,20 @@
 							container.focus()
 							this.togglePlay();
 						}, 300);
+					},
+
+					'volumechange' : (e) => {
+						this.player.trigger('volumechange', { volume : this.volume });
+					},
+
+					'canplay' : (e) => {
+						loader.hide();
+						this.player.trigger('canplay');
+					},
+
+					'waiting' : (e) => {
+						loader.show();
+						this.player.trigger('waiting');
 					}
 
 				});
@@ -522,617 +600,7 @@
 
 			_initCustomEvents () {
 				let mediaElement = $(this._video);
-
-				mediaElement.on({
-					'inited.leplayer' : (e) => {
-					}
-				})
 			}
-		}
-
-		class Control {
-			constructor (cssClass, iconClass) {
-				if (iconClass) {
-					this.icon = new Icon(iconClass);
-					this.icon.element.on({
-						'click' : this._onIconClick.bind(this),
-						'leplayer_icon_click' : this.onIconClick.bind(this)
-					})
-				}
-				this.element = $('<div />')
-					.addClass('control ' + cssClass)
-					.append(this.icon && this.icon.element)
-					.on({
-						'click' : this._onClick.bind(this),
-						'leplayer_click' : this.onClick.bind(this)
-					});
-
-			}
-
-			static divider () {
-				return $('<div />').addClass('divider');
-			}
-
-			static create (name) {
-				switch (name) {
-					case C_BACKWARD:
-						return new BackwardControl();
-
-					case C_DIVIDER:
-						return this.divider();
-
-					case C_DOWNLOAD:
-						return new DownloadControl();
-
-					case C_FORWARD:
-						return new ForwardControl();
-
-					case C_FULLSCREEN:
-						return new FullscreenControl();
-
-					case C_PLAY:
-						return new PlayControl();
-
-					case C_RATE:
-						return new RateControl();
-
-					case C_SOURCE:
-						return new SourceControl();
-
-					case C_SUBTITLE:
-						return new SubtitleControl();
-
-					case C_TIMELINE:
-						return new TimelineControl();
-
-					case C_VOLUME:
-						return new VolumeControl();
-
-					default:
-						return null;
-				}
-			}
-
-			disable () {
-				this.disabled = true
-				this.element.addClass('disabled');
-			}
-
-			_onClick (e) {
-				if (this.disabled) {
-					return false;
-				}
-				this.element.trigger('leplayer_click');
-			}
-
-			_onIconClick (e) {
-				if (this.disabled) {
-					return false;
-				}
-				this.icon.element.trigger('leplayer_icon_click')
-			}
-
-			onClick (e) {
-				e.preventDefault();
-			}
-
-			onIconClick (e) {
-				e.preventDefault();
-			}
-
-		}
-
-
-		class ControlText {
-			constructor (classname) {
-				this.element = $('<div />').addClass('control-text ' + classname);
-			}
-
-			set text (value) {
-				this.element.html(value);
-			}
-		}
-
-		class ControlContainer extends Control {
-			constructor (name, iconClass) {
-				super(name, iconClass)
-				this.iconClass = iconClass;
-				this.listElement = $('<div/>').addClass('control-inner');
-				this.element.addClass('control-container')
-					.append(this.listElement);
-				this._index = 0;
-				this.list = [];
-			}
-
-			get active () {
-				for (let i in this.list)
-					if (this.list[ i ].hasClass('active'))
-						return this.list[ i ];
-				return null;
-			}
-
-			set active (index) {
-				let hasActive = false;
-				for (let i in this.list) {
-					if (this.list[ i ].data('index') == index) {
-						this.list[ i ].addClass('active');
-						this.icon.element.html(this.list[ i ].html());
-						hasActive = true;
-					}
-					else
-						this.list[ i ].removeClass('active');
-				}
-				if (!hasActive)
-					this.icon.iconName = this.iconClass
-			}
-
-			addItem (text, data) {
-				let _self = this;
-				var item = $('<div />')
-					.addClass('inner-item')
-					.data('index', this._index)
-					.html(text)
-					/** TODO: Refactor this callback and event */
-					.on('click', () => {
-						this.onItemClick(item.data('index'));
-					});
-				if (typeof data == 'object') {
-					for (let k in data)
-						item.data(k, data[ k ]);
-				}
-				this._index++;
-				this.list.push(item);
-				this.listElement.append(item);
-
-				return item;
-			}
-
-			getByIndex (index) {
-				for (let i in this.list)
-					if (this.list[ i ].data('index') == index)
-						return this.list[ i ];
-				return null;
-			}
-
-			onItemClick (index) {
-				this.active = index;
-			}
-		}
-
-		class BackwardControl extends Control {
-
-			constructor () {
-				super('backward', 'undo');
-			}
-
-			onClick (e) {
-				super.onClick(e);
-				video.currentTime -= options.playback.step.medium;
-			}
-		}
-
-		class DownloadControl extends Control {
-			constructor () {
-				super('', '');
-				let icon = new Icon('download');
-				this.element = $('<a />')
-					.attr('href', '')
-					.attr('target', '_blank')
-					.attr('download', '')
-					.addClass('control download')
-					.append(icon.element);
-			}
-
-			set link (value) {
-				this.element.attr('href', value);
-			}
-		}
-
-		class ForwardControl extends Control {
-			constructor () {
-				super('forward', 'redo');
-			}
-		}
-
-		class FullscreenControl extends Control {
-			constructor () {
-				super('fullscreen', 'arrows-alt');
-			}
-
-			onClick (e) {
-				super.onClick(e)
-				video.fullscreen.toggle();
-			}
-		}
-
-		class PlayControl extends Control {
-			constructor () {
-				super('play', 'play');
-			}
-
-			pause () {
-				this.icon.iconName = 'play';
-			}
-
-			play () {
-				this.icon.iconName = 'pause';
-			}
-
-			onClick(e) {
-				super.onClick(e);
-				video.togglePlay();
-			}
-		}
-
-		class RateControl extends Control {
-			constructor () {
-				super();
-				this.down = new Control('rate-down', 'backward');
-				this.up = new Control('rate-up', 'forward');
-				this.current = new ControlText('rate-current');
-
-				this.down.element.click(e => {
-					video.rate -= options.rate.step;
-				});
-
-				this.up.element.click(e => {
-					video.rate += options.rate.step;
-				});
-
-				this.element = $('<div />')
-					.addClass('control-container')
-					.append(this.down.element)
-					.append(this.current.element)
-					.append(this.up.element);
-			}
-
-			set (value) {
-				if (this.disabled) {
-					return false;
-				}
-				this.up.element.removeClass('disabled');
-				this.down.element.removeClass('disabled');
-				if (video.rate <= options.rate.min)
-					this.down.element.addClass('disabled');
-				else if (video.rate >= options.rate.max)
-					this.up.element.addClass('disabled');
-				this.show();
-			}
-
-			init () {
-				let rate = Cookie.get('rate', options.rate.default);
-				this.show(rate);
-			}
-
-			show (value) {
-				value = value || video.rate;
-				value = parseFloat(value)
-					.toFixed(2)
-					.toString()
-					.replace(/,/g, '.');
-				this.current.text = '×' + value;
-			}
-
-			disable() {
-				this.disabled = true;
-				this.down.disable.apply(this.down, arguments);
-				this.up.disable.apply(this.up, arguments);
-			}
-		}
-
-		class SourceControl extends ControlContainer {
-			constructor () {
-				super('source-control', 'bullseye');
-				/** TODO: Move sources to the arguments in constror */
-				if (sources.length > 1) {
-					for (var i in sources) {
-						this.addItem(sources[ i ].title, { src : sources[ i ].src });
-					}
-				}
-				else
-					this.disable();
-			}
-
-			set (index) {
-				/** TODO: Emit event on set source*/
-				let s = this.getByIndex(index);
-				if (s != null) {
-					video.source = s.data('src');
-					controls.download = s.data('src');
-				}
-			}
-
-			onItemClick (index) {
-				super.onItemClick(index);
-				this.set(index);
-			}
-		}
-
-		class SubtitleControl extends ControlContainer {
-			constructor () {
-				super('subtitle-control', 'commenting-o');
-			}
-
-			init () {
-				if (video.subtitles.length > 0) {
-					for (var i in video.subtitles) {
-						if (!video.subtitles.hasOwnProperty(i)) continue;
-						let item = video.subtitles[ i ];
-						this.addItem(item.title, {
-							src : item.src,
-							language : item.language
-						});
-					}
-				}
-				else
-					this.disable();
-			}
-
-			onIconClick (e) {
-				super.onIconClick(e);
-				this.onItemClick(-1);
-			}
-
-			onItemClick (index) {
-				super.onItemClick(index);
-				let t = this.getByIndex(index);
-				if (t != null)
-					video.track = t.data('language');
-				else
-					video.track = -1;
-			}
-		}
-
-		class TimelineControl extends Control {
-			constructor () {
-				super('timeline');
-				let duration = video.duration;
-
-				this.drag = false;
-
-				this.current = new ControlText('time-current');
-				this.total = new ControlText('time-total');
-
-				this.marker = $('<div />').addClass('time-marker');
-
-				this.markerShadow = $('<div />')
-					.addClass('time-marker shadow')
-					.append()
-					.hide();
-
-				this.markerShadowTime = $('<div />').addClass('time');
-				this.markerTime = $('<div />')
-					.addClass('time')
-					.hide();
-				this.played = $('<div />').addClass('time-played');
-				this.buffered = $('<div />')
-				this.current.text = '00:00';
-				this.line = $('<div />')
-					.addClass('timeline')
-					.append(this.marker.append(this.markerTime))
-					.append(this.markerShadow.append(this.markerShadowTime))
-					.append(this.played)
-					.append(this.buffered)
-					.on({
-						'mousemove' : (e) => {
-							if (this.drag) return;
-
-							let p = this.getPosition(e.pageX);
-							if (p > 0 && p < 1) {
-								this.markerShadow.show();
-								this.markerShadow.css('left', p * 100 + '%');
-								this.markerShadowTime.html(secondsToTime(video.duration * p));
-							}
-							else
-								this.markerShadow.hide();
-						},
-
-						'mouseleave' : (e) => {
-							if (this.drag) return;
-							this.markerShadow.hide()
-						},
-
-						'mousedown' : (e) => {
-						},
-
-						'click' : (e) => {
-							if (e.which !== 1) return;
-							if (this.drag) return;
-							this.hardMove(this.getPosition(e.pageX));
-							video.seek(video.duration * this.getPosition(e.pageX));
-						},
-
-						'touchmove' : (e) => {
-						}
-					});
-
-				this.element.addClass('timeline-container')
-					.append($('<div />')
-						.addClass('timeline-subcontainer')
-						.append(this.current.element)
-						.append(this.line)
-						.append(this.total.element));
-
-				this.marker.on('mousedown', (e) => {
-					if (e.which !== 1) return;
-					e.preventDefault();
-					this.markerShadow.hide();
-					this.drag = true;
-				});
-
-				$(document).on({
-
-					'mousemove' : (e) => {
-						if (!this.drag) return;
-						let p = this.getPosition(e.pageX);
-						if (p > 0 && p < 1) {
-							this.markerTime
-								.show()
-								.html(secondsToTime(video.duration * p))
-							video.seek(video.duration * p);
-						}
-					},
-
-					'mouseup' : (e) => {
-						this.markerTime.hide()
-						this.drag = false;
-					}
-				});
-
-				/** TODO: Solve problem with open events api */
-				$(video._video).on('leplayer_ended', e => {
-					clearInterval(this.watchBufferInterval);
-				})
-
-				this._initWatchBuffer();
-			}
-
-			getPosition (x) {
-				return (x - this.line.offset().left) / this.line.width();
-			}
-
-			hardMove (percent) {
-				let currentTime = video.duration * percent;
-				percent = percent * 100;
-				this.marker.css('left', percent + '%');
-				this.played.css('width', percent + '%');
-				this.current.text = secondsToTime(currentTime);
-			}
-
-			move () {
-				let percent = (video.currentTime / video.duration * 100).toFixed(2);
-				let currentTime = video.currentTime;
-								this.marker.css('left', percent + '%');
-				this.played.css('width', percent + '%');
-				this.current.text = secondsToTime(currentTime);
-			}
-
-			_initWatchBuffer () {
-				clearInterval(this.watchBufferInterval);
-				let updateProgressBar = () => {
-					const END = 1;
-					const START = 0;
-					let result = $('');
-					video.loaded.forEach(item => {
-						let domItem = $('<div />').addClass('time-buffered');
-						domItem.css({
-							'left' : item[START] * 100 + '%',
-							'width' : (item[END] - item[START]) * 100 + '%'
-						});
-						result = result.add(domItem);
-					});
-					this.buffered.html(result);
-
-					if (video.loaded[0] && (1 - video.loaded[0][END]) <= 0.05) {
-						clearInterval(this.watchBufferInterval);
-					}
-				}
-				this.watchBufferInterval = setInterval(updateProgressBar, 500);
-			}
-		}
-
-		class VolumeControl extends Control {
-			constructor () {
-				super('volume-control', 'volume-down');
-				let _self = this;
-
-				this.marker = $('<div/>').addClass('volume-marker');
-
-				this.active = $('<div/>').addClass('volume-active');
-
-				this.line = $('<div/>')
-					.addClass('volume-line')
-					.append(this.active)
-					.append(this.marker)
-					.on('click', (e) => {
-						if (this.drag) return;
-						let p = this.getPosition(e.pageY);
-						if (p >= 0 && p <= 1) {
-							video.volume = 1 - p;
-						}
-					});
-
-				this.element.addClass('control-container')
-					.append($('<div />')
-						.addClass('control-inner volume-slider')
-						.append(this.line));
-
-				this.drag = false;
-
-				this.marker.on('mousedown', (e) => {
-					if (e.which != 1) return;
-					this.drag = true;
-				});
-
-				$(document).on({
-					'mousemove' : (e) => {
-						if (!this.drag) return;
-						let p = this.getPosition(e.pageY);
-						if (p >= 0 && p <= 1) {
-							video.volume = 1 - p
-						}
-					},
-
-					'mouseup' : (e) => {
-						this.drag = false;
-					}
-				});
-			}
-
-			set value (value) {
-				if (value < options.volume.mutelimit) {
-					this.icon.iconName = 'volume-off';
-				}
-				else {
-					if (value < 0.5)
-						this.icon.iconName = 'volume-down';
-					else
-						this.icon.iconName = 'volume-up';
-				}
-
-				let p = Math.round(value * 100).toString() + '%';
-				this.active.css('height', p);
-				this.marker.css('bottom', p);
-			}
-
-			toggleMuted () {
-				if (video.muted == true) {
-					this.value = Cookie.get('volume', options.volume.default);
-				}
-				else
-					this.value = 0;
-			}
-
-			getPosition (y) {
-				return (y - this.line.offset().top) / this.line.height();
-			}
-
-			onIconClick (e) {
-				super.onIconClick(e);
-				this.toggleMuted();
-			}
-		}
-
-		class Cookie {
-			static get (name, dflt) {
-				var cookies = document.cookie.split(';');
-				for (var i in cookies) {
-					var d = cookies[ i ].trim().split('=');
-					if (d[ 0 ] == 'leplayer_' + name)
-						return d[ 1 ];
-				}
-				return dflt;
-			};
-
-			static set (name, value) {
-				var d = new Date();
-				d.setDate(d.year + 1);
-				document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
-			};
-		}
-
-		class UserAgent {
-
 		}
 
 		class ControlCollection {
@@ -1150,7 +618,7 @@
 
 			set rate (value) {
 				if (this.has(C_RATE)) {
-					this.items.rate.set(value);
+					this.items.rate.value = value;
 				}
 			}
 
@@ -1162,7 +630,7 @@
 
 			set totalTime (value) {
 				if (this.has(C_TIMELINE))
-					this.items.timeline.total.text = value;
+					this.items.timeline.totalTime.text = value;
 			}
 
 			set volume (value) {
@@ -1178,10 +646,10 @@
 			}
 
 			add (name) {
-				if (name == C_DIVIDER)
-					return Control.create(name);
-				else {
-					this.items[ name ] = Control.create(name);
+				if (name == C_DIVIDER) {
+					return controlFactory(player, name);
+				} else {
+					this.items[ name ] = controlFactory(player, name);
 					return this.items[ name ].element;
 				}
 			}
@@ -1201,7 +669,7 @@
 					$.isFunction(this.items[i].init) && this.items[i].init();
 				}
 				this.initTimeline();
-				this.totalTime = secondsToTime(video.duration);
+				//this.totalTime = secondsToTime(video.duration);
 				this.download = sources[ 0 ].src;
 			}
 
@@ -1303,6 +771,7 @@
 				this.collections.common.show();
 				this.collections.mini.hide();
 				this.collections.fullscreen.hide();
+
 			}
 
 			moveTimeMarker () {
@@ -1321,35 +790,102 @@
 			}
 		}
 
-		class Icon {
-			constructor(iconName) {
-				this._useTag = document.createElementNS('http://www.w3.org/2000/svg', 'use');
-				this._svgTag = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		class Sections {
+			constructor(items) {
+				this.player = player;
 
-				this.iconName = this._iconName = iconName;
-				this._svgTag.appendChild(this._useTag);
-				this.element = $('<div />')
-					.addClass('leplayer-icon')
-					.append($(this._svgTag));
+				this.items = items;
+				for ( let i = 0; i < this.items.length; i++) {
+					let endSection;
+					if (i < (this.items.length - 1)) {
+						endSection = this.items[i+1].begin
+					} else {
+						endSection = video.duration;
+					}
+					this.items[i].end = endSection;
+				}
+
+				this.element = $('<div />').addClass('leplayer-sections');
+				this.element.append(this._createSections(items));
+				this.element.find('.leplayer-section').on('click', this.onSectionClick.bind(this));
+
+				this._activeSection = this.getSectionByIndex(0);
+				this.setActiveByIndex(0);
+
+				this.player.trigger('sectionsinit', { items : this.items });
+
+				this.player.on('section_toggle', (e) => {
+					if (this.element.hasClass('leplayer-sections--hidden')) {
+						this.element.removeClass('leplayer-sections--hidden');
+					} else {
+						this.element.addClass('leplayer-sections--hidden');
+					}
+				})
+
+				this.player.on('timeupdate', this.onTimeUpdate.bind(this));
 			}
 
-			set iconName(iconName) {
-				let attrNS = ['http://www.w3.org/1999/xlink', 'href']
-				this._useTag.removeAttributeNS(...attrNS, `${options.svgPath}#leplayer-icon-${this.iconName}`)
-				this._useTag.setAttributeNS(...attrNS, `${options.svgPath}#leplayer-icon-${iconName}`)
-				this._iconName = iconName;
+
+
+			_createSections(items) {
+				let result = '';
+				items.forEach((section, index) => {
+					let item = `
+						<div class="leplayer-section ${!index ? 'leplayer-section--active' : ''}"
+							data-time="${section.begin}" data-index="${index}">
+							<div class="leplayer-section-time">${secondsToTime(section.begin)}</div>
+							<div class="leplayer-section-info">
+								<div class="leplayer-section-title">${section.title}</div>
+								<div class="leplayer-section-description">${section.description}</div>
+							</div>
+						</div>
+					`
+					result += item;
+				});
+				return result;
 			}
 
-			get iconName () {
-				return this._iconName;
+			onSectionClick(e) {
+				let section = $(e.target).closest('.leplayer-section');
+				video.currentTime = section.attr('data-time');
+			}
+
+			setActiveByIndex(index) {
+				if (this._activeSection.attr('data-index') == index) {
+					return
+				}
+				this._activeSection.removeClass('leplayer-section--active');
+
+				this._activeSection = this.getSectionByIndex(index);
+				this._activeSection.addClass('leplayer-section--active');
+				this.element.animate({
+					scrollTop : this._activeSection.position().top
+				}, 1000)
+			}
+
+			getSectionByIndex(index) {
+				return this.element.find(`.leplayer-section[data-index="${index}"]`);
+			}
+
+			onTimeUpdate(e, data) {
+				let currentTime = data.time;
+
+				for (let i = 0; i < this.items.length; i++) {
+					let section = this.items[i];
+					if (currentTime <= section.end) {
+						this.setActiveByIndex(i);
+						break;
+					}
+				}
 			}
 		}
 
-		var sources = [];
+		var sources = this.sources =[];
 		var subtitles = [];
 		var volume = options.volume.default;
+		var controls = this.controls = new Controls();
+		var player = this;
 		var video = null;
-		var controls = new Controls();
 
 		/**
 		 * DOM container to hold video and all other stuff.
@@ -1357,6 +893,9 @@
 		 */
 		var container = null;
 		var overlay = null;
+		var loader = null;
+		var sectionContainer = null;
+		let videoContainer = null;
 
 		let _createNotification = (opt) => {
 			let notification, closeButton;
@@ -1406,15 +945,17 @@
 				console.warn('No sources found.');
 				return this;
 			}
-			video = new Video(element);
+			video = player.video = new Video(element);
 
 			/** TODO: Use promise to async run this */
 			initDom();
 			initControls();
-			video.init().done(() => { video.trigger('inited')});
 			initHotKeys();
+			video.init().done(() => {
+				initSections();
+				player.trigger('inited');
+			});
 
-			// video.trigger(`inited`);
 
 		};
 
@@ -1452,25 +993,47 @@
 			}
 		};
 
+		var initSections = function() {
+			options.dataUrl && player.getData().done((data) => {
+				let section = new Sections(data.sections);
+
+				if (sectionContainer) {
+					sectionContainer.append(section.element);
+				} else {
+					videoContainer.append(section.element);
+				}
+			});
+		}
+
 		var initDom = function () {
-			let videoContainer;
-			let icon = new Icon('play');
 			overlay = $('<div />')
 				.addClass('play-overlay')
-				.append(icon.element);
+				.append(new Icon(player, { iconName : 'play' }).element);
+			loader = $('<div />')
+				.addClass('leplayer-loader-container')
+				.append(new Icon(player, {
+					iconName : 'refresh',
+					className : 'leplayer-icon-spin'
+					}).element)
+				.hide();
 			videoContainer = $('<div />')
 				.addClass('leplayer-video')
-				.append(overlay);
+				.append(overlay)
+				.append(loader);
 			container = $('<div />')
 				.addClass('leplayer-container')
 				.append(videoContainer)
 				.attr('tabindex', 0)
 				.css('width', element.width() + 'px');
 
+			if(options.sectionContainer) {
+				sectionContainer = $(options.sectionContainer).addClass('leplayer-section-container');
+			}
+
 			element.before(container);
 			videoContainer.append(element);
 			overlay.on({
-				'click'    : (e) => { element.trigger('click'); },
+				'click'	: (e) => { element.trigger('click'); },
 				'dblclick' : (e) => { element.trigger('dblclick'); }
 			});
 		};
@@ -1584,12 +1147,25 @@
 			return (focused.length > 0) || $(container).is(':focus');
 		}
 
+		this.getData = () => {
+			return $.ajax({
+				url: options.dataUrl,
+				method: 'GET'
+			}).promise()
+		}
 
+		this.trigger = (eventName, ...args) => {
+			$(element).trigger.call($(element), `leplayer_${eventName}`, ...args);
+		}
+
+		this.on = (eventName, ...args) => {
+			$(element).on.call($(element), `leplayer_${eventName}`, ...args);
+		}
 		init();
-
 
 		return this;
 	};
+
 
 	window.$.fn.lePlayer = function (options) {
 		return this.each(function () {
