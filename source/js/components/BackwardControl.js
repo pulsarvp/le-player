@@ -1,12 +1,12 @@
 'use strict';
 /**
- * @file backward-control.js
+ * @file BackwardControl.js
  *
  * Backward control
  */
 
 import $ from 'jquery';
-import Control from './control';
+import Control from './Control';
 
 /**
  * @param {Player} player Main player

@@ -1,13 +1,11 @@
 'use strict';
 /**
- * @file control-dropdown.js
- *
- * ControlDropdown
+ * @file ControlDropdown.js
  */
 
 
 import $ from 'jquery';
-import Control from './control';
+import Control from './Control';
 
 /**
  * @class ControlDropdown

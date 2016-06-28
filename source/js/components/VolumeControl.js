@@ -1,13 +1,11 @@
 'use strict';
 /**
- * @file volume-control.js
- *
- * Volume Control
+ * @file VolumeControl.js
  */
 
 import $ from 'jquery';
-import ControlDropdown from './control-dropdown';
-import Icon from './icon';
+import ControlDropdown from './ControlDropdown';
+import Icon from './Icon';
 import Cookie from '../utils/cookie';
 
 /**

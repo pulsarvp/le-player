@@ -1,12 +1,10 @@
 'use strict';
 /**
- * @file control-container.js
- *
- * Control container
+ * @file ControlContainer.js
  */
 
 import $ from 'jquery';
-import ControlDropdown from './control-dropdown';
+import ControlDropdown from './ControlDropdown';
 
 /**
  * @param {Player} player Main player

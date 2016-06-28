@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "NODE_ENV=development grunt",
-    "docs": "jsdoc -c docs/conf.json -d docs/out -t ./node_modules/minami"
+    "docs": "jsdoc -c docs/conf.json -d docs/out -t ./node_modules/minami --readme ./README.md"
   },
   "repository": {
     "type": "git",

@@ -1,13 +1,11 @@
 'use strict';
 /**
- * @file timeline-control.js
- *
- * Timeline Control
+ * @file TimelineControl.js
  */
 
 import $ from 'jquery';
-import Control from './control';
-import ControlText from './control-text';
+import Control from './Control';
+import ControlText from './ControlText';
 import { secondsToTime } from '../utils/time';
 
 /**

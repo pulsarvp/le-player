@@ -1,12 +1,12 @@
 'use strict';
 /**
- * @file subtitle-control.js
+ * @file SubtitleControl.js
  *
  * Subtitle control
  */
 
 import $ from 'jquery';
-import ControlContainer from './control-container';
+import ControlContainer from './ControlContainer';
 
 /**
  * @param {Player} player Main player

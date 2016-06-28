@@ -1,0 +1,11 @@
+{
+	"libs": [
+		"browser",
+		"jquery"
+	],
+	"include" : ["./source/**/*.js"],
+	"plugins": {
+		"es_modules": {}
+	},
+	"ecmaVersion": 6
+}

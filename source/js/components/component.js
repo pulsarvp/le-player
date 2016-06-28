@@ -1,13 +1,13 @@
 'use strict';
 /**
- * @file component.js
- *
- * Player component - Base class for all UI
+ * @file Component.js
  */
 
 import $ from 'jquery';
 
 /**
+ * Player component - Base class for all UI
+ *
  * @param {Player} player Main player
  * @param {Object} [options] Options of component
  * @param {jQuery} [options.element] Элемент на котором можно иницилизовать класс.

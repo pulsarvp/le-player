@@ -17,10 +17,11 @@ module.exports = function (grunt) {
 			options : webpackConfig,
 			build : {},
 			"build-dev" : {
-				devtool : 'cheap-inline-module-source-map',
+				devtool : 'eval',
 				plugins : [
 					new webpack.NoErrorsPlugin()
-				]
+				],
+				watch : true
 			}
 		},
 		less : {
@@ -36,7 +37,12 @@ module.exports = function (grunt) {
 				cwd : 'source/less/',
 				src : '**/le-player.less',
 				ext : '.css',
-				dest : 'dist/css/'
+				dest : 'dist/css/',
+				profile : true,
+				displayModules: true,
+				plugins : [
+					new webpack.optimize.DedupePlugin()
+				]
 			},
 			production : {
 				options : {
@@ -83,10 +89,10 @@ module.exports = function (grunt) {
 			// 	files : [ 'source/sass/**/*' ],
 			// 	tasks : [ 'sass:development' ]
 			// },
-			js : {
-				files : [ 'source/js/**/*.js' ],
-				tasks : ['webpack:build-dev']
-			},
+			//js : {
+				//files : [ 'source/js/**/*.js' ],
+				//tasks : ['webpack:build-dev']
+			//},
 
 			svgstore : {
 				files : [ 'source/svg/*.svg' ],
