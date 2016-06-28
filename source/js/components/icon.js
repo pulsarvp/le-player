@@ -1,12 +1,10 @@
 'use strict';
 /**
- * @file icon.js
- *
- * Icon
+ * @file Icon.js
  */
 
 import $ from 'jquery';
-import Component from './component';
+import Component from './Component';
 
 /**
  * @param {Player} player Main player

@@ -1,13 +1,11 @@
 'use strict';
 /**
- * @file control.js
- *
- * Control
+ * @file Control.js
  */
 
 import $ from 'jquery';
-import Component from './component';
-import Icon from './icon';
+import Component from './Component';
+import Icon from './Icon';
 
 /**
  * @class Control

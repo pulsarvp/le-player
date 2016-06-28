@@ -1,13 +1,13 @@
 'use strict';
 /**
- * @file download-control.js
+ * @file DownloadControl.js
  *
  * Download control
  */
 
 import $ from 'jquery';
-import Control from './control';
-import Icon from './icon';
+import Control from './Control';
+import Icon from './Icon';
 
 /**
  * @param {Player} player Main player

@@ -1,12 +1,10 @@
 'use strict';
 /**
- * @file source-control.js
- *
- * Source control
+ * @file SourceControl.js
  */
 
 import $ from 'jquery';
-import ControlContainer from './control-container';
+import ControlContainer from './ControlContainer';
 
 /**
  * @class SourceControl

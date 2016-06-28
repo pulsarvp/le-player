@@ -1,13 +1,13 @@
 
 'use strict';
 /**
- * @file keybinding-info-control.js
+ * @file KeybindingInfoControl.js
  *
  * Info control
  */
 
 import $ from 'jquery';
-import ControlDropdown from './control-dropdown';
+import ControlDropdown from './ControlDropdown';
 
 /**
  * @param {Player} player Main player

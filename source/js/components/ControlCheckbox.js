@@ -1,13 +1,11 @@
 'use strict';
 /**
  * @file control-checkbox.js
- *
- * Control
  */
 
 
 import $ from 'jquery';
-import Control from './control';
+import Control from './Control';
 
 /**
  * @param {Player} player Main player

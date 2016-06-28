@@ -1,12 +1,10 @@
 'use strict';
 /**
- * @file control-text.js
- *
- * Control text
+ * @file ControlText.js
  */
 
 import $ from 'jquery';
-import Control from './control';
+import Control from './Control';
 
 /**
  * @param {Player} player Main player

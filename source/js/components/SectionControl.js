@@ -1,12 +1,10 @@
 'use strict';
 /**
- * @file section-control.js
- *
- * Section control
+ * @file SectionControl.js
  */
 
 import $ from 'jquery';
-import ControlCheckbox from './control-checkbox';
+import ControlCheckbox from './ControlCheckbox';
 
 /**
  * @class SectionControl

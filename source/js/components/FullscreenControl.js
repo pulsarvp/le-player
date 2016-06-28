@@ -1,12 +1,10 @@
 'use strict';
 /**
- * @file fullscreen-control.js
- *
- * Play control
+ * @file FullscreenControl.js
  */
 
 import $ from 'jquery';
-import Control from './control';
+import Control from './Control';
 
 /**
  * @param {Player} player Main player

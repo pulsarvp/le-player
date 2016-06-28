@@ -1,13 +1,11 @@
 'use strict';
 /**
- * @file rate-control.js
- *
- * Rate control
+ * @file RateControl.js
  */
 
 import $ from 'jquery';
-import Control from './control';
-import ControlText from './control-text';
+import Control from './Control';
+import ControlText from './ControlText';
 import Cookie from '../utils/cookie';
 
 /**

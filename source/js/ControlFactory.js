@@ -4,17 +4,17 @@
  *
  */
 
-import PlayControl from './components/play-control';
-import VolumeControl from './components/volume-control';
-import TimelineControl from './components/timeline-control';
-import SectionControl from './components/section-control';
-import FullscreenControl from './components/fullscreen-control';
-import RateControl from './components/rate-control';
-import BackwardControl from './components/backward-control';
-import SourceControl from './components/source-control';
-import SubtitleControl from './components/subtitle-control';
-import DownloadControl from './components/download-control';
-import KeyBindingInfoControl from './components/keybinding-info-control';
+import PlayControl from './components/PlayControl';
+import VolumeControl from './components/VolumeControl';
+import TimelineControl from './components/TimelineControl';
+import SectionControl from './components/SectionControl';
+import FullscreenControl from './components/FullscreenControl';
+import RateControl from './components/RateControl';
+import BackwardControl from './components/BackwardControl';
+import SourceControl from './components/SourceControl';
+import SubtitleControl from './components/SubtitleControl';
+import DownloadControl from './components/DownloadControl';
+import KeyBindingInfoControl from './components/KeybindingInfoControl';
 
 export const C_BACKWARD = 'backward';
 export const C_DIVIDER = 'divider';

@@ -1,7 +1,7 @@
 'use strict';
-import Control from './components/control';
-import Icon from './components/icon';
-import controlFactory, { C_KEYBINDING_INFO } from './control-factory';
+import Control from './components/Control';
+import Icon from './components/Icon';
+import controlFactory, { C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
 
 (function ($) {

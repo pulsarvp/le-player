@@ -1,12 +1,10 @@
 'use strict';
 /**
- * @file play-control.js
- *
- * Play control
+ * @file PlayControl.js
  */
 
 import $ from 'jquery';
-import Control from './control';
+import Control from './Control';
 
 /**
  * @class PlayControl
