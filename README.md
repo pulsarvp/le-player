@@ -6,11 +6,18 @@
 ## Быстрый старт
 
 Для начала нужно скачать плеер себе в проект.
-```npm install --save-dev https://github.com/miptliot/le-player.git```
+
+
+```
+npm install --save-dev https://github.com/miptliot/le-player.git
+```
 
 или
 
-```bower install --save-dev https://github.com/miptliot/le-player.git```
+
+```
+bower install --save-dev https://github.com/miptliot/le-player.git
+```
 
 Для работы с плеером достаточно подключить два файла в `head` и убедиться что подключен jQuery.
 
