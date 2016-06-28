@@ -11,19 +11,24 @@ import Cookie from './utils/cookie';
 	 * @param {jQuery} element Element when player will init
 	 * @param {Object} [options]
 	 * @param {Boolean} [options.autoplay=false]
-	 * @param {String|Number} [options.height='auto']
-	 * @param {String} [options.width]
+	 * When present, the video will automatically start playing as soon as it can do so without stopping.
+	 * @param {String|Number} [options.height='auto'] Height of video container
+	 * @param {String} [options.width] Width of video container
 	 * @param {Boolean} [options.loop=false]
+	 * When present, it specifies that the video will start over again, every time it is finished.
 	 * @param {Boolean} [options.muted=false]
+	 * When present, it specifies that the audio output of the video should be muted.
 	 * @param {String} [options.preload='metadata'] Can be ('auto'|'metadata'|'none')
-	 * @param {String} [options.poster] Path of image
-	 * @param {String} [options.svgPath] Path for svg sprite
-	 * @param {Number} [options.fullscreen.hideTimelineTime=7000]
-	 * @param {Object} [options.rate]
-	 * @param {Number} [options.rate.step=0.25]
+	 * @param {String} [options.poster] Path to poster of video
+	 * @param {String} [options.svgPath] Path to svg sprite for icons
+	 * @param {Number} [options.fullscreen] Fullscreen options
+	 * @param {Number} [options.fullscreen.hideTimelineTime=7000] Delay before hide timeline in fullscreen view
+	 * @param {Object} [options.rate] Rate options
+	 * @param {Number} [options.rate.step=0.25] Step of increase/decrease by rate control
 	 * @param {Number} [options.rate.min=0.5] Min of rate
 	 * @param {Number} [options.rate.max=4.0] Max of rate
 	 * @param {Number} [options.rate.default=1]
+	 * @param {Object} [options.playback] Playback options
 	 * @param {Object} [options.playback.step]
 	 * @param {Nubmer} [options.playback.step.short=5]
 	 * @param {Nubmer} [options.playback.step.medium=30]
@@ -35,7 +40,12 @@ import Cookie from './utils/cookie';
 	 * @param {Number} [options.volume.default=0.4] Default volume
 	 * @param {Number} [options.volume.mutelimit=0.05] Delta when volume is muted
 	 * @param {Number} [options.volume.step=0.05]
-	 * @param {Object} [options.keybinding]
+	 * @param {Object[]} [options.keybinding]
+	 * Object with keybinding options, when key it's name of key binding, and value it's key binding settings
+	 * @param {Number} [options.keybinding[].key] Code of key binding (for example 32 it's space)
+	 * @param {String[]} [options.keybinding[].info] Array of keystrokes order
+	 * @param {String} options.keybinding[].description] Description of key binding
+	 * @param {Function} options.keybinding[].fn] Callback
 	 */
 	let Player = function (element, opts) {
 		const C_BACKWARD = 'backward';
@@ -51,7 +61,7 @@ import Cookie from './utils/cookie';
 		const C_VOLUME = 'volume';
 		const C_SECTION = "section"
 
-		var options = this.options = $.extend({}, {
+		var options = this.options = $.extend(true, {}, {
 			autoplay : false,
 			height : 'auto',
 			loop : false,
@@ -89,8 +99,8 @@ import Cookie from './utils/cookie';
 				mutelimit : 0.05,
 				step : 0.1
 			},
-			keyBinding : {
-				play : {
+			keyBinding : [
+				{
 					key : 32,
 					info : ['Space'],
 					description : 'Начать проигрывание / поставить на паузу',
@@ -98,7 +108,7 @@ import Cookie from './utils/cookie';
 						video.togglePlay();
 					}
 				},
-				backwardMedium : {
+				{
 					key : 37,
 					info : ['←'],
 					description : 'Перемотать на 30 секунд назад',
@@ -106,7 +116,7 @@ import Cookie from './utils/cookie';
 						video.currentTime -= options.playback.step.medium;
 					}
 				},
-				forwardMedium : {
+				{
 					key : 39,
 					info : ['→'],
 					description : 'Перемотать на 30 секунд вперёд',
@@ -114,7 +124,7 @@ import Cookie from './utils/cookie';
 						video.currentTime += options.playback.step.medium;
 					}
 				},
-				backwardShort : {
+				{
 					shiftKey : true,
 					info : ['Shift', '←'],
 					description : 'Перемотать на 5 секунд назад',
@@ -123,7 +133,7 @@ import Cookie from './utils/cookie';
 						video.currentTime -= options.playback.step.short;
 					}
 				},
-				forwardShort : {
+				{
 					shiftKey : true,
 					key : 39,
 					info : ['Shift', '→'],
@@ -133,7 +143,7 @@ import Cookie from './utils/cookie';
 					}
 				},
 
-				volumeUp : {
+				{
 					key : 38,
 					info : ['↑'],
 					description : 'Увеличить громкость',
@@ -142,7 +152,7 @@ import Cookie from './utils/cookie';
 					}
 				},
 
-				volumeDown : {
+				{
 					key : 40,
 					info : ['↓'],
 					description : 'Уменьшить громкость',
@@ -150,7 +160,7 @@ import Cookie from './utils/cookie';
 						video.volume -= options.volume.step;
 					}
 				},
-			}
+			]
 		}, opts);
 
 		/**
@@ -925,11 +935,12 @@ import Cookie from './utils/cookie';
 			// @TODO move this to Video class
 			element.children('source').each(function () {
 				var src = $(this).attr('src');
-				if (src)
+				if (src) {
 					sources.push({
 						src : src,
 						title : $(this).attr('title')
 					});
+				}
 			});
 			if (sources.length == 0) {
 				var src = element.attr('src');
@@ -1050,7 +1061,7 @@ import Cookie from './utils/cookie';
 			$(container).bind('keydown.leplayer.hotkey', (e) => {
 				let _isFocused = isFocused();
 				if (_isFocused) {
-					$.each(options.keyBinding, (action, binding) => {
+					options.keyBinding.forEach(binding => {
 						if( isKeyBinding(e, binding) ) {
 							e.preventDefault();
 							binding.fn(video);
