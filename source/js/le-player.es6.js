@@ -12,7 +12,7 @@ import Cookie from './utils/cookie';
 	 * @param {Object} [options]
 	 * @param {Boolean} [options.autoplay=false]
 	 * @param {String|Number} [options.height='auto']
-	 * @param {String} [options.width='auto']
+	 * @param {String} [options.width]
 	 * @param {Boolean} [options.loop=false]
 	 * @param {Boolean} [options.muted=false]
 	 * @param {String} [options.preload='metadata'] Can be ('auto'|'metadata'|'none')
@@ -59,7 +59,6 @@ import Cookie from './utils/cookie';
 			preload : 'metadata',
 			poster : null,
 			svgPath : '../dist/svg/svg-defs.svg',
-			width : 'auto',
 			fullscreen : {
 				hideTimelineTime : 7000
 			},
@@ -528,7 +527,7 @@ import Cookie from './utils/cookie';
 
 				container
 					.css('width', '100%')
-					.css('max-width', this._video.clientWidth + 'px');
+					.css('max-width', (options.width || this.width) + 'px');
 
 				// This is generally for Firefox only
 				// because it somehow resets track list
@@ -1024,7 +1023,9 @@ import Cookie from './utils/cookie';
 				.addClass('leplayer-container')
 				.append(videoContainer)
 				.attr('tabindex', 0)
-				.css('width', element.width() + 'px');
+				//.css('width', element.width() + 'px');
+				.css('width', '100%')
+				.css('max-width', (options.width || video.width) + 'px');
 
 			if(options.sectionContainer) {
 				sectionContainer = $(options.sectionContainer).addClass('leplayer-section-container');
@@ -1069,14 +1070,14 @@ import Cookie from './utils/cookie';
 				options.height = height + 'px';
 				element.removeAttr('height');
 			}
-			element.css('height', options.height);
+			//element.css('height', options.height);
 
 			width = element.attr('width');
 			if (width) {
 				options.width = width + 'px';
 				element.removeAttr('width');
 			}
-			element.css('width', options.width);
+			//element.css('width', options.width);
 
 			poster = element.attr('poster');
 			if (poster)
