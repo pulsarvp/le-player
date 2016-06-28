@@ -4,7 +4,7 @@
 .leplayer-container {
   color: #1b4b7e;
   display: inline-block;
-  font-family: "Fira Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "PT Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   line-height: 0;
   outline: 0;
   position: relative;
@@ -36,6 +36,7 @@
   color: white;
 }
 .leplayer-container video {
+  width: 100%;
   outline: 0;
 }
 .leplayer-container video::-webkit-media-controls {
@@ -114,7 +115,7 @@
   z-index: 1008;
 }
 .leplayer-controls.controls-fullscreen .info-control__content {
-  background: rgba(70, 82, 100, 0.8);
+  background: rgba(70, 82, 100, 0.85);
   color: white;
 }
 .leplayer-controls.controls-fullscreen .control-text {
@@ -242,13 +243,16 @@
   color: inherit;
 }
 .leplayer-controls .info-control__content {
-  background: rgba(222, 229, 237, 0.8);
+  box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.4);
+  white-space: nowrap;
+  text-align: left;
+  background: rgba(222, 229, 237, 0.85);
   padding: 10px;
   color: black;
   font-size: 12px;
   left: 50%;
   bottom: 37px;
-  width: 300px;
+  max-width: 300px;
   transform: translateX(-50%);
 }
 .leplayer-controls .control-container {
@@ -459,7 +463,8 @@
   }
 }
 .leplayer-sections {
-  font-family: "Fira Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "PT Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 13px;
   position: absolute;
   display: flex;
   top: 0;
@@ -526,12 +531,11 @@
   width: 213px;
 }
 .leplayer-section-title {
-  font-size: 12px;
-  font-weight: 500;
+  font-weight: bold;
 }
 .leplayer-section-description {
-  font-size: 12px;
   display: none;
+  margin-top: 5px;
 }
 .leplayer-key {
   box-shadow: 1px 1px 0 1px rgba(120, 120, 120, 0.5);
