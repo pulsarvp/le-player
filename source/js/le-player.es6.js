@@ -137,7 +137,7 @@ import Cookie from './utils/cookie';
 					shiftKey : true,
 					key : 39,
 					info : ['Shift', '→'],
-					description : 'Перемотать на 5 секунд назад',
+					description : 'Перемотать на 5 секунд вперед',
 					fn : (video) => {
 						video.currentTime += options.playback.step.short;
 					}
