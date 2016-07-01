@@ -22,6 +22,7 @@ class DownloadControl extends Control {
 			className : 'download',
 		}, options);
 		super(player, options);
+		this.player.on('loadedmetadata', this.onLoadedMetaData.bind(this));
 	}
 
 
@@ -56,6 +57,11 @@ class DownloadControl extends Control {
 	 */
 	set link (value) {
 		this.element.attr('href', value);
+	}
+
+
+	onLoadedMetaData(e, data) {
+		this.link = data.video.currentSrc;
 	}
 
 }

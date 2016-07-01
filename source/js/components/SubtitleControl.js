@@ -18,25 +18,10 @@ class SubtitleControl extends ControlContainer {
 		options = $.extend({}, {
 			iconName : 'commenting-o',
 			title : 'Субтитры',
-			className : 'subtitle-control'
+			className : 'subtitle-control',
+			disable : true
 		}, options);
 		super(player, options);
-	}
-
-	init() {
-		let video = this.player.video;
-		if (video.subtitles.length > 0) {
-			for (var i in video.subtitles) {
-				if (!video.subtitles.hasOwnProperty(i)) continue;
-				let item = video.subtitles[ i ];
-				this.addItem(item.title, {
-					src : item.src,
-					language : item.language
-				});
-			}
-		} else {
-			this.disable = true;
-		}
 	}
 
 	onIconClick (e) {
@@ -52,6 +37,21 @@ class SubtitleControl extends ControlContainer {
 		let video = this.player.video;
 		if (item.data('language')) {
 			video.track = item.data('language');
+		}
+	}
+
+	onPlayerInited(e, data) {
+		let video = this.player.video;
+		if (video.subtitles.length > 0) {
+			for (var i in video.subtitles) {
+				if (!video.subtitles.hasOwnProperty(i)) continue;
+				let item = video.subtitles[ i ];
+				this.addItem(item.title, {
+					src : item.src,
+					language : item.language
+				});
+			}
+			this.disable = false;
 		}
 	}
 }

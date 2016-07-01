@@ -16,33 +16,32 @@ class SourceControl extends ControlContainer {
 		options = $.extend({}, {
 			iconName : 'bullseye',
 			title : 'Качество',
-			className : 'source-control'
+			className : 'source-control',
+			disable : true
 		}, options);
 		super(player, options);
-		if (this.player.sources.length > 1) {
-			for (var i in this.player.sources) {
-				this.addItem(this.player.sources[ i ].title, { src : this.player.sources[ i ].src });
-			}
-		} else {
-			this.disable = true;
-		}
-	}
 
-	set (index) {
-		/** TODO: Emit event on set source*/
-		let s = this.getByIndex(index);
-		if (s != null) {
-			this.player.video.source = s.data('src');
-			this.player.controls.download = s.data('src');
-		}
+
 	}
 
 	/**
 	 * @override
 	 */
-	onItemClick (index) {
-		super.onItemClick(index);
-		this.set(index);
+	onItemClick (e) {
+		super.onItemClick(e);
+		let item = $(e.target);
+		this.player.video.source = item.data('src');
+	}
+
+	onPlayerInited(e, data) {
+		if (this.player.sources.length > 1) {
+			for (let i in this.player.sources) {
+				this.addItem(this.player.sources[i].title, {
+					src : this.player.sources[i].src
+				});
+			}
+			this.disable = false;
+		}
 	}
 }
 

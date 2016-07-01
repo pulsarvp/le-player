@@ -54,6 +54,12 @@ class ControlCheckbox extends Control {
 		this.checked = !this.checked;
 	}
 
+	/**
+	 * On checked event handler
+	 *
+	 * @param {Event} e
+	 * @param {Object} data
+	 */
 	onChecked(e, data) {
 
 	}

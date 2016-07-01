@@ -39,6 +39,8 @@ class Control extends Component {
 				'leplayer_click' : this.onIconClick.bind(this)
 			});
 		}
+
+		this.player.on('inited', this.onPlayerInited.bind(this))
 	}
 
 	/**
@@ -86,8 +88,8 @@ class Control extends Component {
 	}
 
 	_onIconClick (e) {
-		event.stopPropagation();
-		event.preventDefault();
+		e.stopPropagation();
+		e.preventDefault();
 		this.icon.element.trigger('leplayer_click');
 	}
 	/**
@@ -105,6 +107,10 @@ class Control extends Component {
 	 */
 	onIconClick (e) {
 		e.preventDefault();
+	}
+
+	onPlayerInited (e, data) {
+
 	}
 
 }

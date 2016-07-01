@@ -23,9 +23,9 @@ class TimelineControl extends Control {
 			className : 'timeline timeline-container'
 		}, options);
 		super(player, options);
-		this.player.on('inited', this._onPlayerInited.bind(this));
-		this.player.on('sectionsinit', this._onSectionsInit.bind(this));
-		this._initWatchBuffer()
+		this.player.on('sectionsinit', this.onSectionsInit.bind(this));
+		this.player.on('loadedmetadata', this.onLoadedMetaData.bind(this));
+		//this._initWatchBuffer()
 	}
 
 	createElement() {
@@ -125,15 +125,7 @@ class TimelineControl extends Control {
 		});
 	}
 
-	_onPlayerInited(e) {
-		let video = this.player.video;
-		this.totalTime.text = secondsToTime(video.duration);
-		this.currentTime.element.css({
-			'width' : this.totalTime.element.width()
-		})
-	}
-
-	_onSectionsInit(e, data) {
+	onSectionsInit(e, data) {
 		let sections = data.items;
 		let video = this.player.video;
 		let duration = video.duration;
@@ -143,8 +135,8 @@ class TimelineControl extends Control {
 			let item = $('<div />')
 				.addClass('timeline-section')
 				.css({
-					width: length / duration * 100 + '%',
-					left: section.begin / duration * 100 + '%'
+					width: length / duration * 99 + '%',
+					left: section.begin / duration * 99 + '%'
 				});
 			result.append(item);
 		})
@@ -175,6 +167,32 @@ class TimelineControl extends Control {
 						this.marker.css('left', percent + '%');
 		this.played.css('width', percent + '%');
 		this.currentTime.text = secondsToTime(currentTime);
+	}
+
+
+
+	/**
+	 * @override
+	 */
+	onPlayerInited(e) {
+		let video = this.player.video;
+		this.totalTime.text = secondsToTime(video.duration);
+		this.currentTime.element.css({
+			'width' : this.totalTime.element.width()
+		})
+	}
+
+
+	/**
+	 * On loadedmetadatta event handler
+	 * It's call when video is init or player change source
+	 * @param {Event} e
+	 * @param {Object} data
+	 * @param {Video} data.video
+	 */
+	onLoadedMetaData(e, data) {
+		let video = data.video;
+		this.totalTime.text = secondsToTime(video.duration);
 	}
 
 	_initWatchBuffer () {
