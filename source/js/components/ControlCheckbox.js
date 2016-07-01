@@ -18,6 +18,7 @@ class ControlCheckbox extends Control {
 	constructor(player, options={}) {
 		super(player, options);
 		this.checked = this.options.checked || false;
+		this.element.on('leplayer_checked', this.onChecked.bind(this))
 	}
 
 
@@ -27,6 +28,9 @@ class ControlCheckbox extends Control {
 	 * @param {boolean} val
 	 */
 	set checked (val) {
+		if (this.disable) {
+			return;
+		}
 		val = !!val;
 		this._checked = val
 		this.element.toggleClass('control-checkbox--checked', val);
@@ -49,6 +53,11 @@ class ControlCheckbox extends Control {
 		super.onClick(e);
 		this.checked = !this.checked;
 	}
+
+	onChecked(e, data) {
+
+	}
+
 
 	/**
 	 * @override

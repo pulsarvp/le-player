@@ -19,17 +19,17 @@ class SectionControl extends ControlCheckbox {
 			iconName : 'list-ul',
 			className : 'control--type_section',
 			title : 'Показать/скрыть секции',
-			checked : true
+			disable : true
 		}, options);
 		super(player, options);
+		this.player.on('sectionsinit', () => {
+			this.disable = false;
+		})
 	}
 
-	/**
-	 * @override
-	 */
-	onClick(e) {
-		super.onClick(e);
-		this.player.trigger('section_toggle', { checked : this.checked });
+	onChecked(e, data) {
+		super.onChecked(e);
+		this.player.trigger('section_toggle', { checked : data.checked });
 	}
 }
 

@@ -1,4 +1,5 @@
 'use strict';
+
 import Control from './components/Control';
 import Icon from './components/Icon';
 import controlFactory, { C_KEYBINDING_INFO } from './ControlFactory';
@@ -647,10 +648,10 @@ import Cookie from './utils/cookie';
 					this.items.volume.value = value;
 			}
 
-			disable () {
+			set disable (value) {
 				for (let i in this.items) {
 					if (!this.items.hasOwnProperty(i)) continue;
-					this.items[ i ].disable();
+					this.items[ i ].disable = value;
 				}
 			}
 
@@ -763,9 +764,9 @@ import Cookie from './utils/cookie';
 				Cookie.set('volume', value);
 			}
 
-			disable () {
+			set disable (value) {
 				for (var i in this.collections) {
-					this.collections[ i ].disable();
+					this.collections[ i ].disable = value;
 				}
 			}
 

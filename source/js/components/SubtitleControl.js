@@ -35,7 +35,7 @@ class SubtitleControl extends ControlContainer {
 				});
 			}
 		} else {
-			this.disable();
+			this.disable = true;
 		}
 	}
 

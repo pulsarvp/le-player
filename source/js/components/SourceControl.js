@@ -24,7 +24,7 @@ class SourceControl extends ControlContainer {
 				this.addItem(this.player.sources[ i ].title, { src : this.player.sources[ i ].src });
 			}
 		} else {
-			this.disable();
+			this.disable = true;
 		}
 	}
 

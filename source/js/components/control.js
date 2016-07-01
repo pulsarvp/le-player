@@ -14,6 +14,7 @@ import Icon from './Icon';
  * @param {String} [options.iconName] Name of control's icon. If empty, control will not have a icon
  * @param {String} [options.className]
  * @param {String} [options.title] Contorl's tooltip, title attr
+ * @param {Boolean} [options.disable=false]
  * @property {Icon} icon Icon in control, if it is exist
  * @extends Component
  */
@@ -21,16 +22,23 @@ class Control extends Component {
 
 	constructor(player, options) {
 		super(player, options);
+		this.disable = true
+
+		this.player.on('inited', (e) => {
+			this.disable = options.disable || false;
+		})
 
 		this.element.on({
 			'click' : this._onClick.bind(this),
 			'leplayer_click' : this.onClick.bind(this)
 		});
 
-		this.options.iconName && this.icon.element.on({
-			'click' : this._onIconClick.bind(this),
-			'leplayer_click' : this.onIconClick.bind(this)
-		});
+		if(this.options.iconName) {
+			this.icon.element.on({
+				'click' : this._onIconClick.bind(this),
+				'leplayer_click' : this.onIconClick.bind(this)
+			});
+		}
 	}
 
 	/**
@@ -61,13 +69,17 @@ class Control extends Component {
 		return `control ${this.options.className} ${super.buildCSSClass()}`
 	}
 
-	disable() {
-		this.disabled = true;
-		this.element.addClass('disabled');
+	set disable(value) {
+		this._disable = value;
+		this.element.toggleClass('disabled', value);
+	}
+
+	get disable() {
+		return this._disable
 	}
 
 	_onClick (e) {
-		if (this.disabled) {
+		if (this.disable) {
 			return false;
 		}
 		this.element.trigger('leplayer_click');
@@ -76,9 +88,6 @@ class Control extends Component {
 	_onIconClick (e) {
 		event.stopPropagation();
 		event.preventDefault();
-		if (this.disabled) {
-			return false;
-		}
 		this.icon.element.trigger('leplayer_click');
 	}
 	/**
