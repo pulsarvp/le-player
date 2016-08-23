@@ -48,7 +48,7 @@ class RateControl extends Control {
 			iconName : 'forward',
 			title : 'Увеличить скорость проигрывания'
 		});
-		this.currentRate = new ControlText({ className : 'rate-current'});
+		this.currentRate = new ControlText(this.player, { className : 'rate-current'});
 
 		this.element
 			.append(this.downControl.element)
@@ -66,22 +66,23 @@ class RateControl extends Control {
 	set value (value) {
 		let video = this.player.video;
 		let options = this.player.options;
-		if (this.disabled) {
+		if (this.disable) {
 			return false;
 		}
-		this.upControl.element.removeClass('disabled');
-		this.downControl.element.removeClass('disabled');
-		if (video.rate <= options.rate.min)
-			this.downControl.element.addClass('disabled');
-		else if (video.rate >= options.rate.max)
-			this.upControl.element.addClass('disabled');
+		this.upControl.disable = false;
+		this.downControl.disable = false;
+		if (video.rate <= options.rate.min) {
+			this.downControl.disable = true;
+		} else if (video.rate >= options.rate.max) {
+			this.upControl.disable = true;
+		}
 		this.show();
 	}
 
-	disable() {
-		this.disabled = true;
-		this.downControl.disable.apply(this.down, arguments);
-		this.upControl.disable.apply(this.up, arguments);
+	set disable(value) {
+		this._disable = value;
+		this.downControl.disable = value;
+		this.upControl.disable = value;
 	}
 
 	init () {
