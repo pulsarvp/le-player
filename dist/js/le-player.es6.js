@@ -1,4 +1,5 @@
 'use strict';
+
 import Control from './components/Control';
 import Icon from './components/Icon';
 import controlFactory, { C_KEYBINDING_INFO } from './ControlFactory';
@@ -137,7 +138,7 @@ import Cookie from './utils/cookie';
 					shiftKey : true,
 					key : 39,
 					info : ['Shift', '→'],
-					description : 'Перемотать на 5 секунд назад',
+					description : 'Перемотать на 5 секунд вперед',
 					fn : (video) => {
 						video.currentTime += options.playback.step.short;
 					}
@@ -358,15 +359,16 @@ import Cookie from './utils/cookie';
 				this._video = this._ctx[ 0 ];
 				this._video.playbackRate = rate;
 				this._video.currentTime = time;
-				if (stop)
+				if (stop) {
 					this.pause();
-				else
+				} else {
 					this.play();
+				}
 
 				// @TODO make this right way
-				setTimeout(() => {
-					controls.totalTime = secondsToTime(this._video.duration);
-				}, 100);
+				//setTimeout(() => {
+					//controls.totalTime = secondsToTime(this._video.duration);
+				//}, 100);
 
 			}
 
@@ -522,22 +524,18 @@ import Cookie from './utils/cookie';
 				if (this._video.readyState > HTMLMediaElement.HAVE_NOTHING) {
 					dfd.resolve()
 					this._onLoadedMetaData();
+					this._textTracksHack();
 				} else {
 					$(this._video).one('loadedmetadata', (e) => {
 						dfd.resolve()
-						this._onLoadedMetaData();
+						this._textTracksHack();
 					});
 				}
 				dfd.notify();
-				return dfd.promise()
+				return dfd.promise();
 			}
 
-			_onLoadedMetaData () {
-				let _self = this;
-
-				container
-					.css('width', '100%')
-					.css('max-width', (options.width || this.width) + 'px');
+			_textTracksHack () {
 
 				// This is generally for Firefox only
 				// because it somehow resets track list
@@ -557,7 +555,13 @@ import Cookie from './utils/cookie';
 						}
 					}
 				}
-				// this.trigger('loadedmetadata')
+			}
+
+			_onLoadedMetaData (e) {
+				container
+					.css('width', '100%')
+					.css('max-width', (options.width || this.width) + 'px');
+				this.player.trigger('loadedmetadata', { video : this._video });
 			}
 
 			_initHtmlEvents () {
@@ -570,6 +574,8 @@ import Cookie from './utils/cookie';
 						controls.moveTimeMarker();
 						this.player.trigger('timeupdate', { time : video.currentTime });
 					},
+
+					'loadedmetadata' : this._onLoadedMetaData.bind(this),
 
 					'ended' : () => {
 						this.pause();
@@ -647,10 +653,10 @@ import Cookie from './utils/cookie';
 					this.items.volume.value = value;
 			}
 
-			disable () {
+			set disable (value) {
 				for (let i in this.items) {
 					if (!this.items.hasOwnProperty(i)) continue;
-					this.items[ i ].disable();
+					this.items[ i ].disable = value;
 				}
 			}
 
@@ -763,9 +769,9 @@ import Cookie from './utils/cookie';
 				Cookie.set('volume', value);
 			}
 
-			disable () {
+			set disable (value) {
 				for (var i in this.collections) {
-					this.collections[ i ].disable();
+					this.collections[ i ].disable = value;
 				}
 			}
 
@@ -938,7 +944,7 @@ import Cookie from './utils/cookie';
 				if (src) {
 					sources.push({
 						src : src,
-						title : $(this).attr('title')
+						title : $(this).attr('title') || 'default'
 					});
 				}
 			});
