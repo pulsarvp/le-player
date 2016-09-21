@@ -48,6 +48,8 @@ import Cookie from './utils/cookie';
 	 * @param {String[]} [options.keybinding[].info] Array of keystrokes order
 	 * @param {String} options.keybinding[].description] Description of key binding
 	 * @param {Function} options.keybinding[].fn] Callback
+	 * @param {Object|Boolean} [options.miniplayer=false]
+	 * @param {String} [options.miniplayer.width] MiniPlayer's width
 	 */
 	let Player = function (element, opts) {
 		const C_BACKWARD = 'backward';
@@ -975,6 +977,12 @@ import Cookie from './utils/cookie';
 			}
 		}
 
+		/**
+		 * @class MiniPlayer
+		 * @param {Player} player Main player
+		 * @param {Object} [options]
+		 * @extends Control
+		 */
 		class MiniPlayer extends Component {
 			constructor (player, options ) {
 				let width;
@@ -1015,7 +1023,12 @@ import Cookie from './utils/cookie';
 				})
 			};
 
-			resetCSS() {
+			/**
+			 * Reset jquery CSS for container and video-container
+			 *
+			 * @private
+			 */
+			_resetCSS() {
 				container.css({
 					'padding-top' : ''
 				})
@@ -1031,6 +1044,9 @@ import Cookie from './utils/cookie';
 				return this._height || (this._height = videoContainer.height);
 			}
 
+			/**
+			 * Move video container under the miniplayer
+			 */
 			updateVideoContainer() {
 				container.css({
 					'padding-top' : videoContainer.height() + 'px'
@@ -1049,16 +1065,26 @@ import Cookie from './utils/cookie';
 				})
 			}
 
+			/**
+			 * Show mini player
+			 *
+			 * @public
+			 */
 			show() {
 				this.visible = true;
 				this.element.show()
 				this.updateVideoContainer()
 			}
 
+			/**
+			 * Hide mini player
+			 *
+			 * @public
+			 */
 			hide() {
 				this.visible = false;
 				this.element.hide();
-				this.resetCSS()
+				this._resetCSS()
 				container.removeClass('leplayer-container--mini');
 				this.element.css({
 					height : ''
