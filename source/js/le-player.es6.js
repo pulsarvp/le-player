@@ -65,9 +65,7 @@ import Cookie from './utils/cookie';
 
 		var player = this;
 		var options = this.options = $.extend(true, {}, {
-			miniplayer : {
-				width: 900
-			},
+			miniplayer : false,
 			autoplay : false,
 			height : 'auto',
 			loop : false,
