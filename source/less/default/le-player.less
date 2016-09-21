@@ -81,6 +81,24 @@
 			color: @color-active;
 		}
 	}
+
+	&--mini {
+		.leplayer-video {
+			z-index: @z-index-miniplayer + 1;
+			position: fixed;
+			width: 170px;
+			top: 0;
+			left: 0;
+			right: 0;
+			margin-left: auto;
+			margin-right: auto;
+			transform: translateX(-100%);
+		}
+		.play-overlay {
+			font-size: 50px;
+		}
+
+	}
 }
 
 .leplayer-controls
@@ -380,7 +398,6 @@
 		display: table-cell;
 		font-size: @control-text-font-size;
 		box-sizing: content-box;
-		height: @control-height;
 		line-height: 100%;
 		padding: 0 5px;
 		text-align: center;
@@ -732,4 +749,77 @@
 	display: inline-block;
 	margin: 4.25px 2px 4.25px 0;
 	padding: 4px;
+}
+
+
+.leplayer-miniplayer {
+	background: @color-miniplayer-bg;
+	position: fixed;
+	z-index: @z-index-miniplayer;
+	top: 0;
+	left: 0;
+	right: 0;
+	box-shadow: 0 10px 15px -10px rgba(0,0,0,.75);
+	height: auto;
+	max-width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	box-sizing: border-box;
+
+	&__info {
+		padding: 10px;
+		height: 50px;
+		margin: 0;
+		margin-left: 180px;
+		display: flex;
+		flex-direction: column;
+		height: auto;
+		line-height: 1.42857143;
+	}
+
+	&__title {
+		color: black;
+		font-size: 14px;
+		margin-bottom: 5px;
+		font-weight: bold;
+		line-height: 100%;
+	}
+
+	&__video-info {
+		margin-bottom: 10px;
+
+	}
+
+	&__controls {
+		position: absolute;
+		bottom: 10px;
+	}
+
+	.control-time {
+		display: table-cell;
+		vertical-align: middle;
+		padding: 6px 10px;
+		font-weight: bold;
+		width: 150px;
+		white-space: nowrap;
+		box-sizing: border-box;
+
+		&__current {
+			background: none;
+			cursor: default;
+			font-size: 15px;
+			text-align: right;
+		}
+
+		&__total {
+			background: none;
+			cursor: default;
+
+			&:before {
+				content : '/';
+				margin-right: 9px;
+			}
+		}
+
+	}
 }

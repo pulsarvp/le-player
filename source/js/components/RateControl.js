@@ -23,31 +23,40 @@ class RateControl extends Control {
 			className : 'control-container'
 		}, options);
 		super(player, options);
-		let video = this.player.video;
-		this.downControl.element.on('click', e => {
-			video.rate -= this.player.options.rate.step;
-		})
+		const video = this.player.video;
 
-		this.upControl.element.on('click', e => {
-			video.rate += this.player.options.rate.step;
-		});
+		this.player.on('ratechange', (e, data) => {
+			this.value = data.rate
+		})
 	}
+
+
 
 	/**
 	 * @override
 	 */
 	createElement() {
 		super.createElement();
+		const video = this.player.video;
+
 		this.downControl = new Control(this.player, {
 			className : 'rate-down',
 			iconName : 'backward',
-			title : 'Уменьшить скорость проигрывания'
+			title : 'Уменьшить скорость проигрывания',
+			onClick : function(e) {
+				video.rate -= this.player.options.rate.step;
+			}
 		});
+
 		this.upControl = new Control(this.player, {
 			className : 'rate-up',
 			iconName : 'forward',
-			title : 'Увеличить скорость проигрывания'
+			title : 'Увеличить скорость проигрывания',
+			onClick : function(e) {
+				video.rate += this.player.options.rate.step;
+			}
 		});
+
 		this.currentRate = new ControlText(this.player, { className : 'rate-current'});
 
 		this.element
@@ -61,6 +70,13 @@ class RateControl extends Control {
 	 */
 	buildCSSClass() {
 		return this.options.className;
+	}
+
+	/**
+	 * @override
+	 */
+	onPlayerInited() {
+		this.value = this.player.video.defaultRate;
 	}
 
 	set value (value) {

@@ -15,6 +15,7 @@ import SourceControl from './components/SourceControl';
 import SubtitleControl from './components/SubtitleControl';
 import DownloadControl from './components/DownloadControl';
 import KeyBindingInfoControl from './components/KeybindingInfoControl';
+import TimeInfoControl from './components/TimeInfoControl';
 
 export const C_BACKWARD = 'backward';
 export const C_DIVIDER = 'divider';
@@ -29,6 +30,7 @@ export const C_TIMELINE = 'timeline';
 export const C_VOLUME = 'volume';
 export const C_SECTION = 'section';
 export const C_KEYBINDING_INFO = 'keybinding info';
+export const C_TIME_INFO = 'timeinfo'
 
 export default function controlFactory(player, name) {
 	switch (name) {
@@ -36,7 +38,9 @@ export default function controlFactory(player, name) {
 			return new BackwardControl(player);
 
 		case C_DIVIDER:
-			return `<div class="divider"></div>`;
+			return {
+				element : $('<div/>').addClass('divider')
+			}
 
 		case C_DOWNLOAD:
 			return new DownloadControl(player);
@@ -70,6 +74,9 @@ export default function controlFactory(player, name) {
 
 		case C_KEYBINDING_INFO:
 			return new KeyBindingInfoControl(player);
+
+		case C_TIME_INFO:
+			return new TimeInfoControl(player)
 
 		default:
 			return null;

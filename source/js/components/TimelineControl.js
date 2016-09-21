@@ -24,8 +24,10 @@ class TimelineControl extends Control {
 		}, options);
 		super(player, options);
 		this.player.on('sectionsinit', this.onSectionsInit.bind(this));
-		this.player.on('loadedmetadata', this.onLoadedMetaData.bind(this));
-		//this._initWatchBuffer()
+		this.player.on('timeupdate', (e, data) => {
+			const { time, duration } = data;
+			this.hardMove(time / duration);
+		})
 	}
 
 	createElement() {
@@ -113,13 +115,13 @@ class TimelineControl extends Control {
 				if (p > 0 && p < 1) {
 					this.markerTime
 						.show()
-						.html(secondsToTime(video.duration * p))
+						.html(secondsToTime(video.duration * p));
 					video.seek(video.duration * p);
 				}
 			},
 
 			'mouseup' : (e) => {
-				this.markerTime.hide()
+				this.markerTime.hide();
 				this.drag = false;
 			}
 		});
@@ -164,7 +166,7 @@ class TimelineControl extends Control {
 		let video = this.player.video;
 		let percent = (video.currentTime / video.duration * 100).toFixed(2);
 		let currentTime = video.currentTime;
-						this.marker.css('left', percent + '%');
+		this.marker.css('left', percent + '%');
 		this.played.css('width', percent + '%');
 		this.currentTime.text = secondsToTime(currentTime);
 	}
@@ -180,19 +182,6 @@ class TimelineControl extends Control {
 		this.currentTime.element.css({
 			'width' : this.totalTime.element.width()
 		})
-	}
-
-
-	/**
-	 * On loadedmetadatta event handler
-	 * It's call when video is init or player change source
-	 * @param {Event} e
-	 * @param {Object} data
-	 * @param {Video} data.video
-	 */
-	onLoadedMetaData(e, data) {
-		let video = data.video;
-		this.totalTime.text = secondsToTime(video.duration);
 	}
 
 	_initWatchBuffer () {

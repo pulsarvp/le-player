@@ -19,6 +19,14 @@ class PlayControl extends Control {
 			className : 'play'
 		}, options);
 		super(player, options);
+
+		this.player.on('play', (e) => {
+			this.play();
+		})
+
+		this.player.on('pause', (e) => {
+			this.pause();
+		})
 	}
 
 	/**
