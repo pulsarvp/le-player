@@ -338,6 +338,7 @@ import Cookie from './utils/cookie';
 			}
 
 			set currentTime (value) {
+				console.log(value, this._video);
 				if (value > this.duration) {
 					this._video.currentTime = this.duration
 				} else if (value < 0 ) {
@@ -481,6 +482,7 @@ import Cookie from './utils/cookie';
 						controls.init();
 						this._initRate();
 						this._initVolume();
+						this.startBuffering();
 						dfd.resolve();
 					});
 				this._initCustomEvents();
@@ -488,6 +490,12 @@ import Cookie from './utils/cookie';
 
 				dfd.notify();
 				return dfd.promise();
+			}
+
+			startBuffering() {
+				return this.play().done( () => {
+					this.pause()
+				})
 			}
 
 			togglePlay () {
@@ -509,15 +517,33 @@ import Cookie from './utils/cookie';
 			}
 
 			play () {
+				let dfd = $.Deferred();
+				const playPromise = this._video.play();
+
+				if( playPromise != null) {
+					playPromise.then(function() {
+						dfd.resolve();
+					})
+				} else {
+					dfd.resolve();
+				}
 				overlay.hide();
-				//controls.play();
-				return this._video.play();
+				return dfd.promise();
 			}
 
 			pause () {
+				let dfd = $.Deferred();
+				const pausePromise = this._video.pause();
+
+				if( pausePromise != null) {
+					pausePromise.then(function() {
+						dfd.resolve();
+					})
+				} else {
+					dfd.resolve();
+				}
 				overlay.show();
-				//controls.pause();
-				return this._video.pause();
+				return dfd.promise();
 			}
 
 			trigger (eventName, ...args) {
@@ -943,6 +969,7 @@ import Cookie from './utils/cookie';
 
 			onSectionClick(e) {
 				let section = $(e.target).closest('.leplayer-section');
+				console.log(secondsToTime(section.attr('data-time')));
 				video.currentTime = section.attr('data-time');
 			}
 
@@ -968,7 +995,7 @@ import Cookie from './utils/cookie';
 
 				for (let i = 0; i < this.items.length; i++) {
 					let section = this.items[i];
-					if (currentTime <= section.end) {
+					if (currentTime < section.end) {
 						this.setActiveByIndex(i);
 						break;
 					}
@@ -1114,7 +1141,6 @@ import Cookie from './utils/cookie';
 
 				this.element = $('<div/>').html(html).contents();
 				this.element.find('.leplayer-miniplayer__controls').append(controls.element);
-				console.log(this.options)
 				this.element.css({
 					'max-width' : this.options.width
 				})
@@ -1202,6 +1228,7 @@ import Cookie from './utils/cookie';
 				}
 				initSections();
 				player.trigger('inited');
+				console.log('inited');
 			});
 
 
