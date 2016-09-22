@@ -1,6 +1,7 @@
 'use strict';
 
 import Control from './components/Control';
+import Component from './components/Component';
 import Icon from './components/Icon';
 import controlFactory, { C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
@@ -47,6 +48,8 @@ import Cookie from './utils/cookie';
 	 * @param {String[]} [options.keybinding[].info] Array of keystrokes order
 	 * @param {String} options.keybinding[].description] Description of key binding
 	 * @param {Function} options.keybinding[].fn] Callback
+	 * @param {Object|Boolean} [options.miniplayer=false]
+	 * @param {String} [options.miniplayer.width] MiniPlayer's width
 	 */
 	let Player = function (element, opts) {
 		const C_BACKWARD = 'backward';
@@ -62,7 +65,9 @@ import Cookie from './utils/cookie';
 		const C_VOLUME = 'volume';
 		const C_SECTION = "section"
 
+		var player = this;
 		var options = this.options = $.extend(true, {}, {
+			miniplayer : false,
 			autoplay : false,
 			height : 'auto',
 			loop : false,
@@ -93,6 +98,9 @@ import Cookie from './utils/cookie';
 				],
 				fullscreen : [
 					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', C_KEYBINDING_INFO,  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'fullscreen' ]
+				],
+				mini : [
+					[ 'play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
 				]
 			},
 			volume : {
@@ -163,6 +171,21 @@ import Cookie from './utils/cookie';
 				},
 			]
 		}, opts);
+
+		this.getData = () => {
+			return $.ajax({
+				url: options.dataUrl,
+				method: 'GET'
+			}).promise()
+		}
+
+		this.trigger = (eventName, ...args) => {
+			$(element).trigger.call($(element), `leplayer_${eventName}`, ...args);
+		}
+
+		this.on = (eventName, ...args) => {
+			$(element).on.call($(element), `leplayer_${eventName}`, ...args);
+		}
 
 		/**
 		 * This class manages FullScreen API.
@@ -239,7 +262,7 @@ import Cookie from './utils/cookie';
 				container.addClass('fullscreen');
 				controls.fullscreen.show();
 				controls.common.hide();
-				controls.mini.hide();
+				//controls.mini.hide();
 
 				clearTimeout(this._hideTimeout);
 				this._hideTimeout = setTimeout(() => {
@@ -263,7 +286,7 @@ import Cookie from './utils/cookie';
 				container.removeClass('fullscreen');
 				controls.fullscreen.hide();
 				controls.common.show();
-				controls.mini.hide();
+				//controls.mini.hide();
 				clearTimeout(this._hideTimeout);
 				$(container).off('.leplayer.fullscreen-hide-timeline');
 			}
@@ -307,7 +330,6 @@ import Cookie from './utils/cookie';
 				this.player = player;
 				this._ctx = ctx;
 				this._video = ctx[ 0 ];
-				this.fullscreen = new Fullscreen();
 				this.subtitles = [];
 				this.bufferRanges = [];
 				this.playbackRate = this._video.playbackRate;
@@ -335,21 +357,28 @@ import Cookie from './utils/cookie';
 				return this._video.clientHeight;
 			}
 
-			get rate () {
-				return this._video.playbackRate;
-			}
-
 			get width () {
 				return this._video.clientWidth;
 			}
 
+			get rate () {
+				return this._video.playbackRate;
+			}
+
+			get defaultRate() {
+				return Cookie.get('rate') || options.rate.default
+			}
+
+
 			set rate (value) {
 				if ( value <= options.rate.max && value >= options.rate.min ) {
 					this._video.playbackRate = value;
+					Cookie.set('rate', value);
 				}
 				/** TODO: Chanche controls.rate in event handler */
-				controls.rate = this._video.playbackRate;
+				//controls.rate = this._video.playbackRate;
 			}
+
 
 			set source (value) {
 				let time = this._video.currentTime;
@@ -385,6 +414,11 @@ import Cookie from './utils/cookie';
 				return this._video.volume;
 			}
 
+
+			get defaultVolume () {
+				return Cookie.get('volume') || options.volume.default;
+			}
+
 			set volume (value) {
 				if (value > 1) {
 					this._video.volume = 1;
@@ -392,9 +426,11 @@ import Cookie from './utils/cookie';
 					this._video.volume = 0;
 				} else {
 					this._video.volume = value;
+					Cookie.set('volume', value);
 				}
 				this._video.mute = (value < options.volume.mutelimit);
 			}
+
 
 			get buffered () {
 				return this._video.buffered;
@@ -442,6 +478,7 @@ import Cookie from './utils/cookie';
 				this._initSubtitles();
 				this._initVideo()
 					.done(() => {
+						this.fullscreen = new Fullscreen();
 						this.fullscreen.init();
 						controls.init();
 						this._initRate();
@@ -475,13 +512,13 @@ import Cookie from './utils/cookie';
 
 			play () {
 				overlay.hide();
-				controls.play();
+				//controls.play();
 				return this._video.play();
 			}
 
 			pause () {
 				overlay.show();
-				controls.pause();
+				//controls.pause();
 				return this._video.pause();
 			}
 
@@ -496,11 +533,11 @@ import Cookie from './utils/cookie';
 			}
 
 			_initRate () {
-				this.rate = Cookie.get('rate', options.rate.default);
+				this.rate = this.defaultRate;
 			}
 
 			_initVolume () {
-				this.volume = Cookie.get('volume', options.volume.default);
+				this.volume = this.defaultVolume;
 			}
 
 			_initSubtitles () {
@@ -571,8 +608,8 @@ import Cookie from './utils/cookie';
 				mediaElement.on({
 
 					'timeupdate' : (e) => {
-						controls.moveTimeMarker();
-						this.player.trigger('timeupdate', { time : video.currentTime });
+						//controls.moveTimeMarker();
+						this.player.trigger('timeupdate', { time : video.currentTime, duration : video.duration });
 					},
 
 					'loadedmetadata' : this._onLoadedMetaData.bind(this),
@@ -600,6 +637,18 @@ import Cookie from './utils/cookie';
 						this.player.trigger('volumechange', { volume : this.volume });
 					},
 
+					'play' : (e) => {
+						this.player.trigger('play');
+					},
+
+					'pause' : (e) => {
+						this.player.trigger('pause');
+					},
+
+					'ratechange' : (e) => {
+						this.player.trigger('ratechange', { volume : this.rate });
+					},
+
 					'canplay' : (e) => {
 						loader.hide();
 						this.player.trigger('canplay');
@@ -618,11 +667,44 @@ import Cookie from './utils/cookie';
 			}
 		}
 
-		class ControlCollection {
-			constructor (name, active) {
+		class ControlCollection  extends Component {
+			constructor (player, options) {
+				options = $.extend({}, {
+					controls : player.options.controls[options.name] || [],
+				}, options);
+				super(player, options);
 				this.items = {};
-				this.active = active || false;
-				this.name = name;
+				this.active = options.active || false;
+				this.name = options.name;
+				this.controls = player.options.controls[this.name];
+			}
+
+
+			/**
+			 * @override
+			 */
+			createElement() {
+				const { name, controls } = this.options;
+
+				this.element = $('<div/>').addClass('leplayer-controlcollection');
+
+				controls.forEach( row => {
+					let elemRow = $('<div/>').addClass(`leplayer-controls controls-${name}`);
+					let hasTimeline = false;
+					row.forEach(controlName => {
+						if(controlName == C_TIMELINE) {
+							hasTimeline = true
+						}
+						const control = controlFactory(this.player, controlName);
+						elemRow.append(control.element);
+					});
+					if (!hasTimeline) {
+						elemRow.css('width', '1px');
+					}
+					this.element.append(elemRow);
+				})
+				return this.element;
+
 			}
 
 			set download (value) {
@@ -678,7 +760,7 @@ import Cookie from './utils/cookie';
 			}
 
 			init () {
-				this.element = container.find(`.controls-${this.name}`)
+				//this.element = container.find(`.controls-${this.name}`)
 				for (let i in this.items) {
 					if (!this.items.hasOwnProperty(i)) continue;
 					$.isFunction(this.items[i].init) && this.items[i].init();
@@ -716,11 +798,11 @@ import Cookie from './utils/cookie';
 		}
 
 		class Controls {
-			constructor () {
+			constructor (player) {
 				this.collections = {
-					common : new ControlCollection('common'),
-					mini : new ControlCollection('mini'),
-					fullscreen : new ControlCollection('fullscreen')
+					common : new ControlCollection(player, { name : 'common' }),
+					//mini : new ControlCollection(player, { name : 'mini' }),
+					fullscreen : new ControlCollection(player, { name : 'fullscreen' })
 				};
 				this.collections.common.active = true;
 			}
@@ -784,7 +866,7 @@ import Cookie from './utils/cookie';
 					this.collections[ i ].init();
 				}
 				this.collections.common.show();
-				this.collections.mini.hide();
+				//this.collections.mini.hide();
 				this.collections.fullscreen.hide();
 
 			}
@@ -895,12 +977,158 @@ import Cookie from './utils/cookie';
 			}
 		}
 
+		/**
+		 * @class MiniPlayer
+		 * @param {Player} player Main player
+		 * @param {Object} [options]
+		 * @extends Control
+		 */
+		class MiniPlayer extends Component {
+			constructor (player, options ) {
+				let width;
+				if (player.options.miniplayer) {
+					width = player.options.miniplayer.width;
+				}
+				options = $.extend({}, {
+					visible : false,
+					width
+				}, options);
+
+				super(player, options);
+				if (!options.visible) {
+					this.hide();
+				}
+
+				container.append(this.element);
+
+				const self = this;
+				$(window).scroll(function(e) {
+					const scrollTop = $(this).scrollTop();
+					const centerVideo = container.offset().top + videoContainer.height() / 2;
+
+					if(scrollTop > centerVideo) {
+						if(!miniPlayer.visible) {
+							self.show();
+
+						}
+					} else {
+						self.hide();
+					}
+				})
+
+				$(window).resize(() => {
+					if(this.visible) {
+						this.updateVideoContainer();
+					}
+				})
+			};
+
+			/**
+			 * Reset jquery CSS for container and video-container
+			 *
+			 * @private
+			 */
+			_resetCSS() {
+				container.css({
+					'padding-top' : ''
+				})
+
+				videoContainer.css({
+					'left' : '',
+					'transform' : '',
+					'margin' : ''
+				})
+			}
+
+			get height() {
+				return this._height || (this._height = videoContainer.height);
+			}
+
+			/**
+			 * Move video container under the miniplayer
+			 */
+			updateVideoContainer() {
+				container.css({
+					'padding-top' : videoContainer.height() + 'px'
+				})
+				container.addClass('leplayer-container--mini');
+
+				const height = videoContainer.height();
+
+				this.element.css({
+					height
+				});
+
+				const videoWidth = videoContainer.width()
+				videoContainer.css({
+					'transform': `translateX(${(videoWidth / 2) - this.element.width() / 2}px)`
+				})
+			}
+
+			/**
+			 * Show mini player
+			 *
+			 * @public
+			 */
+			show() {
+				this.visible = true;
+				this.element.show()
+				this.updateVideoContainer()
+			}
+
+			/**
+			 * Hide mini player
+			 *
+			 * @public
+			 */
+			hide() {
+				this.visible = false;
+				this.element.hide();
+				this._resetCSS()
+				container.removeClass('leplayer-container--mini');
+				this.element.css({
+					height : ''
+				})
+			}
+
+			/**
+			 * @override
+			 */
+			createElement() {
+				const { title = '', videoInfo = '' } = this.player.options;
+				const controls = new ControlCollection(player, { name : 'mini' });
+				const html = `
+					<div class="leplayer-miniplayer">
+						<div class="leplayer-miniplyaer__container">
+						</div>
+						<div class="leplayer-miniplayer__info">
+							<div class="leplayer-miniplayer__title">${title}</div>
+							<div class="leplayer-miniplayer__video-info">${videoInfo}</div>
+
+							<div class="leplayer-miniplayer__controls">
+							</div>
+						</div>
+						<div class="leplayer-miniplayer__section">
+						</div>
+					</div>
+				`.trim();
+
+				this.element = $('<div/>').html(html).contents();
+				this.element.find('.leplayer-miniplayer__controls').append(controls.element);
+				console.log(this.options)
+				this.element.css({
+					'max-width' : this.options.width
+				})
+				return this.element;
+			}
+		}
+
 		var sources = this.sources =[];
 		var subtitles = [];
 		var volume = options.volume.default;
-		var controls = this.controls = new Controls();
-		var player = this;
+		var controls = this.controls;
 		var video = null;
+		this.video = video
 
 		/**
 		 * DOM container to hold video and all other stuff.
@@ -910,6 +1138,7 @@ import Cookie from './utils/cookie';
 		var overlay = null;
 		var loader = null;
 		var sectionContainer = null;
+		let miniPlayer = null;
 		let videoContainer = null;
 
 		let _createNotification = (opt) => {
@@ -961,6 +1190,7 @@ import Cookie from './utils/cookie';
 				console.warn('No sources found.');
 				return this;
 			}
+
 			video = player.video = new Video(element);
 
 			/** TODO: Use promise to async run this */
@@ -968,6 +1198,9 @@ import Cookie from './utils/cookie';
 			initControls();
 			initHotKeys();
 			video.init().done(() => {
+				if(options.miniplayer) {
+					miniPlayer = new MiniPlayer(player);
+				}
 				initSections();
 				player.trigger('inited');
 			});
@@ -975,38 +1208,48 @@ import Cookie from './utils/cookie';
 
 		};
 
+		this.controls = controls;
 		var initControls = function () {
-			for (let name in options.controls) {
-				if (!controls.has(name)) continue;
-				for (let rowIndex in options.controls[ name ]) {
-					let row = options.controls[ name ][ rowIndex ],
-						hasTimeline = false,
-						rowElement = $('<div />').addClass('leplayer-controls controls-' + name);
-
-					for (let i in row) {
-						let controlName = row[ i ];
-
-						if (controlName == C_DIVIDER || !controls.collections[ name ].has(controlName)) {
-							// Create control only if divider or does not exist yet.
-							var c = controls.collections[ name ].add(controlName);
-							if (c != null) {
-								rowElement.append(c);
-								if (controlName == C_TIMELINE)
-									hasTimeline = true;
-							}
-							else
-								console.warn('Cannot create ' + controlName + ' control for collection ' + name + '.');
-						}
-					}
-
-					if (!hasTimeline)
-						rowElement.css('width', '1px');
-
-					rowElement.find('.divider + .divider').remove();
-
-					container.append(rowElement);
-				}
+			controls = new Controls(player);
+			for (const name of ['common', 'fullscreen']) {
+				if (!options.controls.hasOwnProperty(name)) return;
+				const controlCollection = new ControlCollection(player, { name });
+				controls.collections[name] = controlCollection;
+				container.append(controlCollection.element);
 			}
+			if (controls.collections.common != null) {
+				controls.collections.common.active = true;
+			}
+			//for (let name in options.controls) {
+				//if (!controls.has(name)) continue;
+				//for (let rowIndex in options.controls[ name ]) {
+					//let row = options.controls[ name ][ rowIndex ],
+						//hasTimeline = false,
+						//rowElement = $('<div />').addClass('leplayer-controls controls-' + name);
+
+					//for (let i in row) {
+						//let controlName = row[ i ];
+
+						//if (controlName == C_DIVIDER || !controls.collections[ name ].has(controlName)) {
+							//// Create control only if divider or does not exist yet.
+							//var c = controls.collections[ name ].add(controlName);
+							//if (c != null) {
+								//rowElement.append(c);
+								//if (controlName == C_TIMELINE)
+									//hasTimeline = true;
+							//} else {
+								//console.warn('Cannot create ' + controlName + ' control for collection ' + name + '.');
+							//}
+						//}
+					//}
+					//if (!hasTimeline)
+						//rowElement.css('width', '1px');
+
+					//rowElement.find('.divider + .divider').remove();
+
+					//container.append(rowElement);
+				//}
+			//}
 		};
 
 		var initSections = function() {
@@ -1021,10 +1264,16 @@ import Cookie from './utils/cookie';
 			});
 		}
 
+
 		var initDom = function () {
 			overlay = $('<div />')
 				.addClass('play-overlay')
-				.append(new Icon(player, { iconName : 'play' }).element);
+				.append(new Icon(player, { iconName : 'play' }).element)
+				.on({
+					'click'	: (e) => { element.trigger('click'); },
+					'dblclick' : (e) => { element.trigger('dblclick'); }
+				});
+
 			loader = $('<div />')
 				.addClass('leplayer-loader-container')
 				.append(new Icon(player, {
@@ -1032,17 +1281,20 @@ import Cookie from './utils/cookie';
 					className : 'leplayer-icon-spin'
 					}).element)
 				.hide();
+
 			videoContainer = $('<div />')
 				.addClass('leplayer-video')
 				.append(overlay)
 				.append(loader);
+
 			container = $('<div />')
 				.addClass('leplayer-container')
 				.append(videoContainer)
 				.attr('tabindex', 0)
 				//.css('width', element.width() + 'px');
 				.css('width', '100%')
-				.css('max-width', (options.width || video.width) + 'px');
+				.css('max-width', (options.width || video.width) + 'px')
+
 
 			if(options.sectionContainer) {
 				sectionContainer = $(options.sectionContainer).addClass('leplayer-section-container');
@@ -1050,10 +1302,6 @@ import Cookie from './utils/cookie';
 
 			element.before(container);
 			videoContainer.append(element);
-			overlay.on({
-				'click'	: (e) => { element.trigger('click'); },
-				'dblclick' : (e) => { element.trigger('dblclick'); }
-			});
 		};
 
 		var initHotKeys = function () {
@@ -1165,20 +1413,6 @@ import Cookie from './utils/cookie';
 			return (focused.length > 0) || $(container).is(':focus');
 		}
 
-		this.getData = () => {
-			return $.ajax({
-				url: options.dataUrl,
-				method: 'GET'
-			}).promise()
-		}
-
-		this.trigger = (eventName, ...args) => {
-			$(element).trigger.call($(element), `leplayer_${eventName}`, ...args);
-		}
-
-		this.on = (eventName, ...args) => {
-			$(element).on.call($(element), `leplayer_${eventName}`, ...args);
-		}
 		init();
 
 		return this;

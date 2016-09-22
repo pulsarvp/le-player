@@ -1,11 +1,21 @@
 {
+	"ecmaVersion": 6,
 	"libs": [
 		"browser",
-		"jquery"
+		"jquery",
 	],
-	"include" : ["./source/**/*.js"],
+	"loadEagerly": [
+		"./source/js/**/*.js"
+	],
+	"include" : ["./source/js/**/*.js"],
 	"plugins": {
-		"es_modules": {}
+		"es_modules": {
+			"baseUrl": "./source/js/"
+		},
+		"doc_comment": {
+			"fullDocs": true,
+			"strong": true
+		}
 	},
 	"ecmaVersion": 6
 }

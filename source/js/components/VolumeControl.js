@@ -90,10 +90,12 @@ class VolumeControl extends ControlDropdown {
 	}
 
 	toggleMuted () {
-		if (this.player.video.muted == true) {
-			this.value = Cookie.get('volume', options.volume.default);
+		const { video, options } = this.player;
+
+		if (video.volume == 0) {
+			video.volume = video.defaultVolume;
 		} else {
-			this.value = 0;
+			video.volume = 0;
 		}
 	}
 
@@ -104,6 +106,10 @@ class VolumeControl extends ControlDropdown {
 	onIconClick (e) {
 		super.onIconClick(e);
 		this.toggleMuted();
+	}
+
+	onPlayerInited() {
+		this.value = this.player.video.defaultVolume;
 	}
 
 }

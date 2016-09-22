@@ -99,6 +99,9 @@ class Control extends Component {
 	 */
 	onClick (e) {
 		e.preventDefault();
+		if (typeof this.options.onClick == 'function') {
+			this.options.onClick.call(this, arguments);
+		}
 	}
 
 	/**
