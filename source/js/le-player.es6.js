@@ -261,8 +261,7 @@ import Cookie from './utils/cookie';
 				this.player.trigger('fullscreenchange');
 				container.addClass('fullscreen');
 				controls.fullscreen.show();
-				controls.common.hide();
-				//controls.mini.hide();
+				contorls.common.hide();
 
 				clearTimeout(this._hideTimeout);
 				this._hideTimeout = setTimeout(() => {
@@ -286,7 +285,6 @@ import Cookie from './utils/cookie';
 				container.removeClass('fullscreen');
 				controls.fullscreen.hide();
 				controls.common.show();
-				//controls.mini.hide();
 				clearTimeout(this._hideTimeout);
 				$(container).off('.leplayer.fullscreen-hide-timeline');
 			}
@@ -686,7 +684,7 @@ import Cookie from './utils/cookie';
 			createElement() {
 				const { name, controls } = this.options;
 
-				this.element = $('<div/>').addClass('leplayer-controlcollection');
+				this.element = $('<div/>').addClass(`leplayer-control-collection leplayer-control-collection-${name}`);
 
 				controls.forEach( row => {
 					let elemRow = $('<div/>').addClass(`leplayer-controls controls-${name}`);
@@ -755,18 +753,13 @@ import Cookie from './utils/cookie';
 				return (typeof this.items[ name ] == 'object');
 			}
 
-			hide () {
-				this.element.hide();
-			}
 
 			init () {
-				//this.element = container.find(`.controls-${this.name}`)
 				for (let i in this.items) {
 					if (!this.items.hasOwnProperty(i)) continue;
 					$.isFunction(this.items[i].init) && this.items[i].init();
 				}
 				this.initTimeline();
-				//this.totalTime = secondsToTime(video.duration);
 				this.download = sources[ 0 ].src;
 			}
 
@@ -792,8 +785,14 @@ import Cookie from './utils/cookie';
 					this.items.play.play();
 			}
 
+			hide () {
+				this.element.hide();
+				this.element.find('.leplayer-controls').hide()
+			}
+
 			show () {
-				container.find('.controls-' + this.name).show();
+				this.element.show()
+				this.element.find('.leplayer-controls').show()
 			}
 		}
 
@@ -801,13 +800,13 @@ import Cookie from './utils/cookie';
 			constructor (player) {
 				this.collections = {
 					common : new ControlCollection(player, { name : 'common' }),
-					//mini : new ControlCollection(player, { name : 'mini' }),
 					fullscreen : new ControlCollection(player, { name : 'fullscreen' })
 				};
 				this.collections.common.active = true;
 			}
 
 			get common () {
+				console.log(this.collections.common);
 				return this.collections.common;
 			}
 
