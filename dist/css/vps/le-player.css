@@ -47,18 +47,10 @@
 }
 .leplayer-container .play-overlay,
 .leplayer-loader-container {
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-align-items: center;
-      -ms-flex-align: center;
-          align-items: center;
-  -webkit-align-content: center;
-      -ms-flex-line-pack: center;
-          align-content: center;
-  -webkit-justify-content: center;
-      -ms-flex-pack: center;
-          justify-content: center;
+  align-items: center;
+  align-content: center;
+  justify-content: center;
   background: rgba(0, 0, 0, 0.5);
   color: #7fa9c7;
   cursor: pointer;
@@ -74,6 +66,20 @@
 .leplayer-container .play-overlay:hover {
   background: rgba(0, 0, 0, 0.2);
   color: white;
+}
+.leplayer-container--mini .leplayer-video {
+  z-index: 601;
+  position: fixed;
+  width: 170px;
+  top: 0;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  transform: translateX(-100%);
+}
+.leplayer-container--mini .play-overlay {
+  font-size: 50px;
 }
 .leplayer-controls {
   border-collapse: separate;
@@ -243,8 +249,7 @@
   position: absolute;
   z-index: 508;
   left: 50%;
-  -webkit-transform: translateX(-50%);
-          transform: translateX(-50%);
+  transform: translateX(-50%);
 }
 .leplayer-controls .control-dropdown:hover .control-dropdown__content {
   display: block;
@@ -264,8 +269,7 @@
   left: 50%;
   bottom: 37px;
   max-width: 300px;
-  -webkit-transform: translateX(-50%);
-          transform: translateX(-50%);
+  transform: translateX(-50%);
 }
 .leplayer-controls .control-container {
   display: table-cell;
@@ -299,7 +303,6 @@
   display: table-cell;
   font-size: 12px;
   box-sizing: content-box;
-  height: 32px;
   line-height: 100%;
   padding: 0 5px;
   text-align: center;
@@ -467,33 +470,21 @@
   height: 1em;
 }
 .leplayer-icon-spin {
-  -webkit-animation: leplayer-spin 2s infinite linear;
-          animation: leplayer-spin 2s infinite linear;
-}
-@-webkit-keyframes leplayer-spin {
-  100% {
-    -webkit-transform: rotate(360deg);
-            transform: rotate(360deg);
-  }
+  animation: leplayer-spin 2s infinite linear;
 }
 @keyframes leplayer-spin {
   100% {
-    -webkit-transform: rotate(360deg);
-            transform: rotate(360deg);
+    transform: rotate(360deg);
   }
 }
 .leplayer-sections {
   font-family: "PT Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 13px;
   position: absolute;
-  display: -webkit-flex;
-  display: -ms-flexbox;
   display: flex;
   top: 0;
   right: 0;
-  -webkit-flex-direction: column;
-      -ms-flex-direction: column;
-          flex-direction: column;
+  flex-direction: column;
   height: 100%;
   overflow-x: hidden;
   overflow-y: scroll;
@@ -569,4 +560,68 @@
   display: inline-block;
   margin: 4.25px 2px 4.25px 0;
   padding: 4px;
+}
+.leplayer-miniplayer {
+  background: #f5f8fa;
+  position: fixed;
+  z-index: 600;
+  top: 0;
+  left: 0;
+  right: 0;
+  box-shadow: 0 10px 15px -10px rgba(0, 0, 0, 0.75);
+  height: auto;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+.leplayer-miniplayer__info {
+  padding: 10px;
+  height: 50px;
+  margin: 0;
+  margin-left: 180px;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  line-height: 1.42857143;
+}
+.leplayer-miniplayer__title {
+  color: black;
+  font-size: 14px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  line-height: 100%;
+}
+.leplayer-miniplayer__video-info {
+  margin-bottom: 10px;
+}
+.leplayer-miniplayer__controls {
+  position: absolute;
+  bottom: 10px;
+}
+.leplayer-miniplayer .control-time {
+  display: table-cell;
+  vertical-align: middle;
+  padding: 6px 10px;
+  font-weight: bold;
+  width: 150px;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+.leplayer-miniplayer .control-time__current {
+  background: none;
+  cursor: default;
+  font-size: 15px;
+  text-align: right;
+}
+.leplayer-miniplayer .control-time__total {
+  background: none;
+  cursor: default;
+}
+.leplayer-miniplayer .control-time__total:before {
+  content: '/';
+  margin-right: 9px;
+}
+.leplayer-miniplayer .volume-control:hover .volume-slider {
+  display: none;
 }
