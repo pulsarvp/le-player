@@ -37,9 +37,9 @@
 			</div>
 			<h2>Single video</h2>
 			<video id="video1" src="sample1.mp4" height="200"></video>
-			<h2>Multiple videos</h2>
+			<h2>Multiple videos with miniplayer</h2>
 			<video id="video2">
-				<!--<source src="http://sms.video.mipt.ru/video/original/0004/g8nykj6zyg.mp4" title="320p">-->
+				<source src="http://sms.video.mipt.ru/video/original/0004/g8nykj6zyg.mp4" title="320p">
 				<source src="sample2.mp4" title="1280">
 				<track label="EN" srclang="en" src="subs_en.vtt" kind="subtitles">
 				<track label="RU" srclang="ru" src="subs_ru.vtt" kind="subtitles">
@@ -84,7 +84,11 @@
 				poster : 'poster.jpg'
 			});
 			$('#video2').lePlayer({
+				title : 'Multiple videos with mini player',
 				width: 500,
+				miniplayer: {
+					width : '1140px'
+				}
 				//dataUrl : './data.json'
 			});
 			$('#video3').lePlayer({
