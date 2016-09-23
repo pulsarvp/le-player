@@ -261,8 +261,7 @@ import Cookie from './utils/cookie';
 				this.player.trigger('fullscreenchange');
 				container.addClass('fullscreen');
 				controls.fullscreen.show();
-				controls.common.hide();
-				//controls.mini.hide();
+				contorls.common.hide();
 
 				clearTimeout(this._hideTimeout);
 				this._hideTimeout = setTimeout(() => {
@@ -286,7 +285,6 @@ import Cookie from './utils/cookie';
 				container.removeClass('fullscreen');
 				controls.fullscreen.hide();
 				controls.common.show();
-				//controls.mini.hide();
 				clearTimeout(this._hideTimeout);
 				$(container).off('.leplayer.fullscreen-hide-timeline');
 			}
@@ -340,6 +338,7 @@ import Cookie from './utils/cookie';
 			}
 
 			set currentTime (value) {
+				console.log(value, this._video);
 				if (value > this.duration) {
 					this._video.currentTime = this.duration
 				} else if (value < 0 ) {
@@ -483,6 +482,7 @@ import Cookie from './utils/cookie';
 						controls.init();
 						this._initRate();
 						this._initVolume();
+						this.startBuffering();
 						dfd.resolve();
 					});
 				this._initCustomEvents();
@@ -490,6 +490,12 @@ import Cookie from './utils/cookie';
 
 				dfd.notify();
 				return dfd.promise();
+			}
+
+			startBuffering() {
+				return this.play().done( () => {
+					this.pause()
+				})
 			}
 
 			togglePlay () {
@@ -511,15 +517,33 @@ import Cookie from './utils/cookie';
 			}
 
 			play () {
+				let dfd = $.Deferred();
+				const playPromise = this._video.play();
+
+				if( playPromise != null) {
+					playPromise.then(function() {
+						dfd.resolve();
+					})
+				} else {
+					dfd.resolve();
+				}
 				overlay.hide();
-				//controls.play();
-				return this._video.play();
+				return dfd.promise();
 			}
 
 			pause () {
+				let dfd = $.Deferred();
+				const pausePromise = this._video.pause();
+
+				if( pausePromise != null) {
+					pausePromise.then(function() {
+						dfd.resolve();
+					})
+				} else {
+					dfd.resolve();
+				}
 				overlay.show();
-				//controls.pause();
-				return this._video.pause();
+				return dfd.promise();
 			}
 
 			trigger (eventName, ...args) {
@@ -686,7 +710,7 @@ import Cookie from './utils/cookie';
 			createElement() {
 				const { name, controls } = this.options;
 
-				this.element = $('<div/>').addClass('leplayer-controlcollection');
+				this.element = $('<div/>').addClass(`leplayer-control-collection leplayer-control-collection-${name}`);
 
 				controls.forEach( row => {
 					let elemRow = $('<div/>').addClass(`leplayer-controls controls-${name}`);
@@ -755,18 +779,13 @@ import Cookie from './utils/cookie';
 				return (typeof this.items[ name ] == 'object');
 			}
 
-			hide () {
-				this.element.hide();
-			}
 
 			init () {
-				//this.element = container.find(`.controls-${this.name}`)
 				for (let i in this.items) {
 					if (!this.items.hasOwnProperty(i)) continue;
 					$.isFunction(this.items[i].init) && this.items[i].init();
 				}
 				this.initTimeline();
-				//this.totalTime = secondsToTime(video.duration);
 				this.download = sources[ 0 ].src;
 			}
 
@@ -792,8 +811,14 @@ import Cookie from './utils/cookie';
 					this.items.play.play();
 			}
 
+			hide () {
+				this.element.hide();
+				this.element.find('.leplayer-controls').hide()
+			}
+
 			show () {
-				container.find('.controls-' + this.name).show();
+				this.element.show()
+				this.element.find('.leplayer-controls').show()
 			}
 		}
 
@@ -801,13 +826,13 @@ import Cookie from './utils/cookie';
 			constructor (player) {
 				this.collections = {
 					common : new ControlCollection(player, { name : 'common' }),
-					//mini : new ControlCollection(player, { name : 'mini' }),
 					fullscreen : new ControlCollection(player, { name : 'fullscreen' })
 				};
 				this.collections.common.active = true;
 			}
 
 			get common () {
+				console.log(this.collections.common);
 				return this.collections.common;
 			}
 
@@ -944,6 +969,7 @@ import Cookie from './utils/cookie';
 
 			onSectionClick(e) {
 				let section = $(e.target).closest('.leplayer-section');
+				console.log(secondsToTime(section.attr('data-time')));
 				video.currentTime = section.attr('data-time');
 			}
 
@@ -969,7 +995,7 @@ import Cookie from './utils/cookie';
 
 				for (let i = 0; i < this.items.length; i++) {
 					let section = this.items[i];
-					if (currentTime <= section.end) {
+					if (currentTime < section.end) {
 						this.setActiveByIndex(i);
 						break;
 					}
@@ -1115,7 +1141,6 @@ import Cookie from './utils/cookie';
 
 				this.element = $('<div/>').html(html).contents();
 				this.element.find('.leplayer-miniplayer__controls').append(controls.element);
-				console.log(this.options)
 				this.element.css({
 					'max-width' : this.options.width
 				})
@@ -1203,6 +1228,7 @@ import Cookie from './utils/cookie';
 				}
 				initSections();
 				player.trigger('inited');
+				console.log('inited');
 			});
 
 
