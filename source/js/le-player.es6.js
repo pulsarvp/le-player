@@ -50,6 +50,7 @@ import Cookie from './utils/cookie';
 	 * @param {Function} options.keybinding[].fn] Callback
 	 * @param {Object|Boolean} [options.miniplayer=false]
 	 * @param {String} [options.miniplayer.width] MiniPlayer's width
+	 * @param {String} [options.sectionContainer] Selector for sections
 	 */
 	let Player = function (element, opts) {
 		const C_BACKWARD = 'backward';
@@ -1321,10 +1322,6 @@ import Cookie from './utils/cookie';
 				.css('width', '100%')
 				.css('max-width', (options.width || video.width) + 'px')
 
-
-			if(options.sectionContainer) {
-				sectionContainer = $(options.sectionContainer).addClass('leplayer-section-container');
-			}
 
 			element.before(container);
 			videoContainer.append(element);

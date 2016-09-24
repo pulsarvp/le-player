@@ -93,6 +93,9 @@
 			margin-left: auto;
 			margin-right: auto;
 			transform: translateX(-100%);
+			.leplayer-sections {
+				display: none;
+			}
 		}
 		.play-overlay {
 			font-size: 50px;
@@ -634,10 +637,7 @@
 {
 	font-family: @font-main;
 	font-size: 13px;
-	position: absolute;
 	display: flex;
-	top: 0;
-	right: 0;
 	flex-direction: column;
 	height: 100%;
 	overflow-x: hidden;
@@ -659,11 +659,18 @@
 	.leplayer-sections
 	{
 		z-index: @z-index-fullscreen + 6;
+		position: fixed;
 	}
 }
 
 .leplayer-video
 {
+	.leplayer-sections
+	{
+		position: absolute;
+		top: 0;
+		right: 0;
+	}
 	.leplayer-section
 	{
 
