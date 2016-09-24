@@ -339,7 +339,6 @@ import Cookie from './utils/cookie';
 			}
 
 			set currentTime (value) {
-				console.log(value, this._video);
 				if (value > this.duration) {
 					this._video.currentTime = this.duration
 				} else if (value < 0 ) {
@@ -833,7 +832,6 @@ import Cookie from './utils/cookie';
 			}
 
 			get common () {
-				console.log(this.collections.common);
 				return this.collections.common;
 			}
 
@@ -970,7 +968,6 @@ import Cookie from './utils/cookie';
 
 			onSectionClick(e) {
 				let section = $(e.target).closest('.leplayer-section');
-				console.log(secondsToTime(section.attr('data-time')));
 				video.currentTime = section.attr('data-time');
 			}
 
@@ -1031,7 +1028,7 @@ import Cookie from './utils/cookie';
 				const self = this;
 				$(window).scroll(function(e) {
 					const scrollTop = $(this).scrollTop();
-					const centerVideo = container.offset().top + videoContainer.height() / 2;
+					const centerVideo = container.offset().top + container.outerHeight() / 2;
 
 					if(scrollTop > centerVideo) {
 						if(!miniPlayer.visible) {
@@ -1229,7 +1226,6 @@ import Cookie from './utils/cookie';
 				}
 				initSections();
 				player.trigger('inited');
-				console.log('inited');
 			});
 
 
