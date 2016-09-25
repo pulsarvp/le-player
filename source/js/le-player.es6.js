@@ -24,7 +24,7 @@ import Cookie from './utils/cookie';
 	 * @param {String} [options.poster] Path to poster of video
 	 * @param {String} [options.svgPath] Path to svg sprite for icons
 	 * @param {Number} [options.fullscreen] Fullscreen options
-	 * @param {Number} [options.fullscreen.hideTimelineTime=7000] Delay before hide timeline in fullscreen view
+	 * @param {Number} [options.fullscreen.hideTimelineTime=10000] Delay before hide timeline in fullscreen view
 	 * @param {Object} [options.rate] Rate options
 	 * @param {Number} [options.rate.step=0.25] Step of increase/decrease by rate control
 	 * @param {Number} [options.rate.min=0.5] Min of rate
@@ -77,7 +77,7 @@ import Cookie from './utils/cookie';
 			poster : null,
 			svgPath : '../dist/svg/svg-defs.svg',
 			fullscreen : {
-				hideTimelineTime : 7000
+				hideTimelineTime : 10000
 			},
 			rate : {
 				step : 0.25,
@@ -262,7 +262,7 @@ import Cookie from './utils/cookie';
 				this.player.trigger('fullscreenchange');
 				container.addClass('fullscreen');
 				controls.fullscreen.show();
-				contorls.common.hide();
+				controls.common.hide();
 
 				clearTimeout(this._hideTimeout);
 				this._hideTimeout = setTimeout(() => {
