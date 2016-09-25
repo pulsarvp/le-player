@@ -98,7 +98,7 @@ import Cookie from './utils/cookie';
 					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO ]
 				],
 				fullscreen : [
-					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', C_KEYBINDING_INFO,  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'fullscreen' ]
+					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', C_KEYBINDING_INFO,  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen' ]
 				],
 				mini : [
 					[ 'play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
@@ -259,7 +259,7 @@ import Cookie from './utils/cookie';
 			}
 
 			showElements () {
-				this.player.trigger('fullscreenchange');
+				this.player.trigger('fullscreenchange', true);
 				container.addClass('fullscreen');
 				controls.fullscreen.show();
 				controls.common.hide();
@@ -282,7 +282,7 @@ import Cookie from './utils/cookie';
 			}
 
 			hideElements () {
-				this.player.trigger('fullscreenchange');
+				this.player.trigger('fullscreenchange', false);
 				container.removeClass('fullscreen');
 				controls.fullscreen.hide();
 				controls.common.show();
@@ -911,60 +911,62 @@ import Cookie from './utils/cookie';
 			}
 		}
 
-		class Sections {
-			constructor(items) {
-				this.player = player;
+		/**
+		 * @class Sections
+		 * @param {Player} player Main player
+		 * @param {Object} [options]
+		 * @param {Array} [options.items=[]} Data for sections
+		 * @param {Boolean} [options.fullscreenOnly] Show section only in fullscreen
+		 * @extends Component
+		 */
+		class Sections extends Component {
+			constructor(player, options) {
+				let { items = [] } = options;
 
-				this.items = items;
-				for ( let i = 0; i < this.items.length; i++) {
+				for ( let i = 0; i < items.length; i++) {
 					let endSection;
-					if (i < (this.items.length - 1)) {
-						endSection = this.items[i+1].begin
+					if (i < (items.length - 1)) {
+						endSection = items[i+1].begin
 					} else {
 						endSection = video.duration;
 					}
-					this.items[i].end = endSection;
+					items[i].end = endSection;
 				}
 
-				this.element = $('<div />').addClass('leplayer-sections');
-				this.element.append(this._createSections(items));
-				this.element.find('.leplayer-section').on('click', this.onSectionClick.bind(this));
+				//options.items = items;
 
+				super(player, options)
 				this._activeSection = this.getSectionByIndex(0);
+
+				if (this.options.fullscreenOnly) {
+					this.element.hide();
+				}
+				this.items = items;
+
+
 				this.setActiveByIndex(0);
 
-				this.player.trigger('sectionsinit', { items : this.items });
+				this.element.find('.leplayer-section').on('click', this.onSectionClick.bind(this));
 
-				this.player.on('section_toggle', (e) => {
-					if (this.element.hasClass('leplayer-sections--hidden')) {
-						this.element.removeClass('leplayer-sections--hidden');
-					} else {
-						this.element.addClass('leplayer-sections--hidden');
-					}
-				})
+				this.player.on('sectionstoggle', this._onSectionsToggle.bind(this));
 
 				this.player.on('timeupdate', this.onTimeUpdate.bind(this));
+
+				this.player.on('fullscreenchange', this._onFullscreenChange.bind(this))
+
+				this.player.trigger('sectionsinit', { items : this.items });
+			}
+
+			/**
+			 * @override
+			 */
+			createElement() {
+				this.element = $('<div />').addClass('leplayer-sections');
+				this.element.append(this._createSections(this.options.items));
+				return this.element;
 			}
 
 
-
-			_createSections(items) {
-				let result = '';
-				items.forEach((section, index) => {
-					let item = `
-						<div class="leplayer-section ${!index ? 'leplayer-section--active' : ''}"
-							data-time="${section.begin}" data-index="${index}">
-							<div class="leplayer-section-time">${secondsToTime(section.begin)}</div>
-							<div class="leplayer-section-info">
-								<div class="leplayer-section-title">${section.title}</div>
-								<div class="leplayer-section-description">${section.description}</div>
-							</div>
-						</div>
-					`
-					result += item;
-				});
-				return result;
-			}
 
 			onSectionClick(e) {
 				let section = $(e.target).closest('.leplayer-section');
@@ -998,6 +1000,40 @@ import Cookie from './utils/cookie';
 						break;
 					}
 				}
+			}
+
+			_onSectionsToggle(e, data) {
+				if (this.element.hasClass('leplayer-sections--hidden')) {
+					this.element.removeClass('leplayer-sections--hidden');
+				} else {
+					this.element.addClass('leplayer-sections--hidden');
+				}
+			}
+
+			_onFullscreenChange(e, data) {
+				if (this.options.fullscreenOnly) {
+					this.element.toggle(data);
+				}
+			}
+
+
+
+			_createSections(items) {
+				let result = '';
+				items.forEach((section, index) => {
+					let item = `
+						<div class="leplayer-section ${!index ? 'leplayer-section--active' : ''}"
+							data-time="${section.begin}" data-index="${index}">
+							<div class="leplayer-section-time">${secondsToTime(section.begin)}</div>
+							<div class="leplayer-section-info">
+								<div class="leplayer-section-title">${section.title}</div>
+								<div class="leplayer-section-description">${section.description}</div>
+							</div>
+						</div>
+					`
+					result += item;
+				});
+				return result;
 			}
 		}
 
@@ -1277,12 +1313,19 @@ import Cookie from './utils/cookie';
 
 		var initSections = function() {
 			options.dataUrl && player.getData().done((data) => {
-				let section = new Sections(data.sections);
+				const sections = new Sections(player, { items : data.sections });
 
 				if (sectionContainer) {
-					sectionContainer.append(section.element);
+					const fullscreenSections = new Sections(player, {
+						items : data.sections,
+						fullscreenOnly : true
+					});
+					console.log(sectionContainer)
+					sectionContainer.append(sections.element);
+					console.log(sectionContainer, sections.element);
+					videoContainer.append(fullscreenSections.element)
 				} else {
-					videoContainer.append(section.element);
+					videoContainer.append(sections.element);
 				}
 			});
 		}

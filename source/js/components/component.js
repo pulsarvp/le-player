@@ -18,6 +18,7 @@ import $ from 'jquery';
 class Component {
 
 	constructor(player, options) {
+		/** TODO(adinvadim): Add options.component, for clone component instance */
 		options = this.options = $.extend({}, this.options, options);
 		this.player = player;
 

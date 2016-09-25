@@ -30,7 +30,7 @@ class SectionControl extends ControlCheckbox {
 
 	onChecked(e, data) {
 		super.onChecked(e);
-		this.player.trigger('section_toggle', { checked : data.checked });
+		this.player.trigger('sectionstoggle', { checked : data.checked });
 	}
 }
 

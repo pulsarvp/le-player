@@ -42,6 +42,42 @@
 				color: @color-fs-active;
 			}
 		}
+		.leplayer-sections
+		{
+			display: flex;
+			position: absolute;
+			top: 50px;
+			right: 50px;
+			bottom: 132px;
+			z-index: @z-index-fullscreen + 8;
+		}
+
+		.leplayer-section
+		{
+			background: @color-fs-section;
+			color: white;
+
+			&.leplayer-section--active,
+			&:hover
+			{
+				background: @color-fs-section-active;
+			}
+			&:nth-child(2n)
+			{
+				background: @color-fs-section-2n;
+
+				&.leplayer-section--active,
+				&:hover
+				{
+					background: @color-fs-section-2n-active;
+				}
+			}
+		}
+		.leplayer-section-time
+		{
+			color: white;
+		}
+
 	}
 
 	video
@@ -160,6 +196,11 @@
 			background: @color-fs-background;
 			z-index: @z-index-fullscreen + 8;
 		}
+
+		.control-checkbox--checked
+		{
+			background: @color-fs-background-hover;
+		}
 		.info-control
 		{
 			&__content
@@ -183,7 +224,7 @@
 			&:hover
 			{
 				background: @color-fs-inner-item-hover !important;
-				color: @color-fs-background;
+				color: white;
 			}
 			&--active
 			{
@@ -297,13 +338,10 @@
 			}
 		}
 	}
-	.control-checkbox
+	.control-checkbox--checked
 	{
-		&.control-checkbox--checked
-		{
-			background: @color-text;
-			color: @color-background;
-		}
+		background: @color-text;
+		color: @color-background;
 	}
 	.control-dropdown
 	{
@@ -648,19 +686,10 @@
 
 }
 
+
 .leplayer-sections--hidden
 {
 	display: none;
-}
-
-.leplayer-container.fullscreen
-{
-
-	.leplayer-sections
-	{
-		z-index: @z-index-fullscreen + 6;
-		position: fixed;
-	}
 }
 
 .leplayer-video
@@ -674,7 +703,7 @@
 	.leplayer-section
 	{
 
-		background: fade(white, 80%);
+		background: fade(@color-section, 80%);
 
 		&:nth-child(2n)
 		{
