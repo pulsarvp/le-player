@@ -1319,6 +1319,10 @@ import Cookie from './utils/cookie';
 				.css('max-width', (options.width || video.width) + 'px')
 
 
+			if(options.sectionContainer) {
+				sectionContainer = $(options.sectionContainer);
+			}
+
 			element.before(container);
 			videoContainer.append(element);
 		};
