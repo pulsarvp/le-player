@@ -493,9 +493,16 @@ import Cookie from './utils/cookie';
 			}
 
 			startBuffering() {
-				return this.play().done( () => {
-					this.pause()
-				})
+				const volume = this.volume;
+				this.volume = 0
+				return this.play()
+					.then( () => {
+						return this.pause();
+					})
+					.then( () => {
+						this.currentTime = 0;
+						this.volume = volume;
+					})
 			}
 
 			togglePlay () {
