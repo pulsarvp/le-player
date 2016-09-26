@@ -938,9 +938,6 @@ import Cookie from './utils/cookie';
 				super(player, options)
 				this._activeSection = this.getSectionByIndex(0);
 
-				if (this.options.fullscreenOnly) {
-					this.element.hide();
-				}
 				this.items = items;
 
 
@@ -962,6 +959,9 @@ import Cookie from './utils/cookie';
 			 */
 			createElement() {
 				this.element = $('<div />').addClass('leplayer-sections');
+				if(this.options.fullscreenOnly) {
+					this.element.addClass('leplayer-sections--fsonly');
+				}
 				this.element.append(this._createSections(this.options.items));
 				return this.element;
 			}
@@ -970,7 +970,7 @@ import Cookie from './utils/cookie';
 
 			onSectionClick(e) {
 				let section = $(e.target).closest('.leplayer-section');
-				video.currentTime = section.attr('data-time');
+				video.currentTime = section.attr('data-begin');
 			}
 
 			setActiveByIndex(index) {
@@ -990,11 +990,16 @@ import Cookie from './utils/cookie';
 				return this.element.find(`.leplayer-section[data-index="${index}"]`);
 			}
 
+
 			onTimeUpdate(e, data) {
-				let currentTime = data.time;
+				const currentTime = data.time;
+
+				const endSectionTime = this._activeSection.attr('data-end');
+
+				this._activeSection.next().find('.time').text(secondsToTime(endSectionTime - currentTime));
 
 				for (let i = 0; i < this.items.length; i++) {
-					let section = this.items[i];
+					const section = this.items[i];
 					if (currentTime < section.end) {
 						this.setActiveByIndex(i);
 						break;
@@ -1011,9 +1016,6 @@ import Cookie from './utils/cookie';
 			}
 
 			_onFullscreenChange(e, data) {
-				if (this.options.fullscreenOnly) {
-					this.element.toggle(data);
-				}
 			}
 
 
@@ -1021,21 +1023,28 @@ import Cookie from './utils/cookie';
 			_createSections(items) {
 				let result = '';
 				items.forEach((section, index) => {
-					let item = `
+					const item = `
 						<div class="leplayer-section ${!index ? 'leplayer-section--active' : ''}"
-							data-time="${section.begin}" data-index="${index}">
+							data-begin="${section.begin}"
+							data-index="${index}"
+							data-end="${section.end}">
 							<div class="leplayer-section-time">${secondsToTime(section.begin)}</div>
 							<div class="leplayer-section-info">
+								<div class="leplayer-section-next-info">
+									Следующая секция начнется через
+									<span class="time">${secondsToTime(items[0].end)}</span>
+								</div>
 								<div class="leplayer-section-title">${section.title}</div>
 								<div class="leplayer-section-description">${section.description}</div>
 							</div>
 						</div>
-					`
+					`.trim()
 					result += item;
 				});
 				return result;
 			}
 		}
+
 
 		/**
 		 * @class MiniPlayer
@@ -1098,6 +1107,12 @@ import Cookie from './utils/cookie';
 					'transform' : '',
 					'margin' : ''
 				})
+
+				if(this.player.sections) {
+					this.player.sections.element.css({
+						'left' : ''
+					})
+				}
 			}
 
 			get height() {
@@ -1123,6 +1138,12 @@ import Cookie from './utils/cookie';
 				videoContainer.css({
 					'transform': `translateX(${(videoWidth / 2) - this.element.width() / 2}px)`
 				})
+
+				if(this.player.sections) {
+					this.player.sections.element.css({
+						left : this.element.width() + 'px'
+					})
+				}
 			}
 
 			/**
@@ -1182,12 +1203,14 @@ import Cookie from './utils/cookie';
 			}
 		}
 
+		var self = this;
 		var sources = this.sources =[];
 		var subtitles = [];
 		var volume = options.volume.default;
 		var controls = this.controls;
 		var video = null;
 		this.video = video
+		this.sections = null;
 
 		/**
 		 * DOM container to hold video and all other stuff.
@@ -1313,19 +1336,18 @@ import Cookie from './utils/cookie';
 
 		var initSections = function() {
 			options.dataUrl && player.getData().done((data) => {
-				const sections = new Sections(player, { items : data.sections });
+				const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
+				self.sections = new Sections(player, {
+					items : data.sections,
+					fullscreenOnly : isSectionOutside
+				});
 
-				if (sectionContainer) {
-					const fullscreenSections = new Sections(player, {
+				videoContainer.append(self.sections.element);
+				if (isSectionOutside) {
+					const outsideSections = new Sections(player, {
 						items : data.sections,
-						fullscreenOnly : true
 					});
-					console.log(sectionContainer)
-					sectionContainer.append(sections.element);
-					console.log(sectionContainer, sections.element);
-					videoContainer.append(fullscreenSections.element)
-				} else {
-					videoContainer.append(sections.element);
+					sectionContainer.append(outsideSections.element);
 				}
 			});
 		}
