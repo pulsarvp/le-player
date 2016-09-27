@@ -29,7 +29,7 @@ class BackwardControl extends Control {
 	 */
 	onClick(e) {
 		super.onClick(e);
-		this.player.video.currentTime -= options.playback.step.medium;
+		this.player.video.currentTime -= this.player.options.playback.step.medium;
 	}
 }
 
