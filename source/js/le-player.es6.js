@@ -95,7 +95,7 @@ import Cookie from './utils/cookie';
 			},
 			controls : {
 				common : [
-					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'section', 'divider', 'fullscreen' ],
+					[ 'play', 'volume', 'divider', 'timeline',  'divider', 'fullscreen' ],
 					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO ]
 				],
 				fullscreen : [
@@ -1110,11 +1110,19 @@ import Cookie from './utils/cookie';
 				})
 
 				this.player.on('sectionsinit', this._onSectionsInit.bind(this));
+
+				this.player.on('fullscreenchange', this._onFullscreenChange.bind(this));
 			};
 
 			_onSectionsInit(e, data) {
 				if(this.visible) {
 					this.updateVideoContainer();
+				}
+			}
+
+			_onFullscreenChange(e, data) {
+				if (data == true) {
+					this.hide();
 				}
 			}
 
