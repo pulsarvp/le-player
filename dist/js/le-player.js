@@ -239,7 +239,8 @@
 			this.getData = function () {
 				return $.ajax({
 					url: options.dataUrl,
-					method: 'GET'
+					method: 'GET',
+					dataType: 'json'
 				}).promise();
 			};
 
@@ -1254,18 +1255,27 @@
 							_this10.updateVideoContainer();
 						}
 					});
+
+					_this10.player.on('sectionsinit', _this10._onSectionsInit.bind(_this10));
 					return _this10;
 				}
 
 				_createClass(MiniPlayer, [{
-					key: '_resetCSS',
-
+					key: '_onSectionsInit',
+					value: function _onSectionsInit(e, data) {
+						if (this.visible) {
+							this.updateVideoContainer();
+						}
+					}
 
 					/**
 	     * Reset jquery CSS for container and video-container
 	     *
 	     * @private
 	     */
+
+				}, {
+					key: '_resetCSS',
 					value: function _resetCSS() {
 						container.css({
 							'padding-top': ''
