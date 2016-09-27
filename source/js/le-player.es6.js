@@ -49,6 +49,7 @@ import Cookie from './utils/cookie';
 	 * @param {String} options.keybinding[].description] Description of key binding
 	 * @param {Function} options.keybinding[].fn] Callback
 	 * @param {Object|Boolean} [options.miniplayer=false]
+	 * @param {String} [options.miniplayer.width] Width of miniplayer container
 	 * @param {String} [options.miniplayer.width] MiniPlayer's width
 	 * @param {String} [options.sectionContainer] Selector for sections
 	 */
@@ -170,6 +171,15 @@ import Cookie from './utils/cookie';
 						video.volume -= options.volume.step;
 					}
 				},
+
+				{
+					key : 70,
+					info : ['f'],
+					description : 'Открыть/закрыть полноэкраный режим',
+					fn : (video) => {
+						video.fullscreen.toggle()
+					}
+				}
 			]
 		}, opts);
 
@@ -1401,14 +1411,14 @@ import Cookie from './utils/cookie';
 
 		var initHotKeys = function () {
 
-			let isKeyBinding = (e, binding) => {
+			const isKeyBinding = (e, binding) => {
 				return ((e.which === binding.key) || (e.key === binding.key)) &&
 						(!!binding.shiftKey == e.shiftKey) &&
 						(!!binding.ctrlKey == e.ctrlKey)
 			}
 
 			$(container).bind('keydown.leplayer.hotkey', (e) => {
-				let _isFocused = isFocused();
+				const _isFocused = isFocused();
 				if (_isFocused) {
 					options.keyBinding.forEach(binding => {
 						if( isKeyBinding(e, binding) ) {
