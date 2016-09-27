@@ -186,7 +186,8 @@ import Cookie from './utils/cookie';
 		this.getData = () => {
 			return $.ajax({
 				url: options.dataUrl,
-				method: 'GET'
+				method: 'GET',
+				dataType: 'json'
 			}).promise()
 		}
 
@@ -1107,7 +1108,15 @@ import Cookie from './utils/cookie';
 						this.updateVideoContainer();
 					}
 				})
+
+				this.player.on('sectionsinit', this._onSectionsInit.bind(this));
 			};
+
+			_onSectionsInit(e, data) {
+				if(this.visible) {
+					this.updateVideoContainer();
+				}
+			}
 
 			/**
 			 * Reset jquery CSS for container and video-container

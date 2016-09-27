@@ -133,10 +133,12 @@
 			transform: translateX(-100%);
 			.leplayer-sections {
 				transform: translateX(-100%);
+				display: flex;
 			}
 			.leplayer-section-next-info
 			{
 				display: block;
+				margin-bottom: 15px;
 			}
 
 			.leplayer-section-description
@@ -708,6 +710,7 @@
 	font-size: 13px;
 	display: flex;
 	flex-direction: column;
+	flex-wrap: wrap;
 	height: 100%;
 	overflow-x: hidden;
 	overflow-y: scroll;
@@ -769,6 +772,7 @@
 	background: white;
 	color: @color-dark;
 	box-sizing: content-box;
+	width: 100%;
 	&:nth-child(2n)
 	{
 		background: @color-section-2n;
@@ -801,8 +805,8 @@
 
 .leplayer-section-info
 {
-	flex: 1;
 	display: block;
+	width: 100%;
 	float: left;
 	padding-left: 10px;
 	padding-right: 7px;
