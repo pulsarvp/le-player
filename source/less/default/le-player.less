@@ -1,10 +1,6 @@
 @import "variables.less";
 
 
-.undefined {
-	background-color: red !important;
-}
-
 .leplayer-container
 {
 	color: @color-text;
@@ -279,7 +275,6 @@
 			{
 				height: auto;
 				position: relative;
-				top: -2px;
 			}
 			&:hover
 			{
@@ -353,6 +348,7 @@
 		{
 			cursor: not-allowed;
 			color: @color-disabled;
+			pointer-events: none;
 			&:hover
 			{
 				background: @color-background;
@@ -857,6 +853,7 @@
 		flex-direction: column;
 		height: auto;
 		line-height: 1.42857143;
+		color: black;
 	}
 
 	&__title {
@@ -891,11 +888,13 @@
 			cursor: default;
 			font-size: 15px;
 			text-align: right;
+			color: black;
 		}
 
 		&__total {
 			background: none;
 			cursor: default;
+			color: black;
 
 			&:before {
 				content : '/';
