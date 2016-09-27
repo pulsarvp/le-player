@@ -186,7 +186,8 @@ import Cookie from './utils/cookie';
 		this.getData = () => {
 			return $.ajax({
 				url: options.dataUrl,
-				method: 'GET'
+				method: 'GET',
+				dataType: 'json'
 			}).promise()
 		}
 
