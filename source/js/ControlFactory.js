@@ -79,6 +79,7 @@ export default function controlFactory(player, name) {
 			return new TimeInfoControl(player)
 
 		default:
+			console.error(`Control ${name} doesn't exist`);
 			return null;
 	}
 }

@@ -24,7 +24,7 @@ import Cookie from './utils/cookie';
 	 * @param {String} [options.poster] Path to poster of video
 	 * @param {String} [options.svgPath] Path to svg sprite for icons
 	 * @param {Number} [options.fullscreen] Fullscreen options
-	 * @param {Number} [options.fullscreen.hideTimelineTime=7000] Delay before hide timeline in fullscreen view
+	 * @param {Number} [options.fullscreen.hideTimelineTime=10000] Delay before hide timeline in fullscreen view
 	 * @param {Object} [options.rate] Rate options
 	 * @param {Number} [options.rate.step=0.25] Step of increase/decrease by rate control
 	 * @param {Number} [options.rate.min=0.5] Min of rate
@@ -49,7 +49,9 @@ import Cookie from './utils/cookie';
 	 * @param {String} options.keybinding[].description] Description of key binding
 	 * @param {Function} options.keybinding[].fn] Callback
 	 * @param {Object|Boolean} [options.miniplayer=false]
+	 * @param {String} [options.miniplayer.width] Width of miniplayer container
 	 * @param {String} [options.miniplayer.width] MiniPlayer's width
+	 * @param {String} [options.sectionContainer] Selector for sections
 	 */
 	let Player = function (element, opts) {
 		const C_BACKWARD = 'backward';
@@ -76,7 +78,7 @@ import Cookie from './utils/cookie';
 			poster : null,
 			svgPath : '../dist/svg/svg-defs.svg',
 			fullscreen : {
-				hideTimelineTime : 7000
+				hideTimelineTime : 10000
 			},
 			rate : {
 				step : 0.25,
@@ -97,7 +99,7 @@ import Cookie from './utils/cookie';
 					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO ]
 				],
 				fullscreen : [
-					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', C_KEYBINDING_INFO,  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'fullscreen' ]
+					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', C_KEYBINDING_INFO,  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen' ]
 				],
 				mini : [
 					[ 'play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
@@ -169,6 +171,15 @@ import Cookie from './utils/cookie';
 						video.volume -= options.volume.step;
 					}
 				},
+
+				{
+					key : 70,
+					info : ['f'],
+					description : 'Открыть/закрыть полноэкраный режим',
+					fn : (video) => {
+						video.fullscreen.toggle()
+					}
+				}
 			]
 		}, opts);
 
@@ -258,10 +269,10 @@ import Cookie from './utils/cookie';
 			}
 
 			showElements () {
-				this.player.trigger('fullscreenchange');
+				this.player.trigger('fullscreenchange', true);
 				container.addClass('fullscreen');
 				controls.fullscreen.show();
-				contorls.common.hide();
+				controls.common.hide();
 
 				clearTimeout(this._hideTimeout);
 				this._hideTimeout = setTimeout(() => {
@@ -281,7 +292,7 @@ import Cookie from './utils/cookie';
 			}
 
 			hideElements () {
-				this.player.trigger('fullscreenchange');
+				this.player.trigger('fullscreenchange', false);
 				container.removeClass('fullscreen');
 				controls.fullscreen.hide();
 				controls.common.show();
@@ -338,7 +349,6 @@ import Cookie from './utils/cookie';
 			}
 
 			set currentTime (value) {
-				console.log(value, this._video);
 				if (value > this.duration) {
 					this._video.currentTime = this.duration
 				} else if (value < 0 ) {
@@ -493,9 +503,16 @@ import Cookie from './utils/cookie';
 			}
 
 			startBuffering() {
-				return this.play().done( () => {
-					this.pause()
-				})
+				const volume = this.volume;
+				this.volume = 0
+				return this.play()
+					.then( () => {
+						return this.pause();
+					})
+					.then( () => {
+						this.currentTime = 0;
+						this.volume = volume;
+					})
 			}
 
 			togglePlay () {
@@ -832,7 +849,6 @@ import Cookie from './utils/cookie';
 			}
 
 			get common () {
-				console.log(this.collections.common);
 				return this.collections.common;
 			}
 
@@ -912,65 +928,66 @@ import Cookie from './utils/cookie';
 			}
 		}
 
-		class Sections {
-			constructor(items) {
-				this.player = player;
+		/**
+		 * @class Sections
+		 * @param {Player} player Main player
+		 * @param {Object} [options]
+		 * @param {Array} [options.items=[]} Data for sections
+		 * @param {Boolean} [options.fullscreenOnly] Show section only in fullscreen
+		 * @extends Component
+		 */
+		class Sections extends Component {
+			constructor(player, options) {
+				let { items = [] } = options;
 
-				this.items = items;
-				for ( let i = 0; i < this.items.length; i++) {
+				for ( let i = 0; i < items.length; i++) {
 					let endSection;
-					if (i < (this.items.length - 1)) {
-						endSection = this.items[i+1].begin
+					if (i < (items.length - 1)) {
+						endSection = items[i+1].begin
 					} else {
 						endSection = video.duration;
 					}
-					this.items[i].end = endSection;
+					items[i].end = endSection;
 				}
 
-				this.element = $('<div />').addClass('leplayer-sections');
-				this.element.append(this._createSections(items));
-				this.element.find('.leplayer-section').on('click', this.onSectionClick.bind(this));
+				//options.items = items;
 
+				super(player, options)
 				this._activeSection = this.getSectionByIndex(0);
+
+				this.items = items;
+
+
 				this.setActiveByIndex(0);
 
-				this.player.trigger('sectionsinit', { items : this.items });
+				this.element.find('.leplayer-section').on('click', this.onSectionClick.bind(this));
 
-				this.player.on('section_toggle', (e) => {
-					if (this.element.hasClass('leplayer-sections--hidden')) {
-						this.element.removeClass('leplayer-sections--hidden');
-					} else {
-						this.element.addClass('leplayer-sections--hidden');
-					}
-				})
+				this.player.on('sectionstoggle', this._onSectionsToggle.bind(this));
 
 				this.player.on('timeupdate', this.onTimeUpdate.bind(this));
+
+				this.player.on('fullscreenchange', this._onFullscreenChange.bind(this))
+
+				this.player.trigger('sectionsinit', { items : this.items });
+			}
+
+			/**
+			 * @override
+			 */
+			createElement() {
+				this.element = $('<div />').addClass('leplayer-sections');
+				if(this.options.fullscreenOnly) {
+					this.element.addClass('leplayer-sections--fsonly');
+				}
+				this.element.append(this._createSections(this.options.items));
+				return this.element;
 			}
 
 
-
-			_createSections(items) {
-				let result = '';
-				items.forEach((section, index) => {
-					let item = `
-						<div class="leplayer-section ${!index ? 'leplayer-section--active' : ''}"
-							data-time="${section.begin}" data-index="${index}">
-							<div class="leplayer-section-time">${secondsToTime(section.begin)}</div>
-							<div class="leplayer-section-info">
-								<div class="leplayer-section-title">${section.title}</div>
-								<div class="leplayer-section-description">${section.description}</div>
-							</div>
-						</div>
-					`
-					result += item;
-				});
-				return result;
-			}
 
 			onSectionClick(e) {
 				let section = $(e.target).closest('.leplayer-section');
-				console.log(secondsToTime(section.attr('data-time')));
-				video.currentTime = section.attr('data-time');
+				video.currentTime = section.attr('data-begin');
 			}
 
 			setActiveByIndex(index) {
@@ -990,18 +1007,61 @@ import Cookie from './utils/cookie';
 				return this.element.find(`.leplayer-section[data-index="${index}"]`);
 			}
 
+
 			onTimeUpdate(e, data) {
-				let currentTime = data.time;
+				const currentTime = data.time;
+
+				const endSectionTime = this._activeSection.attr('data-end');
+
+				this._activeSection.next().find('.time').text(secondsToTime(endSectionTime - currentTime));
 
 				for (let i = 0; i < this.items.length; i++) {
-					let section = this.items[i];
+					const section = this.items[i];
 					if (currentTime < section.end) {
 						this.setActiveByIndex(i);
 						break;
 					}
 				}
 			}
+
+			_onSectionsToggle(e, data) {
+				if (this.element.hasClass('leplayer-sections--hidden')) {
+					this.element.removeClass('leplayer-sections--hidden');
+				} else {
+					this.element.addClass('leplayer-sections--hidden');
+				}
+			}
+
+			_onFullscreenChange(e, data) {
+			}
+
+
+
+			_createSections(items) {
+				let result = '';
+				items.forEach((section, index) => {
+					const item = `
+						<div class="leplayer-section ${!index ? 'leplayer-section--active' : ''}"
+							data-begin="${section.begin}"
+							data-index="${index}"
+							data-end="${section.end}">
+							<div class="leplayer-section-time">${secondsToTime(section.begin)}</div>
+							<div class="leplayer-section-info">
+								<div class="leplayer-section-next-info">
+									Следующая секция начнется через
+									<span class="time">${secondsToTime(items[0].end)}</span>
+								</div>
+								<div class="leplayer-section-title">${section.title}</div>
+								<div class="leplayer-section-description">${section.description}</div>
+							</div>
+						</div>
+					`.trim()
+					result += item;
+				});
+				return result;
+			}
 		}
+
 
 		/**
 		 * @class MiniPlayer
@@ -1030,7 +1090,7 @@ import Cookie from './utils/cookie';
 				const self = this;
 				$(window).scroll(function(e) {
 					const scrollTop = $(this).scrollTop();
-					const centerVideo = container.offset().top + videoContainer.height() / 2;
+					const centerVideo = container.offset().top + container.outerHeight() / 2;
 
 					if(scrollTop > centerVideo) {
 						if(!miniPlayer.visible) {
@@ -1064,6 +1124,12 @@ import Cookie from './utils/cookie';
 					'transform' : '',
 					'margin' : ''
 				})
+
+				if(this.player.sections) {
+					this.player.sections.element.css({
+						'left' : ''
+					})
+				}
 			}
 
 			get height() {
@@ -1089,6 +1155,12 @@ import Cookie from './utils/cookie';
 				videoContainer.css({
 					'transform': `translateX(${(videoWidth / 2) - this.element.width() / 2}px)`
 				})
+
+				if(this.player.sections) {
+					this.player.sections.element.css({
+						left : this.element.width() + 'px'
+					})
+				}
 			}
 
 			/**
@@ -1148,12 +1220,14 @@ import Cookie from './utils/cookie';
 			}
 		}
 
+		var self = this;
 		var sources = this.sources =[];
 		var subtitles = [];
 		var volume = options.volume.default;
 		var controls = this.controls;
 		var video = null;
 		this.video = video
+		this.sections = null;
 
 		/**
 		 * DOM container to hold video and all other stuff.
@@ -1228,7 +1302,6 @@ import Cookie from './utils/cookie';
 				}
 				initSections();
 				player.trigger('inited');
-				console.log('inited');
 			});
 
 
@@ -1280,12 +1353,18 @@ import Cookie from './utils/cookie';
 
 		var initSections = function() {
 			options.dataUrl && player.getData().done((data) => {
-				let section = new Sections(data.sections);
+				const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
+				self.sections = new Sections(player, {
+					items : data.sections,
+					fullscreenOnly : isSectionOutside
+				});
 
-				if (sectionContainer) {
-					sectionContainer.append(section.element);
-				} else {
-					videoContainer.append(section.element);
+				videoContainer.append(self.sections.element);
+				if (isSectionOutside) {
+					const outsideSections = new Sections(player, {
+						items : data.sections,
+					});
+					sectionContainer.append(outsideSections.element);
 				}
 			});
 		}
@@ -1323,7 +1402,7 @@ import Cookie from './utils/cookie';
 
 
 			if(options.sectionContainer) {
-				sectionContainer = $(options.sectionContainer).addClass('leplayer-section-container');
+				sectionContainer = $(options.sectionContainer);
 			}
 
 			element.before(container);
@@ -1332,14 +1411,14 @@ import Cookie from './utils/cookie';
 
 		var initHotKeys = function () {
 
-			let isKeyBinding = (e, binding) => {
+			const isKeyBinding = (e, binding) => {
 				return ((e.which === binding.key) || (e.key === binding.key)) &&
 						(!!binding.shiftKey == e.shiftKey) &&
 						(!!binding.ctrlKey == e.ctrlKey)
 			}
 
 			$(container).bind('keydown.leplayer.hotkey', (e) => {
-				let _isFocused = isFocused();
+				const _isFocused = isFocused();
 				if (_isFocused) {
 					options.keyBinding.forEach(binding => {
 						if( isKeyBinding(e, binding) ) {
