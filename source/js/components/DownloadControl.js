@@ -56,7 +56,9 @@ class DownloadControl extends Control {
 	 * @param {String} value Path for video
 	 */
 	set link (value) {
-		this.element.attr('href', value);
+		this.element.attr({
+			'href' : value,
+		});
 	}
 
 

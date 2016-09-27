@@ -5,7 +5,6 @@
 {
 	color: @color-text;
 	display: inline-block;
-	line-height: 0;
 	outline: 0;
 	position: relative;
 
@@ -634,7 +633,6 @@
 	display: block;
 	outline: 0;
 	left: 0;
-	line-height: 0;
 	position: relative;
 	z-index: @z-index-base + 6;
 }
@@ -853,7 +851,6 @@
 		display: flex;
 		flex-direction: column;
 		height: auto;
-		line-height: 1.42857143;
 		color: black;
 	}
 
@@ -863,10 +860,16 @@
 		margin-bottom: 5px;
 		font-weight: 500;
 		line-height: 100%;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	&__video-info {
 		margin-bottom: 10px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 
 	}
 
