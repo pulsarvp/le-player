@@ -637,16 +637,18 @@
 	z-index: @z-index-base + 6;
 }
 
-.leplayer-notification
+.leplayer-error-display
 {
 	position: absolute;
 	top: 0;
 	left: 0;
 	right: 0;
-	background: pink;
+	background: red;
+	color: white;
+	font-weight: 500;
 	width: 100%;
-	height: 30px;
-	line-height: 30px;
+	height: auto;
+	display: none;
 	text-align: center;
 	font-size: 15px;
 	z-index: @z-index-base + 7;
@@ -655,7 +657,7 @@
 
 .leplayer-container.fullscreen
 {
-	.leplayer-notification
+	.leplayer-error-display
 	{
 		z-index: @z-index-fullscreen + 7;
 	}

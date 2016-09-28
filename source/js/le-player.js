@@ -6,6 +6,9 @@ import Component from './components/Component';
 import Icon from './components/Icon';
 import controlFactory, { C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
+import { secondsToTime } from './utils/time';
+import MediaError from './MediaError';
+import ErrorDisplay from './components/ErrorDisplay';
 
 
 (function ($) {
@@ -235,6 +238,26 @@ import Cookie from './utils/cookie';
 		this.on = (eventName, ...args) => {
 			$(element).on.call($(element), `leplayer_${eventName}`, ...args);
 		}
+
+		this.setError = function(value) {
+			if (value === null) {
+				this._error = null;
+				if(this.errorDisplay) {
+					this.errorDisplay.element.hide()
+				}
+				return;
+			}
+			this._error = new MediaError(value);
+
+			console.error(this._error);
+			this.trigger('error', { error : this._error});
+		}
+
+		// TODO: Сделать плеер классов и реализовать эти методы через get и set
+		this.getError = function() {
+			return this._error || null;
+		}
+
 
 		/**
 		 * This class manages FullScreen API.
@@ -533,7 +556,6 @@ import Cookie from './utils/cookie';
 						this.startBuffering();
 						dfd.resolve();
 					});
-				this._initCustomEvents();
 				this._initHtmlEvents();
 
 				dfd.notify();
@@ -736,14 +758,15 @@ import Cookie from './utils/cookie';
 					'waiting' : (e) => {
 						loader.show();
 						this.player.trigger('waiting');
-					}
+					},
 
+					'error' : (e) => {
+						this.error = new MediaError(e.target.error.code);
+						this.player.trigger('error', { error : this.error });
+					}
 				});
 			}
 
-			_initCustomEvents () {
-				let mediaElement = $(this._video);
-			}
 		}
 
 		class ControlCollection  extends Component {
@@ -1307,6 +1330,7 @@ import Cookie from './utils/cookie';
 		var video = null;
 		this.video = video
 		this.sections = null;
+		this.controls = controls;
 
 		/**
 		 * DOM container to hold video and all other stuff.
@@ -1343,7 +1367,7 @@ import Cookie from './utils/cookie';
 				return this;
 			}
 
-			initOptions();
+			this.initOptions();
 			// Set source.
 			// @TODO move this to Video class
 			element.children('source').each(function () {
@@ -1372,22 +1396,21 @@ import Cookie from './utils/cookie';
 			video = player.video = new Video(element);
 
 			/** TODO: Use promise to async run this */
-			initDom();
-			initControls();
-			initHotKeys();
+			this.initDom();
+			this.initControls();
+			this.initHotKeys();
 			video.init().done(() => {
 				if(options.miniplayer) {
 					miniPlayer = new MiniPlayer(player);
 				}
-				initSections();
+				this.initSections();
 				player.trigger('inited');
 			});
 
 
 		};
 
-		this.controls = controls;
-		var initControls = function () {
+		this.initControls = function () {
 			controls = new Controls(player);
 			for (const name of ['common', 'fullscreen']) {
 				if (!options.controls.hasOwnProperty(name)) return;
@@ -1398,39 +1421,9 @@ import Cookie from './utils/cookie';
 			if (controls.collections.common != null) {
 				controls.collections.common.active = true;
 			}
-			//for (let name in options.controls) {
-				//if (!controls.has(name)) continue;
-				//for (let rowIndex in options.controls[ name ]) {
-					//let row = options.controls[ name ][ rowIndex ],
-						//hasTimeline = false,
-						//rowElement = $('<div />').addClass('leplayer-controls controls-' + name);
-
-					//for (let i in row) {
-						//let controlName = row[ i ];
-
-						//if (controlName == C_DIVIDER || !controls.collections[ name ].has(controlName)) {
-							//// Create control only if divider or does not exist yet.
-							//var c = controls.collections[ name ].add(controlName);
-							//if (c != null) {
-								//rowElement.append(c);
-								//if (controlName == C_TIMELINE)
-									//hasTimeline = true;
-							//} else {
-								//console.warn('Cannot create ' + controlName + ' control for collection ' + name + '.');
-							//}
-						//}
-					//}
-					//if (!hasTimeline)
-						//rowElement.css('width', '1px');
-
-					//rowElement.find('.divider + .divider').remove();
-
-					//container.append(rowElement);
-				//}
-			//}
 		};
 
-		var initSections = function() {
+		this.initSections = function() {
 			options.dataUrl && player.getData().done((data) => {
 				const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
 				const sections = new Sections(player, {
@@ -1450,7 +1443,8 @@ import Cookie from './utils/cookie';
 		}
 
 
-		var initDom = function () {
+		this.initDom = function () {
+			this.errorDisplay = new ErrorDisplay(this);
 			overlay = $('<div />')
 				.addClass('play-overlay')
 				.append(new Icon(player, { iconName : 'play' }).element)
@@ -1475,6 +1469,7 @@ import Cookie from './utils/cookie';
 			container = $('<div />')
 				.addClass('leplayer-container')
 				.append(videoContainer)
+				.append(this.errorDisplay.element)
 				.attr('tabindex', 0)
 				//.css('width', element.width() + 'px');
 				.css('width', '100%')
@@ -1489,7 +1484,7 @@ import Cookie from './utils/cookie';
 			videoContainer.append(element);
 		};
 
-		var initHotKeys = function () {
+		this.initHotKeys = function () {
 
 			const isKeyBinding = (e, binding) => {
 				return ((e.which === binding.key) || (e.key === binding.key)) &&
@@ -1511,7 +1506,7 @@ import Cookie from './utils/cookie';
 			})
 		};
 
-		var initOptions = function () {
+		this.initOptions = function () {
 			let height, width, poster, attrs, preload;
 			element.removeAttr('controls');
 
