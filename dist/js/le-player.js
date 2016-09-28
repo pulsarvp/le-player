@@ -126,6 +126,8 @@
 	  * @param {String} [options.sectionContainer] Selector for sections
 	  */
 		var Player = function Player(element, opts) {
+			var _this = this;
+
 			var C_BACKWARD = 'backward';
 			var C_DIVIDER = 'divider';
 			var C_DOWNLOAD = 'download';
@@ -166,7 +168,7 @@
 					}
 				},
 				controls: {
-					common: [['play', 'volume', 'divider', 'timeline', 'divider', 'section', 'divider', 'fullscreen'], ['rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', _ControlFactory.C_KEYBINDING_INFO]],
+					common: [['play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen'], ['rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', _ControlFactory.C_KEYBINDING_INFO]],
 					fullscreen: [['play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', _ControlFactory.C_KEYBINDING_INFO, 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen']],
 					mini: [['play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']]
 				},
@@ -251,7 +253,8 @@
 					args[_key - 1] = arguments[_key];
 				}
 
-				(_$$trigger = $(element).trigger).call.apply(_$$trigger, [$(element), 'leplayer_' + eventName].concat(args));
+				var event = $.Event('leplayer_' + eventName, { player: _this });
+				(_$$trigger = $(element).trigger).call.apply(_$$trigger, [$(element), event].concat(args));
 			};
 
 			this.on = function (eventName) {
@@ -292,7 +295,7 @@
 				}, {
 					key: 'init',
 					value: function init() {
-						var _this = this;
+						var _this2 = this;
 
 						if (!this.enabled()) {
 							return null;
@@ -301,27 +304,27 @@
 						$(document).on({
 
 							'fullscreenchange': function fullscreenchange(e) {
-								_this.toggleElements(!!(document.fullScreen || document.fullscreenElement));
+								_this2.toggleElements(!!(document.fullScreen || document.fullscreenElement));
 							},
 
 							'webkitfullscreenchange': function webkitfullscreenchange(e) {
-								_this.toggleElements(!!document.webkitIsFullScreen);
+								_this2.toggleElements(!!document.webkitIsFullScreen);
 							},
 
 							'mozfullscreenchange': function mozfullscreenchange(e) {
-								_this.toggleElements(!!document.mozFullScreen);
+								_this2.toggleElements(!!document.mozFullScreen);
 							},
 
 							'msfullscreenchange': function msfullscreenchange(e) {
-								_this.toggleElements(!!document.msFullscreenElement);
+								_this2.toggleElements(!!document.msFullscreenElement);
 							},
 
 							'webkitbeginfullscreen': function webkitbeginfullscreen(e) {
-								_this.toggleElements(true);
+								_this2.toggleElements(true);
 							},
 
 							'webkitendfullscreen': function webkitendfullscreen(e) {
-								_this.toggleElements(false);
+								_this2.toggleElements(false);
 							}
 						});
 					}
@@ -338,7 +341,7 @@
 				}, {
 					key: 'showElements',
 					value: function showElements() {
-						var _this2 = this;
+						var _this3 = this;
 
 						this.player.trigger('fullscreenchange', true);
 						container.addClass('fullscreen');
@@ -347,16 +350,16 @@
 
 						clearTimeout(this._hideTimeout);
 						this._hideTimeout = setTimeout(function () {
-							_this2._collection.element.hide();
+							_this3._collection.element.hide();
 						}, options.fullscreen.hideTimelineTime);
 
 						$(container).on({
 							'mousemove.leplayer.fullscreen-hide-timeline': function mousemoveLeplayerFullscreenHideTimeline(e) {
 								if (!$(e.currentTarget).hasClass('fullscreen')) return false;
-								clearTimeout(_this2._hideTimeout);
-								_this2._collection.element.show();
-								_this2._hideTimeout = setTimeout(function () {
-									_this2._collection.element.hide();
+								clearTimeout(_this3._hideTimeout);
+								_this3._collection.element.show();
+								_this3._hideTimeout = setTimeout(function () {
+									_this3._collection.element.hide();
 								}, options.fullscreen.hideTimelineTime);
 							}
 						});
@@ -419,17 +422,17 @@
 				_createClass(Video, [{
 					key: 'init',
 					value: function init() {
-						var _this3 = this;
+						var _this4 = this;
 
 						var dfd = $.Deferred();
 						this._initSubtitles();
 						this._initVideo().done(function () {
-							_this3.fullscreen = new Fullscreen();
-							_this3.fullscreen.init();
+							_this4.fullscreen = new Fullscreen();
+							_this4.fullscreen.init();
 							controls.init();
-							_this3._initRate();
-							_this3._initVolume();
-							_this3.startBuffering();
+							_this4._initRate();
+							_this4._initVolume();
+							_this4.startBuffering();
 							dfd.resolve();
 						});
 						this._initCustomEvents();
@@ -441,15 +444,15 @@
 				}, {
 					key: 'startBuffering',
 					value: function startBuffering() {
-						var _this4 = this;
+						var _this5 = this;
 
 						var volume = this.volume;
 						this.volume = 0;
 						return this.play().then(function () {
-							return _this4.pause();
+							return _this5.pause();
 						}).then(function () {
-							_this4.currentTime = 0;
-							_this4.volume = volume;
+							_this5.currentTime = 0;
+							_this5.volume = volume;
 						});
 					}
 				}, {
@@ -558,7 +561,7 @@
 				}, {
 					key: '_initVideo',
 					value: function _initVideo() {
-						var _this5 = this;
+						var _this6 = this;
 
 						var dfd = $.Deferred();
 						if (this._video.readyState > HTMLMediaElement.HAVE_NOTHING) {
@@ -568,7 +571,7 @@
 						} else {
 							$(this._video).one('loadedmetadata', function (e) {
 								dfd.resolve();
-								_this5._textTracksHack();
+								_this6._textTracksHack();
 							});
 						}
 						dfd.notify();
@@ -600,7 +603,7 @@
 				}, {
 					key: '_initHtmlEvents',
 					value: function _initHtmlEvents() {
-						var _this6 = this;
+						var _this7 = this;
 
 						var mediaElement = $(this._video);
 						var timerId = null;
@@ -609,53 +612,53 @@
 
 							'timeupdate': function timeupdate(e) {
 								//controls.moveTimeMarker();
-								_this6.player.trigger('timeupdate', { time: video.currentTime, duration: video.duration });
+								_this7.player.trigger('timeupdate', { time: video.currentTime, duration: video.duration });
 							},
 
 							'loadedmetadata': this._onLoadedMetaData.bind(this),
 
 							'ended': function ended() {
-								_this6.pause();
-								_this6.player.trigger('ended');
+								_this7.pause();
+								_this7.player.trigger('ended');
 							},
 
 							'dblclick': function dblclick() {
 								clearTimeout(timerId);
-								_this6.fullscreen.toggle();
+								_this7.fullscreen.toggle();
 							},
 
 							'click': function click() {
 								clearTimeout(timerId);
 								timerId = setTimeout(function () {
 									container.focus();
-									_this6.togglePlay();
+									_this7.togglePlay();
 								}, 300);
 							},
 
 							'volumechange': function volumechange(e) {
-								_this6.player.trigger('volumechange', { volume: _this6.volume });
+								_this7.player.trigger('volumechange', { volume: _this7.volume });
 							},
 
 							'play': function play(e) {
-								_this6.player.trigger('play');
+								_this7.player.trigger('play');
 							},
 
 							'pause': function pause(e) {
-								_this6.player.trigger('pause');
+								_this7.player.trigger('pause');
 							},
 
 							'ratechange': function ratechange(e) {
-								_this6.player.trigger('ratechange', { volume: _this6.rate });
+								_this7.player.trigger('ratechange', { volume: _this7.rate });
 							},
 
 							'canplay': function canplay(e) {
 								loader.hide();
-								_this6.player.trigger('canplay');
+								_this7.player.trigger('canplay');
 							},
 
 							'waiting': function waiting(e) {
 								loader.show();
-								_this6.player.trigger('waiting');
+								_this7.player.trigger('waiting');
 							}
 
 						});
@@ -812,13 +815,13 @@
 						controls: player.options.controls[options.name] || []
 					}, options);
 
-					var _this7 = _possibleConstructorReturn(this, Object.getPrototypeOf(ControlCollection).call(this, player, options));
+					var _this8 = _possibleConstructorReturn(this, Object.getPrototypeOf(ControlCollection).call(this, player, options));
 
-					_this7.items = {};
-					_this7.active = options.active || false;
-					_this7.name = options.name;
-					_this7.controls = player.options.controls[_this7.name];
-					return _this7;
+					_this8.items = {};
+					_this8.active = options.active || false;
+					_this8.name = options.name;
+					_this8.controls = player.options.controls[_this8.name];
+					return _this8;
 				}
 
 				/**
@@ -829,7 +832,7 @@
 				_createClass(ControlCollection, [{
 					key: 'createElement',
 					value: function createElement() {
-						var _this8 = this;
+						var _this9 = this;
 
 						var _options = this.options;
 						var name = _options.name;
@@ -845,13 +848,13 @@
 								if (controlName == C_TIMELINE) {
 									hasTimeline = true;
 								}
-								var control = (0, _ControlFactory2.default)(_this8.player, controlName);
+								var control = (0, _ControlFactory2.default)(_this9.player, controlName);
 								elemRow.append(control.element);
 							});
 							if (!hasTimeline) {
 								elemRow.css('width', '1px');
 							}
-							_this8.element.append(elemRow);
+							_this9.element.append(elemRow);
 						});
 						return this.element;
 					}
@@ -1083,6 +1086,8 @@
 				_inherits(Sections, _Component2);
 
 				function Sections(player, options) {
+					var _ret;
+
 					_classCallCheck(this, Sections);
 
 					var _options$items = options.items;
@@ -1101,24 +1106,25 @@
 
 					//options.items = items;
 
-					var _this9 = _possibleConstructorReturn(this, Object.getPrototypeOf(Sections).call(this, player, options));
+					var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(Sections).call(this, player, options));
 
-					_this9._activeSection = _this9.getSectionByIndex(0);
+					_this10._activeSection = _this10.getSectionByIndex(0);
 
-					_this9.items = items;
+					_this10.items = items;
 
-					_this9.setActiveByIndex(0);
+					_this10.setActiveByIndex(0);
 
-					_this9.element.find('.leplayer-section').on('click', _this9.onSectionClick.bind(_this9));
+					_this10.element.find('.leplayer-section').on('click', _this10.onSectionClick.bind(_this10));
 
-					_this9.player.on('sectionstoggle', _this9._onSectionsToggle.bind(_this9));
+					_this10.player.on('sectionstoggle', _this10._onSectionsToggle.bind(_this10));
 
-					_this9.player.on('timeupdate', _this9.onTimeUpdate.bind(_this9));
+					_this10.player.on('timeupdate', _this10.onTimeUpdate.bind(_this10));
 
-					_this9.player.on('fullscreenchange', _this9._onFullscreenChange.bind(_this9));
+					_this10.player.on('fullscreenchange', _this10._onFullscreenChange.bind(_this10));
 
-					_this9.player.trigger('sectionsinit', { items: _this9.items });
-					return _this9;
+					_this10.player.trigger('sectionsinit', { items: _this10.items, sections: _this10 });
+
+					return _ret = _this10, _possibleConstructorReturn(_this10, _ret);
 				}
 
 				/**
@@ -1228,15 +1234,15 @@
 						width: width
 					}, options);
 
-					var _this10 = _possibleConstructorReturn(this, Object.getPrototypeOf(MiniPlayer).call(this, player, options));
+					var _this11 = _possibleConstructorReturn(this, Object.getPrototypeOf(MiniPlayer).call(this, player, options));
 
 					if (!options.visible) {
-						_this10.hide();
+						_this11.hide();
 					}
 
-					container.append(_this10.element);
+					container.append(_this11.element);
 
-					var self = _this10;
+					var self = _this11;
 					$(window).scroll(function (e) {
 						var scrollTop = $(this).scrollTop();
 						var centerVideo = container.offset().top + container.outerHeight() / 2;
@@ -1251,13 +1257,15 @@
 					});
 
 					$(window).resize(function () {
-						if (_this10.visible) {
-							_this10.updateVideoContainer();
+						if (_this11.visible) {
+							_this11.updateVideoContainer();
 						}
 					});
 
-					_this10.player.on('sectionsinit', _this10._onSectionsInit.bind(_this10));
-					return _this10;
+					_this11.player.on('sectionsinit', _this11._onSectionsInit.bind(_this11));
+
+					_this11.player.on('fullscreenchange', _this11._onFullscreenChange.bind(_this11));
+					return _this11;
 				}
 
 				_createClass(MiniPlayer, [{
@@ -1265,6 +1273,13 @@
 					value: function _onSectionsInit(e, data) {
 						if (this.visible) {
 							this.updateVideoContainer();
+						}
+					}
+				}, {
+					key: '_onFullscreenChange',
+					value: function _onFullscreenChange(e, data) {
+						if (data == true) {
+							this.hide();
 						}
 					}
 
@@ -1301,6 +1316,7 @@
 	     * Move video container under the miniplayer
 	     */
 					value: function updateVideoContainer() {
+						var sections = this.player.sections;
 						container.css({
 							'padding-top': videoContainer.height() + 'px'
 						});
@@ -1316,10 +1332,17 @@
 						videoContainer.css({
 							'transform': 'translateX(' + (videoWidth / 2 - this.element.width() / 2) + 'px)'
 						});
+						this.element.find('.leplayer-miniplayer__info').css({
+							'margin-left': videoWidth + 'px'
+						});
 
-						if (this.player.sections) {
-							this.player.sections.element.css({
+						if (sections) {
+							sections.element.css({
 								left: this.element.width() + 'px'
+							});
+
+							this.element.find('.leplayer-miniplayer__info').css({
+								'margin-right': sections.element.width() + 'px'
 							});
 						}
 					}
@@ -3476,7 +3499,7 @@
 			key: 'onClick',
 			value: function onClick(e) {
 				_get(Object.getPrototypeOf(BackwardControl.prototype), 'onClick', this).call(this, e);
-				this.player.video.currentTime -= options.playback.step.medium;
+				this.player.video.currentTime -= this.player.options.playback.step.medium;
 			}
 		}]);
 
@@ -3952,7 +3975,9 @@
 		}, {
 			key: 'link',
 			set: function set(value) {
-				this.element.attr('href', value);
+				this.element.attr({
+					'href': value
+				});
 			}
 		}]);
 

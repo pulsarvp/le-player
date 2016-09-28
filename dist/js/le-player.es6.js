@@ -95,7 +95,7 @@ import Cookie from './utils/cookie';
 			},
 			controls : {
 				common : [
-					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'section', 'divider', 'fullscreen' ],
+					[ 'play', 'volume', 'divider', 'timeline',  'divider', 'fullscreen' ],
 					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO ]
 				],
 				fullscreen : [
@@ -192,7 +192,8 @@ import Cookie from './utils/cookie';
 		}
 
 		this.trigger = (eventName, ...args) => {
-			$(element).trigger.call($(element), `leplayer_${eventName}`, ...args);
+			const event = $.Event(`leplayer_${eventName}`, { player : this})
+			$(element).trigger.call($(element), event, ...args);
 		}
 
 		this.on = (eventName, ...args) => {
@@ -969,7 +970,9 @@ import Cookie from './utils/cookie';
 
 				this.player.on('fullscreenchange', this._onFullscreenChange.bind(this))
 
-				this.player.trigger('sectionsinit', { items : this.items });
+				this.player.trigger('sectionsinit', { items : this.items, sections : this });
+
+				return this;
 			}
 
 			/**
@@ -1110,11 +1113,19 @@ import Cookie from './utils/cookie';
 				})
 
 				this.player.on('sectionsinit', this._onSectionsInit.bind(this));
+
+				this.player.on('fullscreenchange', this._onFullscreenChange.bind(this));
 			};
 
 			_onSectionsInit(e, data) {
 				if(this.visible) {
 					this.updateVideoContainer();
+				}
+			}
+
+			_onFullscreenChange(e, data) {
+				if (data == true) {
+					this.hide();
 				}
 			}
 
@@ -1149,6 +1160,7 @@ import Cookie from './utils/cookie';
 			 * Move video container under the miniplayer
 			 */
 			updateVideoContainer() {
+				const sections = this.player.sections;
 				container.css({
 					'padding-top' : videoContainer.height() + 'px'
 				})
@@ -1164,10 +1176,17 @@ import Cookie from './utils/cookie';
 				videoContainer.css({
 					'transform': `translateX(${(videoWidth / 2) - this.element.width() / 2}px)`
 				})
+				this.element.find('.leplayer-miniplayer__info').css({
+					'margin-left' : videoWidth + 'px'
+				})
 
-				if(this.player.sections) {
-					this.player.sections.element.css({
+				if(sections) {
+					sections.element.css({
 						left : this.element.width() + 'px'
+					})
+
+					this.element.find('.leplayer-miniplayer__info').css({
+						'margin-right' : sections.element.width() + 'px'
 					})
 				}
 			}
