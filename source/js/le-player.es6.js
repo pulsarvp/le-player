@@ -1174,7 +1174,7 @@ import Cookie from './utils/cookie';
 			/**
 			 * Move video container under the miniplayer
 			 */
-			updateVideoContainer() {
+			updateVideoContainer(lol) {
 				const sections = this.player.sections;
 				container.css({
 					'padding-top' : videoContainer.height() + 'px'
