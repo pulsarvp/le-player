@@ -97,7 +97,7 @@ import Cookie from './utils/cookie';
 			},
 			controls : {
 				common : [
-					[ 'play', 'volume', 'divider', 'timeline',  'divider', 'fullscreen' ],
+					[ 'play', 'volume', 'divider', 'timeline',  'divider', 'section', 'divider', 'fullscreen' ],
 					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO ]
 				],
 				fullscreen : [
@@ -209,8 +209,8 @@ import Cookie from './utils/cookie';
 			if (!options.excludeControls.hasOwnProperty(name)) return;
 			const controlCollection = options.excludeControls[name];
 			controlCollection.forEach((row, index) => {
-				if (options.controls[name] && options.controls[name][index]) {
-					options.controls[name][index] = excludeArray(options.controls[name][index], row);
+				if (this.options.controls[name] && this.options.controls[name][index]) {
+					this.options.controls[name][index] = excludeArray(options.controls[name][index], row);
 				}
 			})
 		}
