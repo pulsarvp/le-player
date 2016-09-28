@@ -5,8 +5,6 @@
 {
 	color: @color-text;
 	display: inline-block;
-	font-family: @font-main;
-	line-height: 0;
 	outline: 0;
 	position: relative;
 
@@ -635,7 +633,6 @@
 	display: block;
 	outline: 0;
 	left: 0;
-	line-height: 0;
 	position: relative;
 	z-index: @z-index-base + 6;
 }
@@ -706,7 +703,6 @@
 
 .leplayer-sections
 {
-	font-family: @font-main;
 	font-size: 13px;
 	display: flex;
 	flex-direction: column;
@@ -715,7 +711,6 @@
 	overflow-x: hidden;
 	overflow-y: scroll;
 	width: 260px;
-	line-height: 1em;
 	z-index: @z-index-base + 6;
 
 }
@@ -800,7 +795,7 @@
 	font-size: 12px;
 	font-weight: 400;
 	text-align: right;
-	width: 45px;
+	width: 53px;
 }
 
 .leplayer-section-info
@@ -813,7 +808,7 @@
 }
 .leplayer-section-title
 {
-	font-weight: bold;
+	font-weight: 500;
 }
 
 .leplayer-section-description
@@ -856,7 +851,6 @@
 		display: flex;
 		flex-direction: column;
 		height: auto;
-		line-height: 1.42857143;
 		color: black;
 	}
 
@@ -864,12 +858,18 @@
 		color: black;
 		font-size: 14px;
 		margin-bottom: 5px;
-		font-weight: bold;
+		font-weight: 500;
 		line-height: 100%;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	&__video-info {
 		margin-bottom: 10px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 
 	}
 
@@ -882,7 +882,7 @@
 		display: table-cell;
 		vertical-align: middle;
 		padding: 6px 10px;
-		font-weight: bold;
+		font-weight: 500;
 		width: 150px;
 		white-space: nowrap;
 		box-sizing: border-box;
