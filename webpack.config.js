@@ -3,11 +3,14 @@
 const path = require('path');
 
 module.exports = {
-    entry: './source/js/le-player.es6.js',
+    entry: {
+        'le-player' : './source/js/le-player.js',
+        'le-player-ga' : './source/js/plugins/le-player-ga.js'
+    },
 
     output: {
         path: path.join(__dirname, 'dist', 'js'),
-        filename: 'le-player.js',
+        filename: '[name].js',
     },
 
     module: {

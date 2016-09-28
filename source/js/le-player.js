@@ -1,10 +1,12 @@
 'use strict';
 
+import $ from 'jquery';
 import Control from './components/Control';
 import Component from './components/Component';
 import Icon from './components/Icon';
 import controlFactory, { C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
+
 
 (function ($) {
 
@@ -54,6 +56,7 @@ import Cookie from './utils/cookie';
 	 * @param {String} [options.miniplayer.width] Width of miniplayer container
 	 * @param {String} [options.miniplayer.width] MiniPlayer's width
 	 * @param {String} [options.sectionContainer] Selector for sections
+	 * @param {Object} [options.plugins] Keys of objects are name of plugin, value - plugin options
 	 */
 	let Player = function (element, opts) {
 		const C_BACKWARD = 'backward';
@@ -182,7 +185,8 @@ import Cookie from './utils/cookie';
 						video.fullscreen.toggle()
 					}
 				}
-			]
+			],
+			onPlayerInited : function() {}
 		}, opts);
 
 		/**
@@ -1332,7 +1336,7 @@ import Cookie from './utils/cookie';
 
 		}
 
-		var init = function () {
+		this.init = function () {
 			// Check if element is correctly selected.
 			if (element.prop('tagName').toLowerCase() != 'video') {
 				console.warn('Incorrect element selected.');
@@ -1572,32 +1576,21 @@ import Cookie from './utils/cookie';
 			element.attr('preload', options.preload);
 		};
 
-		var secondsToTime = function (seconds) {
-			var h = Math.floor(seconds / 3600);
-			var m = Math.floor(seconds % 3600 / 60);
-			var s = Math.floor(seconds % 3600 % 60);
-			var out = '';
-			if (h > 0)
-				out = h + ':';
-			if (m < 10)
-				out += '0';
-			out += m + ':';
-			if (s < 10)
-				out += '0';
-			out += s;
-			return out;
-		};
-
-
 		var isFocused = function () {
 			let focused = $(container).find(':focus');
 			return (focused.length > 0) || $(container).is(':focus');
 		}
 
-		init();
+		this.init();
+		this.on('inited', this.options.onPlayerInited.bind(this));
 
 		return this;
 	};
+
+
+	Player.plugin = function(name, fn) {
+		Player.prototype[name] = fn;
+	}
 
 
 	window.$.fn.lePlayer = function (options) {
@@ -1605,4 +1598,5 @@ import Cookie from './utils/cookie';
 			return new Player($(this), options);
 		});
 	};
+	window.$.lePlayer = Player;
 }(jQuery));
