@@ -110,6 +110,8 @@
 	  * @param {Obejct} [options.controls] Object of controls
 	  * @param {String[]} [options.controls.common] Array of controls for default view
 	  * @param {String[]} [options.controls.fullscreen] Array of control for fullsreen view
+	  * @param {String[]} [options.controls.mini] Array of control for miniplayer
+	  * @param {Object} [options.excludeControls] Object of exclude controls. Structure is the same as that of options.controls
 	  * @param {Object} [options.volume] Volume's options
 	  * @param {Number} [options.volume.default=0.4] Default volume
 	  * @param {Number} [options.volume.mutelimit=0.05] Delta when volume is muted
@@ -854,6 +856,7 @@
 							if (!hasTimeline) {
 								elemRow.css('width', '1px');
 							}
+							elemRow.find('.divider + .divider').remove();
 							_this9.element.append(elemRow);
 						});
 						return this.element;
@@ -1078,6 +1081,7 @@
 	   * @param {Object} [options]
 	   * @param {Array} [options.items=[]} Data for sections
 	   * @param {Boolean} [options.fullscreenOnly] Show section only in fullscreen
+	   * @param {Boolean} [options.main=true] Main sections of player
 	   * @extends Component
 	   */
 
@@ -1092,6 +1096,8 @@
 
 					var _options$items = options.items;
 					var items = _options$items === undefined ? [] : _options$items;
+					var _options$main = options.main;
+					var main = _options$main === undefined ? true : _options$main;
 
 
 					for (var i = 0; i < items.length; i++) {
@@ -1122,6 +1128,9 @@
 
 					_this10.player.on('fullscreenchange', _this10._onFullscreenChange.bind(_this10));
 
+					if (main) {
+						_this10.player.sections = _this10;
+					}
 					_this10.player.trigger('sectionsinit', { items: _this10.items, sections: _this10 });
 
 					return _ret = _this10, _possibleConstructorReturn(_this10, _ret);
@@ -1269,6 +1278,18 @@
 				}
 
 				_createClass(MiniPlayer, [{
+					key: 'onPlayerInited',
+
+
+					/**
+	     * @override
+	     */
+					value: function onPlayerInited(e) {
+						if (this.visible) {
+							this.updateVideoContainer();
+						}
+					}
+				}, {
 					key: '_onSectionsInit',
 					value: function _onSectionsInit(e, data) {
 						if (this.visible) {
@@ -1542,7 +1563,7 @@
 			var initSections = function initSections() {
 				options.dataUrl && player.getData().done(function (data) {
 					var isSectionOutside = sectionContainer && sectionContainer.length > 0;
-					self.sections = new Sections(player, {
+					var sections = new Sections(player, {
 						items: data.sections,
 						fullscreenOnly: isSectionOutside
 					});
@@ -1550,7 +1571,8 @@
 					videoContainer.append(self.sections.element);
 					if (isSectionOutside) {
 						var outsideSections = new Sections(player, {
-							items: data.sections
+							items: data.sections,
+							main: false
 						});
 						sectionContainer.append(outsideSections.element);
 					}
@@ -1667,6 +1689,45 @@
 					}
 				}
 				element.attr('preload', options.preload);
+
+				/**
+	    * Return array with excluded dist's items from source array
+	    *
+	    * @param {Array} source
+	    * @param {Array} dist
+	    * @return {Array}
+	    */
+				var excludeArray = function excludeArray(source, dist) {
+					var result = [].concat(source);
+					dist.forEach(function (item) {
+						var index = source.indexOf(item);
+						if (index > -1) {
+							result.splice(index, 1);
+						}
+					});
+
+					return result;
+				};
+
+				// exclude controls option
+
+				var _loop = function _loop(name) {
+					if (!options.excludeControls.hasOwnProperty(name)) return {
+							v: void 0
+						};
+					var controlCollection = options.excludeControls[name];
+					controlCollection.forEach(function (row, index) {
+						if (options.controls[name] && options.controls[name][index]) {
+							options.controls[name][index] = excludeArray(options.controls[name][index], row);
+						}
+					});
+				};
+
+				for (var name in options.excludeControls) {
+					var _ret2 = _loop(name);
+
+					if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
+				}
 			};
 
 			var secondsToTime = function secondsToTime(seconds) {
@@ -3975,8 +4036,13 @@
 		}, {
 			key: 'link',
 			set: function set(value) {
+				var parser = document.createElement('a');
+				parser.href = value;
+				var fileName = parser.pathname.split('/');
+				fileName = fileName[fileName.length - 1];
 				this.element.attr({
-					'href': value
+					'href': value,
+					download: fileName
 				});
 			}
 		}]);
