@@ -38,6 +38,8 @@ import Cookie from './utils/cookie';
 	 * @param {Obejct} [options.controls] Object of controls
 	 * @param {String[]} [options.controls.common] Array of controls for default view
 	 * @param {String[]} [options.controls.fullscreen] Array of control for fullsreen view
+	 * @param {String[]} [options.controls.mini] Array of control for miniplayer
+	 * @param {Object} [options.excludeControls] Object of exclude controls. Structure is the same as that of options.controls
 	 * @param {Object} [options.volume] Volume's options
 	 * @param {Number} [options.volume.default=0.4] Default volume
 	 * @param {Number} [options.volume.mutelimit=0.05] Delta when volume is muted
@@ -744,6 +746,7 @@ import Cookie from './utils/cookie';
 					if (!hasTimeline) {
 						elemRow.css('width', '1px');
 					}
+					elemRow.find('.divider + .divider').remove();
 					this.element.append(elemRow);
 				})
 				return this.element;
@@ -936,11 +939,12 @@ import Cookie from './utils/cookie';
 		 * @param {Object} [options]
 		 * @param {Array} [options.items=[]} Data for sections
 		 * @param {Boolean} [options.fullscreenOnly] Show section only in fullscreen
+		 * @param {Boolean} [options.main=true] Main sections of player
 		 * @extends Component
 		 */
 		class Sections extends Component {
 			constructor(player, options) {
-				let { items = [] } = options;
+				let { items = [], main = true } = options;
 
 				for ( let i = 0; i < items.length; i++) {
 					let endSection;
@@ -970,6 +974,9 @@ import Cookie from './utils/cookie';
 
 				this.player.on('fullscreenchange', this._onFullscreenChange.bind(this))
 
+				if (main) {
+					this.player.sections = this;
+				}
 				this.player.trigger('sectionsinit', { items : this.items, sections : this });
 
 				return this;
@@ -1117,6 +1124,15 @@ import Cookie from './utils/cookie';
 				this.player.on('fullscreenchange', this._onFullscreenChange.bind(this));
 			};
 
+			/**
+			 * @override
+			 */
+			onPlayerInited(e) {
+				if(this.visible) {
+					this.updateVideoContainer();
+				}
+			}
+
 			_onSectionsInit(e, data) {
 				if(this.visible) {
 					this.updateVideoContainer();
@@ -1179,6 +1195,7 @@ import Cookie from './utils/cookie';
 				this.element.find('.leplayer-miniplayer__info').css({
 					'margin-left' : videoWidth + 'px'
 				})
+
 
 				if(sections) {
 					sections.element.css({
@@ -1382,15 +1399,16 @@ import Cookie from './utils/cookie';
 		var initSections = function() {
 			options.dataUrl && player.getData().done((data) => {
 				const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
-				self.sections = new Sections(player, {
+				const sections = new Sections(player, {
 					items : data.sections,
-					fullscreenOnly : isSectionOutside
+					fullscreenOnly : isSectionOutside,
 				});
 
 				videoContainer.append(self.sections.element);
 				if (isSectionOutside) {
 					const outsideSections = new Sections(player, {
 						items : data.sections,
+						main : false
 					});
 					sectionContainer.append(outsideSections.element);
 				}
@@ -1522,6 +1540,36 @@ import Cookie from './utils/cookie';
 				}
 			}
 			element.attr('preload', options.preload);
+
+			/**
+			 * Return array with excluded dist's items from source array
+			 *
+			 * @param {Array} source
+			 * @param {Array} dist
+			 * @return {Array}
+			 */
+			const excludeArray = function(source, dist) {
+				const result = [].concat(source);
+				dist.forEach(item => {
+					const index = source.indexOf(item);
+					if (index > -1) {
+						result.splice(index, 1);
+					}
+				})
+
+				return result;
+			}
+
+			// exclude controls option
+			for (const name in options.excludeControls) {
+				if (!options.excludeControls.hasOwnProperty(name)) return;
+				const controlCollection = options.excludeControls[name];
+				controlCollection.forEach((row, index) => {
+					if (options.controls[name] && options.controls[name][index]) {
+						options.controls[name][index] = excludeArray(options.controls[name][index], row);
+					}
+				})
+			}
 		};
 
 		var secondsToTime = function (seconds) {

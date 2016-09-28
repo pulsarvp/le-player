@@ -56,8 +56,13 @@ class DownloadControl extends Control {
 	 * @param {String} value Path for video
 	 */
 	set link (value) {
+		const parser = document.createElement('a');
+		parser.href = value;
+		let fileName = parser.pathname.split('/');
+		fileName = fileName[fileName.length - 1];
 		this.element.attr({
 			'href' : value,
+			download : fileName
 		});
 	}
 
