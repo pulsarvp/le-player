@@ -746,6 +746,7 @@ import Cookie from './utils/cookie';
 					if (!hasTimeline) {
 						elemRow.css('width', '1px');
 					}
+					elemRow.find('.divider + .divider').remove();
 					this.element.append(elemRow);
 				})
 				return this.element;
