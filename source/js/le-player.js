@@ -204,7 +204,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 			dist.forEach(item => {
 				const index = result.indexOf(item);
 				if (index > -1) {
-					console.log(result.splice(index, 1));
+					return
 				}
 			})
 
