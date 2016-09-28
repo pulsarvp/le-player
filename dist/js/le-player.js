@@ -46,9 +46,9 @@
 
 	'use strict';
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
 	var _Control = __webpack_require__(1);
 
@@ -239,6 +239,45 @@
 					}
 				}]
 			}, opts);
+
+			/**
+	   * Return array with excluded dist's items from source array
+	   *
+	   * @param {Array} source
+	   * @param {Array} dist
+	   * @return {Array}
+	   */
+			var excludeArray = function excludeArray(source, dist) {
+				var result = [].concat(source);
+				dist.forEach(function (item) {
+					var index = result.indexOf(item);
+					if (index > -1) {
+						console.log(result.splice(index, 1));
+					}
+				});
+
+				return result;
+			};
+
+			// exclude controls option
+
+			var _loop = function _loop(name) {
+				if (!options.excludeControls.hasOwnProperty(name)) return {
+						v: void 0
+					};
+				var controlCollection = options.excludeControls[name];
+				controlCollection.forEach(function (row, index) {
+					if (options.controls[name] && options.controls[name][index]) {
+						options.controls[name][index] = excludeArray(options.controls[name][index], row);
+					}
+				});
+			};
+
+			for (var name in options.excludeControls) {
+				var _ret = _loop(name);
+
+				if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+			}
 
 			this.getData = function () {
 				return $.ajax({
@@ -1090,7 +1129,7 @@
 				_inherits(Sections, _Component2);
 
 				function Sections(player, options) {
-					var _ret;
+					var _ret2;
 
 					_classCallCheck(this, Sections);
 
@@ -1133,7 +1172,7 @@
 					}
 					_this10.player.trigger('sectionsinit', { items: _this10.items, sections: _this10 });
 
-					return _ret = _this10, _possibleConstructorReturn(_this10, _ret);
+					return _ret2 = _this10, _possibleConstructorReturn(_this10, _ret2);
 				}
 
 				/**
@@ -1519,10 +1558,10 @@
 				controls = new Controls(player);
 				var _arr = ['common', 'fullscreen'];
 				for (var _i = 0; _i < _arr.length; _i++) {
-					var name = _arr[_i];
-					if (!options.controls.hasOwnProperty(name)) return;
-					var controlCollection = new ControlCollection(player, { name: name });
-					controls.collections[name] = controlCollection;
+					var _name = _arr[_i];
+					if (!options.controls.hasOwnProperty(_name)) return;
+					var controlCollection = new ControlCollection(player, { name: _name });
+					controls.collections[_name] = controlCollection;
 					container.append(controlCollection.element);
 				}
 				if (controls.collections.common != null) {
@@ -1689,45 +1728,6 @@
 					}
 				}
 				element.attr('preload', options.preload);
-
-				/**
-	    * Return array with excluded dist's items from source array
-	    *
-	    * @param {Array} source
-	    * @param {Array} dist
-	    * @return {Array}
-	    */
-				var excludeArray = function excludeArray(source, dist) {
-					var result = [].concat(source);
-					dist.forEach(function (item) {
-						var index = source.indexOf(item);
-						if (index > -1) {
-							result.splice(index, 1);
-						}
-					});
-
-					return result;
-				};
-
-				// exclude controls option
-
-				var _loop = function _loop(name) {
-					if (!options.excludeControls.hasOwnProperty(name)) return {
-							v: void 0
-						};
-					var controlCollection = options.excludeControls[name];
-					controlCollection.forEach(function (row, index) {
-						if (options.controls[name] && options.controls[name][index]) {
-							options.controls[name][index] = excludeArray(options.controls[name][index], row);
-						}
-					});
-				};
-
-				for (var name in options.excludeControls) {
-					var _ret2 = _loop(name);
-
-					if ((typeof _ret2 === 'undefined' ? 'undefined' : _typeof(_ret2)) === "object") return _ret2.v;
-				}
 			};
 
 			var secondsToTime = function secondsToTime(seconds) {

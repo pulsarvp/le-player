@@ -185,6 +185,36 @@ import Cookie from './utils/cookie';
 			]
 		}, opts);
 
+		/**
+		 * Return array with excluded dist's items from source array
+		 *
+		 * @param {Array} source
+		 * @param {Array} dist
+		 * @return {Array}
+		 */
+		const excludeArray = function(source, dist) {
+			const result = [].concat(source);
+			dist.forEach(item => {
+				const index = result.indexOf(item);
+				if (index > -1) {
+					console.log(result.splice(index, 1));
+				}
+			})
+
+			return result;
+		}
+
+		// exclude controls option
+		for (const name in options.excludeControls) {
+			if (!options.excludeControls.hasOwnProperty(name)) return;
+			const controlCollection = options.excludeControls[name];
+			controlCollection.forEach((row, index) => {
+				if (options.controls[name] && options.controls[name][index]) {
+					options.controls[name][index] = excludeArray(options.controls[name][index], row);
+				}
+			})
+		}
+
 		this.getData = () => {
 			return $.ajax({
 				url: options.dataUrl,
@@ -1540,36 +1570,6 @@ import Cookie from './utils/cookie';
 				}
 			}
 			element.attr('preload', options.preload);
-
-			/**
-			 * Return array with excluded dist's items from source array
-			 *
-			 * @param {Array} source
-			 * @param {Array} dist
-			 * @return {Array}
-			 */
-			const excludeArray = function(source, dist) {
-				const result = [].concat(source);
-				dist.forEach(item => {
-					const index = source.indexOf(item);
-					if (index > -1) {
-						result.splice(index, 1);
-					}
-				})
-
-				return result;
-			}
-
-			// exclude controls option
-			for (const name in options.excludeControls) {
-				if (!options.excludeControls.hasOwnProperty(name)) return;
-				const controlCollection = options.excludeControls[name];
-				controlCollection.forEach((row, index) => {
-					if (options.controls[name] && options.controls[name][index]) {
-						options.controls[name][index] = excludeArray(options.controls[name][index], row);
-					}
-				})
-			}
 		};
 
 		var secondsToTime = function (seconds) {
