@@ -938,11 +938,12 @@ import Cookie from './utils/cookie';
 		 * @param {Object} [options]
 		 * @param {Array} [options.items=[]} Data for sections
 		 * @param {Boolean} [options.fullscreenOnly] Show section only in fullscreen
+		 * @param {Boolean} [options.main=true] Main sections of player
 		 * @extends Component
 		 */
 		class Sections extends Component {
 			constructor(player, options) {
-				let { items = [] } = options;
+				let { items = [], main = true } = options;
 
 				for ( let i = 0; i < items.length; i++) {
 					let endSection;
@@ -972,6 +973,9 @@ import Cookie from './utils/cookie';
 
 				this.player.on('fullscreenchange', this._onFullscreenChange.bind(this))
 
+				if (main) {
+					this.player.sections = this;
+				}
 				this.player.trigger('sectionsinit', { items : this.items, sections : this });
 
 				return this;
@@ -1119,6 +1123,15 @@ import Cookie from './utils/cookie';
 				this.player.on('fullscreenchange', this._onFullscreenChange.bind(this));
 			};
 
+			/**
+			 * @override
+			 */
+			onPlayerInited(e) {
+				if(this.visible) {
+					this.updateVideoContainer();
+				}
+			}
+
 			_onSectionsInit(e, data) {
 				if(this.visible) {
 					this.updateVideoContainer();
@@ -1161,7 +1174,7 @@ import Cookie from './utils/cookie';
 			/**
 			 * Move video container under the miniplayer
 			 */
-			updateVideoContainer() {
+			updateVideoContainer(lol) {
 				const sections = this.player.sections;
 				container.css({
 					'padding-top' : videoContainer.height() + 'px'
@@ -1181,6 +1194,7 @@ import Cookie from './utils/cookie';
 				this.element.find('.leplayer-miniplayer__info').css({
 					'margin-left' : videoWidth + 'px'
 				})
+
 
 				if(sections) {
 					sections.element.css({
@@ -1384,15 +1398,16 @@ import Cookie from './utils/cookie';
 		var initSections = function() {
 			options.dataUrl && player.getData().done((data) => {
 				const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
-				self.sections = new Sections(player, {
+				const sections = new Sections(player, {
 					items : data.sections,
-					fullscreenOnly : isSectionOutside
+					fullscreenOnly : isSectionOutside,
 				});
 
 				videoContainer.append(self.sections.element);
 				if (isSectionOutside) {
 					const outsideSections = new Sections(player, {
 						items : data.sections,
+						main : false
 					});
 					sectionContainer.append(outsideSections.element);
 				}
