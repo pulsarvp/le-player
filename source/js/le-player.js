@@ -506,6 +506,13 @@ import ErrorDisplay from './components/ErrorDisplay';
 				return this._video.buffered;
 			}
 
+			/**
+			 * @return {TimeRanges}
+			 */
+			get seekable () {
+				return this._video.seekable;
+			}
+
 			get loaded () {
 				let loaded = [];
 				let media = this._video;
@@ -553,7 +560,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 						controls.init();
 						this._initRate();
 						this._initVolume();
-						this.startBuffering();
+						//this.startBuffering();
 						dfd.resolve();
 					});
 				this._initHtmlEvents();
@@ -747,7 +754,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 					},
 
 					'ratechange' : (e) => {
-						this.player.trigger('ratechange', { volume : this.rate });
+						this.player.trigger('ratechange', { rate : this.rate });
 					},
 
 					'canplay' : (e) => {
@@ -796,7 +803,9 @@ import ErrorDisplay from './components/ErrorDisplay';
 						if(controlName == C_TIMELINE) {
 							hasTimeline = true
 						}
-						const control = controlFactory(this.player, controlName);
+						const control = controlFactory(this.player, controlName, {
+							collection : this.options.name
+						});
 						elemRow.append(control.element);
 					});
 					if (!hasTimeline) {
@@ -1055,6 +1064,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 			onSectionClick(e) {
 				let section = $(e.target).closest('.leplayer-section');
 				video.currentTime = section.attr('data-begin');
+				this.player.trigger('sectionsclick', { section : this.items[section.attr('data-index')]});
 			}
 
 			setActiveByIndex(index) {
@@ -1398,12 +1408,13 @@ import ErrorDisplay from './components/ErrorDisplay';
 			this.initDom();
 			this.initControls();
 			this.initHotKeys();
-			video.init().done(() => {
+			video.init().then(() => {
 				if(options.miniplayer) {
 					miniPlayer = new MiniPlayer(player);
 				}
 				this.initSections();
 				player.trigger('inited');
+				this.initPlugins();
 			});
 
 
@@ -1569,6 +1580,20 @@ import ErrorDisplay from './components/ErrorDisplay';
 			}
 			element.attr('preload', options.preload);
 		};
+
+		this.initPlugins = function () {
+			if (this.options.plugins) {
+				for (const name in this.options.plugins) {
+					if(!this.options.plugins.hasOwnProperty(name)) return;
+					const pluginOptions = this.options.plugins[name];
+					if(this[name]) {
+						this[name](pluginOptions);
+					} else {
+						console.error(`Plugin '${name}' doesn't exist`);
+					}
+				}
+			}
+		}
 
 		var isFocused = function () {
 			let focused = $(container).find(':focus');

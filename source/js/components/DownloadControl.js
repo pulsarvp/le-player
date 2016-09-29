@@ -20,6 +20,7 @@ class DownloadControl extends Control {
 		options = $.extend({
 			title : 'Скачать видео',
 			className : 'download',
+			name : 'download'
 		}, options);
 		super(player, options);
 		this.player.on('loadedmetadata', this.onLoadedMetaData.bind(this));

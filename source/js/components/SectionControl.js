@@ -17,7 +17,8 @@ class SectionControl extends ControlCheckbox {
 	constructor (player, options={}) {
 		options = $.extend({}, {
 			iconName : 'list-ul',
-			className : 'control--type_section',
+			className : 'section',
+			name : 'section',
 			title : 'Показать/скрыть секции',
 			disable : true
 		}, options);

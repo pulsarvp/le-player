@@ -20,6 +20,7 @@ class TimelineControl extends Control {
 
 	constructor (player, options={}) {
 		options = $.extend({}, {
+			name : 'timeline',
 			className : 'timeline timeline-container'
 		}, options);
 		super(player, options);
@@ -30,6 +31,9 @@ class TimelineControl extends Control {
 		})
 	}
 
+	/**
+	 * @override
+	 */
 	createElement() {
 		super.createElement();
 		let video = this.player.video;
@@ -125,6 +129,13 @@ class TimelineControl extends Control {
 				this.drag = false;
 			}
 		});
+	}
+
+	/**
+	 * @override
+	 */
+	_onClick(e) {
+		e.preventDefault();
 	}
 
 	onSectionsInit(e, data) {

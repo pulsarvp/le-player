@@ -16,7 +16,8 @@ class PlayControl extends Control {
 		options = $.extend({}, {
 			iconName : 'play',
 			title : 'Воспроизвести видео',
-			className : 'play'
+			className : 'play',
+			name : 'play'
 		}, options);
 		super(player, options);
 

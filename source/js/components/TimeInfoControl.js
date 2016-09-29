@@ -20,7 +20,8 @@ class TimeInfoControl extends Control {
 
 	constructor (player, options={}) {
 		options = $.extend({}, {
-			className : 'timeline timeline-container'
+			className : 'timeline timeline-container',
+			name : 'time-info'
 		}, options);
 		super(player, options);
 
@@ -58,6 +59,10 @@ class TimeInfoControl extends Control {
 
 	set currentTime(value) {
 
+	}
+
+	_onClick(e) {
+		e.preventDefault()
 	}
 }
 

@@ -37,6 +37,14 @@ class ControlDropdown extends Control {
 		return `control-dropdown ${super.buildCSSClass()}`
 	}
 
+	_onClick(e) {
+		if($(e.target).closest(this.dropdownContent).length > 0) {
+			return;
+		}
+
+		super._onClick(e);
+	}
+
 }
 
 export default ControlDropdown;

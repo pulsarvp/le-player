@@ -16,7 +16,8 @@ class FullscreenControl extends Control {
 		options = $.extend({}, {
 			iconName : 'arrows-alt',
 			className : 'fullscreen',
-			title : 'Развернуть/свернуть на полный экран'
+			title : 'Развернуть/свернуть на полный экран',
+			name : 'fullscreen'
 		}, options);
 		super(player, options);
 	}

@@ -20,7 +20,8 @@ class KeyBindingInfoControl extends ControlDropdown {
 		options = $.extend({}, {
 			iconName : 'info',
 			title : 'Инфо',
-			className : 'info-control'
+			className : 'info-control',
+			name : 'info'
 		}, options);
 		super(player, options);
 	}

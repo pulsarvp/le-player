@@ -18,14 +18,15 @@ class SubtitleControl extends ControlContainer {
 		options = $.extend({}, {
 			iconName : 'commenting-o',
 			title : 'Субтитры',
+			name : 'subtitle',
 			className : 'subtitle-control',
 			disable : true
 		}, options);
 		super(player, options);
 	}
 
-	onIconClick (e) {
-		super.onIconClick(e);
+	onClick (e) {
+		super.onClick(e);
 		let video = this.player.video;
 		this.active = null
 		video.track = -1;
