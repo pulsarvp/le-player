@@ -249,7 +249,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 			}
 			this._error = new MediaError(value);
 
-			console.error(this._error);
+			console.error(this._error, this);
 			this.trigger('error', { error : this._error});
 		}
 
@@ -761,8 +761,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 					},
 
 					'error' : (e) => {
-						this.error = new MediaError(e.target.error.code);
-						this.player.trigger('error', { error : this.error });
+						this.player.setError(new MediaError(e.target.error.code));
 					}
 				});
 			}

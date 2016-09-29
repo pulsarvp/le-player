@@ -42,11 +42,11 @@ MediaError.errorTypes = [
 
 
 MediaError.defaultMessages = {
-  1: 'You aborted the media playback',
-  2: 'A network error caused the media download to fail part-way.',
-  3: 'The media playback was aborted due to a corruption problem or because the media used features your browser did not support.',
-  4: 'The media could not be loaded, either because the server or network failed or because the format is not supported.',
-  5: 'The media is encrypted and we do not have the keys to decrypt it.'
+  1: 'Вы прервали загрузку видео.',
+  2: 'Загрузка видео прервана из-за потери соединения.',
+  3: 'Загрузка видео остановлена из-за проблем с видеофайлом или из-за того, что ваш браузер не поддерживает воспроизведение данного файла.',
+  4: 'Видео не может быть загружено из-за проблем с интернет-соединением или проблем на сервере. Или формат файла не поддерживается вашим браузером.',
+  5: 'Видео зашифровано, и мы не можем его расшифровать.'
 };
 
 // Add types as properties on MediaError
