@@ -1,10 +1,15 @@
 'use strict';
 
+import $ from 'jquery';
 import Control from './components/Control';
 import Component from './components/Component';
 import Icon from './components/Icon';
 import controlFactory, { C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
+import { secondsToTime } from './utils/time';
+import MediaError from './MediaError';
+import ErrorDisplay from './components/ErrorDisplay';
+
 
 (function ($) {
 
@@ -54,6 +59,7 @@ import Cookie from './utils/cookie';
 	 * @param {String} [options.miniplayer.width] Width of miniplayer container
 	 * @param {String} [options.miniplayer.width] MiniPlayer's width
 	 * @param {String} [options.sectionContainer] Selector for sections
+	 * @param {Object} [options.plugins] Keys of objects are name of plugin, value - plugin options
 	 */
 	let Player = function (element, opts) {
 		const C_BACKWARD = 'backward';
@@ -97,7 +103,7 @@ import Cookie from './utils/cookie';
 			},
 			controls : {
 				common : [
-					[ 'play', 'volume', 'divider', 'timeline',  'divider', 'fullscreen' ],
+					[ 'play', 'volume', 'divider', 'timeline',  'divider', 'section', 'divider', 'fullscreen' ],
 					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO ]
 				],
 				fullscreen : [
@@ -182,7 +188,8 @@ import Cookie from './utils/cookie';
 						video.fullscreen.toggle()
 					}
 				}
-			]
+			],
+			onPlayerInited : function() {}
 		}, opts);
 
 		/**
@@ -197,7 +204,7 @@ import Cookie from './utils/cookie';
 			dist.forEach(item => {
 				const index = result.indexOf(item);
 				if (index > -1) {
-					console.log(result.splice(index, 1));
+					return
 				}
 			})
 
@@ -209,8 +216,8 @@ import Cookie from './utils/cookie';
 			if (!options.excludeControls.hasOwnProperty(name)) return;
 			const controlCollection = options.excludeControls[name];
 			controlCollection.forEach((row, index) => {
-				if (options.controls[name] && options.controls[name][index]) {
-					options.controls[name][index] = excludeArray(options.controls[name][index], row);
+				if (this.options.controls[name] && this.options.controls[name][index]) {
+					this.options.controls[name][index] = excludeArray(options.controls[name][index], row);
 				}
 			})
 		}
@@ -231,6 +238,26 @@ import Cookie from './utils/cookie';
 		this.on = (eventName, ...args) => {
 			$(element).on.call($(element), `leplayer_${eventName}`, ...args);
 		}
+
+		this.setError = function(value) {
+			if (value === null) {
+				this._error = null;
+				if(this.errorDisplay) {
+					this.errorDisplay.element.hide()
+				}
+				return;
+			}
+			this._error = new MediaError(value);
+
+			console.error(this._error, this);
+			this.trigger('error', { error : this._error});
+		}
+
+		// TODO: Сделать плеер классов и реализовать эти методы через get и set
+		this.getError = function() {
+			return this._error || null;
+		}
+
 
 		/**
 		 * This class manages FullScreen API.
@@ -479,6 +506,13 @@ import Cookie from './utils/cookie';
 				return this._video.buffered;
 			}
 
+			/**
+			 * @return {TimeRanges}
+			 */
+			get seekable () {
+				return this._video.seekable;
+			}
+
 			get loaded () {
 				let loaded = [];
 				let media = this._video;
@@ -526,10 +560,9 @@ import Cookie from './utils/cookie';
 						controls.init();
 						this._initRate();
 						this._initVolume();
-						this.startBuffering();
+						//this.startBuffering();
 						dfd.resolve();
 					});
-				this._initCustomEvents();
 				this._initHtmlEvents();
 
 				dfd.notify();
@@ -721,7 +754,7 @@ import Cookie from './utils/cookie';
 					},
 
 					'ratechange' : (e) => {
-						this.player.trigger('ratechange', { volume : this.rate });
+						this.player.trigger('ratechange', { rate : this.rate });
 					},
 
 					'canplay' : (e) => {
@@ -732,14 +765,14 @@ import Cookie from './utils/cookie';
 					'waiting' : (e) => {
 						loader.show();
 						this.player.trigger('waiting');
-					}
+					},
 
+					'error' : (e) => {
+						this.player.setError(new MediaError(e.target.error.code));
+					}
 				});
 			}
 
-			_initCustomEvents () {
-				let mediaElement = $(this._video);
-			}
 		}
 
 		class ControlCollection  extends Component {
@@ -770,7 +803,9 @@ import Cookie from './utils/cookie';
 						if(controlName == C_TIMELINE) {
 							hasTimeline = true
 						}
-						const control = controlFactory(this.player, controlName);
+						const control = controlFactory(this.player, controlName, {
+							collection : this.options.name
+						});
 						elemRow.append(control.element);
 					});
 					if (!hasTimeline) {
@@ -1029,6 +1064,7 @@ import Cookie from './utils/cookie';
 			onSectionClick(e) {
 				let section = $(e.target).closest('.leplayer-section');
 				video.currentTime = section.attr('data-begin');
+				this.player.trigger('sectionsclick', { section : this.items[section.attr('data-index')]});
 			}
 
 			setActiveByIndex(index) {
@@ -1303,6 +1339,7 @@ import Cookie from './utils/cookie';
 		var video = null;
 		this.video = video
 		this.sections = null;
+		this.controls = controls;
 
 		/**
 		 * DOM container to hold video and all other stuff.
@@ -1332,14 +1369,14 @@ import Cookie from './utils/cookie';
 
 		}
 
-		var init = function () {
+		this.init = function () {
 			// Check if element is correctly selected.
 			if (element.prop('tagName').toLowerCase() != 'video') {
 				console.warn('Incorrect element selected.');
 				return this;
 			}
 
-			initOptions();
+			this.initOptions();
 			// Set source.
 			// @TODO move this to Video class
 			element.children('source').each(function () {
@@ -1368,22 +1405,22 @@ import Cookie from './utils/cookie';
 			video = player.video = new Video(element);
 
 			/** TODO: Use promise to async run this */
-			initDom();
-			initControls();
-			initHotKeys();
-			video.init().done(() => {
+			this.initDom();
+			this.initControls();
+			this.initHotKeys();
+			video.init().then(() => {
 				if(options.miniplayer) {
 					miniPlayer = new MiniPlayer(player);
 				}
-				initSections();
+				this.initSections();
 				player.trigger('inited');
+				this.initPlugins();
 			});
 
 
 		};
 
-		this.controls = controls;
-		var initControls = function () {
+		this.initControls = function () {
 			controls = new Controls(player);
 			for (const name of ['common', 'fullscreen']) {
 				if (!options.controls.hasOwnProperty(name)) return;
@@ -1394,39 +1431,9 @@ import Cookie from './utils/cookie';
 			if (controls.collections.common != null) {
 				controls.collections.common.active = true;
 			}
-			//for (let name in options.controls) {
-				//if (!controls.has(name)) continue;
-				//for (let rowIndex in options.controls[ name ]) {
-					//let row = options.controls[ name ][ rowIndex ],
-						//hasTimeline = false,
-						//rowElement = $('<div />').addClass('leplayer-controls controls-' + name);
-
-					//for (let i in row) {
-						//let controlName = row[ i ];
-
-						//if (controlName == C_DIVIDER || !controls.collections[ name ].has(controlName)) {
-							//// Create control only if divider or does not exist yet.
-							//var c = controls.collections[ name ].add(controlName);
-							//if (c != null) {
-								//rowElement.append(c);
-								//if (controlName == C_TIMELINE)
-									//hasTimeline = true;
-							//} else {
-								//console.warn('Cannot create ' + controlName + ' control for collection ' + name + '.');
-							//}
-						//}
-					//}
-					//if (!hasTimeline)
-						//rowElement.css('width', '1px');
-
-					//rowElement.find('.divider + .divider').remove();
-
-					//container.append(rowElement);
-				//}
-			//}
 		};
 
-		var initSections = function() {
+		this.initSections = function() {
 			options.dataUrl && player.getData().done((data) => {
 				const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
 				const sections = new Sections(player, {
@@ -1446,7 +1453,8 @@ import Cookie from './utils/cookie';
 		}
 
 
-		var initDom = function () {
+		this.initDom = function () {
+			this.errorDisplay = new ErrorDisplay(this);
 			overlay = $('<div />')
 				.addClass('play-overlay')
 				.append(new Icon(player, { iconName : 'play' }).element)
@@ -1471,6 +1479,7 @@ import Cookie from './utils/cookie';
 			container = $('<div />')
 				.addClass('leplayer-container')
 				.append(videoContainer)
+				.append(this.errorDisplay.element)
 				.attr('tabindex', 0)
 				//.css('width', element.width() + 'px');
 				.css('width', '100%')
@@ -1485,7 +1494,7 @@ import Cookie from './utils/cookie';
 			videoContainer.append(element);
 		};
 
-		var initHotKeys = function () {
+		this.initHotKeys = function () {
 
 			const isKeyBinding = (e, binding) => {
 				return ((e.which === binding.key) || (e.key === binding.key)) &&
@@ -1507,7 +1516,7 @@ import Cookie from './utils/cookie';
 			})
 		};
 
-		var initOptions = function () {
+		this.initOptions = function () {
 			let height, width, poster, attrs, preload;
 			element.removeAttr('controls');
 
@@ -1572,32 +1581,35 @@ import Cookie from './utils/cookie';
 			element.attr('preload', options.preload);
 		};
 
-		var secondsToTime = function (seconds) {
-			var h = Math.floor(seconds / 3600);
-			var m = Math.floor(seconds % 3600 / 60);
-			var s = Math.floor(seconds % 3600 % 60);
-			var out = '';
-			if (h > 0)
-				out = h + ':';
-			if (m < 10)
-				out += '0';
-			out += m + ':';
-			if (s < 10)
-				out += '0';
-			out += s;
-			return out;
-		};
-
+		this.initPlugins = function () {
+			if (this.options.plugins) {
+				for (const name in this.options.plugins) {
+					if(!this.options.plugins.hasOwnProperty(name)) return;
+					const pluginOptions = this.options.plugins[name];
+					if(this[name]) {
+						this[name](pluginOptions);
+					} else {
+						console.error(`Plugin '${name}' doesn't exist`);
+					}
+				}
+			}
+		}
 
 		var isFocused = function () {
 			let focused = $(container).find(':focus');
 			return (focused.length > 0) || $(container).is(':focus');
 		}
 
-		init();
+		this.init();
+		this.on('inited', this.options.onPlayerInited.bind(this));
 
 		return this;
 	};
+
+
+	Player.plugin = function(name, fn) {
+		Player.prototype[name] = fn;
+	}
 
 
 	window.$.fn.lePlayer = function (options) {
@@ -1605,4 +1617,5 @@ import Cookie from './utils/cookie';
 			return new Player($(this), options);
 		});
 	};
+	window.$.lePlayer = Player;
 }(jQuery));

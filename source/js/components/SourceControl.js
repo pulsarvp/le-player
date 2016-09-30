@@ -14,6 +14,7 @@ import ControlContainer from './ControlContainer';
 class SourceControl extends ControlContainer {
 	constructor (player, options={}) {
 		options = $.extend({}, {
+			name : 'source',
 			iconName : 'bullseye',
 			title : 'Качество',
 			className : 'source-control',
@@ -27,8 +28,8 @@ class SourceControl extends ControlContainer {
 	/**
 	 * @override
 	 */
-	onItemClick (e) {
-		super.onItemClick(e);
+	onClick (e) {
+		super.onClick(e);
 		let item = $(e.target);
 		this.player.video.source = item.data('src');
 	}

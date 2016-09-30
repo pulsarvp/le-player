@@ -41,7 +41,9 @@ class RateControl extends Control {
 
 		this.downControl = new Control(this.player, {
 			className : 'rate-down',
+			name: 'rate-down',
 			iconName : 'backward',
+			collection : this.options.collection,
 			title : 'Уменьшить скорость проигрывания',
 			onClick : function(e) {
 				video.rate -= this.player.options.rate.step;
@@ -50,7 +52,9 @@ class RateControl extends Control {
 
 		this.upControl = new Control(this.player, {
 			className : 'rate-up',
+			name : 'rate-up',
 			iconName : 'forward',
+			collection : this.options.collection,
 			title : 'Увеличить скорость проигрывания',
 			onClick : function(e) {
 				video.rate += this.player.options.rate.step;
@@ -77,6 +81,13 @@ class RateControl extends Control {
 	 */
 	onPlayerInited() {
 		this.value = this.player.video.defaultRate;
+	}
+
+	/**
+	 *
+	 */
+	_onClick(e) {
+		e.preventDefault()
 	}
 
 	set value (value) {

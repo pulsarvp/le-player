@@ -13,6 +13,8 @@ import Icon from './Icon';
  * @param {Object} [options] Control's options
  * @param {String} [options.iconName] Name of control's icon. If empty, control will not have a icon
  * @param {String} [options.className]
+ * @param {String} [options.name]
+ * @param {String} [options.collection]
  * @param {String} [options.title] Contorl's tooltip, title attr
  * @param {Boolean} [options.disable=false]
  * @property {Icon} icon Icon in control, if it is exist
@@ -32,13 +34,6 @@ class Control extends Component {
 			'click' : this._onClick.bind(this),
 			'leplayer_click' : this.onClick.bind(this)
 		});
-
-		if(this.options.iconName) {
-			this.icon.element.on({
-				'click' : this._onIconClick.bind(this),
-				'leplayer_click' : this.onIconClick.bind(this)
-			});
-		}
 
 		this.player.on('inited', this.onPlayerInited.bind(this))
 	}
@@ -85,13 +80,9 @@ class Control extends Component {
 			return false;
 		}
 		this.element.trigger('leplayer_click');
+		this.player.trigger('controlclick', { control : this });
 	}
 
-	_onIconClick (e) {
-		e.stopPropagation();
-		e.preventDefault();
-		this.icon.element.trigger('leplayer_click');
-	}
 	/**
 	 *
 	 * On click event handler
@@ -104,13 +95,6 @@ class Control extends Component {
 		}
 	}
 
-	/**
-	 * On icon click event handler
-	 * @abstact
-	 */
-	onIconClick (e) {
-		e.preventDefault();
-	}
 
 	onPlayerInited (e, data) {
 

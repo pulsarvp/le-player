@@ -18,7 +18,8 @@ class VolumeControl extends ControlDropdown {
 	constructor (player, options={}) {
 		options = $.extend({}, {
 			iconName : 'volume-down',
-			className : 'volume-control'
+			className : 'volume-control',
+			name : 'volume'
 		}, options);
 		super(player, options);
 
@@ -103,8 +104,8 @@ class VolumeControl extends ControlDropdown {
 		return (y - this.line.offset().top) / this.line.height();
 	}
 
-	onIconClick (e) {
-		super.onIconClick(e);
+	onClick (e) {
+		super.onClick(e);
 		this.toggleMuted();
 	}
 

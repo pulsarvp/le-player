@@ -19,6 +19,7 @@ class BackwardControl extends Control {
 		options = $.extend({}, {
 			iconName : 'undo',
 			className : 'backward',
+			name : 'backward',
 			title : `Отмотать назад на ${player.options.playback.step.medium} секунд`,
 		}, options);
 		super(player, options);
