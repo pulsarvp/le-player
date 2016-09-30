@@ -50,7 +50,11 @@
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-	var _Control = __webpack_require__(1);
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _Control = __webpack_require__(2);
 
 	var _Control2 = _interopRequireDefault(_Control);
 
@@ -69,6 +73,16 @@
 	var _cookie = __webpack_require__(9);
 
 	var _cookie2 = _interopRequireDefault(_cookie);
+
+	var _time = __webpack_require__(12);
+
+	var _MediaError = __webpack_require__(24);
+
+	var _MediaError2 = _interopRequireDefault(_MediaError);
+
+	var _ErrorDisplay = __webpack_require__(25);
+
+	var _ErrorDisplay2 = _interopRequireDefault(_ErrorDisplay);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -126,6 +140,7 @@
 	  * @param {String} [options.miniplayer.width] Width of miniplayer container
 	  * @param {String} [options.miniplayer.width] MiniPlayer's width
 	  * @param {String} [options.sectionContainer] Selector for sections
+	  * @param {Object} [options.plugins] Keys of objects are name of plugin, value - plugin options
 	  */
 		var Player = function Player(element, opts) {
 			var _this = this;
@@ -170,7 +185,7 @@
 					}
 				},
 				controls: {
-					common: [['play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen'], ['rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', _ControlFactory.C_KEYBINDING_INFO]],
+					common: [['play', 'volume', 'divider', 'timeline', 'divider', 'section', 'divider', 'fullscreen'], ['rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', _ControlFactory.C_KEYBINDING_INFO]],
 					fullscreen: [['play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', _ControlFactory.C_KEYBINDING_INFO, 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen']],
 					mini: [['play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']]
 				},
@@ -237,7 +252,8 @@
 					fn: function fn(video) {
 						video.fullscreen.toggle();
 					}
-				}]
+				}],
+				onPlayerInited: function onPlayerInited() {}
 			}, opts);
 
 			/**
@@ -252,7 +268,7 @@
 				dist.forEach(function (item) {
 					var index = result.indexOf(item);
 					if (index > -1) {
-						console.log(result.splice(index, 1));
+						return;
 					}
 				});
 
@@ -267,8 +283,8 @@
 					};
 				var controlCollection = options.excludeControls[name];
 				controlCollection.forEach(function (row, index) {
-					if (options.controls[name] && options.controls[name][index]) {
-						options.controls[name][index] = excludeArray(options.controls[name][index], row);
+					if (_this.options.controls[name] && _this.options.controls[name][index]) {
+						_this.options.controls[name][index] = excludeArray(options.controls[name][index], row);
 					}
 				});
 			};
@@ -306,6 +322,25 @@
 				}
 
 				(_$$on = $(element).on).call.apply(_$$on, [$(element), 'leplayer_' + eventName].concat(args));
+			};
+
+			this.setError = function (value) {
+				if (value === null) {
+					this._error = null;
+					if (this.errorDisplay) {
+						this.errorDisplay.element.hide();
+					}
+					return;
+				}
+				this._error = new _MediaError2.default(value);
+
+				console.error(this._error, this);
+				this.trigger('error', { error: this._error });
+			};
+
+			// TODO: Сделать плеер классов и реализовать эти методы через get и set
+			this.getError = function () {
+				return this._error || null;
 			};
 
 			/**
@@ -473,10 +508,9 @@
 							controls.init();
 							_this4._initRate();
 							_this4._initVolume();
-							_this4.startBuffering();
+							//this.startBuffering();
 							dfd.resolve();
 						});
-						this._initCustomEvents();
 						this._initHtmlEvents();
 
 						dfd.notify();
@@ -689,7 +723,7 @@
 							},
 
 							'ratechange': function ratechange(e) {
-								_this7.player.trigger('ratechange', { volume: _this7.rate });
+								_this7.player.trigger('ratechange', { rate: _this7.rate });
 							},
 
 							'canplay': function canplay(e) {
@@ -700,14 +734,12 @@
 							'waiting': function waiting(e) {
 								loader.show();
 								_this7.player.trigger('waiting');
-							}
+							},
 
+							'error': function error(e) {
+								_this7.player.setError(new _MediaError2.default(e.target.error.code));
+							}
 						});
-					}
-				}, {
-					key: '_initCustomEvents',
-					value: function _initCustomEvents() {
-						var mediaElement = $(this._video);
 					}
 				}, {
 					key: 'currentTime',
@@ -810,6 +842,16 @@
 					get: function get() {
 						return this._video.buffered;
 					}
+
+					/**
+	     * @return {TimeRanges}
+	     */
+
+				}, {
+					key: 'seekable',
+					get: function get() {
+						return this._video.seekable;
+					}
 				}, {
 					key: 'loaded',
 					get: function get() {
@@ -889,7 +931,9 @@
 								if (controlName == C_TIMELINE) {
 									hasTimeline = true;
 								}
-								var control = (0, _ControlFactory2.default)(_this9.player, controlName);
+								var control = (0, _ControlFactory2.default)(_this9.player, controlName, {
+									collection: _this9.options.name
+								});
 								elemRow.append(control.element);
 							});
 							if (!hasTimeline) {
@@ -1195,6 +1239,7 @@
 					value: function onSectionClick(e) {
 						var section = $(e.target).closest('.leplayer-section');
 						video.currentTime = section.attr('data-begin');
+						this.player.trigger('sectionsclick', { section: this.items[section.attr('data-index')] });
 					}
 				}, {
 					key: 'setActiveByIndex',
@@ -1222,7 +1267,7 @@
 
 						var endSectionTime = this._activeSection.attr('data-end');
 
-						this._activeSection.next().find('.time').text(secondsToTime(endSectionTime - currentTime));
+						this._activeSection.next().find('.time').text((0, _time.secondsToTime)(endSectionTime - currentTime));
 
 						for (var i = 0; i < this.items.length; i++) {
 							var section = this.items[i];
@@ -1249,7 +1294,7 @@
 					value: function _createSections(items) {
 						var result = '';
 						items.forEach(function (section, index) {
-							var item = ('\n\t\t\t\t\t\t<div class="leplayer-section ' + (!index ? 'leplayer-section--active' : '') + '"\n\t\t\t\t\t\t\tdata-begin="' + section.begin + '"\n\t\t\t\t\t\t\tdata-index="' + index + '"\n\t\t\t\t\t\t\tdata-end="' + section.end + '">\n\t\t\t\t\t\t\t<div class="leplayer-section-time">' + secondsToTime(section.begin) + '</div>\n\t\t\t\t\t\t\t<div class="leplayer-section-info">\n\t\t\t\t\t\t\t\t<div class="leplayer-section-next-info">\n\t\t\t\t\t\t\t\t\tСледующая секция начнется через\n\t\t\t\t\t\t\t\t\t<span class="time">' + secondsToTime(items[0].end) + '</span>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class="leplayer-section-title">' + section.title + '</div>\n\t\t\t\t\t\t\t\t<div class="leplayer-section-description">' + section.description + '</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t').trim();
+							var item = ('\n\t\t\t\t\t\t<div class="leplayer-section ' + (!index ? 'leplayer-section--active' : '') + '"\n\t\t\t\t\t\t\tdata-begin="' + section.begin + '"\n\t\t\t\t\t\t\tdata-index="' + index + '"\n\t\t\t\t\t\t\tdata-end="' + section.end + '">\n\t\t\t\t\t\t\t<div class="leplayer-section-time">' + (0, _time.secondsToTime)(section.begin) + '</div>\n\t\t\t\t\t\t\t<div class="leplayer-section-info">\n\t\t\t\t\t\t\t\t<div class="leplayer-section-next-info">\n\t\t\t\t\t\t\t\t\tСледующая секция начнется через\n\t\t\t\t\t\t\t\t\t<span class="time">' + (0, _time.secondsToTime)(items[0].end) + '</span>\n\t\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t\t\t<div class="leplayer-section-title">' + section.title + '</div>\n\t\t\t\t\t\t\t\t<div class="leplayer-section-description">' + section.description + '</div>\n\t\t\t\t\t\t\t</div>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t').trim();
 							result += item;
 						});
 						return result;
@@ -1480,6 +1525,7 @@
 			var video = null;
 			this.video = video;
 			this.sections = null;
+			this.controls = controls;
 
 			/**
 	   * DOM container to hold video and all other stuff.
@@ -1505,14 +1551,16 @@
 				container.append(notification);
 			};
 
-			var init = function init() {
+			this.init = function () {
+				var _this12 = this;
+
 				// Check if element is correctly selected.
 				if (element.prop('tagName').toLowerCase() != 'video') {
 					console.warn('Incorrect element selected.');
 					return this;
 				}
 
-				initOptions();
+				this.initOptions();
 				// Set source.
 				// @TODO move this to Video class
 				element.children('source').each(function () {
@@ -1541,20 +1589,20 @@
 				video = player.video = new Video(element);
 
 				/** TODO: Use promise to async run this */
-				initDom();
-				initControls();
-				initHotKeys();
-				video.init().done(function () {
+				this.initDom();
+				this.initControls();
+				this.initHotKeys();
+				video.init().then(function () {
 					if (options.miniplayer) {
 						miniPlayer = new MiniPlayer(player);
 					}
-					initSections();
+					_this12.initSections();
 					player.trigger('inited');
+					_this12.initPlugins();
 				});
 			};
 
-			this.controls = controls;
-			var initControls = function initControls() {
+			this.initControls = function () {
 				controls = new Controls(player);
 				var _arr = ['common', 'fullscreen'];
 				for (var _i = 0; _i < _arr.length; _i++) {
@@ -1567,39 +1615,9 @@
 				if (controls.collections.common != null) {
 					controls.collections.common.active = true;
 				}
-				//for (let name in options.controls) {
-				//if (!controls.has(name)) continue;
-				//for (let rowIndex in options.controls[ name ]) {
-				//let row = options.controls[ name ][ rowIndex ],
-				//hasTimeline = false,
-				//rowElement = $('<div />').addClass('leplayer-controls controls-' + name);
-
-				//for (let i in row) {
-				//let controlName = row[ i ];
-
-				//if (controlName == C_DIVIDER || !controls.collections[ name ].has(controlName)) {
-				//// Create control only if divider or does not exist yet.
-				//var c = controls.collections[ name ].add(controlName);
-				//if (c != null) {
-				//rowElement.append(c);
-				//if (controlName == C_TIMELINE)
-				//hasTimeline = true;
-				//} else {
-				//console.warn('Cannot create ' + controlName + ' control for collection ' + name + '.');
-				//}
-				//}
-				//}
-				//if (!hasTimeline)
-				//rowElement.css('width', '1px');
-
-				//rowElement.find('.divider + .divider').remove();
-
-				//container.append(rowElement);
-				//}
-				//}
 			};
 
-			var initSections = function initSections() {
+			this.initSections = function () {
 				options.dataUrl && player.getData().done(function (data) {
 					var isSectionOutside = sectionContainer && sectionContainer.length > 0;
 					var sections = new Sections(player, {
@@ -1618,7 +1636,8 @@
 				});
 			};
 
-			var initDom = function initDom() {
+			this.initDom = function () {
+				this.errorDisplay = new _ErrorDisplay2.default(this);
 				overlay = $('<div />').addClass('play-overlay').append(new _Icon2.default(player, { iconName: 'play' }).element).on({
 					'click': function click(e) {
 						element.trigger('click');
@@ -1635,7 +1654,7 @@
 
 				videoContainer = $('<div />').addClass('leplayer-video').append(overlay).append(loader);
 
-				container = $('<div />').addClass('leplayer-container').append(videoContainer).attr('tabindex', 0)
+				container = $('<div />').addClass('leplayer-container').append(videoContainer).append(this.errorDisplay.element).attr('tabindex', 0)
 				//.css('width', element.width() + 'px');
 				.css('width', '100%').css('max-width', (options.width || video.width) + 'px');
 
@@ -1647,7 +1666,7 @@
 				videoContainer.append(element);
 			};
 
-			var initHotKeys = function initHotKeys() {
+			this.initHotKeys = function () {
 
 				var isKeyBinding = function isKeyBinding(e, binding) {
 					return (e.which === binding.key || e.key === binding.key) && !!binding.shiftKey == e.shiftKey && !!binding.ctrlKey == e.ctrlKey;
@@ -1667,7 +1686,7 @@
 				});
 			};
 
-			var initOptions = function initOptions() {
+			this.initOptions = function () {
 				var height = void 0,
 				    width = void 0,
 				    poster = void 0,
@@ -1730,17 +1749,18 @@
 				element.attr('preload', options.preload);
 			};
 
-			var secondsToTime = function secondsToTime(seconds) {
-				var h = Math.floor(seconds / 3600);
-				var m = Math.floor(seconds % 3600 / 60);
-				var s = Math.floor(seconds % 3600 % 60);
-				var out = '';
-				if (h > 0) out = h + ':';
-				if (m < 10) out += '0';
-				out += m + ':';
-				if (s < 10) out += '0';
-				out += s;
-				return out;
+			this.initPlugins = function () {
+				if (this.options.plugins) {
+					for (var _name2 in this.options.plugins) {
+						if (!this.options.plugins.hasOwnProperty(_name2)) return;
+						var pluginOptions = this.options.plugins[_name2];
+						if (this[_name2]) {
+							this[_name2](pluginOptions);
+						} else {
+							console.error('Plugin \'' + _name2 + '\' doesn\'t exist');
+						}
+					}
+				}
 			};
 
 			var isFocused = function isFocused() {
@@ -1748,9 +1768,14 @@
 				return focused.length > 0 || $(container).is(':focus');
 			};
 
-			init();
+			this.init();
+			this.on('inited', this.options.onPlayerInited.bind(this));
 
 			return this;
+		};
+
+		Player.plugin = function (name, fn) {
+			Player.prototype[name] = fn;
 		};
 
 		window.$.fn.lePlayer = function (options) {
@@ -1758,10 +1783,17 @@
 				return new Player($(this), options);
 			});
 		};
+		window.$.lePlayer = Player;
 	})(jQuery);
 
 /***/ },
 /* 1 */
+/***/ function(module, exports) {
+
+	module.exports = $;
+
+/***/ },
+/* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1777,7 +1809,7 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -1803,6 +1835,8 @@
 	 * @param {Object} [options] Control's options
 	 * @param {String} [options.iconName] Name of control's icon. If empty, control will not have a icon
 	 * @param {String} [options.className]
+	 * @param {String} [options.name]
+	 * @param {String} [options.collection]
 	 * @param {String} [options.title] Contorl's tooltip, title attr
 	 * @param {Boolean} [options.disable=false]
 	 * @property {Icon} icon Icon in control, if it is exist
@@ -1827,13 +1861,6 @@
 				'click': _this._onClick.bind(_this),
 				'leplayer_click': _this.onClick.bind(_this)
 			});
-
-			if (_this.options.iconName) {
-				_this.icon.element.on({
-					'click': _this._onIconClick.bind(_this),
-					'leplayer_click': _this.onIconClick.bind(_this)
-				});
-			}
 
 			_this.player.on('inited', _this.onPlayerInited.bind(_this));
 			return _this;
@@ -1877,14 +1904,9 @@
 					return false;
 				}
 				this.element.trigger('leplayer_click');
+				this.player.trigger('controlclick', { control: this });
 			}
-		}, {
-			key: '_onIconClick',
-			value: function _onIconClick(e) {
-				e.stopPropagation();
-				e.preventDefault();
-				this.icon.element.trigger('leplayer_click');
-			}
+
 			/**
 	   *
 	   * On click event handler
@@ -1898,17 +1920,6 @@
 				if (typeof this.options.onClick == 'function') {
 					this.options.onClick.call(this, arguments);
 				}
-			}
-
-			/**
-	   * On icon click event handler
-	   * @abstact
-	   */
-
-		}, {
-			key: 'onIconClick',
-			value: function onIconClick(e) {
-				e.preventDefault();
 			}
 		}, {
 			key: 'onPlayerInited',
@@ -1930,12 +1941,6 @@
 	exports.default = Control;
 
 /***/ },
-/* 2 */
-/***/ function(module, exports) {
-
-	module.exports = $;
-
-/***/ },
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -1950,7 +1955,7 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -2033,7 +2038,7 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -2211,10 +2216,10 @@
 	var C_KEYBINDING_INFO = exports.C_KEYBINDING_INFO = 'keybinding info';
 	var C_TIME_INFO = exports.C_TIME_INFO = 'timeinfo';
 
-	function controlFactory(player, name) {
+	function controlFactory(player, name, options) {
 		switch (name) {
 			case C_BACKWARD:
-				return new _BackwardControl2.default(player);
+				return new _BackwardControl2.default(player, options);
 
 			case C_DIVIDER:
 				return {
@@ -2222,40 +2227,40 @@
 				};
 
 			case C_DOWNLOAD:
-				return new _DownloadControl2.default(player);
+				return new _DownloadControl2.default(player, options);
 
 			case C_FORWARD:
-				return new ForwardControl(player);
+				return new ForwardControl(player, options);
 
 			case C_FULLSCREEN:
-				return new _FullscreenControl2.default(player);
+				return new _FullscreenControl2.default(player, options);
 
 			case C_PLAY:
-				return new _PlayControl2.default(player);
+				return new _PlayControl2.default(player, options);
 
 			case C_RATE:
-				return new _RateControl2.default(player);
+				return new _RateControl2.default(player, options);
 
 			case C_SOURCE:
-				return new _SourceControl2.default(player);
+				return new _SourceControl2.default(player, options);
 
 			case C_SUBTITLE:
-				return new _SubtitleControl2.default(player);
+				return new _SubtitleControl2.default(player, options);
 
 			case C_TIMELINE:
-				return new _TimelineControl2.default(player);
+				return new _TimelineControl2.default(player, options);
 
 			case C_VOLUME:
-				return new _VolumeControl2.default(player);
+				return new _VolumeControl2.default(player, options);
 
 			case C_SECTION:
-				return new _SectionControl2.default(player);
+				return new _SectionControl2.default(player, options);
 
 			case C_KEYBINDING_INFO:
-				return new _KeybindingInfoControl2.default(player);
+				return new _KeybindingInfoControl2.default(player, options);
 
 			case C_TIME_INFO:
-				return new _TimeInfoControl2.default(player);
+				return new _TimeInfoControl2.default(player, options);
 
 			default:
 				console.error('Control ' + name + ' doesn\'t exist');
@@ -2278,11 +2283,11 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(1);
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
@@ -2311,7 +2316,8 @@
 			options = _jquery2.default.extend({}, {
 				iconName: 'play',
 				title: 'Воспроизвести видео',
-				className: 'play'
+				className: 'play',
+				name: 'play'
 			}, options);
 
 			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PlayControl).call(this, player, options));
@@ -2383,7 +2389,7 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -2423,7 +2429,8 @@
 
 			options = _jquery2.default.extend({}, {
 				iconName: 'volume-down',
-				className: 'volume-control'
+				className: 'volume-control',
+				name: 'volume'
 			}, options);
 
 			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(VolumeControl).call(this, player, options));
@@ -2498,9 +2505,9 @@
 				return (y - this.line.offset().top) / this.line.height();
 			}
 		}, {
-			key: 'onIconClick',
-			value: function onIconClick(e) {
-				_get(Object.getPrototypeOf(VolumeControl.prototype), 'onIconClick', this).call(this, e);
+			key: 'onClick',
+			value: function onClick(e) {
+				_get(Object.getPrototypeOf(VolumeControl.prototype), 'onClick', this).call(this, e);
 				this.toggleMuted();
 			}
 		}, {
@@ -2547,11 +2554,11 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(1);
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
@@ -2603,6 +2610,15 @@
 			key: 'buildCSSClass',
 			value: function buildCSSClass() {
 				return 'control-dropdown ' + _get(Object.getPrototypeOf(ControlDropdown.prototype), 'buildCSSClass', this).call(this);
+			}
+		}, {
+			key: '_onClick',
+			value: function _onClick(e) {
+				if ((0, _jquery2.default)(e.target).closest(this.dropdownContent).length > 0) {
+					return;
+				}
+
+				_get(Object.getPrototypeOf(ControlDropdown.prototype), '_onClick', this).call(this, e);
 			}
 		}]);
 
@@ -2692,11 +2708,11 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(1);
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
@@ -2732,6 +2748,7 @@
 			_classCallCheck(this, TimelineControl);
 
 			options = _jquery2.default.extend({}, {
+				name: 'timeline',
 				className: 'timeline timeline-container'
 			}, options);
 
@@ -2746,6 +2763,11 @@
 			});
 			return _this;
 		}
+
+		/**
+	  * @override
+	  */
+
 
 		_createClass(TimelineControl, [{
 			key: 'createElement',
@@ -2824,6 +2846,16 @@
 						_this2.drag = false;
 					}
 				});
+			}
+
+			/**
+	   * @override
+	   */
+
+		}, {
+			key: '_onClick',
+			value: function _onClick(e) {
+				e.preventDefault();
 			}
 		}, {
 			key: 'onSectionsInit',
@@ -2938,11 +2970,11 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(1);
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
@@ -3066,7 +3098,7 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -3100,7 +3132,8 @@
 
 			options = _jquery2.default.extend({}, {
 				iconName: 'list-ul',
-				className: 'control--type_section',
+				className: 'section',
+				name: 'section',
 				title: 'Показать/скрыть секции',
 				disable: true
 			}, options);
@@ -3144,11 +3177,11 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(1);
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
@@ -3266,11 +3299,11 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(1);
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
@@ -3299,7 +3332,8 @@
 			options = _jquery2.default.extend({}, {
 				iconName: 'arrows-alt',
 				className: 'fullscreen',
-				title: 'Развернуть/свернуть на полный экран'
+				title: 'Развернуть/свернуть на полный экран',
+				name: 'fullscreen'
 			}, options);
 			return _possibleConstructorReturn(this, Object.getPrototypeOf(FullscreenControl).call(this, player, options));
 		}
@@ -3339,11 +3373,11 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(1);
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
@@ -3408,7 +3442,9 @@
 
 				this.downControl = new _Control3.default(this.player, {
 					className: 'rate-down',
+					name: 'rate-down',
 					iconName: 'backward',
+					collection: this.options.collection,
 					title: 'Уменьшить скорость проигрывания',
 					onClick: function onClick(e) {
 						video.rate -= this.player.options.rate.step;
@@ -3417,7 +3453,9 @@
 
 				this.upControl = new _Control3.default(this.player, {
 					className: 'rate-up',
+					name: 'rate-up',
 					iconName: 'forward',
+					collection: this.options.collection,
 					title: 'Увеличить скорость проигрывания',
 					onClick: function onClick(e) {
 						video.rate += this.player.options.rate.step;
@@ -3447,6 +3485,16 @@
 			key: 'onPlayerInited',
 			value: function onPlayerInited() {
 				this.value = this.player.video.defaultRate;
+			}
+
+			/**
+	   *
+	   */
+
+		}, {
+			key: '_onClick',
+			value: function _onClick(e) {
+				e.preventDefault();
 			}
 		}, {
 			key: 'init',
@@ -3512,11 +3560,11 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(1);
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
@@ -3546,6 +3594,7 @@
 			options = _jquery2.default.extend({}, {
 				iconName: 'undo',
 				className: 'backward',
+				name: 'backward',
 				title: 'Отмотать назад на ' + player.options.playback.step.medium + ' секунд'
 			}, options);
 			return _possibleConstructorReturn(this, Object.getPrototypeOf(BackwardControl).call(this, player, options));
@@ -3586,7 +3635,7 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -3617,6 +3666,7 @@
 			_classCallCheck(this, SourceControl);
 
 			options = _jquery2.default.extend({}, {
+				name: 'source',
 				iconName: 'bullseye',
 				title: 'Качество',
 				className: 'source-control',
@@ -3631,9 +3681,9 @@
 
 
 		_createClass(SourceControl, [{
-			key: 'onItemClick',
-			value: function onItemClick(e) {
-				_get(Object.getPrototypeOf(SourceControl.prototype), 'onItemClick', this).call(this, e);
+			key: 'onClick',
+			value: function onClick(e) {
+				_get(Object.getPrototypeOf(SourceControl.prototype), 'onClick', this).call(this, e);
 				var item = (0, _jquery2.default)(e.target);
 				this.player.video.source = item.data('src');
 			}
@@ -3673,7 +3723,7 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -3850,7 +3900,7 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -3883,6 +3933,7 @@
 			options = _jquery2.default.extend({}, {
 				iconName: 'commenting-o',
 				title: 'Субтитры',
+				name: 'subtitle',
 				className: 'subtitle-control',
 				disable: true
 			}, options);
@@ -3890,9 +3941,9 @@
 		}
 
 		_createClass(SubtitleControl, [{
-			key: 'onIconClick',
-			value: function onIconClick(e) {
-				_get(Object.getPrototypeOf(SubtitleControl.prototype), 'onIconClick', this).call(this, e);
+			key: 'onClick',
+			value: function onClick(e) {
+				_get(Object.getPrototypeOf(SubtitleControl.prototype), 'onClick', this).call(this, e);
 				var video = this.player.video;
 				this.active = null;
 				video.track = -1;
@@ -3949,11 +4000,11 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(1);
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
@@ -3986,7 +4037,8 @@
 
 			options = _jquery2.default.extend({
 				title: 'Скачать видео',
-				className: 'download'
+				className: 'download',
+				name: 'download'
 			}, options);
 
 			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DownloadControl).call(this, player, options));
@@ -4072,7 +4124,7 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
@@ -4103,7 +4155,8 @@
 			options = _jquery2.default.extend({}, {
 				iconName: 'info',
 				title: 'Инфо',
-				className: 'info-control'
+				className: 'info-control',
+				name: 'info'
 			}, options);
 			return _possibleConstructorReturn(this, Object.getPrototypeOf(KeyBindingInfoControl).call(this, player, options));
 		}
@@ -4156,11 +4209,11 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _jquery = __webpack_require__(2);
+	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(1);
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
@@ -4196,7 +4249,8 @@
 			_classCallCheck(this, TimeInfoControl);
 
 			options = _jquery2.default.extend({}, {
-				className: 'timeline timeline-container'
+				className: 'timeline timeline-container',
+				name: 'time-info'
 			}, options);
 
 			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(TimeInfoControl).call(this, player, options));
@@ -4238,6 +4292,11 @@
 				this._totalTimeControl.text = (0, _time.secondsToTime)(video.duration);
 			}
 		}, {
+			key: '_onClick',
+			value: function _onClick(e) {
+				e.preventDefault();
+			}
+		}, {
 			key: 'currentTime',
 			set: function set(value) {}
 		}]);
@@ -4246,6 +4305,158 @@
 	}(_Control3.default);
 
 	exports.default = TimeInfoControl;
+
+/***/ },
+/* 24 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var MediaError = function MediaError(value) {
+		_classCallCheck(this, MediaError);
+
+		if (value instanceof MediaError) {
+			return value;
+		}
+		if (typeof value === 'number') {
+			this.code = value;
+		} else if (typeof value === 'string') {
+			// default code is zero, so this is a custom error
+			this.message = value;
+		} else if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
+
+			// We assign the `code` property manually because native MediaError objects
+			// do not expose it as an own/enumerable property of the object.
+			if (typeof value.code === 'number') {
+				this.code = value.code;
+			}
+
+			_jquery2.default.extend(this, value);
+		}
+
+		if (!this.message) {
+			this.message = MediaError.defaultMessages[this.code] || '';
+		}
+	};
+
+	MediaError.prototype.code = 0;
+
+	MediaError.prototype.message = '';
+
+	MediaError.errorTypes = ['MEDIA_ERR_CUSTOM', 'MEDIA_ERR_ABORTED', 'MEDIA_ERR_NETWORK', 'MEDIA_ERR_DECODE', 'MEDIA_ERR_SRC_NOT_SUPPORTED', 'MEDIA_ERR_ENCRYPTED'];
+
+	MediaError.defaultMessages = {
+		1: 'Вы прервали загрузку видео.',
+		2: 'Загрузка видео прервана из-за потери соединения.',
+		3: 'Загрузка видео остановлена из-за проблем с видеофайлом или из-за того, что ваш браузер не поддерживает воспроизведение данного файла.',
+		4: 'Видео не может быть загружено из-за проблем с интернет-соединением или проблем на сервере. Или формат файла не поддерживается вашим браузером.',
+		5: 'Видео зашифровано, и мы не можем его расшифровать.'
+	};
+
+	// Add types as properties on MediaError
+	// e.g. MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED = 4;
+	for (var errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
+		MediaError[MediaError.errorTypes[errNum]] = errNum;
+		// values should be accessible on both the class and instance
+		MediaError.prototype[MediaError.errorTypes[errNum]] = errNum;
+	}
+
+	exports.default = MediaError;
+
+/***/ },
+/* 25 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
+	 * @file ErrorDisplay.js
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _Component2 = __webpack_require__(3);
+
+	var _Component3 = _interopRequireDefault(_Component2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * @param {Player} player Main player
+	 * @param {Object} [options]
+	 * @class ErrorDisplay
+	 * @extends Component
+	 */
+
+	var ErrorDisplay = function (_Component) {
+		_inherits(ErrorDisplay, _Component);
+
+		function ErrorDisplay(player) {
+			var options = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+
+			_classCallCheck(this, ErrorDisplay);
+
+			var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ErrorDisplay).call(this, player, options));
+
+			_this.player.on('error', _this.onPlayerEror.bind(_this));
+			return _this;
+		}
+
+		/**
+	  * @override
+	  */
+
+
+		_createClass(ErrorDisplay, [{
+			key: 'createElement',
+			value: function createElement() {
+				this.element = (0, _jquery2.default)('<div />').addClass('leplayer-error-display');
+			}
+		}, {
+			key: 'onPlayerEror',
+			value: function onPlayerEror(e, data) {
+				var error = data.error;
+				this.message = error.message;
+				this.element.show();
+			}
+		}, {
+			key: 'message',
+			set: function set(value) {
+				this.element.append(value);
+			}
+		}]);
+
+		return ErrorDisplay;
+	}(_Component3.default);
+
+	exports.default = ErrorDisplay;
 
 /***/ }
 /******/ ]);
