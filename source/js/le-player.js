@@ -1037,8 +1037,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 				this.player.on('timeupdate', this.onTimeUpdate.bind(this));
 
-				this.player.on('fullscreenchange', this._onFullscreenChange.bind(this))
-
 				if (main) {
 					this.player.sections = this;
 				}
@@ -1068,6 +1066,9 @@ import ErrorDisplay from './components/ErrorDisplay';
 			}
 
 			setActiveByIndex(index) {
+				if (this._activeSection.length == 0) {
+					return
+				}
 				if (this._activeSection.attr('data-index') == index) {
 					return
 				}
@@ -1075,9 +1076,12 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 				this._activeSection = this.getSectionByIndex(index);
 				this._activeSection.addClass('leplayer-section--active');
-				this.element.animate({
-					scrollTop : this._activeSection.position().top
-				}, 1000)
+				/** TODO: Сделать нормальную проверку черще this.player.state */
+				if(!container.hasClass('leplayer-container--mini')) {
+					this.element.animate({
+						scrollTop : this._activeSection.position().top
+					}, 800)
+				}
 			}
 
 			getSectionByIndex(index) {
@@ -1086,6 +1090,9 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 
 			onTimeUpdate(e, data) {
+				if (this._activeSection.length == 0) {
+					return
+				}
 				const currentTime = data.time;
 
 				const endSectionTime = this._activeSection.attr('data-end');
@@ -1108,11 +1115,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 					this.element.addClass('leplayer-sections--hidden');
 				}
 			}
-
-			_onFullscreenChange(e, data) {
-			}
-
-
 
 			_createSections(items) {
 				let result = '';
@@ -1436,6 +1438,9 @@ import ErrorDisplay from './components/ErrorDisplay';
 		this.initSections = function() {
 			options.dataUrl && player.getData().done((data) => {
 				const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
+				if (data.sections == null || data.sections.length == 0) {
+					return;
+				}
 				const sections = new Sections(player, {
 					items : data.sections,
 					fullscreenOnly : isSectionOutside,
