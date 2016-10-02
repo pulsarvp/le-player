@@ -97,8 +97,8 @@ import ErrorDisplay from './components/ErrorDisplay';
 			playback : {
 				step : {
 					short : 5,
-					medium : 30,
-					long : 60
+					medium : 10,
+					long : 30
 				}
 			},
 			controls : {
@@ -130,7 +130,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				{
 					key : 37,
 					info : ['←'],
-					description : 'Перемотать на 30 секунд назад',
+					description : `Перемотать на 10 секунд назад`,
 					fn : (video) => {
 						video.currentTime -= options.playback.step.medium;
 					}
@@ -138,30 +138,29 @@ import ErrorDisplay from './components/ErrorDisplay';
 				{
 					key : 39,
 					info : ['→'],
-					description : 'Перемотать на 30 секунд вперёд',
+					description : `Перемотать на 10 секунд вперёд`,
 					fn : (video) => {
 						video.currentTime += options.playback.step.medium;
 					}
 				},
-				{
-					shiftKey : true,
-					info : ['Shift', '←'],
-					description : 'Перемотать на 5 секунд назад',
-					key : 37,
-					fn : (video) => {
-						video.currentTime -= options.playback.step.short;
-					}
-				},
-				{
-					shiftKey : true,
-					key : 39,
-					info : ['Shift', '→'],
-					description : 'Перемотать на 5 секунд вперед',
-					fn : (video) => {
-						video.currentTime += options.playback.step.short;
-					}
-				},
-
+				//{
+					//shiftKey : true,
+					//info : ['Shift', '←'],
+					//description : 'Перемотать на 5 секунд назад',
+					//key : 37,
+					//fn : (video) => {
+						//video.currentTime -= options.playback.step.short;
+					//}
+				//},
+				//{
+					//shiftKey : true,
+					//key : 39,
+					//info : ['Shift', '→'],
+					//description : 'Перемотать на 5 секунд вперед',
+					//fn : (video) => {
+						//video.currentTime += options.playback.step.short;
+					//}
+				//},
 				{
 					key : 38,
 					info : ['↑'],
