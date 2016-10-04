@@ -38,12 +38,13 @@
 		}
 		.leplayer-sections
 		{
-			display: flex;
+			display: block;
 			position: absolute;
 			top: 50px;
 			right: 50px;
 			bottom: 132px;
 			z-index: @z-index-fullscreen + 8;
+			height: calc(~"100% - 120px");
 		}
 
 		.leplayer-sections--hidden
@@ -153,6 +154,10 @@
 				{
 					background: @color-section-hover;
 				}
+			}
+			.leplayer-sections
+			{
+				overflow: hidden;
 			}
 			.leplayer-section-time
 			{
@@ -423,7 +428,7 @@
 			font-size: 12px;
 			left: 50%;
 			bottom: @control-height + 5px;
-			max-width: 300px;
+			min-width: 300px;
 			transform: translateX(-50%);
 		}
 
@@ -706,14 +711,12 @@
 .leplayer-sections
 {
 	font-size: 13px;
-	display: flex;
-	flex-direction: column;
-	flex-wrap: wrap;
 	height: 100%;
 	overflow-x: hidden;
 	overflow-y: scroll;
 	width: 260px;
 	z-index: @z-index-base + 6;
+	box-sizing: border-box;
 
 }
 
@@ -768,7 +771,6 @@
 	padding: 5px 0;
 	background: white;
 	color: @color-dark;
-	box-sizing: content-box;
 	width: 100%;
 	&:nth-child(2n)
 	{
