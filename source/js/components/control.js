@@ -27,7 +27,7 @@ class Control extends Component {
 		this.disable = true
 
 		this.player.on('inited', (e) => {
-			this.disable = options.disable || false;
+			this.disable = this.options.disable || false;
 		})
 
 		this.element.on({

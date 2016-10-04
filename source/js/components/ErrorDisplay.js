@@ -17,7 +17,11 @@ class ErrorDisplay extends Component {
 
 	constructor(player, options={}) {
 		super(player, options);
-		this.player.on('error', this.onPlayerEror.bind(this));
+		if(this.player._error != null) {
+			this.message = this.player._error.message;
+			this.element.show();
+		}
+		this.player.on('error', this.onPlayerError.bind(this));
 	}
 
 	/**
@@ -32,7 +36,7 @@ class ErrorDisplay extends Component {
 		this.element.append(value);
 	}
 
-	onPlayerEror(e, data) {
+	onPlayerError(e, data) {
 		const error = data.error;
 		this.message = error.message;
 		this.element.show();

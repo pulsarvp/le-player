@@ -138,14 +138,31 @@ class TimelineControl extends Control {
 		e.preventDefault();
 	}
 
-	onSectionsInit(e, data) {
-		let sections = data.items;
-		let video = this.player.video;
-		let duration = video.duration;
+	onSectionsInit(e) {
+		const duration = this.player.video.duration;
+		if(isNaN(duration)) {
+			return
+		}
+		if (this.player.sections) {
+			this.updateSectionRanges(this.player.sections.items);
+		}
+	}
+
+	updateSectionRanges(items) {
+		if(this.sections == null || this.sections.length == 0 ) {
+			this.sections = this.createSectionRanges(items);
+			this.line.append(this.sections);
+		} else {
+			this.sections.html(this.createSectionRanges(items));
+		}
+	}
+
+	createSectionRanges(items) {
+		const duration = this.player.video.duration;
 		let result = $('<div />');
-		sections.forEach((section) => {
-			let length = (section.end - section.begin);
-			let item = $('<div />')
+		items.forEach((section) => {
+			const length = (section.end - section.begin);
+			const item = $('<div />')
 				.addClass('timeline-section')
 				.css({
 					width: length / duration * 99 + '%',
@@ -153,7 +170,7 @@ class TimelineControl extends Control {
 				});
 			result.append(item);
 		})
-		this.line.append(result);
+		return result;
 	}
 
 	getPosition (x) {
@@ -193,6 +210,9 @@ class TimelineControl extends Control {
 		this.currentTime.element.css({
 			'width' : this.totalTime.element.width()
 		})
+		if (this.player.sections) {
+			this.updateSectionRanges(this.player.sections.items);
+		}
 	}
 
 	_initWatchBuffer () {
