@@ -72,10 +72,18 @@
 }
 .leplayer-container .play-overlay,
 .leplayer-loader-container {
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  align-items: center;
-  align-content: center;
-  justify-content: center;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-align-content: center;
+      -ms-flex-line-pack: center;
+          align-content: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
   background: rgba(0, 0, 0, 0.5);
   color: #94a5b8;
   cursor: pointer;
@@ -101,10 +109,14 @@
   right: 0;
   margin-left: auto;
   margin-right: auto;
-  transform: translateX(-100%);
+  -webkit-transform: translateX(-100%);
+          transform: translateX(-100%);
 }
 .leplayer-container--mini .leplayer-video .leplayer-sections {
-  transform: translateX(-100%);
+  -webkit-transform: translateX(-100%);
+          transform: translateX(-100%);
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
 }
 .leplayer-container--mini .leplayer-video .leplayer-section-next-info {
@@ -305,7 +317,8 @@
   position: absolute;
   z-index: 508;
   left: 50%;
-  transform: translateX(-50%);
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
 }
 .leplayer-controls .control-dropdown:hover .control-dropdown__content {
   display: block;
@@ -325,7 +338,8 @@
   left: 50%;
   bottom: 37px;
   min-width: 300px;
-  transform: translateX(-50%);
+  -webkit-transform: translateX(-50%);
+          transform: translateX(-50%);
 }
 .leplayer-controls .control-container {
   display: table-cell;
@@ -527,11 +541,19 @@
   height: 1em;
 }
 .leplayer-icon-spin {
-  animation: leplayer-spin 2s infinite linear;
+  -webkit-animation: leplayer-spin 2s infinite linear;
+          animation: leplayer-spin 2s infinite linear;
+}
+@-webkit-keyframes leplayer-spin {
+  100% {
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+  }
 }
 @keyframes leplayer-spin {
   100% {
-    transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
   }
 }
 .leplayer-sections {
@@ -570,6 +592,8 @@
   background: rgba(148, 165, 184, 0.8);
 }
 .leplayer-section {
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
   cursor: pointer;
   padding: 5px 0;
@@ -640,8 +664,12 @@
   height: 50px;
   margin: 0;
   margin-left: 180px;
+  display: -webkit-flex;
+  display: -ms-flexbox;
   display: flex;
-  flex-direction: column;
+  -webkit-flex-direction: column;
+      -ms-flex-direction: column;
+          flex-direction: column;
   height: auto;
   color: black;
 }
