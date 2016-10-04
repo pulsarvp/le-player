@@ -6,7 +6,6 @@ window.$.lePlayer.plugin('ga', function(pluginOptions) {
 	player.on('controlclick', (e, data) => {
 		const control = data.control;
 		const {name, collection} = control.options;
-		console.log(name, collection);
 		if(name) {
 			window.ga(
 				'send',

@@ -203,6 +203,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 			dist.forEach(item => {
 				const index = result.indexOf(item);
 				if (index > -1) {
+					result.splice(index, 1);
 					return
 				}
 			})
@@ -248,7 +249,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 			}
 			this._error = new MediaError(value);
 
-			console.error(this._error, this);
 			this.trigger('error', { error : this._error});
 		}
 
@@ -402,6 +402,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				this.subtitles = [];
 				this.bufferRanges = [];
 				this.playbackRate = this._video.playbackRate;
+				this._initHtmlEvents();
 			}
 
 			get currentTime () {
@@ -559,12 +560,9 @@ import ErrorDisplay from './components/ErrorDisplay';
 						controls.init();
 						this._initRate();
 						this._initVolume();
-						//this.startBuffering();
+						this.startBuffering();
 						dfd.resolve();
 					});
-				this._initHtmlEvents();
-
-				dfd.notify();
 				return dfd.promise();
 			}
 
@@ -1009,16 +1007,8 @@ import ErrorDisplay from './components/ErrorDisplay';
 		class Sections extends Component {
 			constructor(player, options) {
 				let { items = [], main = true } = options;
+				items = [].concat(items);
 
-				for ( let i = 0; i < items.length; i++) {
-					let endSection;
-					if (i < (items.length - 1)) {
-						endSection = items[i+1].begin
-					} else {
-						endSection = video.duration;
-					}
-					items[i].end = endSection;
-				}
 
 				//options.items = items;
 
@@ -1036,10 +1026,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 				this.player.on('timeupdate', this.onTimeUpdate.bind(this));
 
-				if (main) {
-					this.player.sections = this;
-				}
-				this.player.trigger('sectionsinit', { items : this.items, sections : this });
+				//this.player.trigger('sectionsinit', { items : this.items, sections : this });
 
 				return this;
 			}
@@ -1399,8 +1386,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				}
 			}
 			if (sources.length == 0) {
-				console.warn('No sources found.');
-				return this;
+				this.setError(new MediaError('No sources found'));
 			}
 
 			video = player.video = new Video(element);
@@ -1409,11 +1395,15 @@ import ErrorDisplay from './components/ErrorDisplay';
 			this.initDom();
 			this.initControls();
 			this.initHotKeys();
+			this.initSections().then((data) => {
+				this.sections = data.sections;
+				this.trigger('sectionsinit', data);
+			});
 			video.init().then(() => {
+				const dfd = $.Deferred()
 				if(options.miniplayer) {
 					miniPlayer = new MiniPlayer(player);
 				}
-				this.initSections();
 				player.trigger('inited');
 				this.initPlugins();
 			});
@@ -1435,25 +1425,45 @@ import ErrorDisplay from './components/ErrorDisplay';
 		};
 
 		this.initSections = function() {
-			options.dataUrl && player.getData().done((data) => {
-				const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
-				if (data.sections == null || data.sections.length == 0) {
-					return;
-				}
-				const sections = new Sections(player, {
-					items : data.sections,
-					fullscreenOnly : isSectionOutside,
-				});
+			const dfd = $.Deferred();
+			if (options.dataUrl == null) {
+				dfd.reject(null)
+			} else {
+				player.getData().done(data => {
+					const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
+					if (data.sections == null || data.sections.length == 0) {
+						dfd.reject(null)
+						return;
+					}
+					for ( let i = 0; i < data.sections.length; i++) {
+						let endSection;
+						if (i < (data.sections.length - 1)) {
+							endSection = data.sections[i+1].begin
+						} else {
+							endSection = video.duration;
+						}
+						data.sections[i].end = endSection;
+					}
 
-				videoContainer.append(self.sections.element);
-				if (isSectionOutside) {
-					const outsideSections = new Sections(player, {
+					const sections = new Sections(player, {
 						items : data.sections,
-						main : false
+						fullscreenOnly : isSectionOutside,
 					});
-					sectionContainer.append(outsideSections.element);
-				}
-			});
+
+					videoContainer.append(sections.element);
+
+					if (isSectionOutside) {
+						const outsideSections = new Sections(player, {
+							items : data.sections,
+							main : false
+						});
+						sectionContainer.append(outsideSections.element);
+					}
+					dfd.resolve({ sections, items : data.sections });
+				})
+			}
+
+			return dfd.promise()
 		}
 
 

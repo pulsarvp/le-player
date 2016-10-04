@@ -24,7 +24,7 @@ class SectionControl extends ControlCheckbox {
 		}, options);
 		super(player, options);
 		this.player.on('sectionsinit', () => {
-			this.disable = false;
+			this.options.disable = this.disable = false;
 			this.checked = true;
 		})
 	}
