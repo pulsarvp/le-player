@@ -180,8 +180,8 @@
 				playback: {
 					step: {
 						short: 5,
-						medium: 30,
-						long: 60
+						medium: 10,
+						long: 30
 					}
 				},
 				controls: {
@@ -204,34 +204,37 @@
 				}, {
 					key: 37,
 					info: ['←'],
-					description: 'Перемотать на 30 секунд назад',
+					description: 'Перемотать на 10 секунд назад',
 					fn: function fn(video) {
 						video.currentTime -= options.playback.step.medium;
 					}
 				}, {
 					key: 39,
 					info: ['→'],
-					description: 'Перемотать на 30 секунд вперёд',
+					description: 'Перемотать на 10 секунд вперёд',
 					fn: function fn(video) {
 						video.currentTime += options.playback.step.medium;
 					}
-				}, {
-					shiftKey: true,
-					info: ['Shift', '←'],
-					description: 'Перемотать на 5 секунд назад',
-					key: 37,
-					fn: function fn(video) {
-						video.currentTime -= options.playback.step.short;
-					}
-				}, {
-					shiftKey: true,
-					key: 39,
-					info: ['Shift', '→'],
-					description: 'Перемотать на 5 секунд вперед',
-					fn: function fn(video) {
-						video.currentTime += options.playback.step.short;
-					}
-				}, {
+				},
+				//{
+				//shiftKey : true,
+				//info : ['Shift', '←'],
+				//description : 'Перемотать на 5 секунд назад',
+				//key : 37,
+				//fn : (video) => {
+				//video.currentTime -= options.playback.step.short;
+				//}
+				//},
+				//{
+				//shiftKey : true,
+				//key : 39,
+				//info : ['Shift', '→'],
+				//description : 'Перемотать на 5 секунд вперед',
+				//fn : (video) => {
+				//video.currentTime += options.playback.step.short;
+				//}
+				//},
+				{
 					key: 38,
 					info: ['↑'],
 					description: 'Увеличить громкость',
@@ -1209,8 +1212,6 @@
 
 					_this10.player.on('timeupdate', _this10.onTimeUpdate.bind(_this10));
 
-					_this10.player.on('fullscreenchange', _this10._onFullscreenChange.bind(_this10));
-
 					if (main) {
 						_this10.player.sections = _this10;
 					}
@@ -1244,6 +1245,9 @@
 				}, {
 					key: 'setActiveByIndex',
 					value: function setActiveByIndex(index) {
+						if (this._activeSection.length == 0) {
+							return;
+						}
 						if (this._activeSection.attr('data-index') == index) {
 							return;
 						}
@@ -1251,9 +1255,12 @@
 
 						this._activeSection = this.getSectionByIndex(index);
 						this._activeSection.addClass('leplayer-section--active');
-						this.element.animate({
-							scrollTop: this._activeSection.position().top
-						}, 1000);
+						/** TODO: Сделать нормальную проверку черще this.player.state */
+						if (!container.hasClass('leplayer-container--mini')) {
+							this.element.animate({
+								scrollTop: this._activeSection.position().top
+							}, 800);
+						}
 					}
 				}, {
 					key: 'getSectionByIndex',
@@ -1263,6 +1270,9 @@
 				}, {
 					key: 'onTimeUpdate',
 					value: function onTimeUpdate(e, data) {
+						if (this._activeSection.length == 0) {
+							return;
+						}
 						var currentTime = data.time;
 
 						var endSectionTime = this._activeSection.attr('data-end');
@@ -1286,9 +1296,6 @@
 							this.element.addClass('leplayer-sections--hidden');
 						}
 					}
-				}, {
-					key: '_onFullscreenChange',
-					value: function _onFullscreenChange(e, data) {}
 				}, {
 					key: '_createSections',
 					value: function _createSections(items) {
@@ -1620,6 +1627,9 @@
 			this.initSections = function () {
 				options.dataUrl && player.getData().done(function (data) {
 					var isSectionOutside = sectionContainer && sectionContainer.length > 0;
+					if (data.sections == null || data.sections.length == 0) {
+						return;
+					}
 					var sections = new Sections(player, {
 						items: data.sections,
 						fullscreenOnly: isSectionOutside
