@@ -92,7 +92,7 @@ class ControlContainer extends ControlDropdown {
 	 * @param {Object} Data of item
 	 */
 	addItem (content, data) {
-		let item = $('<div />')
+		const item = $('<div />')
 			.addClass('control-container__item')
 			.data(data)
 			.on('click', this.onItemClick.bind(this))

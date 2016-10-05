@@ -21,8 +21,6 @@ class SourceControl extends ControlContainer {
 			disable : true
 		}, options);
 		super(player, options);
-
-
 	}
 
 	/**
@@ -31,16 +29,36 @@ class SourceControl extends ControlContainer {
 	onClick (e) {
 		super.onClick(e);
 		let item = $(e.target);
-		this.player.video.source = item.data('src');
+		const defaultItem = this.getByIndex(0);
+
+		this.player.video.source = {
+			url : defaultItem.data('url'),
+			title : defaultItem.data('title')
+		}
+		this.active = defaultItem;
+
+	}
+
+	onItemClick(e) {
+		super.onItemClick(e);
+		let item = $(e.target);
+		this.player.video.source = {
+			url : item.data('url'),
+			title : item.data('title')
+		}
+
 	}
 
 	onPlayerInited(e, data) {
-		if (this.player.sources.length > 1) {
-			for (let i in this.player.sources) {
-				this.addItem(this.player.sources[i].title, {
-					src : this.player.sources[i].src
-				});
-			}
+		const sources = this.player.options.sources;
+		if (sources.length > 1) {
+			sources.forEach(item => {
+				this.addItem(item.title, {
+					url : item.url,
+					title : item.title
+				})
+			})
+			this.setActiveByIndex(0);
 			this.disable = false;
 		}
 	}

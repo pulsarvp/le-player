@@ -184,6 +184,7 @@ class TimelineControl extends Control {
 	 */
 	hardMove (percent) {
 		let currentTime = this.player.video.duration * percent;
+		if(isNaN(currentTime)) return;
 		percent = percent * 100;
 		this.marker.css('left', percent + '%');
 		this.played.css('width', percent + '%');
@@ -194,6 +195,7 @@ class TimelineControl extends Control {
 		let video = this.player.video;
 		let percent = (video.currentTime / video.duration * 100).toFixed(2);
 		let currentTime = video.currentTime;
+		if(isNaN(currentTime)) return;
 		this.marker.css('left', percent + '%');
 		this.played.css('width', percent + '%');
 		this.currentTime.text = secondsToTime(currentTime);

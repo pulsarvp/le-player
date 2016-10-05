@@ -61,7 +61,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 	 * @param {String} [options.sectionContainer] Selector for sections
 	 * @param {Object} [options.plugins] Keys of objects are name of plugin, value - plugin options
 	 */
-	let Player = function (element, opts) {
+	let Player = function (element, options) {
 		const C_BACKWARD = 'backward';
 		const C_DIVIDER = 'divider';
 		const C_DOWNLOAD = 'download';
@@ -76,7 +76,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 		const C_SECTION = "section"
 
 		var player = this;
-		var options = this.options = $.extend(true, {}, {
+		const defaultOptions = {
 			miniplayer : false,
 			autoplay : false,
 			height : 'auto',
@@ -132,7 +132,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 					info : ['←'],
 					description : `Перемотать на 10 секунд назад`,
 					fn : (video) => {
-						video.currentTime -= options.playback.step.medium;
+						video.currentTime -= defaultOptions.playback.step.medium;
 					}
 				},
 				{
@@ -140,7 +140,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 					info : ['→'],
 					description : `Перемотать на 10 секунд вперёд`,
 					fn : (video) => {
-						video.currentTime += options.playback.step.medium;
+						video.currentTime += defaultOptions.playback.step.medium;
 					}
 				},
 				//{
@@ -166,7 +166,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 					info : ['↑'],
 					description : 'Увеличить громкость',
 					fn : (video) => {
-						video.volume += options.volume.step;
+						video.volume += defaultOptions.volume.step;
 					}
 				},
 
@@ -175,7 +175,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 					info : ['↓'],
 					description : 'Уменьшить громкость',
 					fn : (video) => {
-						video.volume -= options.volume.step;
+						video.volume -= defaultOptions.volume.step;
 					}
 				},
 
@@ -189,7 +189,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				}
 			],
 			onPlayerInited : function() {}
-		}, opts);
+		};
 
 		/**
 		 * Return array with excluded dist's items from source array
@@ -211,20 +211,9 @@ import ErrorDisplay from './components/ErrorDisplay';
 			return result;
 		}
 
-		// exclude controls option
-		for (const name in options.excludeControls) {
-			if (!options.excludeControls.hasOwnProperty(name)) return;
-			const controlCollection = options.excludeControls[name];
-			controlCollection.forEach((row, index) => {
-				if (this.options.controls[name] && this.options.controls[name][index]) {
-					this.options.controls[name][index] = excludeArray(options.controls[name][index], row);
-				}
-			})
-		}
-
 		this.getData = () => {
 			return $.ajax({
-				url: options.dataUrl,
+				url: this.options.dataUrl,
 				method: 'GET',
 				dataType: 'json'
 			}).promise()
@@ -337,7 +326,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				clearTimeout(this._hideTimeout);
 				this._hideTimeout = setTimeout(() => {
 					this._collection.element.hide();
-				}, options.fullscreen.hideTimelineTime);
+				}, player.options.fullscreen.hideTimelineTime);
 
 				$(container).on({
 					'mousemove.leplayer.fullscreen-hide-timeline' : (e) => {
@@ -346,7 +335,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 						this._collection.element.show();
 						this._hideTimeout = setTimeout(() => {
 							this._collection.element.hide();
-						}, options.fullscreen.hideTimelineTime);
+						}, player.options.fullscreen.hideTimelineTime);
 					}
 				})
 			}
@@ -403,6 +392,9 @@ import ErrorDisplay from './components/ErrorDisplay';
 				this.bufferRanges = [];
 				this.playbackRate = this._video.playbackRate;
 				this._initHtmlEvents();
+				if($(this._video).attr('src') == null) {
+					this.source = this.player.options.src;
+				}
 			}
 
 			get currentTime () {
@@ -436,12 +428,12 @@ import ErrorDisplay from './components/ErrorDisplay';
 			}
 
 			get defaultRate() {
-				return Cookie.get('rate') || options.rate.default
+				return Cookie.get('rate') || player.options.rate.default
 			}
 
 
 			set rate (value) {
-				if ( value <= options.rate.max && value >= options.rate.min ) {
+				if ( value <= player.options.rate.max && value >= player.options.rate.min ) {
 					this._video.playbackRate = value;
 					Cookie.set('rate', value);
 				}
@@ -450,25 +442,38 @@ import ErrorDisplay from './components/ErrorDisplay';
 			}
 
 
-			set source (value) {
-				let time = this._video.currentTime;
-				let rate = this._video.playbackRate;
-				let stop = (!this._video.played || this._video.paused);
-				this._ctx.attr('src', value);
-				this._video = this._ctx[ 0 ];
+			set source (src) {
+				if(this.source.url === src.url) return;
+				const time = this._video.currentTime;
+				const rate = this._video.playbackRate;
+				const stop = this._video.paused;
+
+				$(this._video).attr('src', src.url);
+
+				this._video = this._ctx[0];
+
 				this._video.playbackRate = rate;
+
 				this._video.currentTime = time;
+
 				if (stop) {
 					this.pause();
 				} else {
 					this.play();
 				}
 
+				this._source = src;
+				this.player.trigger('changesource', { src : src });
+
 				// @TODO make this right way
 				//setTimeout(() => {
 					//controls.totalTime = secondsToTime(this._video.duration);
 				//}, 100);
 
+			}
+
+			get source () {
+				return this._source || this.player.options.src;
 			}
 
 			set track (value) {
@@ -486,19 +491,19 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 
 			get defaultVolume () {
-				return Cookie.get('volume') || options.volume.default;
+				return Cookie.get('volume') || player.options.volume.default;
 			}
 
 			set volume (value) {
 				if (value > 1) {
 					this._video.volume = 1;
-				} else if (value < options.volume.mutelimit) {
+				} else if (value < player.options.volume.mutelimit) {
 					this._video.volume = 0;
 				} else {
 					this._video.volume = value;
 					Cookie.set('volume', value);
 				}
-				this._video.mute = (value < options.volume.mutelimit);
+				this._video.mute = (value < player.options.volume.mutelimit);
 			}
 
 
@@ -608,7 +613,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				} else {
 					dfd.resolve();
 				}
-				overlay.hide();
+				//overlay.hide();
 				return dfd.promise();
 			}
 
@@ -623,7 +628,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				} else {
 					dfd.resolve();
 				}
-				overlay.show();
+				//overlay.show();
 				return dfd.promise();
 			}
 
@@ -702,7 +707,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 			_onLoadedMetaData (e) {
 				container
 					.css('width', '100%')
-					.css('max-width', (options.width || this.width) + 'px');
+					.css('max-width', (player.options.width || this.width) + 'px');
 				this.player.trigger('loadedmetadata', { video : this._video });
 			}
 
@@ -711,6 +716,10 @@ import ErrorDisplay from './components/ErrorDisplay';
 				let timerId = null;
 
 				mediaElement.on({
+
+					'loadstart' : (e) => {
+						this.player.setError(null)
+					},
 
 					'timeupdate' : (e) => {
 						//controls.moveTimeMarker();
@@ -744,10 +753,12 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 					'play' : (e) => {
 						this.player.trigger('play');
+						overlay.hide()
 					},
 
 					'pause' : (e) => {
 						this.player.trigger('pause');
+						overlay.show()
 					},
 
 					'ratechange' : (e) => {
@@ -781,7 +792,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				this.items = {};
 				this.active = options.active || false;
 				this.name = options.name;
-				this.controls = player.options.controls[this.name];
+				this.controls = this.player.options.controls[this.name];
 			}
 
 
@@ -870,7 +881,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 					$.isFunction(this.items[i].init) && this.items[i].init();
 				}
 				this.initTimeline();
-				this.download = sources[ 0 ].src;
+				//this.download = sources[ 0 ].src;
 			}
 
 			initTimeline () {
@@ -1320,9 +1331,8 @@ import ErrorDisplay from './components/ErrorDisplay';
 		}
 
 		var self = this;
-		var sources = this.sources =[];
 		var subtitles = [];
-		var volume = options.volume.default;
+		//var volume = options.volume.default;
 		var controls = this.controls;
 		var video = null;
 		this.video = video
@@ -1365,29 +1375,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 			}
 
 			this.initOptions();
-			// Set source.
-			// @TODO move this to Video class
-			element.children('source').each(function () {
-				var src = $(this).attr('src');
-				if (src) {
-					sources.push({
-						src : src,
-						title : $(this).attr('title') || 'default'
-					});
-				}
-			});
-			if (sources.length == 0) {
-				var src = element.attr('src');
-				if (src) {
-					sources.push({
-						src : src,
-						title : $(this).attr('title') || 'default'
-					});
-				}
-			}
-			if (sources.length == 0) {
-				this.setError(new MediaError('No sources found'));
-			}
 
 			video = player.video = new Video(element);
 
@@ -1405,6 +1392,10 @@ import ErrorDisplay from './components/ErrorDisplay';
 					miniPlayer = new MiniPlayer(player);
 				}
 				player.trigger('inited');
+
+				// TODO: Вынести это в компонент overlay onPlayerInited
+				overlay.show();
+
 				this.initPlugins();
 			});
 
@@ -1414,7 +1405,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 		this.initControls = function () {
 			controls = new Controls(player);
 			for (const name of ['common', 'fullscreen']) {
-				if (!options.controls.hasOwnProperty(name)) return;
+				if (!this.options.controls.hasOwnProperty(name)) return;
 				const controlCollection = new ControlCollection(player, { name });
 				controls.collections[name] = controlCollection;
 				container.append(controlCollection.element);
@@ -1432,7 +1423,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				player.getData().done(data => {
 					const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
 					if (data.sections == null || data.sections.length == 0) {
-						dfd.reject(null)
+						dfd.reject(null);
 						return;
 					}
 					for ( let i = 0; i < data.sections.length; i++) {
@@ -1469,13 +1460,47 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 		this.initDom = function () {
 			this.errorDisplay = new ErrorDisplay(this);
+			[
+
+				// Remove controls because we dont not support native controls yet
+				'controls',
+
+				// It is unnecessary attrs, this functionality solve CSS
+				'height',
+				'width'
+
+			].forEach( item => {
+				element.removeAttr(item);
+			});
+
+			// Set attrs from options
+			[
+				'poster',
+				'preload',
+				'autoplay',
+				'loop',
+				'muted'
+			].forEach(item => {
+				if(this.options[item]) {
+					element.attr(item, this.options[item]);
+					element.prop(item, this.options[item]);
+				}
+			})
+
+			element.find('source[data-quality]').each((i, item) => {
+				$(item).remove();
+			})
+
+
+			// TODO: Вынести это в отдельнеый компонент
 			overlay = $('<div />')
 				.addClass('play-overlay')
 				.append(new Icon(player, { iconName : 'play' }).element)
 				.on({
 					'click'	: (e) => { element.trigger('click'); },
 					'dblclick' : (e) => { element.trigger('dblclick'); }
-				});
+				})
+				.hide();
 
 			loader = $('<div />')
 				.addClass('leplayer-loader-container')
@@ -1519,7 +1544,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 			$(container).bind('keydown.leplayer.hotkey', (e) => {
 				const _isFocused = isFocused();
 				if (_isFocused) {
-					options.keyBinding.forEach(binding => {
+					this.options.keyBinding.forEach(binding => {
 						if( isKeyBinding(e, binding) ) {
 							e.preventDefault();
 							binding.fn(video);
@@ -1530,69 +1555,76 @@ import ErrorDisplay from './components/ErrorDisplay';
 			})
 		};
 
+		this.optionsFromElement = function() {
+			// Copy video attrs to the opitons
+			let attrOptions = [
+				'height',
+				'width',
+				'poster',
+				'autoplay',
+				'loop',
+				'muted',
+				'preload',
+			]
+			.reduce((obj, item) => {
+				const val = element.attr(item)
+				if(val != null) {
+					obj[item] = element.attr(item);
+				}
+				return obj;
+			}, {});
+
+			if(element.attr('src')) {
+				attrOptions.src = {
+					url : element.attr('src'),
+					title : element.attr('data-quality') || element.attr('title') || 'default'
+				}
+			}
+
+			// Copy sources from HTML5 source element with data-quality attr
+			// If data-quality attr does not exist - no
+			attrOptions.sources = [];
+			element.find('source').each((i, item) => {
+				item = $(item);
+				if(!item.attr('data-quality')) {
+					return
+				}
+				attrOptions.sources = attrOptions.sources.concat({
+					url : item.attr('src'),
+					title : item.attr('data-quality') || item.attr('title') || 'default'
+				})
+
+			});
+
+			if(attrOptions.src == null && attrOptions.sources.length > 0) {
+				attrOptions.src = attrOptions.sources[0]
+			}
+
+			return attrOptions;
+		}
+
+
+
 		this.initOptions = function () {
-			let height, width, poster, attrs, preload;
-			element.removeAttr('controls');
+			const attrOptions = this.optionsFromElement();
 
-			height = element.attr('height');
-			if (height) {
-				options.height = height + 'px';
-				element.removeAttr('height');
-			}
-			//element.css('height', options.height);
+			// Merge default options + video attributts + user options
+			this.options = $.extend(true, defaultOptions, attrOptions, options);
 
-			width = element.attr('width');
-			if (width) {
-				options.width = width + 'px';
-				element.removeAttr('width');
-			}
-			//element.css('width', options.width);
-
-			poster = element.attr('poster');
-			if (poster)
-				options.poster = poster;
-			else if (options.poster)
-				element.attr('poster', options.poster);
-
-			attrs = [ 'autoplay', 'loop', 'muted' ];
-			attrs.forEach((item) => {
-				var a = element.attr(item);
-				if (a) {
-					options[ item ] = true;
-				} else if (options[ item ]) {
-					element.attr(item, '');
-				} else {
-					element.removeAttr(item);
-				}
-				element.prop(item, options[ item ]);
-			})
-
-			preload = element.attr('preload');
-			if (preload) {
-				preload = preload.toLowerCase();
-				if (preload == 'none' || preload == 'metadata')
-					options.preload = preload;
-				else
-					options.preload = 'auto';
+			if (this.options.sources.length == 0) {
+				this.setError(new MediaError('No sources found'));
 			}
 
-			if (options.sources) {
-				if (Array.isArray(options.sources)) {
-					options.sources.forEach((item) => {
-						let source = $('<source />');
-						if (typeof item === 'string') {
-							source.attr('src', item)
-						} else {
-							source.attr('src', item.src)
-						}
-						source.attr('title', item.title || 'default');
-						element.append(source);
-					})
-				} else if (typeof options.sources === 'string') {
-					element.attr('src', options.sources)
-				}
+			// exclude controls option
+			for (const name in this.options.excludeControls) {
+				if (!this.options.excludeControls.hasOwnProperty(name)) return;
+				const controlCollection = this.options.excludeControls[name];
+				controlCollection.forEach((row, index) => {
+					if (this.options.controls[name] && this.options.controls[name][index]) {
+						this.options.controls[name][index] = excludeArray(this.options.controls[name][index], row);
+					}
+				})
 			}
-			element.attr('preload', options.preload);
 		};
 
 		this.initPlugins = function () {
