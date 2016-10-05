@@ -392,6 +392,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				this.bufferRanges = [];
 				this.playbackRate = this._video.playbackRate;
 				this._initHtmlEvents();
+
 				if($(this._video).attr('src') == null) {
 					this.source = this.player.options.src;
 				}
@@ -1574,6 +1575,9 @@ import ErrorDisplay from './components/ErrorDisplay';
 				return obj;
 			}, {});
 
+			attrOptions.sources = [];
+
+			// Src it is main source, that will be load
 			if(element.attr('src')) {
 				attrOptions.src = {
 					url : element.attr('src'),
@@ -1583,7 +1587,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 			// Copy sources from HTML5 source element with data-quality attr
 			// If data-quality attr does not exist - no
-			attrOptions.sources = [];
 			element.find('source').each((i, item) => {
 				item = $(item);
 				if(!item.attr('data-quality')) {
@@ -1600,6 +1603,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				attrOptions.src = attrOptions.sources[0]
 			}
 
+
 			return attrOptions;
 		}
 
@@ -1611,7 +1615,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 			// Merge default options + video attributts + user options
 			this.options = $.extend(true, defaultOptions, attrOptions, options);
 
-			if (this.options.sources.length == 0) {
+			if (this.options.src == null) {
 				this.setError(new MediaError('No sources found'));
 			}
 
