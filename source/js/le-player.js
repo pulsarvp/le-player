@@ -1039,6 +1039,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				this.player.on('timeupdate', this.onTimeUpdate.bind(this));
 
 				//this.player.trigger('sectionsinit', { items : this.items, sections : this });
+				this.player.on('inited', this.onPlayerInited.bind(this));
 
 				return this;
 			}
@@ -1053,6 +1054,16 @@ import ErrorDisplay from './components/ErrorDisplay';
 				}
 				this.element.append(this._createSections(this.options.items));
 				return this.element;
+			}
+
+			/**
+			 * @override
+			 */
+			onPlayerInited() {
+
+				if(this.items != null && this.items.length > 0 ) {
+					this.items[this.items.length - 1].end = this.player.video.duration;
+				}
 			}
 
 
@@ -1128,8 +1139,16 @@ import ErrorDisplay from './components/ErrorDisplay';
 									Следующая секция начнется через
 									<span class="time">${secondsToTime(items[0].end)}</span>
 								</div>
-								<div class="leplayer-section-title">${section.title}</div>
-								<div class="leplayer-section-description">${section.description}</div>
+								${
+									section.title != null ?
+										`<div class="leplayer-section-title">${section.title}</div>`
+									: ''
+								}
+								${
+									section.description != null ?
+										`<div class="leplayer-section-description">${section.description}</div>`
+									: ''
+								}
 							</div>
 						</div>
 					`.trim()
