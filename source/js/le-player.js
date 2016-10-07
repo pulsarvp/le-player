@@ -123,50 +123,68 @@ import ErrorDisplay from './components/ErrorDisplay';
 					key : 32,
 					info : ['Space'],
 					description : 'Начать проигрывание / поставить на паузу',
-					fn : (video) => {
-						video.togglePlay();
+					fn : (player) => {
+						player.video.togglePlay();
 					}
 				},
 				{
 					key : 37,
 					info : ['←'],
 					description : `Перемотать на 10 секунд назад`,
-					fn : (video) => {
-						video.currentTime -= defaultOptions.playback.step.medium;
+					fn : (player) => {
+						player.video.currentTime -= player.options.playback.step.medium;
 					}
 				},
 				{
 					key : 39,
 					info : ['→'],
 					description : `Перемотать на 10 секунд вперёд`,
-					fn : (video) => {
-						video.currentTime += defaultOptions.playback.step.medium;
+					fn : (player) => {
+						player.video.currentTime += player.options.playback.step.medium;
 					}
 				},
-				//{
-					//shiftKey : true,
-					//info : ['Shift', '←'],
-					//description : 'Перемотать на 5 секунд назад',
-					//key : 37,
-					//fn : (video) => {
-						//video.currentTime -= options.playback.step.short;
-					//}
-				//},
-				//{
-					//shiftKey : true,
-					//key : 39,
-					//info : ['Shift', '→'],
-					//description : 'Перемотать на 5 секунд вперед',
-					//fn : (video) => {
-						//video.currentTime += options.playback.step.short;
-					//}
-				//},
+				{
+					shiftKey : true,
+					info : ['Shift', '←'],
+					description : 'Перейти на предыдущую секцию',
+					key : 37,
+					fn : (video) => {
+						if(player.sections == null) {
+							return;
+						}
+
+						const sectionIndex = parseInt(player.sections.activeSection.attr('data-index'));
+						const sectionsLength = player.sections.length;
+						const newIndex = sectionIndex <= 0 ? 0 : sectionIndex - 1;
+
+						player.sections.setActiveByIndex(newIndex);
+						player.video.currentTime = player.sections.items[sectionIndex].begin
+					}
+				},
+				{
+					shiftKey : true,
+					key : 39,
+					info : ['Shift', '→'],
+					description : 'Перейти на следующую секцию',
+					fn : (player) => {
+						if(player.sections == null) {
+							return;
+						}
+
+						const sectionIndex = parseInt(player.sections.activeSection.attr('data-index'));
+						const sectionsLength = player.sections.length;
+						const newIndex = sectionIndex >= sectionsLength ? sectionsLength : sectionIndex + 1
+
+						player.sections.setActiveByIndex(newIndex);
+						player.video.currentTime = player.sections.items[sectionIndex].end
+					}
+				},
 				{
 					key : 38,
 					info : ['↑'],
 					description : 'Увеличить громкость',
-					fn : (video) => {
-						video.volume += defaultOptions.volume.step;
+					fn : (player) => {
+						player.video.volume += player.options.volume.step;
 					}
 				},
 
@@ -174,8 +192,8 @@ import ErrorDisplay from './components/ErrorDisplay';
 					key : 40,
 					info : ['↓'],
 					description : 'Уменьшить громкость',
-					fn : (video) => {
-						video.volume -= defaultOptions.volume.step;
+					fn : (player) => {
+						player.video.volume -= player.options.volume.step;
 					}
 				},
 
@@ -183,8 +201,8 @@ import ErrorDisplay from './components/ErrorDisplay';
 					key : 70,
 					info : ['f'],
 					description : 'Открыть/закрыть полноэкраный режим',
-					fn : (video) => {
-						video.fullscreen.toggle()
+					fn : (player) => {
+						player.video.fullscreen.toggle()
 					}
 				}
 			],
@@ -444,6 +462,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 
 			set source (src) {
+				if(this.source && this.source.url === src.url) return;
 				const time = this._video.currentTime;
 				const rate = this._video.playbackRate;
 				const stop = this._video.paused;
@@ -451,7 +470,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 				$(this._video).attr('src', src.url);
 
 				this._video = this._ctx[0];
-				this._video.load();
 
 				this._video.playbackRate = rate;
 
@@ -474,7 +492,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 			}
 
 			get source () {
-				return this._source || this.player.options.src;
+				return this._source
 			}
 
 			set track (value) {
@@ -1025,7 +1043,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				//options.items = items;
 
 				super(player, options)
-				this._activeSection = this.getSectionByIndex(0);
+				this.activeSection = this.getSectionByIndex(0);
 
 				this.items = items;
 
@@ -1075,20 +1093,25 @@ import ErrorDisplay from './components/ErrorDisplay';
 			}
 
 			setActiveByIndex(index) {
-				if (this._activeSection.length == 0) {
+				if (this.activeSection.length == 0) {
 					return
 				}
-				if (this._activeSection.attr('data-index') == index) {
+				if (this.activeSection.attr('data-index') == index) {
 					return
 				}
-				this._activeSection.removeClass('leplayer-section--active');
 
-				this._activeSection = this.getSectionByIndex(index);
-				this._activeSection.addClass('leplayer-section--active');
-				/** TODO: Сделать нормальную проверку черще this.player.state */
-				if(!container.hasClass('leplayer-container--mini')) {
+				if (this.getSectionByIndex(index).length == 0) {
+					return
+				}
+
+				this.activeSection.removeClass('leplayer-section--active');
+
+				this.activeSection = this.getSectionByIndex(index);
+
+				this.activeSection.addClass('leplayer-section--active');
+				if(!this.player.mini) {
 					this.element.animate({
-						scrollTop : this._activeSection.position().top
+						scrollTop : this.activeSection.position().top
 					}, 800)
 				}
 			}
@@ -1099,14 +1122,16 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 
 			onTimeUpdate(e, data) {
-				if (this._activeSection.length == 0) {
+				if (this.activeSection.length == 0) {
 					return
 				}
 				const currentTime = data.time;
 
-				const endSectionTime = this._activeSection.attr('data-end');
+				const endSectionTime = this.activeSection.attr('data-end');
 
-				this._activeSection.next().find('.time').text(secondsToTime(endSectionTime - currentTime));
+				if(!this.player.mini) {
+					this.activeSection.next().find('.time').text(secondsToTime(endSectionTime - currentTime));
+				}
 
 				for (let i = 0; i < this.items.length; i++) {
 					const section = this.items[i];
@@ -1131,7 +1156,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 					const item = `
 						<div class="leplayer-section ${!index ? 'leplayer-section--active' : ''}"
 							data-begin="${section.begin}"
-							data-index="${index}"
+							data-index="${index.toString()}"
 							data-end="${section.end}">
 							<div class="leplayer-section-time">${secondsToTime(section.begin)}</div>
 							<div class="leplayer-section-info">
@@ -1299,6 +1324,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 			 * @public
 			 */
 			show() {
+				this.player.mini = true;
 				this.visible = true;
 				this.element.show()
 				this.updateVideoContainer()
@@ -1310,6 +1336,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 			 * @public
 			 */
 			hide() {
+				this.player.mini = false;
 				this.visible = false;
 				this.element.hide();
 				this._resetCSS()
@@ -1387,6 +1414,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 		}
 
+		/* TODO: Вынести все методы в прототип */
 		this.init = function () {
 			// Check if element is correctly selected.
 			if (element.prop('tagName').toLowerCase() != 'video') {
@@ -1567,7 +1595,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 					this.options.keyBinding.forEach(binding => {
 						if( isKeyBinding(e, binding) ) {
 							e.preventDefault();
-							binding.fn(video);
+							binding.fn(player);
 							return false;
 						}
 					})
@@ -1675,6 +1703,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 		return this;
 	};
 
+	Player.prototype.mini = false;
 
 	Player.plugin = function(name, fn) {
 		Player.prototype[name] = fn;
