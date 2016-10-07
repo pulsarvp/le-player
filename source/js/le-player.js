@@ -444,7 +444,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 
 			set source (src) {
-				if(this.source.url === src.url) return;
 				const time = this._video.currentTime;
 				const rate = this._video.playbackRate;
 				const stop = this._video.paused;
@@ -452,6 +451,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				$(this._video).attr('src', src.url);
 
 				this._video = this._ctx[0];
+				this._video.load();
 
 				this._video.playbackRate = rate;
 
