@@ -152,13 +152,8 @@ import ErrorDisplay from './components/ErrorDisplay';
 						if(player.sections == null) {
 							return;
 						}
+						player.sections.prev();
 
-						const sectionIndex = parseInt(player.sections.activeSection.attr('data-index'));
-						const sectionsLength = player.sections.length;
-						const newIndex = sectionIndex <= 0 ? 0 : sectionIndex - 1;
-
-						player.sections.setActiveByIndex(newIndex);
-						player.video.currentTime = player.sections.items[sectionIndex].begin
 					}
 				},
 				{
@@ -170,13 +165,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 						if(player.sections == null) {
 							return;
 						}
-
-						const sectionIndex = parseInt(player.sections.activeSection.attr('data-index'));
-						const sectionsLength = player.sections.length;
-						const newIndex = sectionIndex >= sectionsLength ? sectionsLength : sectionIndex + 1
-
-						player.sections.setActiveByIndex(newIndex);
-						player.video.currentTime = player.sections.items[sectionIndex].end
+						player.sections.next()
 					}
 				},
 				{
@@ -1046,6 +1035,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				this.activeSection = this.getSectionByIndex(0);
 
 				this.items = items;
+				this.length = this.items.length
 
 
 				this.setActiveByIndex(0);
@@ -1060,6 +1050,23 @@ import ErrorDisplay from './components/ErrorDisplay';
 				this.player.on('inited', this.onPlayerInited.bind(this));
 
 				return this;
+			}
+
+			next() {
+				const sectionIndex = parseInt(this.activeSection.attr('data-index'));
+				const newIndex = sectionIndex >= this.length ? this.length : sectionIndex + 1;
+
+				this.setActiveByIndex(newIndex);
+
+				this.player.video.currentTime = this.items[sectionIndex].end;
+			}
+
+			prev() {
+				const sectionIndex = parseInt(this.activeSection.attr('data-index'));
+				const newIndex = sectionIndex <= 0 ? 0 : sectionIndex - 1;
+
+				this.setActiveByIndex(newIndex);
+				this.player.video.currentTime = this.items[newIndex].begin;
 			}
 
 			/**
@@ -1110,7 +1117,9 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 				this.activeSection.addClass('leplayer-section--active');
 				if(!this.player.mini) {
-					this.element.animate({
+					this.element
+						.stop()
+						.animate({
 						scrollTop : this.activeSection.position().top
 					}, 800)
 				}
