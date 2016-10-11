@@ -1,4 +1,6 @@
 @import "variables.less";
+@import "components/play-button.less";
+@import "components/loader-container.less";
 
 
 .leplayer
@@ -27,15 +29,6 @@
 			z-index: @z-index-fullscreen + 6;
 		}
 
-		.play-overlay
-		{
-			z-index: @z-index-fullscreen + 7;
-			color:  @color-fs-active;
-			&:hover
-			{
-				color: @color-fs-active;
-			}
-		}
 		.leplayer-sections
 		{
 			display: block;
@@ -95,29 +88,6 @@
 		}
 	}
 
-	.play-overlay
-	{
-		display: flex;
-		align-items: center;
-		align-content: center;
-		justify-content: center;
-		background: rgba(0, 0, 0, 0.5);
-		color: @color-disabled;
-		cursor: pointer;
-		position: absolute;
-		height: 100%;
-		width: 100%;
-		font-size: 80px;
-		outline: 0;
-		text-align: center;
-		text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-		z-index: @z-index-base + 7;
-		&:hover
-		{
-			background: rgba(0, 0, 0, 0.2);
-			color: @color-active;
-		}
-	}
 
 	&--mini {
 		.leplayer-video {
@@ -169,10 +139,6 @@
 				display: block;
 			}
 		}
-		.play-overlay {
-			font-size: 50px;
-		}
-
 	}
 }
 
@@ -708,18 +674,6 @@
 	}
 }
 
-
-.leplayer-loader-container
-{
-	&:extend(.leplayer .play-overlay);
-}
-
-.fullscreen {
-	.leplayer-loader-container
-	{
-		&:extend(.leplayer.fullscreen .play-overlay);
-	}
-}
 
 .leplayer-sections
 {

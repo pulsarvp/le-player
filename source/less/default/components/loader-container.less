@@ -1,0 +1,25 @@
+.leplayer
+{
+	.leplayer-loader-container
+	{
+		&:extend(.leplayer .leplayer-play-button);
+		display: none;
+	}
+}
+
+.leplayer.fullscreen
+{
+	.leplayer-loader-container
+	{
+		&:extend(.leplayer.fullscreen .leplayer-play-button);
+	}
+}
+
+
+.leplayer--waiting
+{
+	.leplayer-loader-container
+	{
+		display: flex;
+	}
+}

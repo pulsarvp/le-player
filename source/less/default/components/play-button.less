@@ -1,0 +1,53 @@
+.leplayer
+{
+	.leplayer-play-button
+	{
+		display: flex;
+		align-items: center;
+		align-content: center;
+		justify-content: center;
+		background: rgba(0, 0, 0, 0.5);
+		color: @color-disabled;
+		cursor: pointer;
+		position: absolute;
+		height: 100%;
+		width: 100%;
+		font-size: 80px;
+		outline: 0;
+		text-align: center;
+		text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+		z-index: @z-index-base + 7;
+		&:hover
+		{
+			background: rgba(0, 0, 0, 0.2);
+			color: @color-active;
+		}
+	}
+}
+
+.leplayer.fullscreen
+{
+	z-index: @z-index-fullscreen + 7;
+	color:  @color-fs-active;
+	&:hover
+	{
+		color: @color-fs-active;
+	}
+}
+
+.leplayer--mini
+{
+	.leplayer-play-button
+	{
+		font-size: 50px;
+	}
+}
+
+.leplayer--playing,
+.leplayer--error
+{
+	.leplayer-play-button
+	{
+		display: none;
+	}
+}

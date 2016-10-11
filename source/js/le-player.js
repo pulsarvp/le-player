@@ -198,6 +198,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 			onPlayerInited : function() {}
 		};
 
+
 		/**
 		 * Return array with excluded dist's items from source array
 		 *
@@ -224,33 +225,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 				method: 'GET',
 				dataType: 'json'
 			}).promise()
-		}
-
-		this.trigger = (eventName, ...args) => {
-			const event = $.Event(`leplayer_${eventName}`, { player : this})
-			$(element).trigger.call($(element), event, ...args);
-		}
-
-		this.on = (eventName, ...args) => {
-			$(element).on.call($(element), `leplayer_${eventName}`, ...args);
-		}
-
-		this.setError = function(value) {
-			if (value === null) {
-				this._error = null;
-				if(this.errorDisplay) {
-					this.errorDisplay.element.hide()
-				}
-				return;
-			}
-			this._error = new MediaError(value);
-
-			this.trigger('error', { error : this._error});
-		}
-
-		// TODO: Сделать плеер классов и реализовать эти методы через get и set
-		this.getError = function() {
-			return this._error || null;
 		}
 
 
@@ -620,7 +594,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 				} else {
 					dfd.resolve();
 				}
-				//overlay.hide();
 				return dfd.promise();
 			}
 
@@ -635,7 +608,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 				} else {
 					dfd.resolve();
 				}
-				//overlay.show();
 				return dfd.promise();
 			}
 
@@ -726,6 +698,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 					'loadstart' : (e) => {
 						this.player.setError(null);
+						this.player.removeClass('leplayer--ended');
 						this.player.trigger('loadstart');
 					},
 
@@ -764,13 +737,24 @@ import ErrorDisplay from './components/ErrorDisplay';
 					},
 
 					'play' : (e) => {
+						this.player.removeClass('leplayer--ended');
+						this.player.removeClass('leplayer--paused');
+						this.player.addClass('leplayer--playing');
+
+
 						this.player.trigger('play');
-						overlay.hide()
 					},
 
 					'pause' : (e) => {
+						this.player.removeClass('leplayer--playing');
+						this.player.addClass('leplayer--paused');
 						this.player.trigger('pause');
-						overlay.show()
+						//overlay.show()
+					},
+
+					'playing' : (e) => {
+						this.player.removeClass('leplayer--waiting');
+						this.player.trigger('playing');
 					},
 
 					'ratechange' : (e) => {
@@ -778,13 +762,30 @@ import ErrorDisplay from './components/ErrorDisplay';
 					},
 
 					'canplay' : (e) => {
-						loader.hide();
+						//loader.hide();
 						this.player.trigger('canplay');
 					},
 
+					'ended' : (e) => {
+						this.player.addClass('leplayer--ended')
+						if(this.player.options.loop) {
+							this.currentTime(0);
+							this.play();
+						} else if (!this._video.paused) {
+							this.pause();
+						}
+						this.player.trigger('ended');
+					},
+					'canplaythrough' : (e) => {
+						this.player.removeClass('leplayer--waiting');
+						this.player.trigger('canplaythrough');
+					},
+
 					'waiting' : (e) => {
-						loader.show();
+						//loader.show();
+						this.player.addClass('leplayer--waiting');
 						this.player.trigger('waiting');
+						this.player.one('timeupdate', () => this.player.removeClass('leplayer--waiting'));
 					},
 
 					'error' : (e) => {
@@ -1403,29 +1404,12 @@ import ErrorDisplay from './components/ErrorDisplay';
 		 * DOM container to hold video and all other stuff.
 		 * @type object
 		 */
-		var container = null;
-		var overlay = null;
-		var loader = null;
-		var sectionContainer = null;
+		let container = this.element = $('<div />')
+		let playButton = this.playButton = null;
+		let loader = null;
+		let sectionContainer = null;
 		let miniPlayer = null;
 		let videoContainer = null;
-
-		let _createNotification = (opt) => {
-			let notification, closeButton;
-			notification = $('<div />')
-				.addClass('leplayer-notification')
-				.append(opt.text);
-			return notification;
-		}
-
-		var _showNotification = (msg) => {
-			let notification = _createNotification({ text: msg });
-			notification = $('<div />')
-				.addClass('leplayer-notification')
-				.append(msg);
-			container.append(notification);
-
-		}
 
 		/* TODO: Вынести все методы в прототип */
 		this.init = function () {
@@ -1437,10 +1421,10 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 			this.initOptions();
 
-			video = player.video = new Video(element);
 
 			/** TODO: Use promise to async run this */
 			this.initDom();
+			video = player.video = new Video(element);
 			this.initControls();
 			this.initHotKeys();
 			this.initSections().then((data) => {
@@ -1454,8 +1438,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 				}
 				player.trigger('inited');
 
-				// TODO: Вынести это в компонент overlay onPlayerInited
-				overlay.show();
 
 				this.initPlugins();
 			});
@@ -1469,7 +1451,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				if (!this.options.controls.hasOwnProperty(name)) return;
 				const controlCollection = new ControlCollection(player, { name });
 				controls.collections[name] = controlCollection;
-				container.append(controlCollection.element);
+				this.element.append(controlCollection.element);
 			}
 			if (controls.collections.common != null) {
 				controls.collections.common.active = true;
@@ -1554,29 +1536,27 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 
 			// TODO: Вынести это в отдельнеый компонент
-			overlay = $('<div />')
-				.addClass('play-overlay')
+			this.playButton = $('<div />')
+				.addClass('leplayer-play-button')
 				.append(new Icon(player, { iconName : 'play' }).element)
 				.on({
-					'click'	: (e) => { element.trigger('click'); },
+					'click' : (e) => { element.trigger('click'); },
 					'dblclick' : (e) => { element.trigger('dblclick'); }
-				})
-				.hide();
+				});
 
 			loader = $('<div />')
 				.addClass('leplayer-loader-container')
 				.append(new Icon(player, {
 					iconName : 'refresh',
 					className : 'leplayer-icon-spin'
-					}).element)
-				.hide();
+					}).element);
 
 			videoContainer = $('<div />')
 				.addClass('leplayer-video')
-				.append(overlay)
+				.append(this.playButton)
 				.append(loader);
 
-			container = $('<div />')
+			this.element = this.element
 				.addClass('leplayer')
 				.append(videoContainer)
 				.append(this.errorDisplay.element)
@@ -1590,7 +1570,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				sectionContainer = $(options.sectionContainer);
 			}
 
-			element.before(container);
+			element.before(this.element);
 			videoContainer.append(element);
 		};
 
@@ -1602,7 +1582,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 						(!!binding.ctrlKey == e.ctrlKey)
 			}
 
-			$(container).bind('keydown.leplayer.hotkey', (e) => {
+			$(this.element).bind('keydown.leplayer.hotkey', (e) => {
 				const _isFocused = isFocused();
 				if (_isFocused) {
 					this.options.keyBinding.forEach(binding => {
@@ -1706,7 +1686,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 		}
 
 		var isFocused = function () {
-			let focused = $(container).find(':focus');
+			const focused = $(container).find(':focus');
 			return (focused.length > 0) || $(container).is(':focus');
 		}
 
@@ -1716,10 +1696,59 @@ import ErrorDisplay from './components/ErrorDisplay';
 		return this;
 	};
 
+	/**
+	 * @static
+	 */
+	Player.plugin = function(name, fn) {;
+		Player.prototype[name] = fn;
+	}
+
 	Player.prototype.mini = false;
 
-	Player.plugin = function(name, fn) {
-		Player.prototype[name] = fn;
+	Player.prototype.trigger = function(eventName, ...args) {
+		const event = $.Event(`leplayer_${eventName}`, { player : this })
+		this.element.trigger.call(this.element, event, ...args);
+		return this;
+	}
+
+
+	Player.prototype.on = function(eventName, ...args) {
+		this.element.on.call(this.element, `leplayer_${eventName}`, ...args);
+		return this;
+	}
+
+
+	Player.prototype.one = function(eventName, ...args) {
+		this.element.one.call(this.element, `leplayer_${eventName}`, ...args);
+	}
+
+
+	Player.prototype.addClass = function(className) {
+		this.element.addClass(className);
+	}
+
+	Player.prototype.removeClass = function(className) {
+		this.element.removeClass(className);
+	}
+
+	Player.prototype.setError = function(value) {
+		if (value === null) {
+			this._error = null;
+			this.removeClass('leplayer--error');
+			if(this.errorDisplay) {
+				this.errorDisplay.element.hide()
+			}
+			return;
+		}
+		this._error = new MediaError(value);
+
+		this.addClass('leplayer--error');
+		this.trigger('error', { error : this._error});
+	}
+
+	// TODO: Сделать плеер классов и реализовать эти методы через get и set
+	Player.prototype.getError = function() {
+		return this._error || null;
 	}
 
 
