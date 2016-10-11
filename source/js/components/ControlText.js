@@ -41,7 +41,12 @@ class ControlText extends Control {
 	 */
 
 	set text (value) {
+		this._text = value;
 		this.element.html(value);
+	}
+
+	get text () {
+		return this._text
 	}
 }
 

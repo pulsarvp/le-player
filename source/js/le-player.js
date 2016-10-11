@@ -464,14 +464,13 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 				this._video.currentTime = time;
 
+				this._source = src;
+
 				if (stop) {
 					this.pause();
 				} else {
 					this.play();
 				}
-
-				this._source = src;
-				this.player.trigger('changesource', { src : src });
 
 				// @TODO make this right way
 				//setTimeout(() => {
@@ -726,7 +725,12 @@ import ErrorDisplay from './components/ErrorDisplay';
 				mediaElement.on({
 
 					'loadstart' : (e) => {
-						this.player.setError(null)
+						this.player.setError(null);
+						this.player.trigger('loadstart');
+					},
+
+					'durationchange' : (e) => {
+						this.player.trigger('durationchange');
 					},
 
 					'timeupdate' : (e) => {

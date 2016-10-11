@@ -25,10 +25,13 @@ class TimelineControl extends Control {
 		}, options);
 		super(player, options);
 		this.player.on('sectionsinit', this.onSectionsInit.bind(this));
+
 		this.player.on('timeupdate', (e, data) => {
 			const { time, duration } = data;
 			this.hardMove(time / duration);
-		})
+		});
+
+		this.player.on('durationchange', this._onDurationChange.bind(this));
 	}
 
 	/**
@@ -159,11 +162,11 @@ class TimelineControl extends Control {
 
 	createSectionRanges(items) {
 		const duration = this.player.video.duration;
-		let result = $('<div />');
+		let result = $('<div />').addClass('leplayer-timeline-sections');
 		items.forEach((section) => {
 			const length = (section.end - section.begin);
 			const item = $('<div />')
-				.addClass('timeline-section')
+				.addClass('leplayer-timeline-section')
 				.css({
 					width: length / duration * 99 + '%',
 					left: section.begin / duration * 99 + '%'
@@ -178,8 +181,7 @@ class TimelineControl extends Control {
 	}
 
 	/**
-	 * Move marker on timeline without change video.currentTime
-	 *
+	 * Move marker on timeline on percent from argument, not from video.currentTime
 	 * @param {Number} percent The percent which you want to move marker on timeline
 	 */
 	hardMove (percent) {
@@ -191,6 +193,9 @@ class TimelineControl extends Control {
 		this.currentTime.text = secondsToTime(currentTime);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	move () {
 		let video = this.player.video;
 		let percent = (video.currentTime / video.duration * 100).toFixed(2);
@@ -202,16 +207,23 @@ class TimelineControl extends Control {
 	}
 
 
+	updateLabels() {
+		const video = this.player.video;
+		this.totalTime.text = secondsToTime(0, Math.floor(video.duration / 3600) > 0);
+		const width = this.totalTime.element.width();
+		this.totalTime.text = secondsToTime(video.duration);
+		this.currentTime.text = secondsToTime(video.currentTime || 0);
+		this.currentTime.element.css({
+			width
+		})
+	}
 
 	/**
 	 * @override
 	 */
 	onPlayerInited(e) {
 		let video = this.player.video;
-		this.totalTime.text = secondsToTime(video.duration);
-		this.currentTime.element.css({
-			'width' : this.totalTime.element.width()
-		})
+		this.updateLabels();
 		if (this.player.sections) {
 			this.updateSectionRanges(this.player.sections.items);
 		}
@@ -239,6 +251,16 @@ class TimelineControl extends Control {
 			}
 		}
 		this.watchBufferInterval = setInterval(updateProgressBar, 500);
+	}
+
+	/**
+	 * On durationchange event handler
+	 */
+	_onDurationChange () {
+		this.updateLabels();
+		if (this.player.sections) {
+			this.updateSectionRanges(this.player.sections.items);
+		}
 	}
 
 }

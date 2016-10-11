@@ -12,6 +12,7 @@ import ControlContainer from './ControlContainer';
  * @extends ControlConainer
  */
 class SourceControl extends ControlContainer {
+	// TODO: Делать disable/enable после options init
 	constructor (player, options={}) {
 		options = $.extend({}, {
 			name : 'source',

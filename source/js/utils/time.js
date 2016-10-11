@@ -12,18 +12,21 @@
  * @param {Number} seconds Seconds
  * @returns {String}
  */
-export function secondsToTime (seconds) {
+export function secondsToTime (seconds, showHours) {
 	var h = Math.floor(seconds / 3600);
 	var m = Math.floor(seconds % 3600 / 60);
 	var s = Math.floor(seconds % 3600 % 60);
 	var out = '';
-	if (h > 0)
-		out = h + ':';
-	if (m < 10)
-		out += '0';
-	out += m + ':';
-	if (s < 10)
-		out += '0';
-	out += s;
+	if (m < 10) {
+		m = '0' + m;
+	}
+	if (s < 10) {
+		s = '0' + s;
+	}
+	out = `${m}:${s}`;
+
+	if(h > 0 || showHours ) {
+		out = `${h}:` + out
+	}
 	return out;
 };

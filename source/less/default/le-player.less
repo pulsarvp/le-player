@@ -572,7 +572,16 @@
 		width: 0;
 		z-index: @z-index-base + 5;
 	}
-	.timeline-section
+	.leplayer-timeline-sections
+	{
+		overflow-x: hidden;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+	}
+	.leplayer-timeline-section
 	{
 		background: @color-timeline-section-odd;
 		bottom: 0;
@@ -583,7 +592,7 @@
 		width: 0;
 		z-index: @z-index-base + 4;
 	}
-	.timeline-section:nth-child(2n)
+	.leplayer-timeline-section:nth-child(2n)
 	{
 		background: @color-timeline-section-even;
 	}
