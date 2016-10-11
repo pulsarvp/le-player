@@ -1303,7 +1303,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				container.css({
 					'padding-top' : videoContainer.height() + 'px'
 				})
-				container.addClass('leplayer-container--mini');
+				container.addClass('leplayer--mini');
 
 				const height = videoContainer.height();
 
@@ -1353,7 +1353,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				this.visible = false;
 				this.element.hide();
 				this._resetCSS()
-				container.removeClass('leplayer-container--mini');
+				container.removeClass('leplayer--mini');
 				this.element.css({
 					height : ''
 				})
@@ -1577,7 +1577,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				.append(loader);
 
 			container = $('<div />')
-				.addClass('leplayer-container')
+				.addClass('leplayer')
 				.append(videoContainer)
 				.append(this.errorDisplay.element)
 				.attr('tabindex', 0)

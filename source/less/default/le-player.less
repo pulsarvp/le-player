@@ -1,7 +1,7 @@
 @import "variables.less";
 
 
-.leplayer-container
+.leplayer
 {
 	color: @color-text;
 	display: inline-block;
@@ -673,7 +673,7 @@
 }
 
 
-.leplayer-container.fullscreen
+.leplayer.fullscreen
 {
 	.leplayer-error-display
 	{
@@ -711,13 +711,13 @@
 
 .leplayer-loader-container
 {
-	&:extend(.leplayer-container .play-overlay);
+	&:extend(.leplayer .play-overlay);
 }
 
 .fullscreen {
 	.leplayer-loader-container
 	{
-		&:extend(.leplayer-container.fullscreen .play-overlay);
+		&:extend(.leplayer.fullscreen .play-overlay);
 	}
 }
 
