@@ -23,7 +23,22 @@ window.$.lePlayer.plugin('ga', function(pluginOptions) {
 			'event',
 			'Player Sections',
 			'Click',
+			player.getView()
 		)
 	})
+
+
+	player.on('timeupdate', () => {
+		const percent = player.video.playedPercentage;
+		const delta = 5
+		if (Math.abs(percent - 100) < delta) {
+			window.ga(
+				'send',
+				'event',
+				'Player Video Played',
+				'95-100%',
+			)
+		}
+	});
 
 })

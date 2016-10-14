@@ -300,7 +300,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 			showElements () {
 				this.player.trigger('fullscreenchange', true);
-				container.addClass('fullscreen');
+				this.player.setView('fullscreen');
 				controls.fullscreen.show();
 				controls.common.hide();
 
@@ -323,7 +323,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 			hideElements () {
 				this.player.trigger('fullscreenchange', false);
-				container.removeClass('fullscreen');
+				this.player.setView('common');
 				controls.fullscreen.hide();
 				controls.common.show();
 				clearTimeout(this._hideTimeout);
@@ -499,41 +499,20 @@ import ErrorDisplay from './components/ErrorDisplay';
 				return this._video.seekable;
 			}
 
-			get loaded () {
-				let loaded = [];
-				let media = this._video;
-				/** FF4+, Chrome */
-				if (
-					media.buffered &&
-					media.buffered.end &&
-					media.duration > 0
-				) {
-					for (let i = 0; i < media.buffered.length; i++) {
-						let start = media.buffered.start(i) / media.duration;
-						let end = media.buffered.end(i) / media.duration;
-						let segment = [start, end];
-						loaded.push(segment);
-					}
-				}
-				/** Safari 5, Webkit head, FF3.6, Chrome 6, IE 7/8 */
-				else if (
-					media.bytesTotal != null &&
-					media.bytesTotal > 0 &&
-					media.bufferedBytes != null
-				) {
-					loaded.push([0, media.bufferedBytes / media.bytesTotal]);
-				}
-				return loaded;
+			/**
+			 * @return {TimeRanges}
+			 */
+			get played() {
+				return this._video.played;
 			}
 
-			get loadedSize () {
-				const START = 0;
-				const END = 1;
-				let sum = 0
-				this.loaded.forEach(item => {
-					sum += item[END] - item[START];
-				});
-				return sum;
+			get playedPercentage() {
+				let result = 0;
+				for (let i = 0; i < this.played.length; i++) {
+					result += (this.played.end(i) - this.played.start(i))
+				}
+
+				return result / this.duration * 100
 			}
 
 			init () {
@@ -1121,7 +1100,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				this.activeSection = this.getSectionByIndex(index);
 
 				this.activeSection.addClass('leplayer-section--active');
-				if(!this.player.mini) {
+				if(this.player.getView() !== 'mini') {
 					this.element
 						.stop()
 						.animate({
@@ -1143,7 +1122,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 				const endSectionTime = this.activeSection.attr('data-end');
 
-				if(!this.player.mini) {
+				if(this.player.getView() !== 'mini' ) {
 					this.activeSection.next().find('.time').text(secondsToTime(endSectionTime - currentTime));
 				}
 
@@ -1304,7 +1283,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 				container.css({
 					'padding-top' : videoContainer.height() + 'px'
 				})
-				container.addClass('leplayer--mini');
 
 				const height = videoContainer.height();
 
@@ -1338,7 +1316,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 			 * @public
 			 */
 			show() {
-				this.player.mini = true;
+				this.player.setView('mini');
 				this.visible = true;
 				this.element.show()
 				this.updateVideoContainer()
@@ -1350,11 +1328,10 @@ import ErrorDisplay from './components/ErrorDisplay';
 			 * @public
 			 */
 			hide() {
-				this.player.mini = false;
+				this.player.setView('common');
 				this.visible = false;
 				this.element.hide();
 				this._resetCSS()
-				container.removeClass('leplayer--mini');
 				this.element.css({
 					height : ''
 				})
@@ -1703,7 +1680,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 		Player.prototype[name] = fn;
 	}
 
-	Player.prototype.mini = false;
+	Player.prototype._view = 'common';
 
 	Player.prototype.trigger = function(eventName, ...args) {
 		const event = $.Event(`leplayer_${eventName}`, { player : this })
@@ -1729,6 +1706,17 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 	Player.prototype.removeClass = function(className) {
 		this.element.removeClass(className);
+	}
+
+	Player.prototype.setView = function(view) {
+		this.element
+			.removeClass(`leplayer--${this._view}`)
+			.addClass(`leplayer--${view}`);
+		this._view = view;
+	}
+
+	Player.prototype.getView = function() {
+		return this._view
 	}
 
 	Player.prototype.setError = function(value) {
