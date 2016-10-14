@@ -445,12 +445,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 				} else {
 					this.play();
 				}
-
-				// @TODO make this right way
-				//setTimeout(() => {
-					//controls.totalTime = secondsToTime(this._video.duration);
-				//}, 100);
-
 			}
 
 			get source () {
@@ -522,7 +516,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 					.done(() => {
 						this.fullscreen = new Fullscreen();
 						this.fullscreen.init();
-						controls.init();
 						this._initRate();
 						this._initVolume();
 						this.startBuffering();
@@ -765,7 +758,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 		}
 
-		class ControlCollection  extends Component {
+		class ControlCollection extends Component {
 			constructor (player, options) {
 				options = $.extend({}, {
 					controls : player.options.controls[options.name] || [],
@@ -808,34 +801,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 			}
 
-			set download (value) {
-				if (this.has(C_DOWNLOAD)) {
-					this.items.download.link = value;
-				}
-			}
-
-			set rate (value) {
-				if (this.has(C_RATE)) {
-					this.items.rate.value = value;
-				}
-			}
-
-			set source (value) {
-				if (this.has(C_SOURCE)) {
-					this.items.source.set(value);
-				}
-			}
-
-			set totalTime (value) {
-				if (this.has(C_TIMELINE))
-					this.items.timeline.totalTime.text = value;
-			}
-
-			set volume (value) {
-				if (this.has(C_VOLUME))
-					this.items.volume.value = value;
-			}
-
 			set disable (value) {
 				for (let i in this.items) {
 					if (!this.items.hasOwnProperty(i)) continue;
@@ -854,38 +819,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 			has (name) {
 				return (typeof this.items[ name ] == 'object');
-			}
-
-
-			init () {
-				for (let i in this.items) {
-					if (!this.items.hasOwnProperty(i)) continue;
-					$.isFunction(this.items[i].init) && this.items[i].init();
-				}
-				this.initTimeline();
-				//this.download = sources[ 0 ].src;
-			}
-
-			initTimeline () {
-				if (this.has(C_TIMELINE)) {
-					if (this.items.timeline.element.width() < 20)
-						this.items.timeline.element.hide();
-				}
-			}
-
-			moveTimeMarker () {
-				if (this.has(C_TIMELINE))
-					this.items.timeline.move();
-			}
-
-			pause () {
-				if (this.has(C_PLAY))
-					this.items.play.pause();
-			}
-
-			play () {
-				if (this.has(C_PLAY))
-					this.items.play.play();
 			}
 
 			hide () {
@@ -960,16 +893,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 			has (name) {
 				return (typeof this.collections[ name ] == 'object');
-			}
-
-			init () {
-				for (var i in this.collections) {
-					this.collections[ i ].init();
-				}
-				this.collections.common.show();
-				//this.collections.mini.hide();
-				this.collections.fullscreen.hide();
-
 			}
 
 			moveTimeMarker () {
