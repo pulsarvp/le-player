@@ -628,7 +628,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 				let dfd = $.Deferred();
 				if (this._video.readyState > HTMLMediaElement.HAVE_NOTHING) {
 					dfd.resolve()
-					this._onLoadedMetaData();
 					this._textTracksHack();
 				} else {
 					$(this._video).one('loadedmetadata', (e) => {
@@ -662,13 +661,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 				}
 			}
 
-			_onLoadedMetaData (e) {
-				container
-					.css('width', '100%')
-					.css('max-width', (player.options.width || this.width) + 'px');
-				this.player.trigger('loadedmetadata', { video : this._video });
-			}
-
 			_initHtmlEvents () {
 				let mediaElement = $(this._video);
 				let timerId = null;
@@ -689,8 +681,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 						//controls.moveTimeMarker();
 						this.player.trigger('timeupdate', { time : video.currentTime, duration : video.duration });
 					},
-
-					'loadedmetadata' : this._onLoadedMetaData.bind(this),
 
 					'ended' : () => {
 						this.pause();
