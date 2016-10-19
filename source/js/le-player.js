@@ -6,7 +6,7 @@ import Component from './components/Component';
 import Icon from './components/Icon';
 import controlFactory, { C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
-import { secondsToTime } from './utils/time';
+import { secondsToTime } from './utils';
 import MediaError from './MediaError';
 import ErrorDisplay from './components/ErrorDisplay';
 
@@ -679,6 +679,10 @@ import ErrorDisplay from './components/ErrorDisplay';
 						this.pause();
 						this.player.trigger('ended');
 
+					},
+
+					'progress' : () => {
+						this.player.trigger('progress');
 					},
 
 					'dblclick' : () => {

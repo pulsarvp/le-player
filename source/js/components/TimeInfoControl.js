@@ -6,7 +6,7 @@
 import $ from 'jquery';
 import Control from './Control';
 import ControlText from './ControlText';
-import { secondsToTime } from '../utils/time';
+import { secondsToTime } from '../utils';
 
 /**
  * @param {Player} player Main player

@@ -6,7 +6,7 @@
 
 import PlayControl from './components/PlayControl';
 import VolumeControl from './components/VolumeControl';
-import TimelineControl from './components/TimelineControl';
+import TimelineControl from './components/Timeline/TimelineControl';
 import SectionControl from './components/SectionControl';
 import FullscreenControl from './components/FullscreenControl';
 import RateControl from './components/RateControl';

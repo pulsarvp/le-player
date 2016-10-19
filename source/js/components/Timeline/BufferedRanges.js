@@ -17,6 +17,7 @@ class BufferedRanges extends Component {
 
 	constructor(player, options) {
 		super(player, options);
+		this._items = [];
 		this.player.on('progress', this.update.bind(this));
 	}
 
@@ -29,11 +30,33 @@ class BufferedRanges extends Component {
 
 
 	update() {
-		const percentify = (time, end) => {
-			// or zero beacase NaN
-			const percent = (time / end) || 0;
+		const buffered = this.player.video.buffered;
+		const duration = this.player.video.duration;
+		const items = this._items;
+		const html = $('<div>');
+		for(let i = 0; i < buffered.length; i++) {
+			const start = buffered.start(i);
+			const end = buffered.end(i);
+			let item = items[i];
 
-			//return percent >=
+			if(!item) {
+				item = $('<div/>').addClass('leplayer-timeline-buffered__range')
+				items[i] = item;
+				this.element.append(item);
+			}
+
+			item.css({
+				left : percentify(start, duration) * 100 + '%',
+				width : percentify(end - start, duration) * 100 + '%'
+			})
+		}
+
+		console.log(items.length, buffered.length)
+		for(let i = items.length; i > buffered.length; i--) {
+			const item = items[i];
+			console.log(item)
+			item.remove();
+			console.log(item);
 		}
 	}
 }

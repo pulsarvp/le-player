@@ -7,7 +7,7 @@ import $ from 'jquery';
 import Control from '../Control';
 import ControlText from '../ControlText';
 import BufferedRanges from './BufferedRanges.js'
-import { secondsToTime } from '../utils/time';
+import { secondsToTime } from '../../utils';
 
 /**
  * @param {Player} player Main player
@@ -80,7 +80,7 @@ class TimelineControl extends Control {
 
 
 		// Buffered ranges
-		this.bufferedRanges = new BufferedRanges();
+		this.bufferedRanges = new BufferedRanges(this.player).element;
 
 		this.line = $('<div />')
 			.addClass('timeline')

@@ -43,5 +43,5 @@ export function secondsToTime (seconds, showHours) {
 export function percentify (length, end) {
 	// or zero beacase NaN
 	const percent = (length / end ) || 0;
-	return (percent >= 1) : 1 ? percent;
+	return (percent >= 1) ? 1 : percent;
 }
