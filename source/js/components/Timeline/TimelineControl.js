@@ -4,8 +4,9 @@
  */
 
 import $ from 'jquery';
-import Control from './Control';
-import ControlText from './ControlText';
+import Control from '../Control';
+import ControlText from '../ControlText';
+import BufferedRanges from './BufferedRanges.js'
 import { secondsToTime } from '../utils/time';
 
 /**
@@ -44,28 +45,49 @@ class TimelineControl extends Control {
 
 		this.drag = false;
 
+		// Create labels
 		this.currentTime = new ControlText(this.player, { className : 'time-current' });
+		this.currentTime.text = '00:00';
 		this.totalTime = new ControlText(this.player, {className : 'time-total' });
 
-		this.marker = $('<div />').addClass('time-marker');
+		// Create line with markers and played range
 
-		this.markerShadow = $('<div />')
-			.addClass('time-marker shadow')
-			.hide();
-
-		this.markerShadowTime = $('<div />').addClass('time');
+		// Marker of current time on timeline
 		this.markerTime = $('<div />')
 			.addClass('time')
 			.hide();
-		this.played = $('<div />').addClass('time-played');
-		this.buffered = $('<div />')
-		this.currentTime.text = '00:00';
+
+		this.marker = $('<div />')
+			.addClass('time-marker')
+			.append(this.markerTime)
+			.on('mousedown', (e) => {
+				if (e.which !== 1) return;
+				e.preventDefault();
+				this.markerShadow.hide();
+				this.drag = true;
+			});
+
+		// Shadow marker, show on timeline's mousemove
+		this.markerShadowTime = $('<div />').addClass('time');
+
+		this.markerShadow = $('<div />')
+			.addClass('time-marker shadow')
+			.append(this.markerShadowTime)
+			.hide();
+
+		// Played ranges
+		this.playedRanges = $('<div />').addClass('time-played');
+
+
+		// Buffered ranges
+		this.bufferedRanges = new BufferedRanges();
+
 		this.line = $('<div />')
 			.addClass('timeline')
-			.append(this.marker.append(this.markerTime))
-			.append(this.markerShadow.append(this.markerShadowTime))
-			.append(this.played)
-			.append(this.buffered)
+			.append(this.marker)
+			.append(this.markerShadow)
+			.append(this.playedRanges)
+			.append(this.bufferedRanges)
 			.on({
 				'mousemove' : (e) => {
 					if (this.drag) return;
@@ -105,13 +127,6 @@ class TimelineControl extends Control {
 				.append(this.currentTime.element)
 				.append(this.line)
 				.append(this.totalTime.element));
-
-		this.marker.on('mousedown', (e) => {
-			if (e.which !== 1) return;
-			e.preventDefault();
-			this.markerShadow.hide();
-			this.drag = true;
-		});
 
 
 		$(document).on({
@@ -189,7 +204,7 @@ class TimelineControl extends Control {
 		if(isNaN(currentTime)) return;
 		percent = percent * 100;
 		this.marker.css('left', percent + '%');
-		this.played.css('width', percent + '%');
+		this.playedRanges.css('width', percent + '%');
 		this.currentTime.text = secondsToTime(currentTime);
 	}
 
@@ -202,7 +217,7 @@ class TimelineControl extends Control {
 		let currentTime = video.currentTime;
 		if(isNaN(currentTime)) return;
 		this.marker.css('left', percent + '%');
-		this.played.css('width', percent + '%');
+		this.playedRanges.css('width', percent + '%');
 		this.currentTime.text = secondsToTime(currentTime);
 	}
 

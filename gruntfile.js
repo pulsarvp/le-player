@@ -13,6 +13,11 @@ module.exports = function (grunt) {
 				'dist/**/*'
 			]
 		},
+		'http-server': {
+			'dev': {
+				port : 2016,
+			}
+		},
 		webpack : {
 			options : webpackConfig,
 			build : {},
@@ -133,7 +138,8 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-postcss');
 	grunt.loadNpmTasks('grunt-svgstore');
+	grunt.loadNpmTasks('grunt-http-server');
 
-	grunt.registerTask('default', [ 'less:development', 'webpack:build-dev', 'concat', 'svgstore', 'watch' ]);
+	grunt.registerTask('default', [ 'less:development', 'webpack:build-dev', 'concat', 'svgstore', 'watch']);
 	grunt.registerTask('production', [ 'clean', 'less', 'postcss', 'concat', 'svgstore', 'webpack:build', 'uglify' ]);
 };

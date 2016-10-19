@@ -6,10 +6,11 @@
  */
 
 /**
- * Convert seconds to format string 'hh:mm:ss'
+ * Convert seconds to format string 'hh?:mm:ss'
  *
  * @access public
  * @param {Number} seconds Seconds
+ * @param {Boolean} showHours convert to format 'hh:mm:ss'
  * @returns {String}
  */
 export function secondsToTime (seconds, showHours) {
@@ -30,3 +31,17 @@ export function secondsToTime (seconds, showHours) {
 	}
 	return out;
 };
+
+
+/**
+ * Return length / end
+ *
+ * @access public
+ * @param {Number} length
+ * @param {Nubmer} end
+ */
+export function percentify (length, end) {
+	// or zero beacase NaN
+	const percent = (length / end ) || 0;
+	return (percent >= 1) : 1 ? percent;
+}
