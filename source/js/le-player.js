@@ -6,7 +6,7 @@ import Component from './components/Component';
 import Icon from './components/Icon';
 import controlFactory, { C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
-import { secondsToTime } from './utils';
+import { secondsToTime, createEl } from './utils';
 import MediaError from './MediaError';
 import ErrorDisplay from './components/ErrorDisplay';
 
@@ -73,7 +73,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 		const C_SUBTITLE = 'subtitle';
 		const C_TIMELINE = 'timeline';
 		const C_VOLUME = 'volume';
-		const C_SECTION = "section"
+		const C_SECTION = "section";
 
 		var player = this;
 		const defaultOptions = {
@@ -195,6 +195,15 @@ import ErrorDisplay from './components/ErrorDisplay';
 					}
 				}
 			],
+			miniplayer : {
+				width: '100%',
+				offsetShow : (player) => {
+					// 80px - it's height of common controls container
+					const offset = player.element.offset().top + player.element.outerHeight() - 80;
+
+					return offset;
+				}
+			},
 			onPlayerInited : function() {}
 		};
 
@@ -1102,62 +1111,43 @@ import ErrorDisplay from './components/ErrorDisplay';
 		 */
 		class MiniPlayer extends Component {
 			constructor (player, options ) {
-				let width;
-				if (player.options.miniplayer) {
-					width = player.options.miniplayer.width;
-				}
+				// Merge options
 				options = $.extend({}, {
 					visible : false,
-					width
-				}, options);
+				}, player.options.miniplayer, options);
 
 				super(player, options);
+
+				if(this.options.width != null) {
+					console.warn('miniplayer.width is deprecated option. Now uses CSS for this')
+				}
+
 				if (!options.visible) {
 					this.hide();
 				}
 
-				container.append(this.element);
-
 				const self = this;
 				$(window).scroll(function(e) {
 					const scrollTop = $(this).scrollTop();
-					const centerVideo = container.offset().top + container.outerHeight() / 2;
 
-					if(scrollTop > centerVideo) {
-						if(!miniPlayer.visible) {
-							self.show();
-
-						}
+					if(scrollTop > self.offsetShow) {
+						self.show();
 					} else {
 						self.hide();
 					}
 				})
 
-				$(window).resize(() => {
-					if(this.visible) {
-						this.updateVideoContainer();
-					}
-				})
-
-				this.player.on('sectionsinit', this._onSectionsInit.bind(this));
-
 				this.player.on('fullscreenchange', this._onFullscreenChange.bind(this));
 			};
 
-			/**
-			 * @override
-			 */
-			onPlayerInited(e) {
-				if(this.visible) {
-					this.updateVideoContainer();
+			get offsetShow() {
+				if ($.isFunction(this.options.offsetShow)) {
+					return this.options.offsetShow(player);
 				}
+
+				return this.options.offsetShow
 			}
 
-			_onSectionsInit(e, data) {
-				if(this.visible) {
-					this.updateVideoContainer();
-				}
-			}
 
 			_onFullscreenChange(e, data) {
 				if (data == true) {
@@ -1165,66 +1155,12 @@ import ErrorDisplay from './components/ErrorDisplay';
 				}
 			}
 
-			/**
-			 * Reset jquery CSS for container and video-container
-			 *
-			 * @private
-			 */
-			_resetCSS() {
-				container.css({
-					'padding-top' : ''
-				})
-
-				videoContainer.css({
-					'left' : '',
-					'transform' : '',
-					'margin' : ''
-				})
-
-				if(this.player.sections) {
-					this.player.sections.element.css({
-						'left' : ''
-					})
-				}
-			}
-
 			get height() {
-				return this._height || (this._height = videoContainer.height);
+				return this.player.element.height();
 			}
 
-			/**
-			 * Move video container under the miniplayer
-			 */
-			updateVideoContainer() {
-				const sections = this.player.sections;
-				container.css({
-					'padding-top' : videoContainer.height() + 'px'
-				})
-
-				const height = videoContainer.height();
-
-				this.element.css({
-					height
-				});
-
-				const videoWidth = videoContainer.width()
-				videoContainer.css({
-					'transform': `translateX(${(videoWidth / 2) - this.element.width() / 2}px)`
-				})
-				this.element.find('.leplayer-miniplayer__info').css({
-					'margin-left' : videoWidth + 'px'
-				})
-
-
-				if(sections) {
-					sections.element.css({
-						left : this.element.width() + 'px'
-					})
-
-					this.element.find('.leplayer-miniplayer__info').css({
-						'margin-right' : sections.element.width() + 'px'
-					})
-				}
+			get width() {
+				return this.options.width || this.player.element.width()
 			}
 
 			/**
@@ -1233,10 +1169,13 @@ import ErrorDisplay from './components/ErrorDisplay';
 			 * @public
 			 */
 			show() {
-				this.player.setView('mini');
+				if (this.visible == true) {
+					return;
+				}
 				this.visible = true;
-				this.element.show()
-				this.updateVideoContainer()
+				this.player.innerElement.css('max-width', this.width);
+				this.player.element.css('padding-top', this.player.videoContainer.height());
+				this.player.setView('mini');
 			}
 
 			/**
@@ -1245,43 +1184,25 @@ import ErrorDisplay from './components/ErrorDisplay';
 			 * @public
 			 */
 			hide() {
+				if(this.visible == false) {
+					return;
+				}
 				this.player.setView('common');
+
+				this.player.innerElement.css('max-width', '')
+				// Added empty space
+				this.player.element.css('padding-top', '');
 				this.visible = false;
-				this.element.hide();
-				this._resetCSS()
-				this.element.css({
-					height : ''
-				})
 			}
 
 			/**
 			 * @override
 			 */
 			createElement() {
-				const { title = '', videoInfo = '' } = this.player.options;
 				const controls = new ControlCollection(player, { name : 'mini' });
-				const html = `
-					<div class="leplayer-miniplayer">
-						<div class="leplayer-miniplyaer__container">
-						</div>
-						<div class="leplayer-miniplayer__info">
-							<div class="leplayer-miniplayer__title">${title}</div>
-							<div class="leplayer-miniplayer__video-info">${videoInfo}</div>
-
-							<div class="leplayer-miniplayer__controls">
-							</div>
-						</div>
-						<div class="leplayer-miniplayer__section">
-						</div>
-					</div>
-				`.trim();
-
-				this.element = $('<div/>').html(html).contents();
-				this.element.find('.leplayer-miniplayer__controls').append(controls.element);
-				this.element.css({
-					'max-width' : this.options.width
-				})
-				return this.element;
+				return this.element = createEl('div', {
+					className : 'leplayer-miniplayer'
+				}).append(controls.element)
 			}
 		}
 
@@ -1298,12 +1219,14 @@ import ErrorDisplay from './components/ErrorDisplay';
 		 * DOM container to hold video and all other stuff.
 		 * @type object
 		 */
+
+		// TODO : Remove this global vars
 		let container = this.element = $('<div />')
 		let playButton = this.playButton = null;
 		let loader = null;
 		let sectionContainer = null;
-		let miniPlayer = null;
-		let videoContainer = null;
+		let videoContainer = this.videoContainer = null;
+		this.innerElement = $('<div />')
 
 		/* TODO: Вынести все методы в прототип */
 		this.init = function () {
@@ -1327,12 +1250,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 			});
 			video.init().then(() => {
 				const dfd = $.Deferred()
-				if(options.miniplayer) {
-					miniPlayer = new MiniPlayer(player);
-				}
 				player.trigger('inited');
-
-
 				this.initPlugins();
 			});
 
@@ -1378,7 +1296,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 						fullscreenOnly : isSectionOutside,
 					});
 
-					videoContainer.append(sections.element);
+					this.innerElement.append(sections.element);
 
 					if (isSectionOutside) {
 						const outsideSections = new Sections(player, {
@@ -1445,14 +1363,38 @@ import ErrorDisplay from './components/ErrorDisplay';
 					className : 'leplayer-icon-spin'
 					}).element);
 
-			videoContainer = $('<div />')
-				.addClass('leplayer-video')
-				.append(this.playButton)
-				.append(loader);
+			this.videoContainer = createEl('div', {
+				className : 'leplayer-video'
+			})
+			.append(this.playButton)
+			.append(loader);
+
+			if(options.miniplayer) {
+				this.miniPlayer = new MiniPlayer(player)
+			}
+
+			this.innerElement = $('<div />')
+				.addClass('leplayer__inner')
+				.append(this.videoContainer)
+				.append(createEl('div', {
+						className : 'leplayer__info'
+					})
+					.append(createEl('div', {
+							className : 'leplayer__title',
+							text : this.options.title || ""
+						}))
+					.append(createEl('div', {
+							className : 'leplayer__video-info',
+							text : this.options.videoInfo || ""
+						}))
+					.append(this.miniPlayer && this.miniPlayer.element)
+				)
+				//.append($('leplayer__video-info')
+					//.text(this.options.videoInfo || ""))
 
 			this.element = this.element
 				.addClass('leplayer')
-				.append(videoContainer)
+				.append(this.innerElement)
 				.append(this.errorDisplay.element)
 				.attr('tabindex', 0)
 				//.css('width', element.width() + 'px');
@@ -1465,7 +1407,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 			}
 
 			element.before(this.element);
-			videoContainer.append(element);
+			this.videoContainer.append(element);
 		};
 
 		this.initHotKeys = function () {
@@ -1628,7 +1570,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 	Player.prototype.setView = function(view) {
 		this.element
 			.removeClass(`leplayer--${this._view}`)
-			.addClass(`leplayer--${view}`);
+			.addClass(`leplayer--${view}`)
 		this._view = view;
 	}
 

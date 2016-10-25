@@ -25,13 +25,10 @@
 	}
 }
 
-.leplayer.leplayer--fullscreen
+.leplayer--fullscreen
 {
-	z-index: @z-index-fullscreen + 7;
-	color:  @color-fs-active;
-	&:hover
-	{
-		color: @color-fs-active;
+	.leplayer-play-button {
+		z-index: @z-index-fullscreen + 7;
 	}
 }
 

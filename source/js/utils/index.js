@@ -45,3 +45,12 @@ export function percentify (length, end) {
 	const percent = (length / end ) || 0;
 	return (percent >= 1) ? 1 : percent;
 }
+
+
+export function createEl(tag='div', props) {
+	if(props.className) {
+		props["class"] = props.className;
+		delete props.className;
+	}
+	return $(`<${tag}/>`, props);
+}
