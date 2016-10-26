@@ -4,9 +4,10 @@
  */
 
 import $ from 'jquery';
-import Control from './Control';
-import ControlText from './ControlText';
-import { secondsToTime } from '../utils/time';
+import Control from '../Control';
+import ControlText from '../ControlText';
+import BufferedRanges from './BufferedRanges.js'
+import { secondsToTime } from '../../utils';
 
 /**
  * @param {Player} player Main player
@@ -25,10 +26,13 @@ class TimelineControl extends Control {
 		}, options);
 		super(player, options);
 		this.player.on('sectionsinit', this.onSectionsInit.bind(this));
+
 		this.player.on('timeupdate', (e, data) => {
 			const { time, duration } = data;
 			this.hardMove(time / duration);
-		})
+		});
+
+		this.player.on('durationchange', this._onDurationChange.bind(this));
 	}
 
 	/**
@@ -41,28 +45,49 @@ class TimelineControl extends Control {
 
 		this.drag = false;
 
+		// Create labels
 		this.currentTime = new ControlText(this.player, { className : 'time-current' });
+		this.currentTime.text = '00:00';
 		this.totalTime = new ControlText(this.player, {className : 'time-total' });
 
-		this.marker = $('<div />').addClass('time-marker');
+		// Create line with markers and played range
 
-		this.markerShadow = $('<div />')
-			.addClass('time-marker shadow')
-			.hide();
-
-		this.markerShadowTime = $('<div />').addClass('time');
+		// Marker of current time on timeline
 		this.markerTime = $('<div />')
 			.addClass('time')
 			.hide();
-		this.played = $('<div />').addClass('time-played');
-		this.buffered = $('<div />')
-		this.currentTime.text = '00:00';
+
+		this.marker = $('<div />')
+			.addClass('time-marker')
+			.append(this.markerTime)
+			.on('mousedown', (e) => {
+				if (e.which !== 1) return;
+				e.preventDefault();
+				this.markerShadow.hide();
+				this.drag = true;
+			});
+
+		// Shadow marker, show on timeline's mousemove
+		this.markerShadowTime = $('<div />').addClass('time');
+
+		this.markerShadow = $('<div />')
+			.addClass('time-marker shadow')
+			.append(this.markerShadowTime)
+			.hide();
+
+		// Played ranges
+		this.playedRanges = $('<div />').addClass('time-played');
+
+
+		// Buffered ranges
+		this.bufferedRanges = new BufferedRanges(this.player).element;
+
 		this.line = $('<div />')
 			.addClass('timeline')
-			.append(this.marker.append(this.markerTime))
-			.append(this.markerShadow.append(this.markerShadowTime))
-			.append(this.played)
-			.append(this.buffered)
+			.append(this.marker)
+			.append(this.markerShadow)
+			.append(this.playedRanges)
+			.append(this.bufferedRanges)
 			.on({
 				'mousemove' : (e) => {
 					if (this.drag) return;
@@ -102,13 +127,6 @@ class TimelineControl extends Control {
 				.append(this.currentTime.element)
 				.append(this.line)
 				.append(this.totalTime.element));
-
-		this.marker.on('mousedown', (e) => {
-			if (e.which !== 1) return;
-			e.preventDefault();
-			this.markerShadow.hide();
-			this.drag = true;
-		});
 
 
 		$(document).on({
@@ -159,11 +177,11 @@ class TimelineControl extends Control {
 
 	createSectionRanges(items) {
 		const duration = this.player.video.duration;
-		let result = $('<div />');
+		let result = $('<div />').addClass('leplayer-timeline-sections');
 		items.forEach((section) => {
 			const length = (section.end - section.begin);
 			const item = $('<div />')
-				.addClass('timeline-section')
+				.addClass('leplayer-timeline-section')
 				.css({
 					width: length / duration * 99 + '%',
 					left: section.begin / duration * 99 + '%'
@@ -178,38 +196,49 @@ class TimelineControl extends Control {
 	}
 
 	/**
-	 * Move marker on timeline without change video.currentTime
-	 *
+	 * Move marker on timeline on percent from argument, not from video.currentTime
 	 * @param {Number} percent The percent which you want to move marker on timeline
 	 */
 	hardMove (percent) {
 		let currentTime = this.player.video.duration * percent;
+		if(isNaN(currentTime)) return;
 		percent = percent * 100;
 		this.marker.css('left', percent + '%');
-		this.played.css('width', percent + '%');
+		this.playedRanges.css('width', percent + '%');
 		this.currentTime.text = secondsToTime(currentTime);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	move () {
 		let video = this.player.video;
 		let percent = (video.currentTime / video.duration * 100).toFixed(2);
 		let currentTime = video.currentTime;
+		if(isNaN(currentTime)) return;
 		this.marker.css('left', percent + '%');
-		this.played.css('width', percent + '%');
+		this.playedRanges.css('width', percent + '%');
 		this.currentTime.text = secondsToTime(currentTime);
 	}
 
 
+	updateLabels() {
+		const video = this.player.video;
+		this.totalTime.text = secondsToTime(0, Math.floor(video.duration / 3600) > 0);
+		const width = this.totalTime.element.width();
+		this.totalTime.text = secondsToTime(video.duration);
+		this.currentTime.text = secondsToTime(video.currentTime || 0);
+		this.currentTime.element.css({
+			width
+		})
+	}
 
 	/**
 	 * @override
 	 */
 	onPlayerInited(e) {
 		let video = this.player.video;
-		this.totalTime.text = secondsToTime(video.duration);
-		this.currentTime.element.css({
-			'width' : this.totalTime.element.width()
-		})
+		this.updateLabels();
 		if (this.player.sections) {
 			this.updateSectionRanges(this.player.sections.items);
 		}
@@ -237,6 +266,16 @@ class TimelineControl extends Control {
 			}
 		}
 		this.watchBufferInterval = setInterval(updateProgressBar, 500);
+	}
+
+	/**
+	 * On durationchange event handler
+	 */
+	_onDurationChange () {
+		this.updateLabels();
+		if (this.player.sections) {
+			this.updateSectionRanges(this.player.sections.items);
+		}
 	}
 
 }

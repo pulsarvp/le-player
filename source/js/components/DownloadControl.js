@@ -23,7 +23,7 @@ class DownloadControl extends Control {
 			name : 'download'
 		}, options);
 		super(player, options);
-		this.player.on('loadedmetadata', this.onLoadedMetaData.bind(this));
+		this.player.on('loadstart', this.onLoadStart.bind(this));
 	}
 
 
@@ -68,8 +68,8 @@ class DownloadControl extends Control {
 	}
 
 
-	onLoadedMetaData(e, data) {
-		this.link = data.video.currentSrc;
+	onLoadStart(e, data) {
+		this.link = this.player.video.source.url
 	}
 
 }

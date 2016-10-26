@@ -33,7 +33,7 @@ class ErrorDisplay extends Component {
 	}
 
 	set message(value) {
-		this.element.append(value);
+		this.element.html(value);
 	}
 
 	onPlayerError(e, data) {
