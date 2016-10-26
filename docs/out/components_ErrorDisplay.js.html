@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>components/SourceControl.js - Documentation</title>
+    <title>components/ErrorDisplay.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">components/SourceControl.js</h1>
+    <h1 class="page-title">components/ErrorDisplay.js</h1>
     
 
     
@@ -40,72 +40,50 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 /**
- * @file SourceControl.js
+ * @file ErrorDisplay.js
  */
+
 
 import $ from 'jquery';
-import ControlContainer from './ControlContainer';
+import Component from './Component';
 
 /**
- * @class SourceControl
  * @param {Player} player Main player
- * @extends ControlConainer
+ * @param {Object} [options]
+ * @class ErrorDisplay
+ * @extends Component
  */
-class SourceControl extends ControlContainer {
-	// TODO: Делать disable/enable после options init
-	constructor (player, options={}) {
-		options = $.extend({}, {
-			name : 'source',
-			iconName : 'bullseye',
-			title : 'Качество',
-			className : 'source-control',
-			disable : true
-		}, options);
+class ErrorDisplay extends Component {
+
+	constructor(player, options={}) {
 		super(player, options);
+		if(this.player._error != null) {
+			this.message = this.player._error.message;
+			this.element.show();
+		}
+		this.player.on('error', this.onPlayerError.bind(this));
 	}
 
 	/**
 	 * @override
 	 */
-	onClick (e) {
-		super.onClick(e);
-		let item = $(e.target);
-		const defaultItem = this.getByIndex(0);
-
-		this.player.video.source = {
-			url : defaultItem.data('url'),
-			title : defaultItem.data('title')
-		}
-		this.active = defaultItem;
-
+	createElement() {
+		this.element = $('&lt;div />')
+			.addClass('leplayer-error-display')
 	}
 
-	onItemClick(e) {
-		super.onItemClick(e);
-		let item = $(e.target);
-		this.player.video.source = {
-			url : item.data('url'),
-			title : item.data('title')
-		}
-
+	set message(value) {
+		this.element.html(value);
 	}
 
-	onPlayerInited(e, data) {
-		const sources = this.player.options.sources;
-		if (sources.length > 1) {
-			sources.forEach(item => {
-				this.addItem(item.title, {
-					url : item.url,
-					title : item.title
-				})
-			})
-			this.setActiveByIndex(0);
-			this.disable = false;
-		}
+	onPlayerError(e, data) {
+		const error = data.error;
+		this.message = error.message;
+		this.element.show();
 	}
 }
 
-export default SourceControl;
+export default ErrorDisplay;
 </code></pre>
         </article>
     </section>

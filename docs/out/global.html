@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>components/SourceControl.js - Documentation</title>
+    <title>Global - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,87 +28,345 @@
 
 <div id="main">
     
-    <h1 class="page-title">components/SourceControl.js</h1>
+    <h1 class="page-title">Global</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>'use strict';
-/**
- * @file SourceControl.js
- */
+        <h2>
+        
+        </h2>
+        
+    
+</header>
 
-import $ from 'jquery';
-import ControlContainer from './ControlContainer';
+<article>
+    <div class="container-overview">
+    
+        
 
-/**
- * @class SourceControl
- * @param {Player} player Main player
- * @extends ControlConainer
- */
-class SourceControl extends ControlContainer {
-	// TODO: Делать disable/enable после options init
-	constructor (player, options={}) {
-		options = $.extend({}, {
-			name : 'source',
-			iconName : 'bullseye',
-			title : 'Качество',
-			className : 'source-control',
-			disable : true
-		}, options);
-		super(player, options);
-	}
+        
 
-	/**
-	 * @override
-	 */
-	onClick (e) {
-		super.onClick(e);
-		let item = $(e.target);
-		const defaultItem = this.getByIndex(0);
 
-		this.player.video.source = {
-			url : defaultItem.data('url'),
-			title : defaultItem.data('title')
-		}
-		this.active = defaultItem;
+<dl class="details">
 
-	}
+    
 
-	onItemClick(e) {
-		super.onItemClick(e);
-		let item = $(e.target);
-		this.player.video.source = {
-			url : item.data('url'),
-			title : item.data('title')
-		}
+    
 
-	}
+    
 
-	onPlayerInited(e, data) {
-		const sources = this.player.options.sources;
-		if (sources.length > 1) {
-			sources.forEach(item => {
-				this.addItem(item.title, {
-					url : item.url,
-					title : item.title
-				})
-			})
-			this.setActiveByIndex(0);
-			this.disable = false;
-		}
-	}
-}
+    
 
-export default SourceControl;
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="element"><span class="type-signature"></span>element<span class="type-signature"> :object</span></h4>
+
+
+
+
+<div class="description">
+    DOM container to hold video and all other stuff.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="le-player.js.html">le-player.js</a>, <a href="le-player.js.html#line240">line 240</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="excludeArray"><span class="type-signature"></span>excludeArray<span class="signature">(source, dist)</span><span class="type-signature"> &rarr; {Array}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Return array with excluded dist's items from source array
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>source</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dist</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="le-player.js.html">le-player.js</a>, <a href="le-player.js.html#line27">line 27</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

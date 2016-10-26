@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>components/SourceControl.js - Documentation</title>
+    <title>components/Sections.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">components/SourceControl.js</h1>
+    <h1 class="page-title">components/Sections.js</h1>
     
 
     
@@ -40,72 +40,198 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 /**
- * @file SourceControl.js
+ * @file Sections.js
  */
 
 import $ from 'jquery';
-import ControlContainer from './ControlContainer';
+import Component from './Component';
+
+import { secondsToTime } from '../utils';
 
 /**
- * @class SourceControl
+ * @class Sections
  * @param {Player} player Main player
- * @extends ControlConainer
+ * @param {Object} [options]
+ * @param {Array} [options.items=[]} Data for sections
+ * @param {Boolean} [options.fullscreenOnly] Show section only in fullscreen
+ * @param {Boolean} [options.main=true] Main sections of player
+ * @extends Component
  */
-class SourceControl extends ControlContainer {
-	// TODO: Делать disable/enable после options init
-	constructor (player, options={}) {
-		options = $.extend({}, {
-			name : 'source',
-			iconName : 'bullseye',
-			title : 'Качество',
-			className : 'source-control',
-			disable : true
-		}, options);
-		super(player, options);
+class Sections extends Component {
+	constructor(player, options) {
+		let { items = [], main = true } = options;
+		items = [].concat(items);
+
+
+		//options.items = items;
+
+		super(player, options)
+		this.activeSection = this.getSectionByIndex(0);
+
+		this.items = items;
+		this.length = this.items.length
+
+
+		this.setActiveByIndex(0);
+
+		this.element.find('.leplayer-section').on('click', this.onSectionClick.bind(this));
+
+		this.player.on('sectionstoggle', this._onSectionsToggle.bind(this));
+
+		this.player.on('timeupdate', this.onTimeUpdate.bind(this));
+
+		//this.player.trigger('sectionsinit', { items : this.items, sections : this });
+		this.player.on('inited', this.onPlayerInited.bind(this));
+
+		return this;
+	}
+
+	next() {
+		const sectionIndex = parseInt(this.activeSection.attr('data-index'));
+		const newIndex = sectionIndex >= this.length ? this.length : sectionIndex + 1;
+
+		this.setActiveByIndex(newIndex);
+
+		this.player.video.currentTime = this.items[sectionIndex].end;
+	}
+
+	prev() {
+		const sectionIndex = parseInt(this.activeSection.attr('data-index'));
+		const newIndex = sectionIndex &lt;= 0 ? 0 : sectionIndex - 1;
+
+		this.setActiveByIndex(newIndex);
+		this.player.video.currentTime = this.items[newIndex].begin;
 	}
 
 	/**
 	 * @override
 	 */
-	onClick (e) {
-		super.onClick(e);
-		let item = $(e.target);
-		const defaultItem = this.getByIndex(0);
-
-		this.player.video.source = {
-			url : defaultItem.data('url'),
-			title : defaultItem.data('title')
+	createElement() {
+		this.element = $('&lt;div />').addClass('leplayer-sections');
+		if(this.options.fullscreenOnly) {
+			this.element.addClass('leplayer-sections--fsonly');
 		}
-		this.active = defaultItem;
-
+		this.element.append(this._createSections(this.options.items));
+		return this.element;
 	}
 
-	onItemClick(e) {
-		super.onItemClick(e);
-		let item = $(e.target);
-		this.player.video.source = {
-			url : item.data('url'),
-			title : item.data('title')
-		}
+	/**
+	 * @override
+	 */
+	onPlayerInited() {
 
+		if(this.items != null &amp;&amp; this.items.length > 0 ) {
+			this.items[this.items.length - 1].end = this.player.video.duration;
+		}
 	}
 
-	onPlayerInited(e, data) {
-		const sources = this.player.options.sources;
-		if (sources.length > 1) {
-			sources.forEach(item => {
-				this.addItem(item.title, {
-					url : item.url,
-					title : item.title
-				})
-			})
-			this.setActiveByIndex(0);
-			this.disable = false;
+
+
+	onSectionClick(e) {
+		const video = this.player.video;
+		const section = $(e.target).closest('.leplayer-section');
+		video.currentTime = section.attr('data-begin');
+		this.player.trigger('sectionsclick', { section : this.items[section.attr('data-index')]});
+	}
+
+	setActiveByIndex(index) {
+		if (this.activeSection.length == 0) {
+			return
 		}
+		if (this.activeSection.attr('data-index') == index) {
+			return
+		}
+
+		if (this.getSectionByIndex(index).length == 0) {
+			return
+		}
+
+		this.activeSection.removeClass('leplayer-section--active');
+
+		this.activeSection = this.getSectionByIndex(index);
+
+		this.activeSection.addClass('leplayer-section--active');
+		if(this.player.getView() !== 'mini') {
+			this.element
+				.stop()
+				.animate({
+				scrollTop : this.activeSection.position().top
+			}, 800)
+		}
+	}
+
+	getSectionByIndex(index) {
+		return this.element.find(`.leplayer-section[data-index="${index}"]`);
+	}
+
+
+	onTimeUpdate(e, data) {
+		if (this.activeSection.length == 0) {
+			return
+		}
+		const currentTime = data.time;
+
+		const endSectionTime = this.activeSection.attr('data-end');
+
+		// Update span with end section time
+		if(this.player.getView() === 'mini' ) {
+			this.activeSection
+				.next()
+				.find('.time')
+				.text(secondsToTime(endSectionTime - currentTime));
+		}
+
+		for (let i = 0; i &lt; this.items.length; i++) {
+			const section = this.items[i];
+			if (currentTime &lt; section.end) {
+				this.setActiveByIndex(i);
+				break;
+			}
+		}
+	}
+
+	_onSectionsToggle(e, data) {
+		if (this.element.hasClass('leplayer-sections--hidden')) {
+			this.element.removeClass('leplayer-sections--hidden');
+		} else {
+			this.element.addClass('leplayer-sections--hidden');
+		}
+	}
+
+	_createSections(items) {
+		let result = '';
+		items.forEach((section, index) => {
+			const item = `
+				&lt;div class="leplayer-section ${!index ? 'leplayer-section--active' : ''}"
+					data-begin="${section.begin}"
+					data-index="${index.toString()}"
+					data-end="${section.end}">
+					&lt;div class="leplayer-section-time">${secondsToTime(section.begin)}&lt;/div>
+					&lt;div class="leplayer-section-info">
+						&lt;div class="leplayer-section-next-info">
+							Следующая секция начнется через
+							&lt;span class="time">${secondsToTime(items[0].end)}&lt;/span>
+						&lt;/div>
+						${
+							section.title != null ?
+								`&lt;div class="leplayer-section-title">${section.title}&lt;/div>`
+							: ''
+						}
+						${
+							section.description != null ?
+								`&lt;div class="leplayer-section-description">${section.description}&lt;/div>`
+							: ''
+						}
+					&lt;/div>
+				&lt;/div>
+			`.trim()
+			result += item;
+		});
+		return result;
 	}
 }
 
-export default SourceControl;
+export default Sections;
 </code></pre>
         </article>
     </section>

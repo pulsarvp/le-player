@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>components/SourceControl.js - Documentation</title>
+    <title>ErrorDisplay - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,87 +28,401 @@
 
 <div id="main">
     
-    <h1 class="page-title">components/SourceControl.js</h1>
+    <h1 class="page-title">ErrorDisplay</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>'use strict';
-/**
- * @file SourceControl.js
- */
+        <h2>
+        ErrorDisplay
+        </h2>
+        
+    
+</header>
 
-import $ from 'jquery';
-import ControlContainer from './ControlContainer';
+<article>
+    <div class="container-overview">
+    
+        
 
-/**
- * @class SourceControl
- * @param {Player} player Main player
- * @extends ControlConainer
- */
-class SourceControl extends ControlContainer {
-	// TODO: Делать disable/enable после options init
-	constructor (player, options={}) {
-		options = $.extend({}, {
-			name : 'source',
-			iconName : 'bullseye',
-			title : 'Качество',
-			className : 'source-control',
-			disable : true
-		}, options);
-		super(player, options);
-	}
+    
 
-	/**
-	 * @override
-	 */
-	onClick (e) {
-		super.onClick(e);
-		let item = $(e.target);
-		const defaultItem = this.getByIndex(0);
+    <h4 class="name" id="ErrorDisplay"><span class="type-signature"></span>new ErrorDisplay<span class="signature">(player, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
-		this.player.video.source = {
-			url : defaultItem.data('url'),
-			title : defaultItem.data('title')
-		}
-		this.active = defaultItem;
+    
 
-	}
 
-	onItemClick(e) {
-		super.onItemClick(e);
-		let item = $(e.target);
-		this.player.video.source = {
-			url : item.data('url'),
-			title : item.data('title')
-		}
 
-	}
 
-	onPlayerInited(e, data) {
-		const sources = this.player.options.sources;
-		if (sources.length > 1) {
-			sources.forEach(item => {
-				this.addItem(item.title, {
-					url : item.url,
-					title : item.title
-				})
-			})
-			this.setActiveByIndex(0);
-			this.disable = false;
-		}
-	}
-}
 
-export default SourceControl;
-</code></pre>
-        </article>
-    </section>
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>player</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Player.html">Player</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Main player</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_ErrorDisplay.js.html">components/ErrorDisplay.js</a>, <a href="components_ErrorDisplay.js.html#line10">line 10</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="Component.html">Component</a></li>
+    </ul>
+
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="buildCSSClass"><span class="type-signature">(abstract) </span>buildCSSClass<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="Component.html#buildCSSClass">Component#buildCSSClass</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_component.js.html">components/component.js</a>, <a href="components_component.js.html#line47">line 47</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="createElement"><span class="type-signature"></span>createElement<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="Component.html#createElement">Component#createElement</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_ErrorDisplay.js.html">components/ErrorDisplay.js</a>, <a href="components_ErrorDisplay.js.html#line30">line 30</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

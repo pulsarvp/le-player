@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>components/SourceControl.js - Documentation</title>
+    <title>TimeInfoControl - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,87 +28,621 @@
 
 <div id="main">
     
-    <h1 class="page-title">components/SourceControl.js</h1>
+    <h1 class="page-title">TimeInfoControl</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>'use strict';
-/**
- * @file SourceControl.js
- */
+        <h2>
+        TimeInfoControl
+        </h2>
+        
+    
+</header>
 
-import $ from 'jquery';
-import ControlContainer from './ControlContainer';
+<article>
+    <div class="container-overview">
+    
+        
 
-/**
- * @class SourceControl
- * @param {Player} player Main player
- * @extends ControlConainer
- */
-class SourceControl extends ControlContainer {
-	// TODO: Делать disable/enable после options init
-	constructor (player, options={}) {
-		options = $.extend({}, {
-			name : 'source',
-			iconName : 'bullseye',
-			title : 'Качество',
-			className : 'source-control',
-			disable : true
-		}, options);
-		super(player, options);
-	}
+    
 
-	/**
-	 * @override
-	 */
-	onClick (e) {
-		super.onClick(e);
-		let item = $(e.target);
-		const defaultItem = this.getByIndex(0);
+    <h4 class="name" id="TimeInfoControl"><span class="type-signature"></span>new TimeInfoControl<span class="signature">(player)</span><span class="type-signature"></span></h4>
 
-		this.player.video.source = {
-			url : defaultItem.data('url'),
-			title : defaultItem.data('title')
-		}
-		this.active = defaultItem;
+    
 
-	}
 
-	onItemClick(e) {
-		super.onItemClick(e);
-		let item = $(e.target);
-		this.player.video.source = {
-			url : item.data('url'),
-			title : item.data('title')
-		}
 
-	}
 
-	onPlayerInited(e, data) {
-		const sources = this.player.options.sources;
-		if (sources.length > 1) {
-			sources.forEach(item => {
-				this.addItem(item.title, {
-					url : item.url,
-					title : item.title
-				})
-			})
-			this.setActiveByIndex(0);
-			this.disable = false;
-		}
-	}
-}
 
-export default SourceControl;
-</code></pre>
-        </article>
-    </section>
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>player</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Player.html">Player</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Main player</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>currentTime</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ControlText.html">ControlText</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Current time's text</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>totalTime</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="ControlText.html">ControlText</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Total time</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>line</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">jQuery</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_TimeInfoControl.js.html">components/TimeInfoControl.js</a>, <a href="components_TimeInfoControl.js.html#line11">line 11</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="Control.html">Control</a></li>
+    </ul>
+
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="buildCSSClass"><span class="type-signature"></span>buildCSSClass<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="Control.html#buildCSSClass">Control#buildCSSClass</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_control.js.html">components/control.js</a>, <a href="components_control.js.html#line65">line 65</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="createElement"><span class="type-signature"></span>createElement<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-overrides">Overrides:</dt>
+    <dd class="tag-overrides"><ul class="dummy"><li>
+        <a href="Control.html#createElement">Control#createElement</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_TimeInfoControl.js.html">components/TimeInfoControl.js</a>, <a href="components_TimeInfoControl.js.html#line38">line 38</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="onClick"><span class="type-signature"></span>onClick<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    On click event handler
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="Control.html#onClick">Control#onClick</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_control.js.html">components/control.js</a>, <a href="components_control.js.html#line91">line 91</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="onPlayerInited"><span class="type-signature"></span>onPlayerInited<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="components_TimeInfoControl.js.html">components/TimeInfoControl.js</a>, <a href="components_TimeInfoControl.js.html#line54">line 54</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

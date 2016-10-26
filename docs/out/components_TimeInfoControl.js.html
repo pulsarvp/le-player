@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>components/SourceControl.js - Documentation</title>
+    <title>components/TimeInfoControl.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">components/SourceControl.js</h1>
+    <h1 class="page-title">components/TimeInfoControl.js</h1>
     
 
     
@@ -40,72 +40,73 @@
         <article>
             <pre class="prettyprint source linenums"><code>'use strict';
 /**
- * @file SourceControl.js
+ * @file TimeInfoControl.js
  */
 
 import $ from 'jquery';
-import ControlContainer from './ControlContainer';
+import Control from './Control';
+import ControlText from './ControlText';
+import { secondsToTime } from '../utils';
 
 /**
- * @class SourceControl
  * @param {Player} player Main player
- * @extends ControlConainer
+ * @class TimeInfoControl
+ * @property {ControlText} currentTime Current time's text
+ * @property {ControlText} totalTime Total time
+ * @property {jQuery} line
+ * @extends Control
  */
-class SourceControl extends ControlContainer {
-	// TODO: Делать disable/enable после options init
+class TimeInfoControl extends Control {
+
 	constructor (player, options={}) {
 		options = $.extend({}, {
-			name : 'source',
-			iconName : 'bullseye',
-			title : 'Качество',
-			className : 'source-control',
-			disable : true
+			className : 'timeline timeline-container',
+			name : 'time-info'
 		}, options);
 		super(player, options);
+
+		this.player.on('timeupdate', (e, data) => {
+			const { time } = data;
+			this._currentTimeControl.text = secondsToTime(time);
+		})
 	}
+
 
 	/**
 	 * @override
 	 */
-	onClick (e) {
-		super.onClick(e);
-		let item = $(e.target);
-		const defaultItem = this.getByIndex(0);
+	createElement() {
+		this._currentTimeControl = new ControlText(this.player, { className : 'control-time__current'});
+		this._totalTimeControl = new ControlText(this.player, { className : 'control-time__total'});
 
-		this.player.video.source = {
-			url : defaultItem.data('url'),
-			title : defaultItem.data('title')
-		}
-		this.active = defaultItem;
+		this.element = $('&lt;div/>').addClass('control-time');
+		this.element
+			.append(this._currentTimeControl.element)
+			.append(this._totalTimeControl.element)
+
+		return this.element;
+	}
+
+
+	/**
+	 * @override
+	 */
+	onPlayerInited(e) {
+		let video = this.player.video;
+		this._currentTimeControl.text = secondsToTime(video.currentTime);
+		this._totalTimeControl.text = secondsToTime(video.duration);
+	}
+
+	set currentTime(value) {
 
 	}
 
-	onItemClick(e) {
-		super.onItemClick(e);
-		let item = $(e.target);
-		this.player.video.source = {
-			url : item.data('url'),
-			title : item.data('title')
-		}
-
-	}
-
-	onPlayerInited(e, data) {
-		const sources = this.player.options.sources;
-		if (sources.length > 1) {
-			sources.forEach(item => {
-				this.addItem(item.title, {
-					url : item.url,
-					title : item.title
-				})
-			})
-			this.setActiveByIndex(0);
-			this.disable = false;
-		}
+	_onClick(e) {
+		e.preventDefault()
 	}
 }
 
-export default SourceControl;
+export default TimeInfoControl;
 </code></pre>
         </article>
     </section>
