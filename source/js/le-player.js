@@ -8,6 +8,7 @@ import MiniPlayer from './components/MiniPlayer';
 import Icon from './components/Icon';
 import Sections from './components/Sections';
 import ErrorDisplay from './components/ErrorDisplay';
+import FullscreenApi from './FullscreenApi';
 
 import { C_TIMELINE, C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
@@ -153,7 +154,7 @@ const defaultOptions = {
 			info : ['f'],
 			description : 'Открыть/закрыть полноэкраный режим',
 			fn : (player) => {
-				player.video.fullscreen.toggle()
+				player.toggleFullscreen();
 			}
 		}
 	],
@@ -242,6 +243,8 @@ let Player = function (element, options) {
 	let loader = null;
 	let sectionContainer = null;
 	let videoContainer = this.videoContainer = null;
+	this._userActivity = false;
+
 	this.innerElement = createEl('div');
 
 
@@ -329,6 +332,7 @@ let Player = function (element, options) {
 
 		toggle () {
 			let containerEl = this.player.element[ 0 ];
+			console.log(this.is())
 			if (this.is()) {
 				if (document.exitFullscreen)				document.exitFullscreen();
 				else if (document.mozCancelFullScreen)	  document.mozCancelFullScreen();
@@ -365,7 +369,8 @@ let Player = function (element, options) {
 		constructor (player, ctx) {
 			this.player = player;
 			this._ctx = ctx;
-			this._video = ctx[ 0 ];
+			this._video = ctx[0];
+			this._element = ctx[0];
 			this.subtitles = [];
 			this.bufferRanges = [];
 			this.playbackRate = this._video.playbackRate;
@@ -513,8 +518,8 @@ let Player = function (element, options) {
 			this._initSubtitles();
 			this._initVideo()
 				.done(() => {
-					this.fullscreen = new Fullscreen(this.player);
-					this.fullscreen.init();
+					//this.fullscreen = new Fullscreen(this.player);
+					//this.fullscreen.init();
 					this._initRate();
 					this._initVolume();
 					this.startBuffering();
@@ -686,7 +691,7 @@ let Player = function (element, options) {
 
 				'dblclick' : () => {
 					clearTimeout(timerId);
-					this.fullscreen.toggle();
+					//this.fullscreen.toggle();
 				},
 
 				'click' : () => {
@@ -1067,8 +1072,11 @@ let Player = function (element, options) {
 	}
 
 	this.init();
-	this._userActivity = false;
+
 	this.listenUserActivity();
+
+	$(document).on(fsApi.fullscreenchange, this.onFullscrenChange.bind(this));
+
 	this.on('inited', this.options.onPlayerInited.bind(this));
 	return this;
 };
@@ -1117,15 +1125,18 @@ Player.prototype.toggleClass = function(className, flag) {
 	return this;
 }
 
-Player.prototype.setView = function(view) {
-	this.element
-		.removeClass(`leplayer--${this._view}`)
-		.addClass(`leplayer--${view}`)
-	this._view = view;
+Player.prototype.setView = function(view, flag=true) {
+	if (flag) {
+		this.element
+			.removeClass(`leplayer--${this._view}`)
+			.addClass(`leplayer--${view}`)
+		this._view = view;
+	}
+	return this;
 }
 
 Player.prototype.getView = function() {
-	return this._view
+	return this._view;
 }
 
 Player.prototype.setError = function(value) {
@@ -1234,6 +1245,49 @@ Player.prototype.getSectionData = function() {
 		dataType: 'json'
 	}).promise()
 }
+
+Player.prototype.requestFullscreen = function() {
+	const fsApi = FullscreenApi;
+
+	this.setView('fullscreen');
+
+	console.log(fsApi)
+
+	if(fsApi.requestFullscreen) {
+
+		// Call HTML5 Video api requestFullscreen
+		this.video._element[fsApi.requestFullscreen]();
+
+		this.trigger('fullscreenchange', true);
+	} else {
+		console.log('lul');
+	}
+}
+
+Player.prototype.exitFullscreen = function() {
+	const fsApi = FullscreenApi;
+
+	this.setView('common');
+
+	if(fsApi.exitFullscreen) {
+		this.video._element[fsApi.exitFullscreen]();
+	} else {
+		console.log('lil');
+	}
+
+	this.trigger('fullscreenchange', false);
+
+}
+
+Player.prototype.toggleFullscreen = function() {
+	if(this.getView() === 'fullscreen') {
+		this.exitFullscreen()
+	} else {
+		this.requestFullscreen()
+	}
+}
+
+
 
 
 window.$.fn.lePlayer = function (options) {
