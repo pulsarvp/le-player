@@ -57,9 +57,9 @@
 
 		player.on('controlclick', function (e, data) {
 			var control = data.control;
-			var _control$options = control.options;
-			var name = _control$options.name;
-			var collection = _control$options.collection;
+			var _control$options = control.options,
+			    name = _control$options.name,
+			    collection = _control$options.collection;
 
 			if (name) {
 				window.ga('send', 'event', 'Player Control Click', name, collection);
@@ -67,7 +67,15 @@
 		});
 
 		player.on('sectionsclick', function (e, data) {
-			window.ga('send', 'event', 'Player Sections', 'Click');
+			window.ga('send', 'event', 'Player Sections', 'Click', player.getView());
+		});
+
+		player.on('timeupdate', function () {
+			var percent = player.video.playedPercentage;
+			var delta = 5;
+			if (Math.abs(percent - 100) < delta) {
+				window.ga('send', 'event', 'Player Video Played', '95-100%');
+			}
 		});
 	});
 
