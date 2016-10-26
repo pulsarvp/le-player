@@ -1,17 +1,153 @@
 'use strict';
 
 import $ from 'jquery';
+import ControlCollection from './components/ControlCollection';
 import Control from './components/Control';
 import Component from './components/Component';
 import Icon from './components/Icon';
-import controlFactory, { C_KEYBINDING_INFO } from './ControlFactory';
+import Sections from './components/Sections';
+import ErrorDisplay from './components/ErrorDisplay';
+
+import { C_TIMELINE, C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
 import { secondsToTime, createEl } from './utils';
+
 import MediaError from './MediaError';
-import ErrorDisplay from './components/ErrorDisplay';
 
 
 (function ($) {
+
+	const defaultOptions = {
+		miniplayer : false,
+		autoplay : false,
+		height : 'auto',
+		loop : false,
+		muted : false,
+		preload : 'metadata',
+		poster : null,
+		svgPath : '../dist/svg/svg-defs.svg',
+		innactivityTimeout : 10000,
+		fullscreen : {
+			hideTimelineTime : 10000
+		},
+		rate : {
+			step : 0.25,
+			min : 0.5,
+			max : 4.0,
+			'default' : 1
+		},
+		playback : {
+			step : {
+				short : 5,
+				medium : 10,
+				long : 30
+			}
+		},
+		controls : {
+			common : [
+				[ 'play', 'volume', 'divider', 'timeline',  'divider', 'section', 'divider', 'fullscreen' ],
+				[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO ]
+			],
+			fullscreen : [
+				[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', C_KEYBINDING_INFO,  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen' ]
+			],
+			mini : [
+				[ 'play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
+			]
+		},
+		volume : {
+			default : 0.4,
+			mutelimit : 0.05,
+			step : 0.1
+		},
+		keyBinding : [
+			{
+				key : 32,
+				info : ['Space'],
+				description : 'Начать проигрывание / поставить на паузу',
+				fn : (player) => {
+					player.video.togglePlay();
+				}
+			},
+			{
+				key : 37,
+				info : ['←'],
+				description : `Перемотать на 10 секунд назад`,
+				fn : (player) => {
+					player.video.currentTime -= player.options.playback.step.medium;
+				}
+			},
+			{
+				key : 39,
+				info : ['→'],
+				description : `Перемотать на 10 секунд вперёд`,
+				fn : (player) => {
+					player.video.currentTime += player.options.playback.step.medium;
+				}
+			},
+			{
+				shiftKey : true,
+				info : ['Shift', '←'],
+				description : 'Перейти на предыдущую секцию',
+				key : 37,
+				fn : (player) => {
+					if(player.sections == null) {
+						return;
+					}
+					player.sections.prev();
+
+				}
+			},
+			{
+				shiftKey : true,
+				key : 39,
+				info : ['Shift', '→'],
+				description : 'Перейти на следующую секцию',
+				fn : (player) => {
+					if(player.sections == null) {
+						return;
+					}
+					player.sections.next()
+				}
+			},
+			{
+				key : 38,
+				info : ['↑'],
+				description : 'Увеличить громкость',
+				fn : (player) => {
+					player.video.volume += player.options.volume.step;
+				}
+			},
+
+			{
+				key : 40,
+				info : ['↓'],
+				description : 'Уменьшить громкость',
+				fn : (player) => {
+					player.video.volume -= player.options.volume.step;
+				}
+			},
+
+			{
+				key : 70,
+				info : ['f'],
+				description : 'Открыть/закрыть полноэкраный режим',
+				fn : (player) => {
+					player.video.fullscreen.toggle()
+				}
+			}
+		],
+		miniplayer : {
+			width: '100%',
+			offsetShow : (player) => {
+				// 80px - it's height of common controls container
+				const offset = player.element.offset().top + player.element.outerHeight() - 80;
+
+				return offset;
+			}
+		},
+		onPlayerInited : function() {}
+	};
 
 	/**
 	 * @class Player
@@ -62,150 +198,31 @@ import ErrorDisplay from './components/ErrorDisplay';
 	 * @param {Object} [options.plugins] Keys of objects are name of plugin, value - plugin options
 	 */
 	let Player = function (element, options) {
-		const C_BACKWARD = 'backward';
-		const C_DIVIDER = 'divider';
-		const C_DOWNLOAD = 'download';
-		const C_FORWARD = 'forward';
-		const C_FULLSCREEN = 'fullscreen';
-		const C_PLAY = 'play';
-		const C_RATE = 'rate';
-		const C_SOURCE = 'source';
-		const C_SUBTITLE = 'subtitle';
-		const C_TIMELINE = 'timeline';
-		const C_VOLUME = 'volume';
-		const C_SECTION = "section";
 
 		var player = this;
-		const defaultOptions = {
-			miniplayer : false,
-			autoplay : false,
-			height : 'auto',
-			loop : false,
-			muted : false,
-			preload : 'metadata',
-			poster : null,
-			svgPath : '../dist/svg/svg-defs.svg',
-			fullscreen : {
-				hideTimelineTime : 10000
-			},
-			rate : {
-				step : 0.25,
-				min : 0.5,
-				max : 4.0,
-				'default' : 1
-			},
-			playback : {
-				step : {
-					short : 5,
-					medium : 10,
-					long : 30
-				}
-			},
-			controls : {
-				common : [
-					[ 'play', 'volume', 'divider', 'timeline',  'divider', 'section', 'divider', 'fullscreen' ],
-					[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO ]
-				],
-				fullscreen : [
-					[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', C_KEYBINDING_INFO,  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen' ]
-				],
-				mini : [
-					[ 'play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
-				]
-			},
-			volume : {
-				default : 0.4,
-				mutelimit : 0.05,
-				step : 0.1
-			},
-			keyBinding : [
-				{
-					key : 32,
-					info : ['Space'],
-					description : 'Начать проигрывание / поставить на паузу',
-					fn : (player) => {
-						player.video.togglePlay();
-					}
-				},
-				{
-					key : 37,
-					info : ['←'],
-					description : `Перемотать на 10 секунд назад`,
-					fn : (player) => {
-						player.video.currentTime -= player.options.playback.step.medium;
-					}
-				},
-				{
-					key : 39,
-					info : ['→'],
-					description : `Перемотать на 10 секунд вперёд`,
-					fn : (player) => {
-						player.video.currentTime += player.options.playback.step.medium;
-					}
-				},
-				{
-					shiftKey : true,
-					info : ['Shift', '←'],
-					description : 'Перейти на предыдущую секцию',
-					key : 37,
-					fn : (video) => {
-						if(player.sections == null) {
-							return;
-						}
-						player.sections.prev();
+		var self = this;
 
-					}
-				},
-				{
-					shiftKey : true,
-					key : 39,
-					info : ['Shift', '→'],
-					description : 'Перейти на следующую секцию',
-					fn : (player) => {
-						if(player.sections == null) {
-							return;
-						}
-						player.sections.next()
-					}
-				},
-				{
-					key : 38,
-					info : ['↑'],
-					description : 'Увеличить громкость',
-					fn : (player) => {
-						player.video.volume += player.options.volume.step;
-					}
-				},
+		var subtitles = [];
 
-				{
-					key : 40,
-					info : ['↓'],
-					description : 'Уменьшить громкость',
-					fn : (player) => {
-						player.video.volume -= player.options.volume.step;
-					}
-				},
+		// key -> contol collection name, valuy -> ControlCollection
+		this.controls = {};
 
-				{
-					key : 70,
-					info : ['f'],
-					description : 'Открыть/закрыть полноэкраный режим',
-					fn : (player) => {
-						player.video.fullscreen.toggle()
-					}
-				}
-			],
-			miniplayer : {
-				width: '100%',
-				offsetShow : (player) => {
-					// 80px - it's height of common controls container
-					const offset = player.element.offset().top + player.element.outerHeight() - 80;
+		// Entity component
+		this.video = null;
 
-					return offset;
-				}
-			},
-			onPlayerInited : function() {}
-		};
+		this.sections = null;
+
+		/**
+		 * DOM container to hold video and all other stuff.
+		 * @type object
+		 */
+
+		this.element = createEl('div');
+		let playButton = this.playButton = null;
+		let loader = null;
+		let sectionContainer = null;
+		let videoContainer = this.videoContainer = null;
+		this.innerElement = createEl('div');
 
 
 		/**
@@ -245,7 +262,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 			constructor () {
 				this.player = player;
-				this._collection = controls.fullscreen;
+				this._collection = player.controls.fullscreen;
 				this._hideTimeout = null;
 				this.fullscreenEnabled = false;
 			}
@@ -310,37 +327,17 @@ import ErrorDisplay from './components/ErrorDisplay';
 			showElements () {
 				this.player.trigger('fullscreenchange', true);
 				this.player.setView('fullscreen');
-				controls.fullscreen.show();
-				controls.common.hide();
-
-				clearTimeout(this._hideTimeout);
-				this._hideTimeout = setTimeout(() => {
-					this._collection.element.hide();
-				}, player.options.fullscreen.hideTimelineTime);
-
-				$(container).on({
-					'mousemove.leplayer.fullscreen-hide-timeline' : (e) => {
-						if (!$(e.currentTarget).hasClass('fullscreen')) return false;
-						clearTimeout(this._hideTimeout);
-						this._collection.element.show();
-						this._hideTimeout = setTimeout(() => {
-							this._collection.element.hide();
-						}, player.options.fullscreen.hideTimelineTime);
-					}
-				})
 			}
 
 			hideElements () {
 				this.player.trigger('fullscreenchange', false);
 				this.player.setView('common');
-				controls.fullscreen.hide();
-				controls.common.show();
 				clearTimeout(this._hideTimeout);
-				$(container).off('.leplayer.fullscreen-hide-timeline');
+				$(this.player.element).off('.leplayer.fullscreen-hide-timeline');
 			}
 
 			toggle () {
-				let containerEl = container[ 0 ];
+				let containerEl = this.player.element[ 0 ];
 				if (this.is()) {
 					if (document.exitFullscreen)				document.exitFullscreen();
 					else if (document.mozCancelFullScreen)	  document.mozCancelFullScreen();
@@ -374,7 +371,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 		}
 
 		class Video {
-			constructor (ctx) {
+			constructor (player, ctx) {
 				this.player = player;
 				this._ctx = ctx;
 				this._video = ctx[ 0 ];
@@ -681,7 +678,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 					'timeupdate' : (e) => {
 						//controls.moveTimeMarker();
-						this.player.trigger('timeupdate', { time : video.currentTime, duration : video.duration });
+						this.player.trigger('timeupdate', { time : this.currentTime, duration : this.duration });
 					},
 
 					'ended' : () => {
@@ -702,7 +699,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 					'click' : () => {
 						clearTimeout(timerId);
 						timerId = setTimeout(() => {
-							container.focus()
+							this.player.element.focus()
 							this.togglePlay();
 						}, 300);
 					},
@@ -771,336 +768,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 		}
 
-		class ControlCollection extends Component {
-			constructor (player, options) {
-				options = $.extend({}, {
-					controls : player.options.controls[options.name] || [],
-				}, options);
-				super(player, options);
-				this.items = {};
-				this.active = options.active || false;
-				this.name = options.name;
-				this.controls = this.player.options.controls[this.name];
-			}
 
-
-			/**
-			 * @override
-			 */
-			createElement() {
-				const { name, controls } = this.options;
-
-				this.element = $('<div/>').addClass(`leplayer-control-collection leplayer-control-collection-${name}`);
-
-				controls.forEach( row => {
-					let elemRow = $('<div/>').addClass(`leplayer-controls controls-${name}`);
-					let hasTimeline = false;
-					row.forEach(controlName => {
-						if(controlName == C_TIMELINE) {
-							hasTimeline = true
-						}
-						const control = controlFactory(this.player, controlName, {
-							collection : this.options.name
-						});
-						elemRow.append(control.element);
-					});
-					if (!hasTimeline) {
-						elemRow.css('width', '1px');
-					}
-					elemRow.find('.divider + .divider').remove();
-					this.element.append(elemRow);
-				})
-				return this.element;
-
-			}
-
-			set disable (value) {
-				for (let i in this.items) {
-					if (!this.items.hasOwnProperty(i)) continue;
-					this.items[ i ].disable = value;
-				}
-			}
-
-			add (name) {
-				if (name == C_DIVIDER) {
-					return controlFactory(player, name);
-				} else {
-					this.items[ name ] = controlFactory(player, name);
-					return this.items[ name ].element;
-				}
-			}
-
-			has (name) {
-				return (typeof this.items[ name ] == 'object');
-			}
-
-			hide () {
-				this.element.hide();
-				this.element.find('.leplayer-controls').hide()
-			}
-
-			show () {
-				this.element.show()
-				this.element.find('.leplayer-controls').show()
-			}
-		}
-
-		class Controls {
-			constructor (player) {
-				this.collections = {
-					common : new ControlCollection(player, { name : 'common' }),
-					fullscreen : new ControlCollection(player, { name : 'fullscreen' })
-				};
-				this.collections.common.active = true;
-			}
-
-			get common () {
-				return this.collections.common;
-			}
-
-			get fullscreen () {
-				return this.collections.fullscreen;
-			}
-
-			get mini () {
-				return this.collections.mini;
-			}
-
-			set download (value) {
-				for (var i in this.collections) {
-					this.collections[ i ].download = value;
-				}
-			}
-
-			set rate (value) {
-				Cookie.set('rate', value);
-				for (var i in this.collections) {
-					this.collections[ i ].rate = value;
-				}
-			}
-
-			set source (value) {
-				for (var i in this.collections) {
-					this.collections[ i ].source = value;
-				}
-			}
-
-			set totalTime (value) {
-				for (var i in this.collections) {
-					this.collections[ i ].totalTime = value;
-				}
-			}
-
-			set volume (value) {
-				for (var i in this.collections) {
-					this.collections[ i ].volume = value;
-				}
-				Cookie.set('volume', value);
-			}
-
-			set disable (value) {
-				for (var i in this.collections) {
-					this.collections[ i ].disable = value;
-				}
-			}
-
-			has (name) {
-				return (typeof this.collections[ name ] == 'object');
-			}
-
-			moveTimeMarker () {
-				for (var i in this.collections)
-					this.collections[ i ].moveTimeMarker();
-			}
-
-			pause () {
-				for (var i in this.collections)
-					this.collections[ i ].pause();
-			}
-
-			play () {
-				for (var i in this.collections)
-					this.collections[ i ].play();
-			}
-		}
-
-		/**
-		 * @class Sections
-		 * @param {Player} player Main player
-		 * @param {Object} [options]
-		 * @param {Array} [options.items=[]} Data for sections
-		 * @param {Boolean} [options.fullscreenOnly] Show section only in fullscreen
-		 * @param {Boolean} [options.main=true] Main sections of player
-		 * @extends Component
-		 */
-		class Sections extends Component {
-			constructor(player, options) {
-				let { items = [], main = true } = options;
-				items = [].concat(items);
-
-
-				//options.items = items;
-
-				super(player, options)
-				this.activeSection = this.getSectionByIndex(0);
-
-				this.items = items;
-				this.length = this.items.length
-
-
-				this.setActiveByIndex(0);
-
-				this.element.find('.leplayer-section').on('click', this.onSectionClick.bind(this));
-
-				this.player.on('sectionstoggle', this._onSectionsToggle.bind(this));
-
-				this.player.on('timeupdate', this.onTimeUpdate.bind(this));
-
-				//this.player.trigger('sectionsinit', { items : this.items, sections : this });
-				this.player.on('inited', this.onPlayerInited.bind(this));
-
-				return this;
-			}
-
-			next() {
-				const sectionIndex = parseInt(this.activeSection.attr('data-index'));
-				const newIndex = sectionIndex >= this.length ? this.length : sectionIndex + 1;
-
-				this.setActiveByIndex(newIndex);
-
-				this.player.video.currentTime = this.items[sectionIndex].end;
-			}
-
-			prev() {
-				const sectionIndex = parseInt(this.activeSection.attr('data-index'));
-				const newIndex = sectionIndex <= 0 ? 0 : sectionIndex - 1;
-
-				this.setActiveByIndex(newIndex);
-				this.player.video.currentTime = this.items[newIndex].begin;
-			}
-
-			/**
-			 * @override
-			 */
-			createElement() {
-				this.element = $('<div />').addClass('leplayer-sections');
-				if(this.options.fullscreenOnly) {
-					this.element.addClass('leplayer-sections--fsonly');
-				}
-				this.element.append(this._createSections(this.options.items));
-				return this.element;
-			}
-
-			/**
-			 * @override
-			 */
-			onPlayerInited() {
-
-				if(this.items != null && this.items.length > 0 ) {
-					this.items[this.items.length - 1].end = this.player.video.duration;
-				}
-			}
-
-
-
-			onSectionClick(e) {
-				let section = $(e.target).closest('.leplayer-section');
-				video.currentTime = section.attr('data-begin');
-				this.player.trigger('sectionsclick', { section : this.items[section.attr('data-index')]});
-			}
-
-			setActiveByIndex(index) {
-				if (this.activeSection.length == 0) {
-					return
-				}
-				if (this.activeSection.attr('data-index') == index) {
-					return
-				}
-
-				if (this.getSectionByIndex(index).length == 0) {
-					return
-				}
-
-				this.activeSection.removeClass('leplayer-section--active');
-
-				this.activeSection = this.getSectionByIndex(index);
-
-				this.activeSection.addClass('leplayer-section--active');
-				if(this.player.getView() !== 'mini') {
-					this.element
-						.stop()
-						.animate({
-						scrollTop : this.activeSection.position().top
-					}, 800)
-				}
-			}
-
-			getSectionByIndex(index) {
-				return this.element.find(`.leplayer-section[data-index="${index}"]`);
-			}
-
-
-			onTimeUpdate(e, data) {
-				if (this.activeSection.length == 0) {
-					return
-				}
-				const currentTime = data.time;
-
-				const endSectionTime = this.activeSection.attr('data-end');
-
-				if(this.player.getView() !== 'mini' ) {
-					this.activeSection.next().find('.time').text(secondsToTime(endSectionTime - currentTime));
-				}
-
-				for (let i = 0; i < this.items.length; i++) {
-					const section = this.items[i];
-					if (currentTime < section.end) {
-						this.setActiveByIndex(i);
-						break;
-					}
-				}
-			}
-
-			_onSectionsToggle(e, data) {
-				if (this.element.hasClass('leplayer-sections--hidden')) {
-					this.element.removeClass('leplayer-sections--hidden');
-				} else {
-					this.element.addClass('leplayer-sections--hidden');
-				}
-			}
-
-			_createSections(items) {
-				let result = '';
-				items.forEach((section, index) => {
-					const item = `
-						<div class="leplayer-section ${!index ? 'leplayer-section--active' : ''}"
-							data-begin="${section.begin}"
-							data-index="${index.toString()}"
-							data-end="${section.end}">
-							<div class="leplayer-section-time">${secondsToTime(section.begin)}</div>
-							<div class="leplayer-section-info">
-								<div class="leplayer-section-next-info">
-									Следующая секция начнется через
-									<span class="time">${secondsToTime(items[0].end)}</span>
-								</div>
-								${
-									section.title != null ?
-										`<div class="leplayer-section-title">${section.title}</div>`
-									: ''
-								}
-								${
-									section.description != null ?
-										`<div class="leplayer-section-description">${section.description}</div>`
-									: ''
-								}
-							</div>
-						</div>
-					`.trim()
-					result += item;
-				});
-				return result;
-			}
-		}
 
 
 		/**
@@ -1126,19 +794,31 @@ import ErrorDisplay from './components/ErrorDisplay';
 					this.hide();
 				}
 
-				const self = this;
-				$(window).scroll(function(e) {
-					const scrollTop = $(this).scrollTop();
-
-					if(scrollTop > self.offsetShow) {
-						self.show();
-					} else {
-						self.hide();
-					}
-				})
-
+				this.listenScroll();
 				this.player.on('fullscreenchange', this._onFullscreenChange.bind(this));
 			};
+
+			listenScroll() {
+				let didScroll = false;
+
+				$(window).scroll(function() {
+					didScroll = true;
+				})
+
+				setInterval(() => {
+					if(didScroll) {
+						didScroll = false;
+
+						const scrollTop = $(window).scrollTop();
+
+						if(scrollTop > this.offsetShow) {
+							this.show();
+						} else {
+							this.hide();
+						}
+					}
+				}, 250)
+			}
 
 			get offsetShow() {
 				if ($.isFunction(this.options.offsetShow)) {
@@ -1206,28 +886,6 @@ import ErrorDisplay from './components/ErrorDisplay';
 			}
 		}
 
-		var self = this;
-		var subtitles = [];
-		//var volume = options.volume.default;
-		var controls = this.controls;
-		var video = null;
-		this.video = video
-		this.sections = null;
-		this.controls = controls;
-
-		/**
-		 * DOM container to hold video and all other stuff.
-		 * @type object
-		 */
-
-		// TODO : Remove this global vars
-		let container = this.element = $('<div />')
-		let playButton = this.playButton = null;
-		let loader = null;
-		let sectionContainer = null;
-		let videoContainer = this.videoContainer = null;
-		this.innerElement = $('<div />')
-
 		/* TODO: Вынести все методы в прототип */
 		this.init = function () {
 			// Check if element is correctly selected.
@@ -1241,14 +899,14 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 			/** TODO: Use promise to async run this */
 			this.initDom();
-			video = player.video = new Video(element);
+			this.video = new Video(this, element);
 			this.initControls();
 			this.initHotKeys();
 			this.initSections().then((data) => {
 				this.sections = data.sections;
 				this.trigger('sectionsinit', data);
 			});
-			video.init().then(() => {
+			this.video.init().then(() => {
 				const dfd = $.Deferred()
 				player.trigger('inited');
 				this.initPlugins();
@@ -1258,15 +916,15 @@ import ErrorDisplay from './components/ErrorDisplay';
 		};
 
 		this.initControls = function () {
-			controls = new Controls(player);
+			//controls = new Controls(player);
 			for (const name of ['common', 'fullscreen']) {
 				if (!this.options.controls.hasOwnProperty(name)) return;
 				const controlCollection = new ControlCollection(player, { name });
-				controls.collections[name] = controlCollection;
+				this.controls[name] = controlCollection;
 				this.element.append(controlCollection.element);
 			}
-			if (controls.collections.common != null) {
-				controls.collections.common.active = true;
+			if (this.controls.common != null) {
+				this.controls.common.active = true;
 			}
 		};
 
@@ -1286,7 +944,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 						if (i < (data.sections.length - 1)) {
 							endSection = data.sections[i+1].begin
 						} else {
-							endSection = video.duration;
+							endSection = this.video.duration;
 						}
 						data.sections[i].end = endSection;
 					}
@@ -1314,6 +972,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 
 		this.initDom = function () {
+			const options = this.options;
 			this.errorDisplay = new ErrorDisplay(this);
 			[
 
@@ -1399,7 +1058,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 				.attr('tabindex', 0)
 				//.css('width', element.width() + 'px');
 				.css('width', '100%')
-				.css('max-width', (options.width || video.width) + 'px')
+				.css('max-width', (options.width || this.video.width) + 'px')
 
 
 			if(options.sectionContainer) {
@@ -1521,14 +1180,15 @@ import ErrorDisplay from './components/ErrorDisplay';
 			}
 		}
 
-		var isFocused = function () {
-			const focused = $(container).find(':focus');
-			return (focused.length > 0) || $(container).is(':focus');
+		var isFocused = () => {
+			const focused = $(this.element).find(':focus');
+			return (focused.length > 0) || $(this.element).is(':focus');
 		}
 
 		this.init();
+		this._userActivity = false;
+		this.listenUserActivity();
 		this.on('inited', this.options.onPlayerInited.bind(this));
-
 		return this;
 	};
 
@@ -1539,7 +1199,9 @@ import ErrorDisplay from './components/ErrorDisplay';
 		Player.prototype[name] = fn;
 	}
 
+
 	Player.prototype._view = 'common';
+
 
 	Player.prototype.trigger = function(eventName, ...args) {
 		const event = $.Event(`leplayer_${eventName}`, { player : this })
@@ -1561,10 +1223,17 @@ import ErrorDisplay from './components/ErrorDisplay';
 
 	Player.prototype.addClass = function(className) {
 		this.element.addClass(className);
+		return this;
 	}
 
 	Player.prototype.removeClass = function(className) {
 		this.element.removeClass(className);
+		return this;
+	}
+
+	Player.prototype.toggleClass = function(className, flag) {
+		this.element.toggleClass(className, flag);
+		return this;
 	}
 
 	Player.prototype.setView = function(view) {
@@ -1592,6 +1261,85 @@ import ErrorDisplay from './components/ErrorDisplay';
 		this.addClass('leplayer--error');
 		this.trigger('error', { error : this._error});
 	}
+
+	Player.prototype.listenUserActivity = function() {
+		let mouseInProgress;
+		let lastMoveX;
+		let lastMoveY;
+
+		const onMouseMove = (e) => {
+			if(e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
+				lastMoveX = e.screenX;
+				lastMoveY = e.screenY;
+				this._userActivity = true
+			}
+		}
+
+		const onMouseDown = (e) => {
+			this._userActivity = true
+
+			// While user is pressing mouse or touch, dispatch user activity
+			clearInterval(mouseInProgress);
+
+			mouseInProgress = setInterval(() => {
+				this._userActivity = true
+			}, 250);
+		}
+
+		const onMouseUp = (e) => {
+			this._userActivity = true
+			clearInterval(mouseInProgress);
+		}
+
+		this.element.on('mousemove', onMouseMove);
+
+		this.element.on('mousedown', onMouseDown);
+
+		this.element.on('mouseup', onMouseUp);
+
+		this.element.on('keydown', (e) => this._userActivity = true );
+		this.element.on('keyup', (e) => this._userActivity = true );
+
+		// See http://ejohn.org/blog/learning-from-twitter/
+		let inactivityTimeout;
+		const delay = this.options.innactivityTimeout;
+		setInterval(() => {
+			if (this._userActivity) {
+
+				// Reset user activuty tracker
+				this._userActivity = false;
+
+				this.setUserActive(true);
+
+				clearTimeout(inactivityTimeout);
+
+				if (delay > 0) {
+
+					inactivityTimeout = setTimeout(() => {
+						if (!this._userActivity) {
+							this.setUserActive(false)
+						}
+					}, delay);
+				}
+			}
+		}, 250)
+	}
+
+	/**
+	 * @params {Boolean} value
+	 */
+	Player.prototype.setUserActive = function(value) {
+		if(value !== this.getUserActive) {
+			this._userActive = value;
+			this.toggleClass('leplayer--user-active', value);
+			this.trigger('useractive');
+		}
+	}
+
+	Player.prototype.getUserActive = function() {
+		return this._userActive || false;
+	}
+
 
 	// TODO: Сделать плеер классов и реализовать эти методы через get и set
 	Player.prototype.getError = function() {

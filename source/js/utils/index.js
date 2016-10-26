@@ -48,7 +48,7 @@ export function percentify (length, end) {
 
 
 export function createEl(tag='div', props) {
-	if(props.className) {
+	if(props && props.className) {
 		props["class"] = props.className;
 		delete props.className;
 	}
