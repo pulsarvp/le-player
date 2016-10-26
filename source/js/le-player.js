@@ -244,14 +244,6 @@ let Player = function (element, options) {
 	let videoContainer = this.videoContainer = null;
 	this.innerElement = createEl('div');
 
-	this.getData = () => {
-		return $.ajax({
-			url: this.options.dataUrl,
-			method: 'GET',
-			dataType: 'json'
-		}).promise()
-	}
-
 
 	/**
 	 * This class manages FullScreen API.
@@ -817,7 +809,7 @@ let Player = function (element, options) {
 		if (options.dataUrl == null) {
 			dfd.reject(null)
 		} else {
-			this.getData().done(data => {
+			this.getSectionData().done(data => {
 				const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
 				if (data.sections == null || data.sections.length == 0) {
 					dfd.reject(null);
@@ -1233,6 +1225,14 @@ Player.prototype.getUserActive = function() {
 // TODO: Сделать плеер классов и реализовать эти методы через get и set
 Player.prototype.getError = function() {
 	return this._error || null;
+}
+
+Player.prototype.getSectionData = function() {
+	return $.ajax({
+		url: this.options.dataUrl,
+		method: 'GET',
+		dataType: 'json'
+	}).promise()
 }
 
 
