@@ -222,9 +222,9 @@ let Player = function (element, options) {
 
 	let self = this;
 	let player = this;
+	let subtitles = [];
 
-	var subtitles = [];
-
+	const fsApi = FullscreenApi;
 	// key -> contol collection name, valuy -> ControlCollection
 	this.controls = {};
 
@@ -247,123 +247,6 @@ let Player = function (element, options) {
 
 	this.innerElement = createEl('div');
 
-
-	/**
-	 * This class manages FullScreen API.
-	 * @TODO: add fullscreenerror handler.
-	 */
-	class Fullscreen {
-
-		constructor (player) {
-			this.player = player;
-			this._collection = player.controls.fullscreen;
-			this._hideTimeout = null;
-			this.fullscreenEnabled = false;
-		}
-
-		/**
-		 * @returns {boolean} Whether browser supports fullscreen mode.
-		 */
-		enabled () {
-			return !!(document.fullscreenEnabled
-				|| document.mozFullScreenEnabled
-				|| document.msFullscreenEnabled
-				|| document.webkitSupportsFullscreen
-				|| document.webkitFullscreenEnabled
-				|| document.createElement('video').webkitRequestFullScreen);
-		}
-
-		init () {
-			if (!this.enabled()) {
-				return null;
-			}
-				// Fullscreen change handlers.
-			$(document).on({
-
-				'fullscreenchange' : (e) => {
-					this.toggleElements(!!(document.fullScreen || document.fullscreenElement));
-				},
-
-				'webkitfullscreenchange' : (e) => {
-					this.toggleElements(!!document.webkitIsFullScreen);
-				},
-
-				'mozfullscreenchange' : (e) => {
-					this.toggleElements(!!document.mozFullScreen);
-				},
-
-				'msfullscreenchange' : (e) => {
-					this.toggleElements(!!document.msFullscreenElement);
-				},
-
-				'webkitbeginfullscreen' : (e) => {
-					this.toggleElements(true)
-				},
-
-				'webkitendfullscreen' : (e) => {
-					this.toggleElements(false)
-				}
-			});
-		}
-
-		/**
-		 * @returns {boolean} Whether browser is in fullscreen mode.
-		 */
-		is () {
-			return !!(document.fullScreen
-				|| document.webkitIsFullScreen
-				|| document.mozFullScreen
-				|| document.msFullscreenElement
-				|| document.fullscreenElement
-				|| this.fullscreenEnabled);
-		}
-
-		showElements () {
-			this.player.trigger('fullscreenchange', true);
-			this.player.setView('fullscreen');
-		}
-
-		hideElements () {
-			this.player.trigger('fullscreenchange', false);
-			this.player.setView('common');
-			clearTimeout(this._hideTimeout);
-			$(this.player.element).off('.leplayer.fullscreen-hide-timeline');
-		}
-
-		toggle () {
-			let containerEl = this.player.element[ 0 ];
-			console.log(this.is())
-			if (this.is()) {
-				if (document.exitFullscreen)				document.exitFullscreen();
-				else if (document.mozCancelFullScreen)	  document.mozCancelFullScreen();
-				else if (document.webkitCancelFullScreen)   document.webkitCancelFullScreen();
-				else if (document.msExitFullscreen)		 document.msExitFullscreen();
-				else if (document.webkitExitFullscreen)	 document.webkitExitFullscreen();
-				this.hideElements(); // @TODO: make this only if fullscreen fired.
-				this.fullscreenEnabled = false;
-			}
-			else {
-				if (containerEl.requestFullScreen)			containerEl.requestFullScreen();
-				else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();
-				else if (containerEl.mozRequestFullScreen)	containerEl.mozRequestFullScreen();
-				else if (containerEl.msExitFullscreen)		containerEl.msRequestFullscreen();
-				this.showElements(); // @TODO: make this only if fullscreen fired.
-				this.fullscreEnabled = true;
-			}
-		}
-
-		/**
-		 * Update DOM structure according to current state.
-		 */
-		toggleElements (show) {
-			if (!!show) {
-				this.showElements();
-			}
-			else {
-				this.hideElements();
-			}
-		}
-	}
 
 	class Video {
 		constructor (player, ctx) {
@@ -1075,7 +958,10 @@ let Player = function (element, options) {
 
 	this.listenUserActivity();
 
-	$(document).on(fsApi.fullscreenchange, this.onFullscrenChange.bind(this));
+	$(document).on(fsApi.fullscreenchange, this._onEntityFullscrenChange.bind(this));
+
+
+	this.on('fullscreenchange', this.onFullscreenChange.bind(this));
 
 	this.on('inited', this.options.onPlayerInited.bind(this));
 	return this;
@@ -1125,13 +1011,11 @@ Player.prototype.toggleClass = function(className, flag) {
 	return this;
 }
 
-Player.prototype.setView = function(view, flag=true) {
-	if (flag) {
-		this.element
-			.removeClass(`leplayer--${this._view}`)
-			.addClass(`leplayer--${view}`)
-		this._view = view;
-	}
+Player.prototype.setView = function(view) {
+	this.element
+		.removeClass(`leplayer--${this._view}`)
+		.addClass(`leplayer--${view}`)
+	this._view = view;
 	return this;
 }
 
@@ -1249,30 +1133,19 @@ Player.prototype.getSectionData = function() {
 Player.prototype.requestFullscreen = function() {
 	const fsApi = FullscreenApi;
 
-	this.setView('fullscreen');
-
-	console.log(fsApi)
-
 	if(fsApi.requestFullscreen) {
-
 		// Call HTML5 Video api requestFullscreen
-		this.video._element[fsApi.requestFullscreen]();
+		this.element[0][fsApi.requestFullscreen]();
 
 		this.trigger('fullscreenchange', true);
-	} else {
-		console.log('lul');
 	}
 }
 
 Player.prototype.exitFullscreen = function() {
 	const fsApi = FullscreenApi;
 
-	this.setView('common');
-
 	if(fsApi.exitFullscreen) {
-		this.video._element[fsApi.exitFullscreen]();
-	} else {
-		console.log('lil');
+		document[fsApi.exitFullscreen]();
 	}
 
 	this.trigger('fullscreenchange', false);
@@ -1287,8 +1160,20 @@ Player.prototype.toggleFullscreen = function() {
 	}
 }
 
+Player.prototype._onEntityFullscrenChange = function() {
+	const fsApi = FullscreenApi;
+	const isFs = !!document[fsApi.fullscreenElement];
+	this.trigger('fullscreenchange', isFs);
+}
 
-
+Player.prototype.onFullscreenChange = function(e, isFs) {
+	const fsApi = FullscreenApi;
+	if(isFs) {
+		this.setView('fullscreen');
+	} else {
+		this.setView('common');
+	}
+}
 
 window.$.fn.lePlayer = function (options) {
 	return this.each(function () {
