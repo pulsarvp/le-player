@@ -14,7 +14,7 @@
 	outline: 0;
 	text-align: center;
 	text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-	z-index: @z-index-base + 7;
+	z-index: @z-index-base + 8;
 	&:hover
 	{
 		background: rgba(0, 0, 0, 0.2);
@@ -39,11 +39,19 @@
 	}
 }
 
+.leplayer--paused
+{
+	.leplayer-play-button
+	{
+		display: flex;
+	}
+}
+
 
 .leplayer--fullscreen
 {
 	.leplayer-play-button {
-		z-index: @z-index-fullscreen + 7;
+		z-index: @z-index-fullscreen + 8;
 	}
 
 	.leplayer-play-button
@@ -76,13 +84,5 @@
 	.leplayer-play-button
 	{
 		display: none;
-	}
-}
-
-.leplayer--paused
-{
-	.leplayer-play-button
-	{
-		display: flex;
 	}
 }
