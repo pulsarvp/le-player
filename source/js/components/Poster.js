@@ -10,15 +10,17 @@ import Component from './Component';
 /**
  * @param {Player} player Main player
  * @param {Object} [options]
- * @class ErrorDisplay
+ * @param {String} [options.imgUrl] path to poster image
+ * @class Poster
  * @extends Component
  */
 class Poster extends Component {
 
 	constructor(player, options={}) {
 		options = $.extend({}, {
-			poster : player.options.poster
+			imgUrl : player.options.poster
 		}, options);
+
 		super(player, options);
 	}
 
@@ -27,7 +29,7 @@ class Poster extends Component {
 	 */
 	createElement() {
 		this.element = $('<div />')
-			.css('background-image', `url("${this.player.options.poster}")`)
+			.css('background-image', `url("${this.options.imgUrl}")`)
 			.addClass('leplayer-poster')
 	}
 
