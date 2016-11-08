@@ -5,6 +5,8 @@ import ControlCollection from './components/ControlCollection';
 import Control from './components/Control';
 import Component from './components/Component';
 import MiniPlayer from './components/MiniPlayer';
+import PlayButton from './components/PlayButton'
+
 import Icon from './components/Icon';
 import Sections from './components/Sections';
 import ErrorDisplay from './components/ErrorDisplay';
@@ -239,7 +241,6 @@ let Player = function (element, options) {
 	 */
 
 	this.element = createEl('div');
-	let playButton = this.playButton = null;
 	let loader = null;
 	let sectionContainer = null;
 	let videoContainer = this.videoContainer = null;
@@ -253,7 +254,7 @@ let Player = function (element, options) {
 			this.player = player;
 			this._ctx = ctx;
 			this._video = ctx[0];
-			this._element = ctx[0];
+			this.element = $(this._video);
 			this.subtitles = [];
 			this.bufferRanges = [];
 			this.playbackRate = this._video.playbackRate;
@@ -543,7 +544,6 @@ let Player = function (element, options) {
 
 		_initHtmlEvents () {
 			let mediaElement = $(this._video);
-			let timerId = null;
 
 			mediaElement.on({
 
@@ -573,16 +573,11 @@ let Player = function (element, options) {
 				},
 
 				'dblclick' : () => {
-					clearTimeout(timerId);
-					//this.fullscreen.toggle();
+					this.player.trigger('dblclick');
 				},
 
 				'click' : () => {
-					clearTimeout(timerId);
-					timerId = setTimeout(() => {
-						this.player.element.focus()
-						this.togglePlay();
-					}, 300);
+					this.player.trigger('click')
 				},
 
 				'volumechange' : (e) => {
@@ -673,7 +668,7 @@ let Player = function (element, options) {
 		this.video.init().then(() => {
 			const dfd = $.Deferred()
 			this.trigger('inited');
-			this.initPlugins();
+			this._initPlugins();
 		});
 
 
@@ -739,6 +734,7 @@ let Player = function (element, options) {
 	this.initDom = function () {
 		const options = this.options;
 		this.errorDisplay = new ErrorDisplay(this);
+		this.playButton = new PlayButton(this);
 		[
 
 			// Remove controls because we dont not support native controls yet
@@ -772,14 +768,6 @@ let Player = function (element, options) {
 
 
 		// TODO: Вынести это в отдельнеый компонент
-		this.playButton = createEl('div', {
-				className : 'leplayer-play-button'
-			})
-			.append(new Icon(this, { iconName : 'play' }).element)
-			.on({
-				'click' : (e) => { element.trigger('click'); },
-				'dblclick' : (e) => { element.trigger('dblclick'); }
-			});
 
 		loader = $('<div />')
 			.addClass('leplayer-loader-container')
@@ -791,7 +779,7 @@ let Player = function (element, options) {
 		this.videoContainer = createEl('div', {
 			className : 'leplayer-video'
 		})
-		.append(this.playButton)
+		.append(this.playButton.element)
 		.append(loader);
 
 		if(options.miniplayer) {
@@ -822,7 +810,6 @@ let Player = function (element, options) {
 			.append(this.innerElement)
 			.append(this.errorDisplay.element)
 			.attr('tabindex', 0)
-			//.css('width', element.width() + 'px');
 			.css('width', '100%')
 			.css('max-width', (options.width || this.video.width) + 'px')
 
@@ -935,20 +922,6 @@ let Player = function (element, options) {
 		}
 	};
 
-	this.initPlugins = function () {
-		if (this.options.plugins) {
-			for (const name in this.options.plugins) {
-				if(!this.options.plugins.hasOwnProperty(name)) return;
-				const pluginOptions = this.options.plugins[name];
-				if(this[name]) {
-					this[name](pluginOptions);
-				} else {
-					console.error(`Plugin '${name}' doesn't exist`);
-				}
-			}
-		}
-	}
-
 	var isFocused = () => {
 		const focused = $(this.element).find(':focus');
 		return (focused.length > 0) || $(this.element).is(':focus');
@@ -956,28 +929,76 @@ let Player = function (element, options) {
 
 	this.init();
 
-	this.listenUserActivity();
+	this._listenUserActivity();
 
 	$(document).on(fsApi.fullscreenchange, this._onEntityFullscrenChange.bind(this));
 
 
 	this.on('fullscreenchange', this.onFullscreenChange.bind(this));
-
+	this.on('click', this.onClick.bind(this));
+	this.on('dblclick', this.onDbclick.bind(this));
 	this.on('inited', this.options.onPlayerInited.bind(this));
+
 	return this;
 };
 
+
 /**
+ * @access private
+ *
+ * Function, than init all plugins from player options.
+ * If plugin doesn't exist throw an error
+ * @returns {Player} this
+ *
+ */
+Player.prototype._initPlugins = function() {
+	if (this.options.plugins) {
+		for (const name in this.options.plugins) {
+			if(!this.options.plugins.hasOwnProperty(name)) return;
+			const pluginOptions = this.options.plugins[name];
+			if(this[name]) {
+				this[name](pluginOptions);
+			} else {
+				console.error(`Plugin '${name}' doesn't exist`);
+			}
+		}
+	}
+
+	return this;
+}
+
+/**
+ * Static helper for creating a plugins for leplayer
+ *
+ * @access public
  * @static
+ * @param {String} name The name of plugin
+ * @param {Function} fn Plugin init function
+ *
+ * @example
+ * Player.plugin('helloWorld', function(pluginOptions) {
+ *    const player = this;
+ *    player.on('click', () => console.log('Hello world'));
+ * })
+ *
  */
 Player.plugin = function(name, fn) {;
 	Player.prototype[name] = fn;
 }
 
-
+/**
+ * @access private
+ */
 Player.prototype._view = 'common';
 
-
+/**
+ * Emit a player event (the name of event would be a leplayer_smth)
+ *
+ * @access public
+ * @param {String} eventName
+ * @param {Arguments} ...args jQuery.fn.on other arguments
+ * @returns {Player} this
+ */
 Player.prototype.trigger = function(eventName, ...args) {
 	const event = $.Event(`leplayer_${eventName}`, { player : this })
 	this.element.trigger.call(this.element, event, ...args);
@@ -985,6 +1006,14 @@ Player.prototype.trigger = function(eventName, ...args) {
 }
 
 
+/**
+ * Listen a player event with leplayer_ suffix
+ *
+ * @access public
+ * @param {String} eventName
+ * @param {Arguments} ...args jQuery.fn.on other arguments
+ * @returns {Player} this
+ */
 Player.prototype.on = function(eventName, ...args) {
 	this.element.on.call(this.element, `leplayer_${eventName}`, ...args);
 	return this;
@@ -996,21 +1025,50 @@ Player.prototype.one = function(eventName, ...args) {
 }
 
 
+/**
+ * Add the CSS class for general leplayer DOM element
+ *
+ * @access public
+ * @param {String} className Name of class (not a selector, it's mean, that string sould be without point at the start)
+ * @returns {Player} this
+ */
 Player.prototype.addClass = function(className) {
 	this.element.addClass(className);
 	return this;
 }
 
+/**
+ * Remove the CSS class from general leplayer DOM element
+ *
+ * @access public
+ * @param {String} className Name of class
+ * @returns {Player} this
+ */
 Player.prototype.removeClass = function(className) {
 	this.element.removeClass(className);
 	return this;
 }
 
+/**
+ * Toggle the CSS class from general leplayer DOM element
+ *
+ * @access public
+ * @param {String} className
+ * @param {Boolean} flag
+ * @returns {Player} this
+ */
 Player.prototype.toggleClass = function(className, flag) {
 	this.element.toggleClass(className, flag);
 	return this;
 }
 
+/**
+ * Set player view
+ *
+ * @access public
+ * @param {String} view Can be 'common', 'fullscreen', 'mini'
+ * @returns {Player} this
+ */
 Player.prototype.setView = function(view) {
 	this.element
 		.removeClass(`leplayer--${this._view}`)
@@ -1019,10 +1077,22 @@ Player.prototype.setView = function(view) {
 	return this;
 }
 
+/**
+ * Return the view of player
+ *
+ * @access public
+ * @returns {String}
+ */
 Player.prototype.getView = function() {
 	return this._view;
 }
 
+/**
+ * Show player error if param value not null. Also trigger player event 'error'
+ *
+ * @param {String|MediaError} value
+ * @returns {Player} this
+ */
 Player.prototype.setError = function(value) {
 	if (value === null) {
 		this._error = null;
@@ -1030,15 +1100,20 @@ Player.prototype.setError = function(value) {
 		if(this.errorDisplay) {
 			this.errorDisplay.element.hide()
 		}
-		return;
+		return this;
 	}
 	this._error = new MediaError(value);
 
 	this.addClass('leplayer--error');
 	this.trigger('error', { error : this._error});
+
+	return this;
 }
 
-Player.prototype.listenUserActivity = function() {
+/**
+ * @access private
+ */
+Player.prototype._listenUserActivity = function() {
 	let mouseInProgress;
 	let lastMoveX;
 	let lastMoveY;
@@ -1102,6 +1177,31 @@ Player.prototype.listenUserActivity = function() {
 }
 
 /**
+ * @access private
+ */
+Player.prototype._dblclickTimerId = null;
+
+Player.prototype.onClick = function(e) {
+	clearTimeout(this._dblclickTimerId);
+	this._dblclickTimerId = setTimeout(() => {
+		this.element.focus()
+		this.togglePlay();
+	}, 300);
+};
+
+/**
+ * On dblclick on the video player event handler
+ *
+ * @access public
+ * @param {Event} e
+ */
+Player.prototype.onDbclick = function(e) {
+	clearTimeout(this._dblclickTimerId);
+	this.toggleFullscreen();
+}
+
+/**
+ * @access public
  * @params {Boolean} value
  */
 Player.prototype.setUserActive = function(value) {
@@ -1114,6 +1214,18 @@ Player.prototype.setUserActive = function(value) {
 
 Player.prototype.getUserActive = function() {
 	return this._userActive || false;
+}
+
+Player.prototype.play = function() {
+	return this.video.play();
+}
+
+Player.prototype.pause = function() {
+	return this.video.pause();
+}
+
+Player.prototype.togglePlay = function() {
+	return this.video.togglePlay();
 }
 
 

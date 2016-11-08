@@ -1,34 +1,59 @@
-.leplayer
+.leplayer-play-button
 {
-	.leplayer-play-button
+	display: none;
+	align-items: center;
+	align-content: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.5);
+	color: @color-primary;
+	cursor: pointer;
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	font-size: 50px;
+	outline: 0;
+	text-align: center;
+	text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+	z-index: @z-index-base + 7;
+	&:hover
 	{
-		display: none;
-		align-items: center;
-		align-content: center;
-		justify-content: center;
-		background: rgba(0, 0, 0, 0.5);
-		color: @color-disabled;
-		cursor: pointer;
-		position: absolute;
-		height: 100%;
-		width: 100%;
-		font-size: 80px;
-		outline: 0;
-		text-align: center;
-		text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-		z-index: @z-index-base + 7;
-		&:hover
+		background: rgba(0, 0, 0, 0.2);
+
+		.leplayer-play-button__button
 		{
-			background: rgba(0, 0, 0, 0.2);
-			color: @color-active;
+			opacity: 0.8;
 		}
 	}
+
+	&__button
+	{
+		padding: 25px;
+		background-color: @color-active;
+		border-radius: 50%;
+	}
+
+	.leplayer-icon
+	{
+		position: relative;
+		left: 4px;
+	}
 }
+
 
 .leplayer--fullscreen
 {
 	.leplayer-play-button {
 		z-index: @z-index-fullscreen + 7;
+	}
+
+	.leplayer-play-button
+	{
+		font-size: 50px;
+	}
+
+	.leplayer-play-button__button
+	{
+		padding: 30px;
 	}
 }
 
@@ -36,7 +61,12 @@
 {
 	.leplayer-play-button
 	{
-		font-size: 50px;
+		font-size: 30px;
+	}
+
+	.leplayer-play-button__button
+	{
+		padding: 20px;
 	}
 }
 
