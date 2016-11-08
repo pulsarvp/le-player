@@ -8,6 +8,7 @@ import MiniPlayer from './components/MiniPlayer';
 import Icon from './components/Icon';
 import Sections from './components/Sections';
 import ErrorDisplay from './components/ErrorDisplay';
+import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
 import { C_TIMELINE, C_KEYBINDING_INFO } from './ControlFactory';
@@ -405,7 +406,12 @@ let Player = function (element, options) {
 					//this.fullscreen.init();
 					this._initRate();
 					this._initVolume();
-					this.startBuffering();
+
+
+					// temporary solution for poster usage
+					// this.startBuffering();
+
+
 					dfd.resolve();
 				});
 			return dfd.promise();
@@ -544,7 +550,12 @@ let Player = function (element, options) {
 		_initHtmlEvents () {
 			let mediaElement = $(this._video);
 			let timerId = null;
-
+			mediaElement.one({
+				'play' : (e) => {
+					this.player.trigger('firstplay');
+					this.player.removeClass('leplayer--virgin');
+				}
+			});
 			mediaElement.on({
 
 				'loadstart' : (e) => {
@@ -559,6 +570,9 @@ let Player = function (element, options) {
 
 				'timeupdate' : (e) => {
 					//controls.moveTimeMarker();
+					if ( this.currentTime > 0 ) {
+						this.player.removeClass('leplayer--virgin');
+					};
 					this.player.trigger('timeupdate', { time : this.currentTime, duration : this.duration });
 				},
 
@@ -593,7 +607,6 @@ let Player = function (element, options) {
 					this.player.removeClass('leplayer--ended');
 					this.player.removeClass('leplayer--paused');
 					this.player.addClass('leplayer--playing');
-
 
 					this.player.trigger('play');
 				},
@@ -646,7 +659,6 @@ let Player = function (element, options) {
 				}
 			});
 		}
-
 	}
 
 
@@ -675,7 +687,6 @@ let Player = function (element, options) {
 			this.trigger('inited');
 			this.initPlugins();
 		});
-
 
 	};
 
@@ -739,10 +750,12 @@ let Player = function (element, options) {
 	this.initDom = function () {
 		const options = this.options;
 		this.errorDisplay = new ErrorDisplay(this);
+
 		[
 
 			// Remove controls because we dont not support native controls yet
 			'controls',
+			'poster',
 
 			// It is unnecessary attrs, this functionality solve CSS
 			'height',
@@ -754,7 +767,6 @@ let Player = function (element, options) {
 
 		// Set attrs from options
 		[
-			'poster',
 			'preload',
 			'autoplay',
 			'loop',
@@ -794,6 +806,12 @@ let Player = function (element, options) {
 		.append(this.playButton)
 		.append(loader);
 
+		if(options.poster) {
+			this.poster = new Poster(this);
+			this.videoContainer.append(this.poster.element);
+		}
+
+
 		if(options.miniplayer) {
 			this.miniPlayer = new MiniPlayer(this)
 		}
@@ -825,6 +843,9 @@ let Player = function (element, options) {
 			//.css('width', element.width() + 'px');
 			.css('width', '100%')
 			.css('max-width', (options.width || this.video.width) + 'px')
+
+		this.addClass('leplayer--paused');
+		this.addClass('leplayer--virgin');
 
 
 		if(options.sectionContainer) {
@@ -915,7 +936,6 @@ let Player = function (element, options) {
 
 	this.initOptions = function () {
 		const attrOptions = this.optionsFromElement();
-
 		// Merge default options + video attributts + user options
 		this.options = $.extend(true, defaultOptions, attrOptions, options);
 
