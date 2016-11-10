@@ -5,9 +5,13 @@ import ControlCollection from './components/ControlCollection';
 import Control from './components/Control';
 import Component from './components/Component';
 import MiniPlayer from './components/MiniPlayer';
+import PlayButton from './components/PlayButton'
+
 import Icon from './components/Icon';
 import Sections from './components/Sections';
 import ErrorDisplay from './components/ErrorDisplay';
+import Poster from './components/Poster';
+import FullscreenApi from './FullscreenApi';
 
 import { C_TIMELINE, C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
@@ -153,7 +157,7 @@ const defaultOptions = {
 			info : ['f'],
 			description : 'Открыть/закрыть полноэкраный режим',
 			fn : (player) => {
-				player.video.fullscreen.toggle()
+				player.toggleFullscreen();
 			}
 		}
 	],
@@ -221,9 +225,9 @@ let Player = function (element, options) {
 
 	let self = this;
 	let player = this;
+	let subtitles = [];
 
-	var subtitles = [];
-
+	const fsApi = FullscreenApi;
 	// key -> contol collection name, valuy -> ControlCollection
 	this.controls = {};
 
@@ -238,134 +242,20 @@ let Player = function (element, options) {
 	 */
 
 	this.element = createEl('div');
-	let playButton = this.playButton = null;
 	let loader = null;
 	let sectionContainer = null;
 	let videoContainer = this.videoContainer = null;
+	this._userActivity = false;
+
 	this.innerElement = createEl('div');
 
-
-	/**
-	 * This class manages FullScreen API.
-	 * @TODO: add fullscreenerror handler.
-	 */
-	class Fullscreen {
-
-		constructor (player) {
-			this.player = player;
-			this._collection = player.controls.fullscreen;
-			this._hideTimeout = null;
-			this.fullscreenEnabled = false;
-		}
-
-		/**
-		 * @returns {boolean} Whether browser supports fullscreen mode.
-		 */
-		enabled () {
-			return !!(document.fullscreenEnabled
-				|| document.mozFullScreenEnabled
-				|| document.msFullscreenEnabled
-				|| document.webkitSupportsFullscreen
-				|| document.webkitFullscreenEnabled
-				|| document.createElement('video').webkitRequestFullScreen);
-		}
-
-		init () {
-			if (!this.enabled()) {
-				return null;
-			}
-				// Fullscreen change handlers.
-			$(document).on({
-
-				'fullscreenchange' : (e) => {
-					this.toggleElements(!!(document.fullScreen || document.fullscreenElement));
-				},
-
-				'webkitfullscreenchange' : (e) => {
-					this.toggleElements(!!document.webkitIsFullScreen);
-				},
-
-				'mozfullscreenchange' : (e) => {
-					this.toggleElements(!!document.mozFullScreen);
-				},
-
-				'msfullscreenchange' : (e) => {
-					this.toggleElements(!!document.msFullscreenElement);
-				},
-
-				'webkitbeginfullscreen' : (e) => {
-					this.toggleElements(true)
-				},
-
-				'webkitendfullscreen' : (e) => {
-					this.toggleElements(false)
-				}
-			});
-		}
-
-		/**
-		 * @returns {boolean} Whether browser is in fullscreen mode.
-		 */
-		is () {
-			return !!(document.fullScreen
-				|| document.webkitIsFullScreen
-				|| document.mozFullScreen
-				|| document.msFullscreenElement
-				|| document.fullscreenElement
-				|| this.fullscreenEnabled);
-		}
-
-		showElements () {
-			this.player.trigger('fullscreenchange', true);
-			this.player.setView('fullscreen');
-		}
-
-		hideElements () {
-			this.player.trigger('fullscreenchange', false);
-			this.player.setView('common');
-			clearTimeout(this._hideTimeout);
-			$(this.player.element).off('.leplayer.fullscreen-hide-timeline');
-		}
-
-		toggle () {
-			let containerEl = this.player.element[ 0 ];
-			if (this.is()) {
-				if (document.exitFullscreen)				document.exitFullscreen();
-				else if (document.mozCancelFullScreen)	  document.mozCancelFullScreen();
-				else if (document.webkitCancelFullScreen)   document.webkitCancelFullScreen();
-				else if (document.msExitFullscreen)		 document.msExitFullscreen();
-				else if (document.webkitExitFullscreen)	 document.webkitExitFullscreen();
-				this.hideElements(); // @TODO: make this only if fullscreen fired.
-				this.fullscreenEnabled = false;
-			}
-			else {
-				if (containerEl.requestFullScreen)			containerEl.requestFullScreen();
-				else if (containerEl.webkitRequestFullScreen) containerEl.webkitRequestFullScreen();
-				else if (containerEl.mozRequestFullScreen)	containerEl.mozRequestFullScreen();
-				else if (containerEl.msExitFullscreen)		containerEl.msRequestFullscreen();
-				this.showElements(); // @TODO: make this only if fullscreen fired.
-				this.fullscreEnabled = true;
-			}
-		}
-
-		/**
-		 * Update DOM structure according to current state.
-		 */
-		toggleElements (show) {
-			if (!!show) {
-				this.showElements();
-			}
-			else {
-				this.hideElements();
-			}
-		}
-	}
 
 	class Video {
 		constructor (player, ctx) {
 			this.player = player;
 			this._ctx = ctx;
-			this._video = ctx[ 0 ];
+			this._video = ctx[0];
+			this.element = $(this._video);
 			this.subtitles = [];
 			this.bufferRanges = [];
 			this.playbackRate = this._video.playbackRate;
@@ -513,11 +403,16 @@ let Player = function (element, options) {
 			this._initSubtitles();
 			this._initVideo()
 				.done(() => {
-					this.fullscreen = new Fullscreen(this.player);
-					this.fullscreen.init();
+					//this.fullscreen = new Fullscreen(this.player);
+					//this.fullscreen.init();
 					this._initRate();
 					this._initVolume();
-					this.startBuffering();
+
+
+					// temporary solution for poster usage
+					// this.startBuffering();
+
+
 					dfd.resolve();
 				});
 			return dfd.promise();
@@ -655,7 +550,13 @@ let Player = function (element, options) {
 
 		_initHtmlEvents () {
 			let mediaElement = $(this._video);
-			let timerId = null;
+
+			mediaElement.one({
+				'play' : (e) => {
+					this.player.trigger('firstplay');
+					this.player.removeClass('leplayer--virgin');
+				}
+			});
 
 			mediaElement.on({
 
@@ -671,6 +572,9 @@ let Player = function (element, options) {
 
 				'timeupdate' : (e) => {
 					//controls.moveTimeMarker();
+					if ( this.currentTime > 0 ) {
+						this.player.removeClass('leplayer--virgin');
+					};
 					this.player.trigger('timeupdate', { time : this.currentTime, duration : this.duration });
 				},
 
@@ -685,16 +589,11 @@ let Player = function (element, options) {
 				},
 
 				'dblclick' : () => {
-					clearTimeout(timerId);
-					this.fullscreen.toggle();
+					this.player.trigger('dblclick');
 				},
 
 				'click' : () => {
-					clearTimeout(timerId);
-					timerId = setTimeout(() => {
-						this.player.element.focus()
-						this.togglePlay();
-					}, 300);
+					this.player.trigger('click')
 				},
 
 				'volumechange' : (e) => {
@@ -705,7 +604,6 @@ let Player = function (element, options) {
 					this.player.removeClass('leplayer--ended');
 					this.player.removeClass('leplayer--paused');
 					this.player.addClass('leplayer--playing');
-
 
 					this.player.trigger('play');
 				},
@@ -758,7 +656,6 @@ let Player = function (element, options) {
 				}
 			});
 		}
-
 	}
 
 
@@ -785,9 +682,8 @@ let Player = function (element, options) {
 		this.video.init().then(() => {
 			const dfd = $.Deferred()
 			this.trigger('inited');
-			this.initPlugins();
+			this._initPlugins();
 		});
-
 
 	};
 
@@ -851,10 +747,13 @@ let Player = function (element, options) {
 	this.initDom = function () {
 		const options = this.options;
 		this.errorDisplay = new ErrorDisplay(this);
+		this.playButton = new PlayButton(this);
+
 		[
 
 			// Remove controls because we dont not support native controls yet
 			'controls',
+			'poster',
 
 			// It is unnecessary attrs, this functionality solve CSS
 			'height',
@@ -866,7 +765,6 @@ let Player = function (element, options) {
 
 		// Set attrs from options
 		[
-			'poster',
 			'preload',
 			'autoplay',
 			'loop',
@@ -884,14 +782,6 @@ let Player = function (element, options) {
 
 
 		// TODO: Вынести это в отдельнеый компонент
-		this.playButton = createEl('div', {
-				className : 'leplayer-play-button'
-			})
-			.append(new Icon(this, { iconName : 'play' }).element)
-			.on({
-				'click' : (e) => { element.trigger('click'); },
-				'dblclick' : (e) => { element.trigger('dblclick'); }
-			});
 
 		loader = $('<div />')
 			.addClass('leplayer-loader-container')
@@ -903,8 +793,14 @@ let Player = function (element, options) {
 		this.videoContainer = createEl('div', {
 			className : 'leplayer-video'
 		})
-		.append(this.playButton)
+		.append(this.playButton.element)
 		.append(loader);
+
+		if(options.poster) {
+			this.poster = new Poster(this);
+			this.videoContainer.append(this.poster.element);
+		}
+
 
 		if(options.miniplayer) {
 			this.miniPlayer = new MiniPlayer(this)
@@ -934,9 +830,11 @@ let Player = function (element, options) {
 			.append(this.innerElement)
 			.append(this.errorDisplay.element)
 			.attr('tabindex', 0)
-			//.css('width', element.width() + 'px');
 			.css('width', '100%')
 			.css('max-width', (options.width || this.video.width) + 'px')
+
+		this.addClass('leplayer--paused');
+		this.addClass('leplayer--virgin');
 
 
 		if(options.sectionContainer) {
@@ -1027,7 +925,6 @@ let Player = function (element, options) {
 
 	this.initOptions = function () {
 		const attrOptions = this.optionsFromElement();
-
 		// Merge default options + video attributts + user options
 		this.options = $.extend(true, defaultOptions, attrOptions, options);
 
@@ -1047,43 +944,83 @@ let Player = function (element, options) {
 		}
 	};
 
-	this.initPlugins = function () {
-		if (this.options.plugins) {
-			for (const name in this.options.plugins) {
-				if(!this.options.plugins.hasOwnProperty(name)) return;
-				const pluginOptions = this.options.plugins[name];
-				if(this[name]) {
-					this[name](pluginOptions);
-				} else {
-					console.error(`Plugin '${name}' doesn't exist`);
-				}
-			}
-		}
-	}
-
 	var isFocused = () => {
 		const focused = $(this.element).find(':focus');
 		return (focused.length > 0) || $(this.element).is(':focus');
 	}
 
 	this.init();
-	this._userActivity = false;
-	this.listenUserActivity();
+
+	this._listenUserActivity();
+
+	$(document).on(fsApi.fullscreenchange, this._onEntityFullscrenChange.bind(this));
+
+
+	this.on('fullscreenchange', this.onFullscreenChange.bind(this));
+	this.on('click', this.onClick.bind(this));
+	this.on('dblclick', this.onDbclick.bind(this));
 	this.on('inited', this.options.onPlayerInited.bind(this));
+
 	return this;
 };
 
+
 /**
+ * @access private
+ *
+ * Function, than init all plugins from player options.
+ * If plugin doesn't exist throw an error
+ * @returns {Player} this
+ *
+ */
+Player.prototype._initPlugins = function() {
+	if (this.options.plugins) {
+		for (const name in this.options.plugins) {
+			if(!this.options.plugins.hasOwnProperty(name)) return;
+			const pluginOptions = this.options.plugins[name];
+			if(this[name]) {
+				this[name](pluginOptions);
+			} else {
+				console.error(`Plugin '${name}' doesn't exist`);
+			}
+		}
+	}
+
+	return this;
+}
+
+/**
+ * Static helper for creating a plugins for leplayer
+ *
+ * @access public
  * @static
+ * @param {String} name The name of plugin
+ * @param {Function} fn Plugin init function
+ *
+ * @example
+ * Player.plugin('helloWorld', function(pluginOptions) {
+ *    const player = this;
+ *    player.on('click', () => console.log('Hello world'));
+ * })
+ *
  */
 Player.plugin = function(name, fn) {;
 	Player.prototype[name] = fn;
 }
 
-
+/**
+ * @access private
+ */
 Player.prototype._view = 'common';
 
-
+/**
+ * Emit a player event (the name of event would be a leplayer_smth)
+ *
+ * @access public
+ * @param {String} eventName
+ * @param {Arguments} ...args jQuery.fn.on other arguments
+ * @returns {Player} this
+ */
 Player.prototype.trigger = function(eventName, ...args) {
 	const event = $.Event(`leplayer_${eventName}`, { player : this })
 	this.element.trigger.call(this.element, event, ...args);
@@ -1091,6 +1028,14 @@ Player.prototype.trigger = function(eventName, ...args) {
 }
 
 
+/**
+ * Listen a player event with leplayer_ suffix
+ *
+ * @access public
+ * @param {String} eventName
+ * @param {Arguments} ...args jQuery.fn.on other arguments
+ * @returns {Player} this
+ */
 Player.prototype.on = function(eventName, ...args) {
 	this.element.on.call(this.element, `leplayer_${eventName}`, ...args);
 	return this;
@@ -1102,32 +1047,74 @@ Player.prototype.one = function(eventName, ...args) {
 }
 
 
+/**
+ * Add the CSS class for general leplayer DOM element
+ *
+ * @access public
+ * @param {String} className Name of class (not a selector, it's mean, that string sould be without point at the start)
+ * @returns {Player} this
+ */
 Player.prototype.addClass = function(className) {
 	this.element.addClass(className);
 	return this;
 }
 
+/**
+ * Remove the CSS class from general leplayer DOM element
+ *
+ * @access public
+ * @param {String} className Name of class
+ * @returns {Player} this
+ */
 Player.prototype.removeClass = function(className) {
 	this.element.removeClass(className);
 	return this;
 }
 
+/**
+ * Toggle the CSS class from general leplayer DOM element
+ *
+ * @access public
+ * @param {String} className
+ * @param {Boolean} flag
+ * @returns {Player} this
+ */
 Player.prototype.toggleClass = function(className, flag) {
 	this.element.toggleClass(className, flag);
 	return this;
 }
 
+/**
+ * Set player view
+ *
+ * @access public
+ * @param {String} view Can be 'common', 'fullscreen', 'mini'
+ * @returns {Player} this
+ */
 Player.prototype.setView = function(view) {
 	this.element
 		.removeClass(`leplayer--${this._view}`)
 		.addClass(`leplayer--${view}`)
 	this._view = view;
+	return this;
 }
 
+/**
+ * Return the view of player
+ *
+ * @access public
+ * @returns {String}
+ */
 Player.prototype.getView = function() {
-	return this._view
+	return this._view;
 }
 
+/**
+ * Show player error if param value not null. Also trigger player event 'error'
+ *
+ * @param {String|MediaError} value
+ * @returns {Player} this
+ */
 Player.prototype.setError = function(value) {
 	if (value === null) {
 		this._error = null;
@@ -1135,15 +1122,20 @@ Player.prototype.setError = function(value) {
 		if(this.errorDisplay) {
 			this.errorDisplay.element.hide()
 		}
-		return;
+		return this;
 	}
 	this._error = new MediaError(value);
 
 	this.addClass('leplayer--error');
 	this.trigger('error', { error : this._error});
+
+	return this;
 }
 
-Player.prototype.listenUserActivity = function() {
+/**
+ * @access private
+ */
+Player.prototype._listenUserActivity = function() {
 	let mouseInProgress;
 	let lastMoveX;
 	let lastMoveY;
@@ -1207,6 +1199,31 @@ Player.prototype.listenUserActivity = function() {
 }
 
 /**
+ * @access private
+ */
+Player.prototype._dblclickTimerId = null;
+
+Player.prototype.onClick = function(e) {
+	clearTimeout(this._dblclickTimerId);
+	this._dblclickTimerId = setTimeout(() => {
+		this.element.focus()
+		this.togglePlay();
+	}, 300);
+};
+
+/**
+ * On dblclick on the video player event handler
+ *
+ * @access public
+ * @param {Event} e
+ */
+Player.prototype.onDbclick = function(e) {
+	clearTimeout(this._dblclickTimerId);
+	this.toggleFullscreen();
+}
+
+/**
+ * @access public
  * @params {Boolean} value
  */
 Player.prototype.setUserActive = function(value) {
@@ -1219,6 +1236,18 @@ Player.prototype.setUserActive = function(value) {
 
 Player.prototype.getUserActive = function() {
 	return this._userActive || false;
+}
+
+Player.prototype.play = function() {
+	return this.video.play();
+}
+
+Player.prototype.pause = function() {
+	return this.video.pause();
+}
+
+Player.prototype.togglePlay = function() {
+	return this.video.togglePlay();
 }
 
 
@@ -1235,6 +1264,50 @@ Player.prototype.getSectionData = function() {
 	}).promise()
 }
 
+Player.prototype.requestFullscreen = function() {
+	const fsApi = FullscreenApi;
+
+	if(fsApi.requestFullscreen) {
+		// Call HTML5 Video api requestFullscreen
+		this.element[0][fsApi.requestFullscreen]();
+
+		this.trigger('fullscreenchange', true);
+	}
+}
+
+Player.prototype.exitFullscreen = function() {
+	const fsApi = FullscreenApi;
+
+	if(fsApi.exitFullscreen) {
+		document[fsApi.exitFullscreen]();
+	}
+
+	this.trigger('fullscreenchange', false);
+
+}
+
+Player.prototype.toggleFullscreen = function() {
+	if(this.getView() === 'fullscreen') {
+		this.exitFullscreen()
+	} else {
+		this.requestFullscreen()
+	}
+}
+
+Player.prototype._onEntityFullscrenChange = function() {
+	const fsApi = FullscreenApi;
+	const isFs = !!document[fsApi.fullscreenElement];
+	this.trigger('fullscreenchange', isFs);
+}
+
+Player.prototype.onFullscreenChange = function(e, isFs) {
+	const fsApi = FullscreenApi;
+	if(isFs) {
+		this.setView('fullscreen');
+	} else {
+		this.setView('common');
+	}
+}
 
 window.$.fn.lePlayer = function (options) {
 	return this.each(function () {

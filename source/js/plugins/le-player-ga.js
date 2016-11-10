@@ -3,6 +3,14 @@ import $ from 'jquery';
 window.$.lePlayer.plugin('ga', function(pluginOptions) {
 	const player = this;
 
+	player.on('firstplay', (e) => {
+		window.ga(
+			'send',
+			'event',
+			'Player Video Started'
+		)
+	})
+
 	player.on('controlclick', (e, data) => {
 		const control = data.control;
 		const {name, collection} = control.options;

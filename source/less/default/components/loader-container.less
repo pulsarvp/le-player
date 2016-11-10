@@ -1,17 +1,26 @@
-.leplayer
+.leplayer-loader-container
+{
+	&:extend(.leplayer-play-button);
+	color: @color-active;
+	font-size: 116px;
+
+	display: none;
+}
+
+.leplayer--fullscreen
 {
 	.leplayer-loader-container
 	{
-		&:extend(.leplayer .leplayer-play-button);
-		display: none;
+		&:extend(.leplayer--fullscreen .leplayer-play-button);
+		font-size: 128px;
 	}
 }
 
-.leplayer.leplayer--fullscreen
+.leplayer--mini
 {
 	.leplayer-loader-container
 	{
-		&:extend(.leplayer.leplayer--fullscreen .leplayer-play-button);
+		font-size: 82px;
 	}
 }
 

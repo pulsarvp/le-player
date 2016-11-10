@@ -32,7 +32,7 @@ class Control extends Component {
 
 		this.element.on({
 			'click' : this._onClick.bind(this),
-			'leplayer_click' : this.onClick.bind(this)
+			'leplayer_control_click' : this.onClick.bind(this)
 		});
 
 		this.player.on('inited', this.onPlayerInited.bind(this))
@@ -79,7 +79,7 @@ class Control extends Component {
 		if (this.disable) {
 			return false;
 		}
-		this.element.trigger('leplayer_click');
+		this.element.trigger('leplayer_control_click');
 		this.player.trigger('controlclick', { control : this });
 	}
 
@@ -103,3 +103,4 @@ class Control extends Component {
 }
 
 export default Control;
+

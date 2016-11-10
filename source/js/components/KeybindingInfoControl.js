@@ -41,7 +41,7 @@ class KeyBindingInfoControl extends ControlDropdown {
 				if (index != 0) {
 					keyString += ` + `
 				}
-				keyString += `<div class="leplayer-key">${key}</div>`
+				keyString += `<kbd class="leplayer-key">${key}</kbd>`
 			});
 
 			item = `

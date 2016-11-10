@@ -7,6 +7,7 @@
 	display: block;
 	outline: 0;
 	position: relative;
+	background-color: transparent;
 
 	&.leplayer--fullscreen
 	{
@@ -101,6 +102,7 @@
 			&__item
 			{
 			}
+
 		}
 		.control-text
 		{
@@ -560,6 +562,7 @@
 	display: none;
 	text-align: center;
 	font-size: 15px;
+	padding: 15px;
 	z-index: @z-index-base + 7;
 }
 
@@ -705,6 +708,8 @@
 
 .leplayer-key
 {
+	font-family: inherit;
+	font-size: inherit;
 	box-shadow: 1px 1px 0 1px rgba(120,120,120,0.5);
 	background: #eee;
 	border-radius: 2px;
@@ -762,3 +767,4 @@
 @import "components/loader-container.less";
 @import "components/sections.less";
 @import "components/timeline-buffered.less";
+@import "components/poster.less";

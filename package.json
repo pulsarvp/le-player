@@ -50,6 +50,7 @@
     "grunt-webpack": "^1.0.11",
     "jsdoc": "^3.4.0",
     "minami": "^1.1.1",
+    "postcss-initial": "^1.5.2",
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1"
   }

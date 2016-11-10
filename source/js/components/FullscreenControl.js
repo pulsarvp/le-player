@@ -27,7 +27,7 @@ class FullscreenControl extends Control {
 	 */
 	onClick(e) {
 		super.onClick(e)
-		this.player.video.fullscreen.toggle();
+		this.player.toggleFullscreen();
 	}
 }
 
