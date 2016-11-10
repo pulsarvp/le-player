@@ -3,6 +3,7 @@
   display: block;
   outline: 0;
   position: relative;
+  background-color: transparent;
 }
 .leplayer.leplayer--fullscreen {
   position: absolute;
@@ -400,6 +401,7 @@
   display: none;
   text-align: center;
   font-size: 15px;
+  padding: 15px;
   z-index: 507;
 }
 .leplayer.leplayer--fullscreen .leplayer-error-display {
@@ -500,6 +502,8 @@
   display: block;
 }
 .leplayer-key {
+  font-family: inherit;
+  font-size: inherit;
   box-shadow: 1px 1px 0 1px rgba(120, 120, 120, 0.5);
   background: #eee;
   border-radius: 2px;
@@ -568,6 +572,8 @@
   height: 100% !important;
   margin: 0 auto;
   width: 100% !important;
+  padding-top: 0 !important;
+  z-index: 1006;
 }
 .leplayer--mini .leplayer-video {
   z-index: 601;
@@ -585,8 +591,8 @@
   margin-top: auto;
   margin-bottom: auto;
 }
-.leplayer .leplayer-play-button,
-.leplayer .leplayer-loader-container {
+.leplayer-play-button,
+.leplayer-loader-container {
   display: none;
   -ms-flex-align: center;
       align-items: center;
@@ -595,37 +601,67 @@
   -ms-flex-pack: center;
       justify-content: center;
   background: rgba(0, 0, 0, 0.5);
-  color: #7fa9c7;
+  color: #00548f;
   cursor: pointer;
   position: absolute;
   height: 100%;
   width: 100%;
-  font-size: 80px;
+  font-size: 50px;
   outline: 0;
   text-align: center;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-  z-index: 507;
+  z-index: 508;
 }
-.leplayer .leplayer-play-button:hover {
+.leplayer-play-button:hover {
   background: rgba(0, 0, 0, 0.2);
-  color: white;
 }
-.leplayer--fullscreen .leplayer-play-button {
-  z-index: 1007;
+.leplayer-play-button:hover .leplayer-play-button__button {
+  opacity: 0.8;
 }
-.leplayer--mini .leplayer-play-button {
-  font-size: 50px;
+.leplayer-play-button__button {
+  padding: 25px;
+  background-color: white;
+  border-radius: 50%;
 }
-.leplayer--playing .leplayer-play-button,
-.leplayer--error .leplayer-play-button {
-  display: none;
+.leplayer-play-button .leplayer-icon {
+  position: relative;
+  left: 4px;
 }
 .leplayer--paused .leplayer-play-button {
   display: -ms-flexbox;
   display: flex;
 }
-.leplayer .leplayer-loader-container {
+.leplayer--fullscreen .leplayer-play-button,
+.leplayer--fullscreen .leplayer-loader-container {
+  z-index: 1008;
+}
+.leplayer--fullscreen .leplayer-play-button,
+.leplayer--fullscreen .leplayer-loader-container {
+  font-size: 50px;
+}
+.leplayer--fullscreen .leplayer-play-button__button {
+  padding: 30px;
+}
+.leplayer--mini .leplayer-play-button {
+  font-size: 30px;
+}
+.leplayer--mini .leplayer-play-button__button {
+  padding: 20px;
+}
+.leplayer--playing .leplayer-play-button,
+.leplayer--error .leplayer-play-button {
   display: none;
+}
+.leplayer-loader-container {
+  color: white;
+  font-size: 116px;
+  display: none;
+}
+.leplayer--fullscreen .leplayer-loader-container {
+  font-size: 128px;
+}
+.leplayer--mini .leplayer-loader-container {
+  font-size: 82px;
 }
 .leplayer--waiting .leplayer-loader-container {
   display: -ms-flexbox;
@@ -812,4 +848,20 @@
   bottom: 0;
   background-color: rgba(255, 0, 0, 0.4);
   z-index: 505;
+}
+.leplayer-poster {
+  display: none;
+  position: absolute;
+  z-index: 507;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-size: cover;
+}
+.leplayer--virgin .leplayer-poster {
+  display: block;
+}
+.leplayer--fullscreen .leplayer-poster {
+  z-index: 1007;
 }

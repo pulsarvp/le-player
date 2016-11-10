@@ -44,46 +44,13 @@
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	window.$.lePlayer.plugin('ga', function (pluginOptions) {
-		var player = this;
-
-		player.on('controlclick', function (e, data) {
-			var control = data.control;
-			var _control$options = control.options,
-			    name = _control$options.name,
-			    collection = _control$options.collection;
-
-			if (name) {
-				window.ga('send', 'event', 'Player Control Click', name, collection);
-			}
-		});
-
-		player.on('sectionsclick', function (e, data) {
-			window.ga('send', 'event', 'Player Sections', 'Click', player.getView());
-		});
-
-		player.on('timeupdate', function () {
-			var percent = player.video.playedPercentage;
-			var delta = 5;
-			if (Math.abs(percent - 100) < delta) {
-				window.ga('send', 'event', 'Player Video Played', '95-100%');
-			}
-		});
-	});
+	eval("'use strict';\n\nvar _jquery = __webpack_require__(1);\n\nvar _jquery2 = _interopRequireDefault(_jquery);\n\nfunction _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }\n\nwindow.$.lePlayer.plugin('ga', function (pluginOptions) {\n\tvar player = this;\n\n\tplayer.on('firstplay', function (e) {\n\t\twindow.ga('send', 'event', 'Player Video Started');\n\t});\n\n\tplayer.on('controlclick', function (e, data) {\n\t\tvar control = data.control;\n\t\tvar _control$options = control.options;\n\t\tvar name = _control$options.name;\n\t\tvar collection = _control$options.collection;\n\n\t\tif (name) {\n\t\t\twindow.ga('send', 'event', 'Player Control Click', name, collection);\n\t\t}\n\t});\n\n\tplayer.on('sectionsclick', function (e, data) {\n\t\twindow.ga('send', 'event', 'Player Sections', 'Click', player.getView());\n\t});\n\n\tplayer.on('timeupdate', function () {\n\t\tvar percent = player.video.playedPercentage;\n\t\tvar delta = 5;\n\t\tif (Math.abs(percent - 100) < delta) {\n\t\t\twindow.ga('send', 'event', 'Player Video Played', '95-100%');\n\t\t}\n\t});\n});\n\n/*****************\n ** WEBPACK FOOTER\n ** ./source/js/plugins/le-player-ga.js\n ** module id = 0\n ** module chunks = 1\n **/\n//# sourceURL=webpack:///./source/js/plugins/le-player-ga.js?");
 
 /***/ },
 /* 1 */
 /***/ function(module, exports) {
 
-	module.exports = $;
+	eval("module.exports = $;\n\n/*****************\n ** WEBPACK FOOTER\n ** external \"$\"\n ** module id = 1\n ** module chunks = 0 1\n **/\n//# sourceURL=webpack:///external_%22$%22?");
 
 /***/ }
 /******/ ]);
