@@ -220,6 +220,8 @@ const defaultOptions = {
  * @param {String} [options.miniplayer.width] MiniPlayer's width
  * @param {String} [options.sectionContainer] Selector for sections
  * @param {Object} [options.plugins] Keys of objects are name of plugin, value - plugin options
+ * @param {String|Object} [options.data] Url or JSON with data for player
+ * @param {Array} [options.data.sections] Sections array
  */
 let Player = function (element, options) {
 
