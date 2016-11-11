@@ -679,7 +679,6 @@ let Player = function (element, options) {
 		this.initHotKeys();
 		this.initSections().then((data) => {
 			this.sections = data.sectionsComponent;
-			console.log(data);
 			this.trigger('sectionsinit', data);
 		});
 		this.video.init().then(() => {
@@ -709,7 +708,6 @@ let Player = function (element, options) {
 		} else {
 			this.getSectionData().done(sections => {
 				sections = [...sections];
-				console.log(sections);
 
 				const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
 
@@ -736,7 +734,6 @@ let Player = function (element, options) {
 
 				this.innerElement.append(sectionsComponent.element);
 
-				console.log(sections);
 				if (isSectionOutside) {
 					const outsideSections = new Sections(player, {
 						items : sections,
