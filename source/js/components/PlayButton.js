@@ -16,7 +16,6 @@ class PlayButton extends Control {
 	constructor(player, options) {
 		super(player, options)
 
-		console.log(this.element, this.player);
 		this.element.on('dblclick', this._onDbclick.bind(this));
 	}
 
