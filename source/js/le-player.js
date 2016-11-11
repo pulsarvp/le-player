@@ -676,11 +676,11 @@ let Player = function (element, options) {
 		this.initControls();
 		this.initHotKeys();
 		this.initSections().then((data) => {
-			this.sections = data.sections;
+			this.sections = data.sectionsComponent;
+			console.log(data);
 			this.trigger('sectionsinit', data);
 		});
 		this.video.init().then(() => {
-			const dfd = $.Deferred()
 			this.trigger('inited');
 			this._initPlugins();
 		});
@@ -702,41 +702,47 @@ let Player = function (element, options) {
 
 	this.initSections = function() {
 		const dfd = $.Deferred();
-		if (options.dataUrl == null) {
+		if (this.options.data == null) {
 			dfd.reject(null)
 		} else {
-			this.getSectionData().done(data => {
+			this.getSectionData().done(sections => {
+				sections = [...sections];
+				console.log(sections);
+
 				const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
-				if (data.sections == null || data.sections.length == 0) {
+
+				if (sections == null || sections.length == 0) {
 					dfd.reject(null);
 					return;
 				}
-				for ( let i = 0; i < data.sections.length; i++) {
+
+				for ( let i = 0; i < sections.length; i++) {
 					let endSection;
-					if (i < (data.sections.length - 1)) {
-						endSection = data.sections[i+1].begin
+					if (i < (sections.length - 1)) {
+						endSection = sections[i+1].begin
 					} else {
 						endSection = this.video.duration;
 					}
-					data.sections[i].end = endSection;
+					sections[i].end = endSection;
 				}
 
-				const sections = new Sections(this, {
+				const sectionsComponent = new Sections(this, {
 
-					items : data.sections,
+					items : sections,
 					fullscreenOnly : isSectionOutside,
 				});
 
-				this.innerElement.append(sections.element);
+				this.innerElement.append(sectionsComponent.element);
 
+				console.log(sections);
 				if (isSectionOutside) {
 					const outsideSections = new Sections(player, {
-						items : data.sections,
+						items : sections,
 						main : false
 					});
 					sectionContainer.append(outsideSections.element);
 				}
-				dfd.resolve({ sections, items : data.sections });
+				dfd.resolve({ sectionsComponent, items : sections });
 			})
 		}
 
@@ -1256,12 +1262,38 @@ Player.prototype.getError = function() {
 	return this._error || null;
 }
 
+/**
+ * Get some data for player
+ *
+ * @access public
+ * @returns {jQuery.promise} Promise
+ */
+Player.prototype.getData = function() {
+	const dfd = new $.Deferred();
+
+	if (this._data !== undefined) {
+		dfd.resolve(this._data);
+		return dfd.promise()
+	}
+
+	if (typeof this.options.data === 'string') {
+		return $.ajax({
+			url: this.options.data,
+			method: 'GET',
+			dataType: 'json'
+		}).promise();
+
+	} else if (typeof this.options.data === 'object') {
+		dfd.resolve(this.options.data);
+		return dfd.promise()
+	}
+}
+
 Player.prototype.getSectionData = function() {
-	return $.ajax({
-		url: this.options.dataUrl,
-		method: 'GET',
-		dataType: 'json'
-	}).promise()
+	return this.getData()
+		.then(data => {
+			return data.sections
+		})
 }
 
 Player.prototype.requestFullscreen = function() {

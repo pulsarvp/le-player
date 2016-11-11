@@ -25,6 +25,7 @@ class TimelineControl extends Control {
 			className : 'timeline timeline-container'
 		}, options);
 		super(player, options);
+
 		this.player.on('sectionsinit', this.onSectionsInit.bind(this));
 
 		this.player.on('timeupdate', (e, data) => {
@@ -161,6 +162,7 @@ class TimelineControl extends Control {
 		if(isNaN(duration)) {
 			return
 		}
+		console.log(this.player.sections);
 		if (this.player.sections) {
 			this.updateSectionRanges(this.player.sections.items);
 		}
