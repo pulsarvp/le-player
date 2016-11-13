@@ -41,7 +41,6 @@ class Sections extends Component {
 
 		//this.player.trigger('sectionsinit', { items : this.items, sections : this });
 		this.player.on('inited', this.onPlayerInited.bind(this));
-		console.log(items);
 
 		return this;
 	}

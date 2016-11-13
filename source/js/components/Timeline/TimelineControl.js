@@ -162,7 +162,6 @@ class TimelineControl extends Control {
 		if(isNaN(duration)) {
 			return
 		}
-		console.log(this.player.sections);
 		if (this.player.sections) {
 			this.updateSectionRanges(this.player.sections.items);
 		}
