@@ -819,11 +819,11 @@ let Player = function (element, options) {
 				})
 				.append(createEl('div', {
 						className : 'leplayer__title',
-						text : this.options.title || ""
+						html : this.options.title || ""
 					}))
 				.append(createEl('div', {
 						className : 'leplayer__video-info',
-						text : this.options.videoInfo || ""
+						html : this.options.videoInfo || ""
 					}))
 				.append(this.miniPlayer && this.miniPlayer.element)
 			)
