@@ -150,9 +150,9 @@ class Sections extends Component {
 	}
 
 	_onSectionsToggle(e, data) {
-		if (this.element.hasClass('leplayer-sections--hidden')) {
+		if (this.element.hasClass('leplayer-sections--hidden') && data.checked) {
 			this.element.removeClass('leplayer-sections--hidden');
-		} else {
+		} else if (!data.checked) {
 			this.element.addClass('leplayer-sections--hidden');
 		}
 	}
