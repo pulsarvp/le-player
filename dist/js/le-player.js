@@ -913,10 +913,10 @@
 				className: 'leplayer__info'
 			}).append((0, _utils.createEl)('div', {
 				className: 'leplayer__title',
-				text: this.options.title || ""
+				html: this.options.title || ""
 			})).append((0, _utils.createEl)('div', {
 				className: 'leplayer__video-info',
-				text: this.options.videoInfo || ""
+				html: this.options.videoInfo || ""
 			})).append(this.miniPlayer && this.miniPlayer.element));
 			//.append($('leplayer__video-info')
 			//.text(this.options.videoInfo || ""))
@@ -2672,7 +2672,6 @@
 				if (isNaN(duration)) {
 					return;
 				}
-				console.log(this.player.sections);
 				if (this.player.sections) {
 					this.updateSectionRanges(this.player.sections.items);
 				}
@@ -4656,7 +4655,6 @@
 
 			//this.player.trigger('sectionsinit', { items : this.items, sections : this });
 			_this.player.on('inited', _this.onPlayerInited.bind(_this));
-			console.log(items);
 
 			return _ret = _this, _possibleConstructorReturn(_this, _ret);
 		}
