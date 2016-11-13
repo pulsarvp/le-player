@@ -3124,10 +3124,7 @@
 
 			var _this = _possibleConstructorReturn(this, (SectionControl.__proto__ || Object.getPrototypeOf(SectionControl)).call(this, player, options));
 
-			_this.player.on('sectionsinit', function () {
-				_this.options.disable = _this.disable = false;
-				_this.checked = true;
-			});
+			_this.player.on('sectionsinit', _this._onSectionsInit.bind(_this));
 			return _this;
 		}
 
@@ -3135,7 +3132,16 @@
 			key: 'onChecked',
 			value: function onChecked(e, data) {
 				_get(SectionControl.prototype.__proto__ || Object.getPrototypeOf(SectionControl.prototype), 'onChecked', this).call(this, e);
-				this.player.trigger('sectionstoggle', { checked: data.checked });
+				this.player.trigger('sectionstoggle', {
+					checked: data.checked,
+					view: this.player.getView()
+				});
+			}
+		}, {
+			key: '_onSectionsInit',
+			value: function _onSectionsInit(e) {
+				this.options.disable = this.disable = false;
+				this.checked = true;
 			}
 		}]);
 
@@ -4770,9 +4776,9 @@
 		}, {
 			key: '_onSectionsToggle',
 			value: function _onSectionsToggle(e, data) {
-				if (this.element.hasClass('leplayer-sections--hidden')) {
+				if (this.element.hasClass('leplayer-sections--hidden') && data.checked) {
 					this.element.removeClass('leplayer-sections--hidden');
-				} else {
+				} else if (!data.checked) {
 					this.element.addClass('leplayer-sections--hidden');
 				}
 			}
