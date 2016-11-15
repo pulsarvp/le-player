@@ -61,9 +61,9 @@
 
 		player.on('controlclick', function (e, data) {
 			var control = data.control;
-			var _control$options = control.options;
-			var name = _control$options.name;
-			var collection = _control$options.collection;
+			var _control$options = control.options,
+			    name = _control$options.name,
+			    collection = _control$options.collection;
 
 			if (name) {
 				window.ga('send', 'event', 'Player Control Click', name, collection);

@@ -533,8 +533,10 @@
 					mediaElement.on((_mediaElement$on = {
 
 						'loadstart': function loadstart(e) {
-							_this4.player.setError(null);
 							_this4.player.removeClass('leplayer--ended');
+
+							_this4.player.setError(null);
+
 							_this4.player.trigger('loadstart');
 						},
 
@@ -848,8 +850,7 @@
 
 					if (isSectionOutside) {
 						var outsideSections = new _Sections2.default(player, {
-							items: sections,
-							main: false
+							items: sections
 						});
 						sectionContainer.append(outsideSections.element);
 					}
@@ -1043,7 +1044,7 @@
 		this.on('fullscreenchange', this.onFullscreenChange.bind(this));
 		this.on('click', this.onClick.bind(this));
 		this.on('dblclick', this.onDbclick.bind(this));
-		this.on('inited', this.options.onPlayerInited.bind(this));
+		this.on('inited', this._onInited.bind(this));
 
 		return this;
 	};
@@ -1312,7 +1313,7 @@
 
 		clearTimeout(this._dblclickTimerId);
 		this._dblclickTimerId = setTimeout(function () {
-			_this12.element.focus();
+			_this12.video.element.focus();
 			_this12.togglePlay();
 		}, 300);
 	};
@@ -1437,12 +1438,20 @@
 		}
 	};
 
+	Player.prototype._onInited = function (e) {
+		this.options.onPlayerInited.call(e, this);
+		this.addClass('leplayer--inited');
+	};
+
 	window.$.fn.lePlayer = function (options) {
 		return this.each(function () {
 			return new Player((0, _jquery2.default)(this), options);
 		});
 	};
+
 	window.$.lePlayer = Player;
+
+	window.lePlayer = Player;
 
 /***/ },
 /* 1 */
@@ -1518,9 +1527,9 @@
 			value: function createElement() {
 				var _this2 = this;
 
-				var _options = this.options;
-				var name = _options.name;
-				var controls = _options.controls;
+				var _options = this.options,
+				    name = _options.name,
+				    controls = _options.controls;
 
 
 				this.element = (0, _utils.createEl)('div', {
@@ -2282,9 +2291,9 @@
 		}, {
 			key: 'toggleMuted',
 			value: function toggleMuted() {
-				var _player = this.player;
-				var video = _player.video;
-				var options = _player.options;
+				var _player = this.player,
+				    video = _player.video,
+				    options = _player.options;
 
 
 				if (video.volume == 0) {
@@ -2553,8 +2562,8 @@
 			_this.player.on('sectionsinit', _this.onSectionsInit.bind(_this));
 
 			_this.player.on('timeupdate', function (e, data) {
-				var time = data.time;
-				var duration = data.duration;
+				var time = data.time,
+				    duration = data.duration;
 
 				_this.hardMove(time / duration);
 			});
@@ -4635,10 +4644,10 @@
 
 			_classCallCheck(this, Sections);
 
-			var _options$items = options.items;
-			var items = _options$items === undefined ? [] : _options$items;
-			var _options$main = options.main;
-			var main = _options$main === undefined ? true : _options$main;
+			var _options$items = options.items,
+			    items = _options$items === undefined ? [] : _options$items,
+			    _options$main = options.main,
+			    main = _options$main === undefined ? true : _options$main;
 
 			items = [].concat(items);
 
