@@ -627,7 +627,7 @@
   position: relative;
   left: 4px;
 }
-.leplayer--paused .leplayer-play-button {
+.leplayer--inited .leplayer-play-button {
   display: -ms-flexbox;
   display: flex;
 }
