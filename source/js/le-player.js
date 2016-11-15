@@ -1212,7 +1212,7 @@ Player.prototype._dblclickTimerId = null;
 Player.prototype.onClick = function(e) {
 	clearTimeout(this._dblclickTimerId);
 	this._dblclickTimerId = setTimeout(() => {
-		this.element.focus()
+		this.video.element.focus()
 		this.togglePlay();
 	}, 300);
 };
