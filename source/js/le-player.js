@@ -563,8 +563,10 @@ let Player = function (element, options) {
 			mediaElement.on({
 
 				'loadstart' : (e) => {
-					this.player.setError(null);
 					this.player.removeClass('leplayer--ended');
+
+					this.player.setError(null);
+
 					this.player.trigger('loadstart');
 				},
 
@@ -737,7 +739,6 @@ let Player = function (element, options) {
 				if (isSectionOutside) {
 					const outsideSections = new Sections(player, {
 						items : sections,
-						main : false
 					});
 					sectionContainer.append(outsideSections.element);
 				}
@@ -964,7 +965,7 @@ let Player = function (element, options) {
 	this.on('fullscreenchange', this.onFullscreenChange.bind(this));
 	this.on('click', this.onClick.bind(this));
 	this.on('dblclick', this.onDbclick.bind(this));
-	this.on('inited', this.options.onPlayerInited.bind(this));
+	this.on('inited', this._onInited.bind(this));
 
 	return this;
 };
@@ -1340,9 +1341,17 @@ Player.prototype.onFullscreenChange = function(e, isFs) {
 	}
 }
 
+Player.prototype._onInited = function(e) {
+	this.options.onPlayerInited.call(e, this);
+	this.addClass('leplayer--inited');
+}
+
 window.$.fn.lePlayer = function (options) {
 	return this.each(function () {
 		return new Player($(this), options);
 	});
 };
+
 window.$.lePlayer = Player;
+
+window.lePlayer = Player;
