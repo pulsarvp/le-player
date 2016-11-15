@@ -5,78 +5,73 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>LePlayer Demo Page</title>
 		<link id="linkPlayerTheme" rel="stylesheet" href="../dist/css/default/le-player.css">
-		<link rel="stylesheet" href="../bower_components/bootstrap/dist/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 		<style>
-
 		body {
-			margin: 0;
-			padding: 0;
+			padding-top: 1.5rem;
+			padding-bottom: 1.5rem;
 		}
-
 		</style>
 	</head>
 	<body>
-<div id="debug"></div>
+		<div id="debug"></div>
 		<div class="warning-subtitle alert alert-danger" role="alert" style="display: none;">
 			<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 			Note that for subtitles to work you need to run this page under
 			<em>http</em> protocol.
 		</div>
+		<a href="https://github.com/miptliot/le-player"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png"></a>
 		<div class="container">
 
-			<div class="dropdown" id="changeTheme">
-			  <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-			    Выбрать тему
-			    <span class="caret"></span>
-			  </button>
-			  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-			    <li><a href="#" class="link-set-theme" data-name="default">Лекторий <span class="label label-default">Default</span></a></li>
-			    <li><a href="#" class="link-set-theme" data-name="vps">video.mipt</a></li>
-			    <li><a href="#" class="link-set-theme" data-name="ussr">СССР</a></li>
-			    <li><a href="#" class="link-set-theme" data-name="vps-gray">Новый video.mipt</a></li>
-			  </ul>
+			<div class="header clearfix">
+				<nav>
+					<ul class="nav nav-pills float-xs-right">
+						<li role="presentation" class="nav-item active">
+							<a class="nav-link active" href="#">Демо</a>
+						</li>
+						<li role="presentation" class="nav-item">
+							<a class="nav-link active" href="../docs/out/index.html">Readme</a>
+						</li>
+						<li role="presentation" class="nav-item">
+							<a class="nav-link active" href="../docs/out/Player.html">Документация</a>
+						</li>
+						<li role="presentation" class="dropdown" id="changeTheme">
+						  <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+							Выбрать тему
+							<span class="caret"></span>
+						  </a>
+						  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+							<li><a href="#" class="link-set-theme" data-name="default">Лекторий <span class="label label-default">Default</span></a></li>
+							<li><a href="#" class="link-set-theme" data-name="vps">video.mipt</a></li>
+							<li><a href="#" class="link-set-theme" data-name="ussr">СССР</a></li>
+							<li><a href="#" class="link-set-theme" data-name="vps-gray">Новый video.mipt</a></li>
+						  </ul>
+						</li>
+					</ul>
+				</nav>
 			</div>
-			<!--<h2>Single video</h2>-->
-			<!--<video id="video1" src="./corrupted.mp4" height="200"></video>-->
+
 			<h2>Multiple videos with miniplayer</h2>
-			<video id="video2">
-				<source data-quality="SD" src="./sample1.mp4">
-				<source data-quality="SD" src="http://lectoriy.mipt.ru/cdn/videosh264/Physics-Electricity-L09-Kozel-131001.01.mp4">
-				<track label="EN" srclang="en" src="subs_en.vtt" kind="subtitles">
-				<track label="RU" srclang="ru" src="subs_ru.vtt" kind="subtitles">
-			</video>
+			<div class="row">
+				<div class="col-sm-12 col-md-7">
+					<video id="video">
+						<source data-quality="SD" src="http://lectoriy.ciot-env.ru/cdn/videosh264/TherPhys-FieldTh-L02-Gershtein-130220.01.mp4">
+						<source data-quality="SD" src="http://lectoriy.mipt.ru/cdn/videosh264/Physics-Electricity-L09-Kozel-131001.01.mp4">
+						<track label="EN" srclang="en" src="subs_en.vtt" kind="subtitles">
+						<track label="RU" srclang="ru" src="subs_ru.vtt" kind="subtitles">
+					</video>
+				</div>
+				<div class="col-sm-12 col-md-2">
+					<div id="sections"></div>
+				</div>
+			</div>
 			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
 			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
 			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
 			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
 			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
-			<!--<div class="clearfix">-->
-				<!--<h2>Corrupted</h2>-->
-				<!--<video id="video3" src="http://lectoriy.mipt.ru/cdn/videosh264/Physics-Electricity-L09-Kozel-131001.01.mp4">-->
-				<!--</video>-->
-				<!--<div id="video3section" style="-->
-					<!--position: relative;-->
-					<!--width: 300px;-->
-					<!--height: 300px;-->
-					<!--float: left;-->
-				<!--"></div>-->
-			<!--</div>-->
-
-			<!--<h2> Contorls in one lines </h2>-->
-			<!--<p>-->
-			<!--<button class="btn btn-hide-divider" data-video-id="videoControlsOnLine"> Скрыть отустпы </button>-->
-			<!--<button class="btn btn-hide-line-offset" data-video-id="videoControlsOnLine"> Скрыть отустп между контролами и видео </button>-->
-			<!--</p>-->
-			<!--<video id="videoControlsOnLine">-->
-
-				<!--<source src="sample2.mp4" title="1280">-->
-				<!--<track label="EN" srclang="en" src="subs_en.vtt" kind="subtitles">-->
-				<!--<track label="RU" srclang="ru" src="subs_ru.vtt" kind="subtitles">-->
-
-			<!--</video>-->
-
 		</div>
-	</body>
+	<script type="text/javascript" src="//vk.com/js/api/openapi.js?136"></script>
 	<script>
 			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
@@ -85,8 +80,8 @@
 		ga('create', 'UA-5832386-17', 'none');
 		ga('send', 'pageview');
 	</script>
-	<script src="../bower_components/jquery/dist/jquery.min.js"></script>
-	<script src="../bower_components/bootstrap/dist/js/bootstrap.min.js" charset="utf-8"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" charset="utf-8"></script>
 	<script src="index.js" charset="utf-8"></script>
 	<script src="../dist/js/le-player.js"></script>
 	<script src="../dist/js/le-player-ga.js"></script>
@@ -94,54 +89,28 @@
 		$(document).ready(function () {
 			if (window.location.protocol != 'http:')
 				$('.warning-subtitle').show();
-			$('#video1').lePlayer({
-				poster : 'poster.jpg'
-			});
-			$('#video2').lePlayer({
+			$('#video').lePlayer({
 				title : 'Multiple videos with mini player',
-				width: 500,
-				dataUrl : './data.json',
+				width: '100%',
+				data : './sections.json',
+				sectionContainer: "#sections",
+				poster : './poster.jpg',
 				miniplayer: {
 					width : '1140px'
 				},
 				preload : 'metadata',
+				excludeControls  : {
+					common : [ [ 'section' ], [ 'subtitle' ] ]
+				},
 				plugins : {
 					'ga' : {}
-				}
-				//dataUrl : './data.json'
-			});
-			$('#video3').lePlayer({
-				width: 500,
-				sectionContainer: '#video3section'
-			});
-			$('#videoControlsOnLine').lePlayer({
-				width: 1000,
-				controls : {
-					common : [
-						[
-							'play',
-							'volume',
-							'divider',
-							'rate',
-							'divider',
-							'timeline',
-							'divider',
-							'backward',
-							'divider',
-							'source',
-							'divider',
-							'subtitle',
-							'divider',
-							'download',
-							'divider',
-							'keybinding info',
-							'divider',
-							'fullscreen',
-						]
-					]
+				},
+				onPlayerInited : function(){
+					console.log("Player inited")
 				}
 				//dataUrl : './data.json'
 			});
 		});
 	</script>
+	</body>
 </html>
