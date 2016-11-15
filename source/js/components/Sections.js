@@ -13,8 +13,7 @@ import { secondsToTime } from '../utils';
  * @param {Player} player Main player
  * @param {Object} [options]
  * @param {Array} [options.items=[]} Data for sections
- * @param {Boolean} [options.fullscreenOnly] Show section only in fullscreen
- * @param {Boolean} [options.main=true] Main sections of player
+ * @param {Boolean} [options.views] Show section only in fullscreen
  * @extends Component
  */
 class Sections extends Component {
