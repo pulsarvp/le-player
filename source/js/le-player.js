@@ -665,7 +665,7 @@ let Player = function (element, options) {
 
 				'waiting' : (e) => {
 					this.player.addClass('leplayer--waiting');
-					this.player.one('timeupdate', () => this.removeClass('leplayer--waiting'));
+					this.player.one('timeupdate', () => this.player.removeClass('leplayer--waiting'));
 					this.player.trigger('waiting');
 				},
 
