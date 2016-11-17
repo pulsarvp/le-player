@@ -580,7 +580,6 @@ let Player = function (element, options) {
 				},
 
 				'timeupdate' : (e) => {
-					//controls.moveTimeMarker();
 					if ( this.currentTime > 0 ) {
 						this.player.removeClass('leplayer--virgin');
 					};
