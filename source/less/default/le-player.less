@@ -254,6 +254,15 @@
 			z-index: @z-index-base + 8;
 			left: 50%;
 			transform: translateX(-50%);
+			&:before
+			{
+				content: '';
+				position: absolute;
+				width: @control-height;
+				height: 1px;
+				bottom: -1px;
+				left: 0;
+			}
 		}
 
 		&:hover
