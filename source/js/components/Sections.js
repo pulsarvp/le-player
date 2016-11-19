@@ -13,8 +13,7 @@ import { secondsToTime } from '../utils';
  * @param {Player} player Main player
  * @param {Object} [options]
  * @param {Array} [options.items=[]} Data for sections
- * @param {Boolean} [options.fullscreenOnly] Show section only in fullscreen
- * @param {Boolean} [options.main=true] Main sections of player
+ * @param {Boolean} [options.views] Show section only in fullscreen
  * @extends Component
  */
 class Sections extends Component {
@@ -30,16 +29,16 @@ class Sections extends Component {
 		this.items = items;
 		this.length = this.items.length
 
-
 		this.setActiveByIndex(0);
 
-		this.element.find('.leplayer-section').on('click', this.onSectionClick.bind(this));
+		this.element
+			.find('.leplayer-section')
+			.on('click', this.onSectionClick.bind(this));
 
 		this.player.on('sectionstoggle', this._onSectionsToggle.bind(this));
 
 		this.player.on('timeupdate', this.onTimeUpdate.bind(this));
 
-		//this.player.trigger('sectionsinit', { items : this.items, sections : this });
 		this.player.on('inited', this.onPlayerInited.bind(this));
 
 		return this;
@@ -94,29 +93,28 @@ class Sections extends Component {
 	}
 
 	setActiveByIndex(index) {
-		if (this.activeSection.length == 0) {
-			return
-		}
-		if (this.activeSection.attr('data-index') == index) {
-			return
-		}
-
-		if (this.getSectionByIndex(index).length == 0) {
-			return
+		if (
+			this.activeSection.length == 0 ||
+			this.activeSection.attr('data-index') == index ||
+			this.getSectionByIndex(index).length == 0
+		) {
+			return this
 		}
 
 		this.activeSection.removeClass('leplayer-section--active');
-
 		this.activeSection = this.getSectionByIndex(index);
-
 		this.activeSection.addClass('leplayer-section--active');
+
+		const topPosition = this.activeSection.position().top;
+
 		if(this.player.getView() !== 'mini') {
 			this.element
-				.stop()
 				.animate({
-				scrollTop : this.activeSection.position().top
-			}, 800)
+					scrollTop : this.element.scrollTop() + topPosition
+				}, 800)
 		}
+
+		return this
 	}
 
 	getSectionByIndex(index) {
@@ -128,12 +126,13 @@ class Sections extends Component {
 		if (this.activeSection.length == 0) {
 			return
 		}
+
 		const currentTime = data.time;
 
-		const endSectionTime = this.activeSection.attr('data-end');
-
 		// Update span with end section time
+		// TODO: Вынести это в отдельный компонент ShowTime или типо того
 		if(this.player.getView() === 'mini' ) {
+			const endSectionTime = this.activeSection.attr('data-end');
 			this.activeSection
 				.next()
 				.find('.time')
@@ -143,7 +142,7 @@ class Sections extends Component {
 		for (let i = 0; i < this.items.length; i++) {
 			const section = this.items[i];
 			if (currentTime < section.end) {
-				this.setActiveByIndex(i);
+				this.setActiveByIndex(i)
 				break;
 			}
 		}

@@ -28,12 +28,17 @@ class TimelineControl extends Control {
 
 		this.player.on('sectionsinit', this.onSectionsInit.bind(this));
 
-		this.player.on('timeupdate', (e, data) => {
-			const { time, duration } = data;
-			this.hardMove(time / duration);
-		});
+		this.player.on('timeupdate', this._onTimeUpdate.bind(this));
+
+		this.player.on('timeupdateload', this._onTimeUpdate.bind(this))
 
 		this.player.on('durationchange', this._onDurationChange.bind(this));
+	}
+
+	_onTimeUpdate(e, data) {
+		const { time } = data;
+		const duration = this.player.video.duration;
+		this.hardMove(time / duration);
 	}
 
 	/**
