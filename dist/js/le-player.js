@@ -1453,8 +1453,28 @@
 	};
 
 	Player.prototype._onInited = function (e) {
-		this.options.onPlayerInited.call(e, this);
+		this.options.onPlayerInited.call(this, e);
 		this.addClass('leplayer--inited');
+	};
+
+	/**
+	 * Return the height of player. If you want get height only of video element, use this.video.height or whatever
+	 *
+	 * @access public
+	 * @returns {Number} Height in px
+	 */
+	Player.prototype.getHeight = function () {
+		return this.element.height();
+	};
+
+	/**
+	 * Return the width of player.
+	 *
+	 * @access public
+	 * @returns {Number} Width in px
+	 */
+	Player.prototype.getWidth = function () {
+		return this.element.width();
 	};
 
 	window.$.fn.lePlayer = function (options) {
