@@ -66,7 +66,7 @@
   background: #465264;
 }
 .leplayer-controls.controls-fullscreen .info-control__content {
-  background: rgba(70, 82, 100, 0.85);
+  background: #465264;
   color: white;
 }
 .leplayer-controls.controls-fullscreen .control-text {
@@ -188,6 +188,14 @@
   left: 50%;
   transform: translateX(-50%);
 }
+.leplayer-controls .control-dropdown__content:before {
+  content: '';
+  position: absolute;
+  width: 32px;
+  height: 1px;
+  bottom: -1px;
+  left: 0;
+}
 .leplayer-controls .control-dropdown:hover .control-dropdown__content {
   display: block;
 }
@@ -196,17 +204,15 @@
   color: inherit;
 }
 .leplayer-controls .info-control__content {
-  box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.4);
   white-space: nowrap;
   text-align: left;
-  background: rgba(246, 213, 213, 0.85);
+  background: #f6d5d5;
   padding: 10px;
   color: black;
   font-size: 12px;
-  left: 50%;
-  bottom: 37px;
+  /*left: 50%;*/
   min-width: 300px;
-  transform: translateX(-50%);
+  /*transform: translateX(-50%);*/
 }
 .leplayer-controls .control-container {
   display: table-cell;
@@ -417,14 +423,6 @@
   width: 1em;
   height: 1em;
 }
-.leplayer-icon-spin {
-  animation: leplayer-spin 2s infinite linear;
-}
-@keyframes leplayer-spin {
-  100% {
-    transform: rotate(360deg);
-  }
-}
 .leplayer__inner {
   position: relative;
   overflow: hidden;
@@ -548,6 +546,9 @@
 .leplayer-miniplayer .volume-control:hover .volume-slider {
   display: none;
 }
+.leplayer-miniplayer .rate-current {
+  min-width: 34px;
+}
 .leplayer-video {
   background: #000;
   display: block;
@@ -649,7 +650,9 @@
   padding: 20px;
 }
 .leplayer--playing .leplayer-play-button,
-.leplayer--error .leplayer-play-button {
+.leplayer--error .leplayer-play-button,
+.leplayer--waiting .leplayer-play-button,
+.leplayer--seeking .leplayer-play-button {
   display: none;
 }
 .leplayer-loader-container {
@@ -663,9 +666,22 @@
 .leplayer--mini .leplayer-loader-container {
   font-size: 82px;
 }
-.leplayer--waiting .leplayer-loader-container {
+.leplayer--waiting .leplayer-loader-container,
+.leplayer--seeking .leplayer-loader-container {
   display: -ms-flexbox;
   display: flex;
+}
+.leplayer--waiting .leplayer-loader-container__icon,
+.leplayer--seeking .leplayer-loader-container__icon {
+  animation: leplayer-spin 2s infinite linear;
+}
+.leplayer-loader-container__icon {
+  animation: none;
+}
+@keyframes leplayer-spin {
+  100% {
+    transform: rotate(360deg);
+  }
 }
 .leplayer-sections {
   font-size: 13px;
@@ -756,7 +772,6 @@
   position: absolute;
   top: 0;
   right: 0;
-  height: auto;
 }
 .leplayer__inner .leplayer-section {
   background: rgba(255, 255, 255, 0.8);

@@ -545,11 +545,20 @@
 						},
 
 						'timeupdate': function timeupdate(e) {
-							//controls.moveTimeMarker();
 							if (_this4.currentTime > 0) {
 								_this4.player.removeClass('leplayer--virgin');
 							};
 							_this4.player.trigger('timeupdate', { time: _this4.currentTime, duration: _this4.duration });
+						},
+
+						'seeking': function seeking(e) {
+							_this4.player.addClass('leplayer--seeking');
+							_this4.player.trigger('seeking');
+						},
+
+						'seeked': function seeked(e) {
+							_this4.player.removeClass('leplayer--seeking');
+							_this4.player.trigger('seeked');
 						},
 
 						'ended': function ended() {
@@ -615,12 +624,11 @@
 						_this4.player.removeClass('leplayer--waiting');
 						_this4.player.trigger('canplaythrough');
 					}), _defineProperty(_mediaElement$on, 'waiting', function waiting(e) {
-						//loader.show();
 						_this4.player.addClass('leplayer--waiting');
-						_this4.player.trigger('waiting');
 						_this4.player.one('timeupdate', function () {
 							return _this4.player.removeClass('leplayer--waiting');
 						});
+						_this4.player.trigger('waiting');
 					}), _defineProperty(_mediaElement$on, 'error', function error(e) {
 						_this4.player.setError(new _MediaError2.default(e.target.error.code));
 					}), _mediaElement$on));
@@ -631,13 +639,18 @@
 					return this._video.currentTime;
 				},
 				set: function set(value) {
+					var time = void 0;
 					if (value > this.duration) {
-						this._video.currentTime = this.duration;
+						time = this.duration;
 					} else if (value < 0) {
-						this._video.currentTime = 0;
+						time = 0;
 					} else {
-						this._video.currentTime = value;
+						time = value;
 					}
+
+					this.player.trigger('timeupdateload', { time: time });
+
+					this._video.currentTime = time;
 				}
 			}, {
 				key: 'duration',
@@ -894,7 +907,7 @@
 
 			loader = (0, _jquery2.default)('<div />').addClass('leplayer-loader-container').append(new _Icon2.default(this, {
 				iconName: 'refresh',
-				className: 'leplayer-icon-spin'
+				className: 'leplayer-loader-container__icon'
 			}).element);
 
 			this.videoContainer = (0, _utils.createEl)('div', {
@@ -1042,8 +1055,9 @@
 		(0, _jquery2.default)(document).on(fsApi.fullscreenchange, this._onEntityFullscrenChange.bind(this));
 
 		this.on('fullscreenchange', this.onFullscreenChange.bind(this));
-		this.on('click', this.onClick.bind(this));
-		this.on('dblclick', this.onDbclick.bind(this));
+		this.on('click', this._onClick.bind(this));
+		this.on('dblclick', this._onDbclick.bind(this));
+		//this.on('waiting', this._onWaiting.bind(this));
 		this.on('inited', this._onInited.bind(this));
 
 		return this;
@@ -1308,7 +1322,7 @@
 	 */
 	Player.prototype._dblclickTimerId = null;
 
-	Player.prototype.onClick = function (e) {
+	Player.prototype._onClick = function (e) {
 		var _this12 = this;
 
 		clearTimeout(this._dblclickTimerId);
@@ -1321,10 +1335,10 @@
 	/**
 	 * On dblclick on the video player event handler
 	 *
-	 * @access public
+	 * @access private
 	 * @param {Event} e
 	 */
-	Player.prototype.onDbclick = function (e) {
+	Player.prototype._onDbclick = function (e) {
 		clearTimeout(this._dblclickTimerId);
 		this.toggleFullscreen();
 	};
@@ -1439,8 +1453,28 @@
 	};
 
 	Player.prototype._onInited = function (e) {
-		this.options.onPlayerInited.call(e, this);
+		this.options.onPlayerInited.call(this, e);
 		this.addClass('leplayer--inited');
+	};
+
+	/**
+	 * Return the height of player. If you want get height only of video element, use this.video.height or whatever
+	 *
+	 * @access public
+	 * @returns {Number} Height in px
+	 */
+	Player.prototype.getHeight = function () {
+		return this.element.height();
+	};
+
+	/**
+	 * Return the width of player.
+	 *
+	 * @access public
+	 * @returns {Number} Width in px
+	 */
+	Player.prototype.getWidth = function () {
+		return this.element.width();
 	};
 
 	window.$.fn.lePlayer = function (options) {
@@ -2561,23 +2595,28 @@
 
 			_this.player.on('sectionsinit', _this.onSectionsInit.bind(_this));
 
-			_this.player.on('timeupdate', function (e, data) {
-				var time = data.time,
-				    duration = data.duration;
+			_this.player.on('timeupdate', _this._onTimeUpdate.bind(_this));
 
-				_this.hardMove(time / duration);
-			});
+			_this.player.on('timeupdateload', _this._onTimeUpdate.bind(_this));
 
 			_this.player.on('durationchange', _this._onDurationChange.bind(_this));
 			return _this;
 		}
 
-		/**
-	  * @override
-	  */
-
-
 		_createClass(TimelineControl, [{
+			key: '_onTimeUpdate',
+			value: function _onTimeUpdate(e, data) {
+				var time = data.time;
+
+				var duration = this.player.video.duration;
+				this.hardMove(time / duration);
+			}
+
+			/**
+	   * @override
+	   */
+
+		}, {
 			key: 'createElement',
 			value: function createElement() {
 				var _this2 = this;
@@ -4632,8 +4671,7 @@
 	 * @param {Player} player Main player
 	 * @param {Object} [options]
 	 * @param {Array} [options.items=[]} Data for sections
-	 * @param {Boolean} [options.fullscreenOnly] Show section only in fullscreen
-	 * @param {Boolean} [options.main=true] Main sections of player
+	 * @param {Boolean} [options.views] Show section only in fullscreen
 	 * @extends Component
 	 */
 	var Sections = function (_Component) {
@@ -4668,7 +4706,6 @@
 
 			_this.player.on('timeupdate', _this.onTimeUpdate.bind(_this));
 
-			//this.player.trigger('sectionsinit', { items : this.items, sections : this });
 			_this.player.on('inited', _this.onPlayerInited.bind(_this));
 
 			return _ret = _this, _possibleConstructorReturn(_this, _ret);
@@ -4732,27 +4769,23 @@
 		}, {
 			key: 'setActiveByIndex',
 			value: function setActiveByIndex(index) {
-				if (this.activeSection.length == 0) {
-					return;
-				}
-				if (this.activeSection.attr('data-index') == index) {
-					return;
-				}
-
-				if (this.getSectionByIndex(index).length == 0) {
-					return;
+				if (this.activeSection.length == 0 || this.activeSection.attr('data-index') == index || this.getSectionByIndex(index).length == 0) {
+					return this;
 				}
 
 				this.activeSection.removeClass('leplayer-section--active');
-
 				this.activeSection = this.getSectionByIndex(index);
-
 				this.activeSection.addClass('leplayer-section--active');
+
+				var topPosition = this.activeSection.position().top;
+
 				if (this.player.getView() !== 'mini') {
-					this.element.stop().animate({
-						scrollTop: this.activeSection.position().top
+					this.element.animate({
+						scrollTop: this.element.scrollTop() + topPosition
 					}, 800);
 				}
+
+				return this;
 			}
 		}, {
 			key: 'getSectionByIndex',
@@ -4765,12 +4798,13 @@
 				if (this.activeSection.length == 0) {
 					return;
 				}
+
 				var currentTime = data.time;
 
-				var endSectionTime = this.activeSection.attr('data-end');
-
 				// Update span with end section time
+				// TODO: Вынести это в отдельный компонент ShowTime или типо того
 				if (this.player.getView() === 'mini') {
+					var endSectionTime = this.activeSection.attr('data-end');
 					this.activeSection.next().find('.time').text((0, _utils.secondsToTime)(endSectionTime - currentTime));
 				}
 

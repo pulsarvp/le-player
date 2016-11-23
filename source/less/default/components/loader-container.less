@@ -25,10 +25,30 @@
 }
 
 
-.leplayer--waiting
+.leplayer--waiting,
+.leplayer--seeking
 {
 	.leplayer-loader-container
 	{
 		display: flex;
+	}
+
+	.leplayer-loader-container__icon
+	{
+		animation: leplayer-spin 2s infinite linear;
+	}
+}
+
+.leplayer-loader-container__icon
+{
+	animation: none;
+}
+
+
+@keyframes leplayer-spin
+{
+	100%
+	{
+		transform: rotate(360deg);
 	}
 }

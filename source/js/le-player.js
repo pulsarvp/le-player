@@ -273,13 +273,18 @@ let Player = function (element, options) {
 		}
 
 		set currentTime (value) {
+			let time;
 			if (value > this.duration) {
-				this._video.currentTime = this.duration
+				time = this.duration
 			} else if (value < 0 ) {
-				this._video.currentTime = 0
+				time = 0
 			} else {
-				this._video.currentTime = value;
+				time = value;
 			}
+
+			this.player.trigger('timeupdateload', { time });
+
+			this._video.currentTime = time;
 		}
 
 		get duration () {
@@ -575,11 +580,20 @@ let Player = function (element, options) {
 				},
 
 				'timeupdate' : (e) => {
-					//controls.moveTimeMarker();
 					if ( this.currentTime > 0 ) {
 						this.player.removeClass('leplayer--virgin');
 					};
 					this.player.trigger('timeupdate', { time : this.currentTime, duration : this.duration });
+				},
+
+				'seeking' : (e) => {
+					this.player.addClass('leplayer--seeking');
+					this.player.trigger('seeking');
+				},
+
+				'seeked' : (e) => {
+					this.player.removeClass('leplayer--seeking');
+					this.player.trigger('seeked');
 				},
 
 				'ended' : () => {
@@ -649,10 +663,9 @@ let Player = function (element, options) {
 				},
 
 				'waiting' : (e) => {
-					//loader.show();
 					this.player.addClass('leplayer--waiting');
-					this.player.trigger('waiting');
 					this.player.one('timeupdate', () => this.player.removeClass('leplayer--waiting'));
+					this.player.trigger('waiting');
 				},
 
 				'error' : (e) => {
@@ -793,7 +806,7 @@ let Player = function (element, options) {
 			.addClass('leplayer-loader-container')
 			.append(new Icon(this, {
 				iconName : 'refresh',
-				className : 'leplayer-icon-spin'
+				className : 'leplayer-loader-container__icon'
 				}).element);
 
 		this.videoContainer = createEl('div', {
@@ -963,8 +976,9 @@ let Player = function (element, options) {
 
 
 	this.on('fullscreenchange', this.onFullscreenChange.bind(this));
-	this.on('click', this.onClick.bind(this));
-	this.on('dblclick', this.onDbclick.bind(this));
+	this.on('click', this._onClick.bind(this));
+	this.on('dblclick', this._onDbclick.bind(this));
+	//this.on('waiting', this._onWaiting.bind(this));
 	this.on('inited', this._onInited.bind(this));
 
 	return this;
@@ -1209,7 +1223,7 @@ Player.prototype._listenUserActivity = function() {
  */
 Player.prototype._dblclickTimerId = null;
 
-Player.prototype.onClick = function(e) {
+Player.prototype._onClick = function(e) {
 	clearTimeout(this._dblclickTimerId);
 	this._dblclickTimerId = setTimeout(() => {
 		this.video.element.focus()
@@ -1220,10 +1234,10 @@ Player.prototype.onClick = function(e) {
 /**
  * On dblclick on the video player event handler
  *
- * @access public
+ * @access private
  * @param {Event} e
  */
-Player.prototype.onDbclick = function(e) {
+Player.prototype._onDbclick = function(e) {
 	clearTimeout(this._dblclickTimerId);
 	this.toggleFullscreen();
 }
@@ -1342,8 +1356,28 @@ Player.prototype.onFullscreenChange = function(e, isFs) {
 }
 
 Player.prototype._onInited = function(e) {
-	this.options.onPlayerInited.call(e, this);
+	this.options.onPlayerInited.call(this, e);
 	this.addClass('leplayer--inited');
+}
+
+/**
+ * Return the height of player. If you want get height only of video element, use this.video.height or whatever
+ *
+ * @access public
+ * @returns {Number} Height in px
+ */
+Player.prototype.getHeight = function() {
+	return this.element.height()
+}
+
+/**
+ * Return the width of player.
+ *
+ * @access public
+ * @returns {Number} Width in px
+ */
+Player.prototype.getWidth = function() {
+	return this.element.width()
 }
 
 window.$.fn.lePlayer = function (options) {
