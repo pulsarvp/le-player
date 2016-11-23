@@ -4,8 +4,14 @@
 	color: @color-active;
 	font-size: 116px;
 
-	display: none;
+	display: flex;
 }
+
+.leplayer-loader-container__icon
+{
+	animation: leplayer-spin 2s infinite linear;
+}
+
 
 .leplayer--fullscreen
 {
@@ -25,6 +31,20 @@
 }
 
 
+.leplayer--inited,
+.leplayer--error
+{
+	.leplayer-loader-container
+	{
+		display: none;
+	}
+
+	.leplayer-loader-container__icon
+	{
+		animation: none;
+	}
+}
+
 .leplayer--waiting,
 .leplayer--seeking
 {
@@ -37,11 +57,6 @@
 	{
 		animation: leplayer-spin 2s infinite linear;
 	}
-}
-
-.leplayer-loader-container__icon
-{
-	animation: none;
 }
 
 
