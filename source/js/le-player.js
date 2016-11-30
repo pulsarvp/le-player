@@ -1356,8 +1356,9 @@ Player.prototype.onFullscreenChange = function(e, isFs) {
 }
 
 Player.prototype._onInited = function(e) {
-	this.options.onPlayerInited.call(this, e);
 	this.addClass('leplayer--inited');
+
+	this.options.onPlayerInited.call(this, e);
 }
 
 /**
