@@ -1999,6 +1999,7 @@
 	 * @param {String} [options.name]
 	 * @param {String} [options.collection]
 	 * @param {String} [options.title] Contorl's tooltip, title attr
+	 * @param {Function} [options.onClick] On click event handler
 	 * @param {Boolean} [options.disable=false]
 	 * @property {Icon} icon Icon in control, if it is exist
 	 * @extends Component
@@ -3500,7 +3501,12 @@
 					}
 				});
 
-				this.currentRate = new _ControlText2.default(this.player, { className: 'rate-current' });
+				this.currentRate = new _ControlText2.default(this.player, {
+					className: 'rate-current',
+					onClick: function onClick(e) {
+						video.rate = this.player.options.rate.default;
+					}
+				});
 
 				this.element.append(this.downControl.element).append(this.currentRate.element).append(this.upControl.element);
 			}
