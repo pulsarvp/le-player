@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>RateControl - Documentation</title>
+    <title>ControlCollection - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">RateControl</h1>
+    <h1 class="page-title">ControlCollection</h1>
     
 
     
@@ -41,7 +41,7 @@
 <header>
     
         <h2>
-        RateControl
+        ControlCollection
         </h2>
         
     
@@ -54,7 +54,7 @@
 
     
 
-    <h4 class="name" id="RateControl"><span class="type-signature"></span>new RateControl<span class="signature">(player, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="ControlCollection"><span class="type-signature"></span>new ControlCollection<span class="signature">(player, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
 
     
 
@@ -152,7 +152,68 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last">Options of component
+                <h6>Properties</h6>
+                
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>controls</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">jQuery</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Array of rows of control's name</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -190,13 +251,13 @@
 
         <tr>
             
-                <td class="name"><code>downControl</code></td>
+                <td class="name"><code>Array</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type"><a href="Control.html">Control</a></span>
+<span class="param-type">Array</span>
 
 
             
@@ -206,53 +267,7 @@
 
             
 
-            <td class="description last">Down rate control</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>upControl</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Control.html">Control</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Up rate control</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>currentRate</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="ControlText.html">ControlText</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Control of cuurent rate</td>
+            <td class="description last">of rows of control's name</td>
         </tr>
 
     
@@ -291,7 +306,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_RateControl.js.html">components/RateControl.js</a>, <a href="components_RateControl.js.html#line11">line 11</a>
+        <a href="components_ControlCollection.js.html">components/ControlCollection.js</a>, <a href="components_ControlCollection.js.html#line21">line 21</a>
     </li></ul></dd>
     
 
@@ -321,17 +336,6 @@
     </div>
 
     
-        <h3 class="subsection-title">Extends</h3>
-
-        
-
-
-    <ul>
-        <li><a href="Control.html">Control</a></li>
-    </ul>
-
-
-    
 
     
 
@@ -345,167 +349,6 @@
 
     
         <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    <h4 class="name" id="_onClick"><span class="type-signature"></span>_onClick<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_RateControl.js.html">components/RateControl.js</a>, <a href="components_RateControl.js.html#line89">line 89</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="buildCSSClass"><span class="type-signature"></span>buildCSSClass<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="Control.html#buildCSSClass">Control#buildCSSClass</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_RateControl.js.html">components/RateControl.js</a>, <a href="components_RateControl.js.html#line75">line 75</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         
             
@@ -539,11 +382,6 @@
     
 
     
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="Control.html#createElement">Control#createElement</a>
-    </li></ul></dd>
-    
 
     
 
@@ -564,172 +402,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_RateControl.js.html">components/RateControl.js</a>, <a href="components_RateControl.js.html#line38">line 38</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="onClick"><span class="type-signature"></span>onClick<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    On click event handler
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-    <dt class="inherited-from">Inherited From:</dt>
-    <dd class="inherited-from"><ul class="dummy"><li>
-        <a href="Control.html#onClick">Control#onClick</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_control.js.html">components/control.js</a>, <a href="components_control.js.html#line91">line 91</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="onPlayerInited"><span class="type-signature"></span>onPlayerInited<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_RateControl.js.html">components/RateControl.js</a>, <a href="components_RateControl.js.html#line82">line 82</a>
+        <a href="components_ControlCollection.js.html">components/ControlCollection.js</a>, <a href="components_ControlCollection.js.html#line38">line 38</a>
     </li></ul></dd>
     
 

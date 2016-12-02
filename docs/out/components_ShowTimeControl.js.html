@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>RateControl - Documentation</title>
+    <title>components/ShowTimeControl.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,742 +28,64 @@
 
 <div id="main">
     
-    <h1 class="page-title">RateControl</h1>
+    <h1 class="page-title">components/ShowTimeControl.js</h1>
     
 
     
 
 
 
-
-<section>
-
-<header>
-    
-        <h2>
-        RateControl
-        </h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-
-    
-
-    <h4 class="name" id="RateControl"><span class="type-signature"></span>new RateControl<span class="signature">(player, options<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-        <th>Attributes</th>
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>player</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Player.html">Player</a></span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Main player</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-    <h5 class="subsection-title">Properties:</h5>
-
-    
-
-<table class="props">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>downControl</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Control.html">Control</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Down rate control</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>upControl</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="Control.html">Control</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Up rate control</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>currentRate</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type"><a href="ControlText.html">ControlText</a></span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Control of cuurent rate</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_RateControl.js.html">components/RateControl.js</a>, <a href="components_RateControl.js.html#line11">line 11</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-    </div>
-
-    
-        <h3 class="subsection-title">Extends</h3>
-
-        
-
-
-    <ul>
-        <li><a href="Control.html">Control</a></li>
-    </ul>
-
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    <h4 class="name" id="_onClick"><span class="type-signature"></span>_onClick<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_RateControl.js.html">components/RateControl.js</a>, <a href="components_RateControl.js.html#line89">line 89</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="buildCSSClass"><span class="type-signature"></span>buildCSSClass<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="Control.html#buildCSSClass">Control#buildCSSClass</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_RateControl.js.html">components/RateControl.js</a>, <a href="components_RateControl.js.html#line75">line 75</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="createElement"><span class="type-signature"></span>createElement<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-overrides">Overrides:</dt>
-    <dd class="tag-overrides"><ul class="dummy"><li>
-        <a href="Control.html#createElement">Control#createElement</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_RateControl.js.html">components/RateControl.js</a>, <a href="components_RateControl.js.html#line38">line 38</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="onClick"><span class="type-signature"></span>onClick<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    On click event handler
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-    <dt class="inherited-from">Inherited From:</dt>
-    <dd class="inherited-from"><ul class="dummy"><li>
-        <a href="Control.html#onClick">Control#onClick</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_control.js.html">components/control.js</a>, <a href="components_control.js.html#line91">line 91</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="onPlayerInited"><span class="type-signature"></span>onPlayerInited<span class="signature">()</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="components_RateControl.js.html">components/RateControl.js</a>, <a href="components_RateControl.js.html#line82">line 82</a>
-    </li></ul></dd>
-    
-
     
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+/**
+ * @file control-checkbox.js
+ */
 
-    
-
-    
-</dl>
-
-
-
-
-
 
+import $ from 'jquery';
+import ControlText from './ControlText';
+import { createEl, secondsToTime } from '../utils';
 
+/**
+ * @param {Player} player Main player
+ * @param {Object} [options]
+ * @param {function} [options.countTime]
+ * @class ShowTimeControl
+ */
+class ShowTimeControl extends ControlText {
 
+	constructor(player, options={}) {
+		super(player, options);
+		this.player.on('timeupdate', this._onTimeUpdate.bind(this));
+	}
 
+	_onTimeUpdate(e, data) {
+		const currentTime = data.currentTime;
+		this.text = secondsToTime(this.getTime(currentTime));
+	}
 
+	getTime(time) {
+		if (typeof this.options.getTime === 'function') {
+			return this.options.getTime(this.player)
+		}
+		return time;
+	}
 
+	/**
+	 * @override
+	 */
+	buildCSSClass() {
+		return `leplayer-show-time ${super.buildCSSClass()}`
+	}
 
-
-
-
-
-        
-    
-
-    
-
-    
-</article>
+}
 
-</section>
+export default ShowTimeControl;
+</code></pre>
+        </article>
+    </section>
 
 
 
@@ -773,7 +95,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri Dec 02 2016 17:05:06 GMT+0300 (MSK) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Fri Dec 02 2016 17:05:05 GMT+0300 (MSK) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
