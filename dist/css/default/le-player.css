@@ -440,7 +440,6 @@
   left: 0;
   right: 0;
   height: auto;
-  height: 100%;
   display: -ms-flexbox;
   display: flex;
   position: fixed;
@@ -658,13 +657,25 @@
 .leplayer-loader-container {
   color: white;
   font-size: 116px;
-  display: none;
+  display: -ms-flexbox;
+  display: flex;
+}
+.leplayer-loader-container__icon {
+  animation: leplayer-spin 2s infinite linear;
 }
 .leplayer--fullscreen .leplayer-loader-container {
   font-size: 128px;
 }
 .leplayer--mini .leplayer-loader-container {
   font-size: 82px;
+}
+.leplayer--inited .leplayer-loader-container,
+.leplayer--error .leplayer-loader-container {
+  display: none;
+}
+.leplayer--inited .leplayer-loader-container__icon,
+.leplayer--error .leplayer-loader-container__icon {
+  animation: none;
 }
 .leplayer--waiting .leplayer-loader-container,
 .leplayer--seeking .leplayer-loader-container {
@@ -674,9 +685,6 @@
 .leplayer--waiting .leplayer-loader-container__icon,
 .leplayer--seeking .leplayer-loader-container__icon {
   animation: leplayer-spin 2s infinite linear;
-}
-.leplayer-loader-container__icon {
-  animation: none;
 }
 @keyframes leplayer-spin {
   100% {

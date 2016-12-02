@@ -241,7 +241,7 @@
 		width: '100%',
 		offsetShow: function offsetShow(player) {
 			// 80px - it's height of common controls container
-			var offset = player.element.offset().top + player.element.outerHeight() - 80;
+			var offset = player.element.offset().top + player.element.outerHeight() - player.getControls('common').element.height();
 
 			return offset;
 		}
@@ -818,7 +818,6 @@
 				var name = _arr[_i];
 				if (!this.options.controls.hasOwnProperty(name)) return;
 				var controlCollection = new _ControlCollection2.default(this, { name: name });
-				this.controls[name] = controlCollection;
 				this.element.append(controlCollection.element);
 			}
 			if (this.controls.common != null) {
@@ -1443,6 +1442,17 @@
 		this.trigger('fullscreenchange', isFs);
 	};
 
+	/**
+	 * Get ControlCollection of Player by name (e.x 'common', 'fullscreen')
+	 *
+	 * @access public
+	 * @param {String} name Name of ControlCollection
+	 * @returns {ControlCollection}
+	 */
+	Player.prototype.getControls = function (name) {
+		return this.controls[name];
+	};
+
 	Player.prototype.onFullscreenChange = function (e, isFs) {
 		var fsApi = _FullscreenApi2.default;
 		if (isFs) {
@@ -1453,8 +1463,9 @@
 	};
 
 	Player.prototype._onInited = function (e) {
-		this.options.onPlayerInited.call(this, e);
 		this.addClass('leplayer--inited');
+
+		this.options.onPlayerInited.call(this, e);
 	};
 
 	/**
@@ -1506,8 +1517,6 @@
 		value: true
 	});
 
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _jquery = __webpack_require__(1);
@@ -1532,6 +1541,14 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	/**
+	 * @param {Player} player Main player
+	 * @param {Object} [options] Options of component
+	 * @param {jQuery} [options.controls] Array of rows of control's name
+	 * @property {Array} Array of rows of control's name
+	 * @pr
+	 *
+	 */
 	var ControlCollection = function (_Component) {
 		_inherits(ControlCollection, _Component);
 
@@ -1544,10 +1561,11 @@
 
 			var _this = _possibleConstructorReturn(this, (ControlCollection.__proto__ || Object.getPrototypeOf(ControlCollection)).call(this, player, options));
 
-			_this.items = {};
+			_this.controls = [];
 			_this.active = options.active || false;
 			_this.name = options.name;
-			_this.controls = _this.player.options.controls[_this.name];
+
+			_this.player.controls[_this.name] = _this;
 			return _this;
 		}
 
@@ -1591,21 +1609,6 @@
 					_this2.element.append(elemRow);
 				});
 				return this.element;
-			}
-		}, {
-			key: 'add',
-			value: function add(name) {
-				if (name == C_DIVIDER) {
-					return (0, _ControlFactory2.default)(player, name);
-				} else {
-					this.items[name] = (0, _ControlFactory2.default)(player, name);
-					return this.items[name].element;
-				}
-			}
-		}, {
-			key: 'has',
-			value: function has(name) {
-				return _typeof(this.items[name]) == 'object';
 			}
 		}, {
 			key: 'hide',
