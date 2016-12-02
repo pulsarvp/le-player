@@ -16,6 +16,7 @@ import Icon from './Icon';
  * @param {String} [options.name]
  * @param {String} [options.collection]
  * @param {String} [options.title] Contorl's tooltip, title attr
+ * @param {Function} [options.onClick] On click event handler
  * @param {Boolean} [options.disable=false]
  * @property {Icon} icon Icon in control, if it is exist
  * @extends Component
