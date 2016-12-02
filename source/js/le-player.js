@@ -165,7 +165,7 @@ const defaultOptions = {
 		width: '100%',
 		offsetShow : (player) => {
 			// 80px - it's height of common controls container
-			const offset = player.element.offset().top + player.element.outerHeight() - 80;
+			const offset = player.element.offset().top + player.element.outerHeight() - player.getControls('common').element.height();
 
 			return offset;
 		}
@@ -708,7 +708,6 @@ let Player = function (element, options) {
 		for (const name of ['common', 'fullscreen']) {
 			if (!this.options.controls.hasOwnProperty(name)) return;
 			const controlCollection = new ControlCollection(this, { name });
-			this.controls[name] = controlCollection;
 			this.element.append(controlCollection.element);
 		}
 		if (this.controls.common != null) {
@@ -1346,6 +1345,17 @@ Player.prototype._onEntityFullscrenChange = function() {
 	this.trigger('fullscreenchange', isFs);
 }
 
+/**
+ * Get ControlCollection of Player by name (e.x 'common', 'fullscreen')
+ *
+ * @access public
+ * @param {String} name Name of ControlCollection
+ * @returns {ControlCollection}
+ */
+Player.prototype.getControls = function(name) {
+	return this.controls[name];
+}
+
 Player.prototype.onFullscreenChange = function(e, isFs) {
 	const fsApi = FullscreenApi;
 	if(isFs) {
@@ -1356,8 +1366,9 @@ Player.prototype.onFullscreenChange = function(e, isFs) {
 }
 
 Player.prototype._onInited = function(e) {
-	this.options.onPlayerInited.call(this, e);
 	this.addClass('leplayer--inited');
+
+	this.options.onPlayerInited.call(this, e);
 }
 
 /**

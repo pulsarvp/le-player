@@ -10,16 +10,25 @@ import controlFactory, { C_TIMELINE } from '../ControlFactory';
 import { createEl } from '../utils';
 
 
+/**
+ * @param {Player} player Main player
+ * @param {Object} [options] Options of component
+ * @param {jQuery} [options.controls] Array of rows of control's name
+ * @property {Array} Array of rows of control's name
+ * @pr
+ *
+ */
 class ControlCollection extends Component {
 	constructor (player, options) {
 		options = $.extend({}, {
 			controls : player.options.controls[options.name] || [],
 		}, options);
 		super(player, options);
-		this.items = {};
+		this.controls = [];
 		this.active = options.active || false;
 		this.name = options.name;
-		this.controls = this.player.options.controls[this.name];
+
+		this.player.controls[this.name] = this;
 	}
 
 
@@ -62,19 +71,6 @@ class ControlCollection extends Component {
 			if (!this.items.hasOwnProperty(i)) continue;
 			this.items[ i ].disable = value;
 		}
-	}
-
-	add (name) {
-		if (name == C_DIVIDER) {
-			return controlFactory(player, name);
-		} else {
-			this.items[ name ] = controlFactory(player, name);
-			return this.items[ name ].element;
-		}
-	}
-
-	has (name) {
-		return (typeof this.items[ name ] == 'object');
 	}
 
 	hide () {
