@@ -61,7 +61,12 @@ class RateControl extends Control {
 			}
 		});
 
-		this.currentRate = new ControlText(this.player, { className : 'rate-current'});
+		this.currentRate = new ControlText(this.player, {
+			className : 'rate-current',
+			onClick : function(e) {
+				video.rate = this.player.options.rate.default
+			}
+		});
 
 		this.element
 			.append(this.downControl.element)
