@@ -34,6 +34,7 @@ class MiniPlayer extends Component {
 
 		this.listenScroll();
 		this.player.on('fullscreenchange', this._onFullscreenChange.bind(this));
+		this.player.on('inited', this._onPlayerInited.bind(this));
 	};
 
 	listenScroll() {
@@ -66,13 +67,6 @@ class MiniPlayer extends Component {
 		return this.options.offsetShow
 	}
 
-
-	_onFullscreenChange(e, data) {
-		if (data == true) {
-			this.hide();
-		}
-	}
-
 	get height() {
 		return this.player.element.height();
 	}
@@ -91,9 +85,14 @@ class MiniPlayer extends Component {
 			return;
 		}
 		this.visible = true;
-		this.player.innerElement.css('max-width', this.width);
+
+		// Added empty space
 		this.player.element.css('padding-top', this.player.videoContainer.height());
+
 		this.player.setView('mini');
+		this.player.innerElement.css('max-width', this.width);
+		this.player.innerElement.css('height', this.player.video.height);
+
 	}
 
 	/**
@@ -108,7 +107,8 @@ class MiniPlayer extends Component {
 		this.player.setView('common');
 
 		this.player.innerElement.css('max-width', '')
-		// Added empty space
+		this.player.innerElement.css('height', '')
+
 		this.player.element.css('padding-top', '');
 		this.visible = false;
 	}
@@ -121,6 +121,24 @@ class MiniPlayer extends Component {
 		return this.element = createEl('div', {
 			className : 'leplayer-miniplayer'
 		}).append(controls.element)
+	}
+
+
+
+	_onFullscreenChange(e, data) {
+		if (data == true) {
+			this.hide();
+		}
+	}
+
+	_onPlayerInited(e) {
+		const scrollTop = $(window).scrollTop();
+
+		if(scrollTop > this.offsetShow) {
+			this.show();
+		} else {
+			this.hide();
+		}
 	}
 }
 
