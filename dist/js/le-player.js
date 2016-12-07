@@ -4435,6 +4435,7 @@
 
 			_this.listenScroll();
 			_this.player.on('fullscreenchange', _this._onFullscreenChange.bind(_this));
+			_this.player.on('inited', _this._onPlayerInited.bind(_this));
 			return _this;
 		}
 
@@ -4464,13 +4465,6 @@
 				}, 250);
 			}
 		}, {
-			key: '_onFullscreenChange',
-			value: function _onFullscreenChange(e, data) {
-				if (data == true) {
-					this.hide();
-				}
-			}
-		}, {
 			key: 'show',
 
 
@@ -4484,9 +4478,13 @@
 					return;
 				}
 				this.visible = true;
-				this.player.innerElement.css('max-width', this.width);
+
+				// Added empty space
 				this.player.element.css('padding-top', this.player.videoContainer.height());
+
 				this.player.setView('mini');
+				this.player.innerElement.css('max-width', this.width);
+				this.player.innerElement.css('height', this.player.video.height);
 			}
 
 			/**
@@ -4504,7 +4502,8 @@
 				this.player.setView('common');
 
 				this.player.innerElement.css('max-width', '');
-				// Added empty space
+				this.player.innerElement.css('height', '');
+
 				this.player.element.css('padding-top', '');
 				this.visible = false;
 			}
@@ -4520,6 +4519,24 @@
 				return this.element = (0, _utils.createEl)('div', {
 					className: 'leplayer-miniplayer'
 				}).append(controls.element);
+			}
+		}, {
+			key: '_onFullscreenChange',
+			value: function _onFullscreenChange(e, data) {
+				if (data == true) {
+					this.hide();
+				}
+			}
+		}, {
+			key: '_onPlayerInited',
+			value: function _onPlayerInited(e) {
+				var scrollTop = (0, _jquery2.default)(window).scrollTop();
+
+				if (scrollTop > this.offsetShow) {
+					this.show();
+				} else {
+					this.hide();
+				}
 			}
 		}, {
 			key: 'offsetShow',

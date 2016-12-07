@@ -836,6 +836,7 @@
   position: relative;
   -ms-flex: 0 0 260px;
       flex: 0 0 260px;
+  width: 260px;
 }
 @media screen and (max-width: 750px) {
   .leplayer--mini .leplayer__inner .leplayer-sections {
