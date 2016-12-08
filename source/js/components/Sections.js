@@ -107,12 +107,10 @@ class Sections extends Component {
 
 		const topPosition = this.activeSection.position().top;
 
-		if(this.player.getView() !== 'mini') {
-			this.element
-				.animate({
-					scrollTop : this.element.scrollTop() + topPosition
-				}, 800)
-		}
+		this.element
+			.animate({
+				scrollTop : this.element.scrollTop() + topPosition
+			}, 800)
 
 		return this
 	}
