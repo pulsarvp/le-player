@@ -3,6 +3,11 @@ import $ from 'jquery';
 window.$.lePlayer.plugin('ga', function(pluginOptions) {
 	const player = this;
 
+	if (window.ga) {
+		console.error('Google Analytics does not exist');
+		return;
+	}
+
 	player.on('firstplay', (e) => {
 		window.ga(
 			'send',
