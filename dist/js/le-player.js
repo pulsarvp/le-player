@@ -4805,11 +4805,11 @@
 
 				var topPosition = this.activeSection.position().top;
 
-				if (this.player.getView() !== 'mini') {
-					this.element.animate({
-						scrollTop: this.element.scrollTop() + topPosition
-					}, 800);
-				}
+				this.element.animate({
+					scrollTop: this.element.scrollTop() + topPosition
+				}, 800);
+
+				this.player.trigger('sectionschange', { section: this.items[index] });
 
 				return this;
 			}

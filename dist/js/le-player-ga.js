@@ -55,6 +55,11 @@
 	window.$.lePlayer.plugin('ga', function (pluginOptions) {
 		var player = this;
 
+		if (window.ga) {
+			console.error('Google Analytics does not exist');
+			return;
+		}
+
 		player.on('firstplay', function (e) {
 			window.ga('send', 'event', 'Player Video Started');
 		});

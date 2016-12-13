@@ -699,6 +699,7 @@
   width: 260px;
   z-index: 16;
   box-sizing: border-box;
+  position: relative;
 }
 .leplayer-sections--hidden {
   display: none;
