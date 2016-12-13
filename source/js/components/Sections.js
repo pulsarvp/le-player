@@ -112,6 +112,8 @@ class Sections extends Component {
 				scrollTop : this.element.scrollTop() + topPosition
 			}, 800)
 
+		this.player.trigger('sectionschange', { section : this.items[index]});
+
 		return this
 	}
 
