@@ -52,10 +52,12 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	window.$.lePlayer.plugin('ga', function (pluginOptions) {
+	var Player = window.$.lePlayer;
+
+	Player.plugin('ga', function (pluginOptions) {
 		var player = this;
 
-		if (window.ga) {
+		if (!window.ga) {
 			console.error('Google Analytics does not exist');
 			return;
 		}
