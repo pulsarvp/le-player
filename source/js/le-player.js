@@ -2,8 +2,6 @@
 
 import $ from 'jquery';
 import ControlCollection from './components/ControlCollection';
-import Control from './components/Control';
-import Component from './components/Component';
 import MiniPlayer from './components/MiniPlayer';
 import PlayButton from './components/PlayButton'
 
@@ -13,9 +11,9 @@ import ErrorDisplay from './components/ErrorDisplay';
 import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
-import { C_TIMELINE, C_KEYBINDING_INFO } from './ControlFactory';
+import { C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
-import { secondsToTime, createEl } from './utils';
+import { createEl } from './utils';
 
 import MediaError from './MediaError';
 
@@ -42,7 +40,6 @@ function excludeArray(source, dist) {
 }
 
 const defaultOptions = {
-	miniplayer : false,
 	autoplay : false,
 	height : 'auto',
 	loop : false,
@@ -225,18 +222,15 @@ const defaultOptions = {
  */
 let Player = function (element, options) {
 
-	let self = this;
 	let player = this;
-	let subtitles = [];
 
 	const fsApi = FullscreenApi;
+
 	// key -> contol collection name, valuy -> ControlCollection
 	this.controls = {};
 
 	// Entity component
 	this.video = null;
-
-	this.sections = null;
 
 	/**
 	 * DOM container to hold video and all other stuff.
@@ -244,9 +238,7 @@ let Player = function (element, options) {
 	 */
 
 	this.element = createEl('div');
-	let loader = null;
 	let sectionContainer = null;
-	let videoContainer = this.videoContainer = null;
 	this._userActivity = false;
 
 	this.innerElement = createEl('div');
@@ -582,8 +574,10 @@ let Player = function (element, options) {
 				'timeupdate' : (e) => {
 					if ( this.currentTime > 0 ) {
 						this.player.removeClass('leplayer--virgin');
-					};
+					}
+
 					this.player.trigger('timeupdate', { time : this.currentTime, duration : this.duration });
+
 				},
 
 				'seeking' : (e) => {
@@ -594,12 +588,6 @@ let Player = function (element, options) {
 				'seeked' : (e) => {
 					this.player.removeClass('leplayer--seeking');
 					this.player.trigger('seeked');
-				},
-
-				'ended' : () => {
-					this.pause();
-					this.player.trigger('ended');
-
 				},
 
 				'progress' : () => {
@@ -649,12 +637,14 @@ let Player = function (element, options) {
 
 				'ended' : (e) => {
 					this.player.addClass('leplayer--ended')
+
 					if(this.player.options.loop) {
 						this.currentTime(0);
 						this.play();
 					} else if (!this._video.paused) {
 						this.pause();
 					}
+
 					this.player.trigger('ended');
 				},
 				'canplaythrough' : (e) => {
@@ -801,18 +791,18 @@ let Player = function (element, options) {
 
 		// TODO: Вынести это в отдельнеый компонент
 
-		loader = $('<div />')
+		this.loader = $('<div />')
 			.addClass('leplayer-loader-container')
 			.append(new Icon(this, {
-				iconName : 'refresh',
-				className : 'leplayer-loader-container__icon'
+					iconName : 'refresh',
+					className : 'leplayer-loader-container__icon'
 				}).element);
 
 		this.videoContainer = createEl('div', {
-			className : 'leplayer-video'
-		})
-		.append(this.playButton.element)
-		.append(loader);
+				className : 'leplayer-video'
+			})
+			.append(this.playButton.element)
+			.append(this.loader);
 
 		if(options.poster) {
 			this.poster = new Poster(this);
@@ -1023,7 +1013,7 @@ Player.prototype._initPlugins = function() {
  * })
  *
  */
-Player.plugin = function(name, fn) {;
+Player.plugin = function(name, fn) {
 	Player.prototype[name] = fn;
 }
 
@@ -1357,7 +1347,6 @@ Player.prototype.getControls = function(name) {
 }
 
 Player.prototype.onFullscreenChange = function(e, isFs) {
-	const fsApi = FullscreenApi;
 	if(isFs) {
 		this.setView('fullscreen');
 	} else {
