@@ -14,6 +14,14 @@ module.exports = {
     },
 
     module: {
+		preLoaders : [
+			{
+				test: /(\.js)$/,
+				loader : 'eslint',
+                exclude: /(node_modules|bower_components|jquery)/,
+                include: path.join(__dirname, 'source', 'js'),
+			}
+		],
         loaders: [
             {
                 test: /(\.js)$/,
@@ -37,6 +45,9 @@ module.exports = {
     externals: {
         jquery: "$"
     },
+	eslint : {
+		emitWarning: true
+	}
 };
 
 
