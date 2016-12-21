@@ -6,8 +6,9 @@
 import $ from 'jquery';
 import Component from './Component';
 import ControlCollection from './ControlCollection';
-import { secondsToTime, createEl } from '../utils';
-import Icon from './Icon';
+import { createEl } from '../utils';
+
+// TODO: Сделать это в качестве плагина для плеера
 
 /**
  * @class MiniPlayer
@@ -16,6 +17,7 @@ import Icon from './Icon';
  * @extends Control
  */
 class MiniPlayer extends Component {
+
 	constructor (player, options ) {
 		// Merge options
 		options = $.extend({}, {
@@ -24,39 +26,25 @@ class MiniPlayer extends Component {
 
 		super(player, options);
 
-		if(this.options.width != null) {
-			console.warn('miniplayer.width is deprecated option. Now uses CSS for this')
+		if (options.visible) {
+			this.show();
 		}
 
-		if (!options.visible) {
-			this.hide();
-		}
 
-		this.listenScroll();
+		$(window).on('scroll', this.update.bind(this));
+		$(window).on('resize', this.update.bind(this));
 		this.player.on('fullscreenchange', this._onFullscreenChange.bind(this));
 		this.player.on('inited', this._onPlayerInited.bind(this));
-	};
+	}
 
-	listenScroll() {
-		let didScroll = false;
+	update() {
+		const scrollTop = $(window).scrollTop();
 
-		$(window).scroll(function() {
-			didScroll = true;
-		})
-
-		setInterval(() => {
-			if(didScroll) {
-				didScroll = false;
-
-				const scrollTop = $(window).scrollTop();
-
-				if(scrollTop > this.offsetShow) {
-					this.show();
-				} else {
-					this.hide();
-				}
-			}
-		}, 250)
+		if(scrollTop > this.offsetShow) {
+			this.show();
+		} else {
+			this.hide();
+		}
 	}
 
 	get offsetShow() {
@@ -77,14 +65,14 @@ class MiniPlayer extends Component {
 
 	/**
 	 * Show mini player
+	 * @param {Boolean} force
 	 *
 	 * @public
 	 */
-	show() {
-		if (this.visible == true) {
+	show(force) {
+		if (!force && this.player.getView() === 'mini') {
 			return;
 		}
-		this.visible = true;
 
 		// Added empty space
 		this.player.element.css('padding-top', this.player.videoContainer.height());
@@ -97,11 +85,12 @@ class MiniPlayer extends Component {
 
 	/**
 	 * Hide mini player
+	 * @param {Boolean} force
 	 *
 	 * @public
 	 */
-	hide() {
-		if(this.visible == false) {
+	hide(force) {
+		if(!force && this.player.getView() !== 'mini') {
 			return;
 		}
 		this.player.setView('common');
@@ -110,7 +99,6 @@ class MiniPlayer extends Component {
 		this.player.innerElement.css('height', '')
 
 		this.player.element.css('padding-top', '');
-		this.visible = false;
 	}
 
 	/**
@@ -135,7 +123,7 @@ class MiniPlayer extends Component {
 		const scrollTop = $(window).scrollTop();
 
 		if(scrollTop > this.offsetShow) {
-			this.show();
+			this.show(true);
 		} else {
 			this.hide();
 		}

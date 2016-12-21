@@ -29,7 +29,6 @@ class SourceControl extends ControlContainer {
 	 */
 	onClick (e) {
 		super.onClick(e);
-		let item = $(e.target);
 		const defaultItem = this.getByIndex(0);
 
 		this.player.video.source = {

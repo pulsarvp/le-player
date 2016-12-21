@@ -23,7 +23,6 @@ class RateControl extends Control {
 			className : 'control-container'
 		}, options);
 		super(player, options);
-		const video = this.player.video;
 
 		this.player.on('ratechange', (e, data) => {
 			this.value = data.rate

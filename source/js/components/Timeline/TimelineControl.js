@@ -47,7 +47,6 @@ class TimelineControl extends Control {
 	createElement() {
 		super.createElement();
 		let video = this.player.video;
-		let duration = video.duration;
 
 		this.drag = false;
 
@@ -243,7 +242,6 @@ class TimelineControl extends Control {
 	 * @override
 	 */
 	onPlayerInited(e) {
-		let video = this.player.video;
 		this.updateLabels();
 		if (this.player.sections) {
 			this.updateSectionRanges(this.player.sections.items);
@@ -252,7 +250,6 @@ class TimelineControl extends Control {
 
 	_initWatchBuffer () {
 		clearInterval(this.watchBufferInterval);
-		let arr = [];
 		let video = this.player.video;
 		let updateProgressBar = () => {
 			const END = 1;

@@ -4,6 +4,7 @@
  *
  * @module time
  */
+import $ from 'jquery';
 
 /**
  * Convert seconds to format string 'hh?:mm:ss'
@@ -30,7 +31,7 @@ export function secondsToTime (seconds, showHours) {
 		out = `${h}:` + out
 	}
 	return out;
-};
+}
 
 
 /**

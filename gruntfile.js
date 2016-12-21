@@ -24,7 +24,7 @@ module.exports = function (grunt) {
 			"build-dev" : {
 				devtool : 'eval',
 				plugins : [
-					new webpack.NoErrorsPlugin()
+					//new webpack.NoErrorsPlugin()
 				],
 				watch : true
 			}

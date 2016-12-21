@@ -55,8 +55,8 @@
 			<div class="row">
 				<div class="col-sm-12 col-md-7">
 					<video id="video">
-						<source data-quality="SD" src="http://lectoriy.ciot-env.ru/cdn/videosh264/TherPhys-FieldTh-L02-Gershtein-130220.01.mp4">
-						<source data-quality="SD" src="http://lectoriy.mipt.ru/cdn/videosh264/Physics-Electricity-L09-Kozel-131001.01.mp4">
+						<source data-quality="SD" src="./demo.mp4">
+						<source data-quality="HD" src="http://lectoriy.mipt.ru/cdn/videosh264/Physics-Electricity-S05-Ovchinkin-140930.03.mp4">
 						<track label="EN" srclang="en" src="subs_en.vtt" kind="subtitles">
 						<track label="RU" srclang="ru" src="subs_ru.vtt" kind="subtitles">
 					</video>
@@ -71,15 +71,6 @@
 			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
 			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
 		</div>
-	<script type="text/javascript" src="//vk.com/js/api/openapi.js?136"></script>
-	<script>
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-		})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-		ga('create', 'UA-5832386-17', 'none');
-		ga('send', 'pageview');
-	</script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" charset="utf-8"></script>
 	<script src="index.js" charset="utf-8"></script>
@@ -87,21 +78,20 @@
 	<script src="../dist/js/le-player-ga.js"></script>
 	<script>
 		$(document).ready(function () {
-			if (window.location.protocol != 'http:')
+			if (window.location.protocol != 'http:') {
 				$('.warning-subtitle').show();
-			$('#video').lePlayer({
+			}
+
+			var player = new lePlayer($('#video'), {
 				title : 'Multiple videos with mini player',
 				width: '100%',
-				data : './sections.json',
+				data : './data.json',
 				sectionContainer: "#sections",
 				poster : './poster.jpg',
 				miniplayer: {
 					width : '1140px'
 				},
 				preload : 'metadata',
-				excludeControls  : {
-					common : [ [ 'section' ], [ 'subtitle' ] ]
-				},
 				plugins : {
 					'ga' : {}
 				},

@@ -3,7 +3,6 @@
  * @file BufferedRanges.js
  */
 
-import $ from 'jquery';
 import { percentify, createEl } from '../../utils';
 import Component from '../Component';
 

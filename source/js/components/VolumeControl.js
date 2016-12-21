@@ -5,8 +5,6 @@
 
 import $ from 'jquery';
 import ControlDropdown from './ControlDropdown';
-import Icon from './Icon';
-import Cookie from '../utils/cookie';
 
 /**
  * @param {Player} player Main player
@@ -91,7 +89,7 @@ class VolumeControl extends ControlDropdown {
 	}
 
 	toggleMuted () {
-		const { video, options } = this.player;
+		const { video } = this.player;
 
 		if (video.volume == 0) {
 			video.volume = video.defaultVolume;

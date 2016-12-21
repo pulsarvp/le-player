@@ -3,7 +3,6 @@
  * @file PlayButton.js
  */
 
-import $ from 'jquery';
 import Control from './Control';
 import Icon from './Icon';
 import { createEl } from '../utils';
