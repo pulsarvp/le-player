@@ -42,17 +42,11 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var Player = window.$.lePlayer;
+	var Player = window.lePlayer || window.$.lePlayer;
 
 	Player.plugin('ga', function (pluginOptions) {
 		var player = this;
@@ -89,12 +83,6 @@
 			}
 		});
 	});
-
-/***/ },
-/* 1 */
-/***/ function(module, exports) {
-
-	module.exports = $;
 
 /***/ }
 /******/ ]);
