@@ -15,7 +15,7 @@ class MediaError {
 			// We assign the `code` property manually because native MediaError objects
 			// do not expose it as an own/enumerable property of the object.
 			if (typeof value.code === 'number') {
-			  this.code = value.code;
+				this.code = value.code;
 			}
 
 			$.extend(this, value);

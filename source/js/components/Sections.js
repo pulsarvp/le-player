@@ -18,7 +18,7 @@ import { secondsToTime } from '../utils';
  */
 class Sections extends Component {
 	constructor(player, options) {
-		let { items = [], main = true } = options;
+		let { items = [] } = options;
 		items = [].concat(items);
 
 		//options.items = items;

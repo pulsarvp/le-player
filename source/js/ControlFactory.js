@@ -4,6 +4,8 @@
  *
  */
 
+import $ from 'jquery';
+
 import PlayControl from './components/PlayControl';
 import VolumeControl from './components/VolumeControl';
 import TimelineControl from './components/Timeline/TimelineControl';
@@ -44,9 +46,6 @@ export default function controlFactory(player, name, options) {
 
 		case C_DOWNLOAD:
 			return new DownloadControl(player, options);
-
-		case C_FORWARD:
-			return new ForwardControl(player, options);
 
 		case C_FULLSCREEN:
 			return new FullscreenControl(player, options);

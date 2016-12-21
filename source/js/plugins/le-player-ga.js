@@ -1,6 +1,4 @@
-import $ from 'jquery';
-
-const Player = window.$.lePlayer;
+const Player = window.lePlayer || window.$.lePlayer;
 
 Player.plugin('ga', function(pluginOptions) {
 	const player = this;
@@ -51,7 +49,7 @@ Player.plugin('ga', function(pluginOptions) {
 				'send',
 				'event',
 				'Player Video Played',
-				'95-100%',
+				'95-100%'
 			)
 		}
 	});

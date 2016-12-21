@@ -20,7 +20,7 @@ class Cookie {
 				return d[ 1 ];
 		}
 		return dflt;
-	};
+	}
 
 	/**
 	 * @public
@@ -32,7 +32,7 @@ class Cookie {
 		var d = new Date();
 		d.setDate(d.year + 1);
 		document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
-	};
+	}
 }
 
 export default Cookie;

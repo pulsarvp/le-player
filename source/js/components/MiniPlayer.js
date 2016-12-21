@@ -6,8 +6,7 @@
 import $ from 'jquery';
 import Component from './Component';
 import ControlCollection from './ControlCollection';
-import { secondsToTime, createEl } from '../utils';
-import Icon from './Icon';
+import { createEl } from '../utils';
 
 /**
  * @class MiniPlayer
@@ -16,6 +15,7 @@ import Icon from './Icon';
  * @extends Control
  */
 class MiniPlayer extends Component {
+
 	constructor (player, options ) {
 		// Merge options
 		options = $.extend({}, {
@@ -35,7 +35,7 @@ class MiniPlayer extends Component {
 		this.listenScroll();
 		this.player.on('fullscreenchange', this._onFullscreenChange.bind(this));
 		this.player.on('inited', this._onPlayerInited.bind(this));
-	};
+	}
 
 	listenScroll() {
 		let didScroll = false;

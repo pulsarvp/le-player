@@ -60,6 +60,10 @@
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
+	"rules": {
+		"no-unused-vars": ["error", { "args": "none" }],
+		"no-console": ["error", { "allow" : [ "warn", "error"] }]
+	},
     "parserOptions": {
       "ecmaVersion": 6,
       "sourceType": "module"
