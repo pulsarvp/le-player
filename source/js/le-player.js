@@ -6,6 +6,7 @@ import MiniPlayer from './components/MiniPlayer';
 import PlayButton from './components/PlayButton'
 
 import Icon from './components/Icon';
+import Time from './components/Timeline/Time';
 import Sections from './components/Sections';
 import ErrorDisplay from './components/ErrorDisplay';
 import Poster from './components/Poster';
@@ -13,7 +14,7 @@ import FullscreenApi from './FullscreenApi';
 
 import { C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
-import { createEl } from './utils';
+import { createEl, secondsToTime } from './utils';
 
 import MediaError from './MediaError';
 
@@ -679,13 +680,22 @@ let Player = function (element, options) {
 
 		/** TODO: Use promise to async run this */
 		this.initDom();
+
+		// Create video link
 		this.video = new Video(this, element);
+
+		// Create controls
+		// TODO: move this action to the initDom
 		this.initControls();
+
+		// Listen hotkeys
 		this.initHotKeys();
+
 		this.initSections().then((data) => {
 			this.sections = data.sectionsComponent;
 			this.trigger('sectionsinit', data);
 		});
+
 		this.video.init().then(() => {
 			this.trigger('inited');
 			this._initPlugins();
@@ -705,6 +715,12 @@ let Player = function (element, options) {
 		}
 	};
 
+	/**
+	 * Init sections, get ajax or json with sections data and create Sections object and added them to the DOM
+	 *
+	 * @access private
+	 * @returns {jqPromise} jQuery promise
+	 */
 	this.initSections = function() {
 		const dfd = $.Deferred();
 		if (this.options.data == null) {
@@ -752,10 +768,17 @@ let Player = function (element, options) {
 	}
 
 
+	/**
+	 * Remove unnecessary attributes, and set some attrs from options (loop, poster etc...). Create main DOM objects
+	 *
+	 * @access private
+	 */
 	this.initDom = function () {
 		const options = this.options;
 		this.errorDisplay = new ErrorDisplay(this);
 		this.playButton = new PlayButton(this);
+
+		//element.width(this.video.width);
 
 		[
 
@@ -798,6 +821,7 @@ let Player = function (element, options) {
 					className : 'leplayer-loader-container__icon'
 				}).element);
 
+
 		this.videoContainer = createEl('div', {
 				className : 'leplayer-video'
 			})
@@ -814,6 +838,13 @@ let Player = function (element, options) {
 			this.miniPlayer = new MiniPlayer(this)
 		}
 
+
+		const lastTimer = new Time(this, {
+			fn : (player) => {
+				const video = player.video
+				return secondsToTime(video.duration - video.currentTime);
+			}
+		})
 		this.innerElement = $('<div />')
 			.addClass('leplayer__inner')
 			.append(this.videoContainer)
@@ -828,6 +859,10 @@ let Player = function (element, options) {
 						className : 'leplayer__video-info',
 						html : this.options.videoInfo || ""
 					}))
+				.append(createEl('div', {
+						className : 'leplayer__last',
+						html : `Видео закончится через `,
+					}).append(lastTimer.element))
 				.append(this.miniPlayer && this.miniPlayer.element)
 			)
 			//.append($('leplayer__video-info')
@@ -878,6 +913,14 @@ let Player = function (element, options) {
 		})
 	};
 
+	/**
+	 * Get options from video's attribute ( height, width, poster, preload etc...)
+	 * Get source video from src attr or <source> element with data attr 'data-quality'
+	 * Also get sources for different quality from <source> element with data attr 'data-quality'
+	 *
+	 * @access public
+	 * @returns {Object} options
+	 */
 	this.optionsFromElement = function() {
 		// Copy video attrs to the opitons
 		let attrOptions = [
@@ -931,6 +974,13 @@ let Player = function (element, options) {
 
 
 
+	/**
+	 * Merge defaultOptions with attrOptions and user's options;
+	 *
+	 * And complement two objects: controls and excludeControls
+	 *
+	 * @access private
+	 */
 	this.initOptions = function () {
 		const attrOptions = this.optionsFromElement();
 		// Merge default options + video attributts + user options

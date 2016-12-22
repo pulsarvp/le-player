@@ -24,6 +24,7 @@ class Sections extends Component {
 		//options.items = items;
 
 		super(player, options)
+
 		this.activeSection = this.getSectionByIndex(0);
 
 		this.items = items;
@@ -39,7 +40,9 @@ class Sections extends Component {
 
 		this.player.on('timeupdate', this.onTimeUpdate.bind(this));
 
-		this.player.on('inited', this.onPlayerInited.bind(this));
+		this.player.on('inited', this.updateSectionDuration.bind(this));
+
+		this.player.on('durationchange', this.updateSectionDuration.bind(this));
 
 		return this;
 	}
@@ -76,16 +79,20 @@ class Sections extends Component {
 	/**
 	 * @override
 	 */
-	onPlayerInited() {
-
+	updateSectionDuration() {
 		if(this.items != null && this.items.length > 0 ) {
-			this.items[this.items.length - 1].end = this.player.video.duration;
+			const length = this.items.length
+			this.items[length - 1].end = this.player.video.duration;
+
+			// TODO: Продумать функцияю updateSection
+			//this.updateSection(this.items[length - 1], length - 1);
 		}
 	}
 
 
 
 	onSectionClick(e) {
+		console.log('click')
 		const video = this.player.video;
 		const section = $(e.target).closest('.leplayer-section');
 		video.currentTime = section.attr('data-begin');
@@ -156,34 +163,57 @@ class Sections extends Component {
 		}
 	}
 
+	/**
+	 * Create HTML of section by data and index section
+	 *
+	 * @returns {String} HTML
+	 */
+	createSection(section, index) {
+		const items = this.items || this.options.items;
+		const item = `
+			<div class="leplayer-section ${!index ? 'leplayer-section--active' : ''}"
+				data-begin="${section.begin}"
+				data-index="${index.toString()}"
+				data-end="${section.end}">
+				<div class="leplayer-section-time">${secondsToTime(section.begin)}</div>
+				<div class="leplayer-section-info">
+					<div class="leplayer-section-next-info">
+						${section.nextInfo || 'Следующая секция начнется через'}
+						<span class="time">${secondsToTime(items[0].end)}</span>
+					</div>
+					${
+						section.title != null ?
+							`<div class="leplayer-section-title">${section.title}</div>`
+						: ''
+					}
+					${
+						section.description != null ?
+							`<div class="leplayer-section-description">${section.description}</div>`
+						: ''
+					}
+				</div>
+			</div>
+		`.trim()
+		return item
+	}
+
+	// TODO: Придумать что сделать с событиями после обновления полносью секции
+	/**
+	 * Find section by index and update him using data
+	 *
+	 * @param {Object} data
+	 * @param {Number} index
+	 */
+	updateSection(data, index) {
+		this.getSectionByIndex(index)
+			.replaceWith(this.createSection(data, index))
+			.on('click', this.onSectionClick.bind(this));
+	}
+
 	_createSections(items) {
 		let result = '';
 		items.forEach((section, index) => {
-			const item = `
-				<div class="leplayer-section ${!index ? 'leplayer-section--active' : ''}"
-					data-begin="${section.begin}"
-					data-index="${index.toString()}"
-					data-end="${section.end}">
-					<div class="leplayer-section-time">${secondsToTime(section.begin)}</div>
-					<div class="leplayer-section-info">
-						<div class="leplayer-section-next-info">
-							Следующая секция начнется через
-							<span class="time">${secondsToTime(items[0].end)}</span>
-						</div>
-						${
-							section.title != null ?
-								`<div class="leplayer-section-title">${section.title}</div>`
-							: ''
-						}
-						${
-							section.description != null ?
-								`<div class="leplayer-section-description">${section.description}</div>`
-							: ''
-						}
-					</div>
-				</div>
-			`.trim()
-			result += item;
+			result += this.createSection(section, index);
 		});
 		return result;
 	}
