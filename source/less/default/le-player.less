@@ -575,7 +575,7 @@
 }
 
 
-.leplayer.leplayer--fullscreen
+.leplayer--fullscreen
 {
 	.leplayer-error-display
 	{
@@ -583,6 +583,14 @@
 	}
 }
 
+
+.leplayer--error
+{
+	.leplayer-error-display
+	{
+		display: block;
+	}
+}
 .leplayer-icon
 {
 	display: block;
@@ -644,6 +652,18 @@
 	display: none;
 }
 
+.leplayer__last
+{
+	display: none;
+	position: absolute;
+
+	.leplayer-time
+	{
+		display: inline;
+	}
+}
+
+
 .leplayer--mini
 {
 	.leplayer__info
@@ -657,6 +677,13 @@
 		height: 100%;
 		// Width of controls in miniplayer
 		min-width: 300px;
+	}
+
+	.leplayer__last
+	{
+		display: block;
+		right: 20px;
+
 	}
 
 	.leplayer__title {
