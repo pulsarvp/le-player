@@ -964,11 +964,6 @@ let Player = function (element, options) {
 
 		});
 
-		if(attrOptions.src == null && attrOptions.sources.length > 0) {
-			attrOptions.src = attrOptions.sources[0]
-		}
-
-
 		return attrOptions;
 	}
 
@@ -985,6 +980,14 @@ let Player = function (element, options) {
 		const attrOptions = this.optionsFromElement();
 		// Merge default options + video attributts + user options
 		this.options = $.extend(true, defaultOptions, attrOptions, options);
+
+		if(this.options.sources && !Array.isArray(this.options.sources)) {
+			this.options.sources = [this.options.sources]
+		}
+
+		if(this.options.src == null && this.options.sources.length > 0) {
+			this.options.src = this.options.sources[0]
+		}
 
 		if (this.options.src == null) {
 			this.setError(new MediaError('No sources found'));
