@@ -313,6 +313,7 @@ let Player = function (element, options) {
 
 
 		set source (src) {
+			if(src == null) return;
 			if(this.source && this.source.url === src.url) return;
 			const time = this._video.currentTime;
 			const rate = this._video.playbackRate;
