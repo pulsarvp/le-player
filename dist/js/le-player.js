@@ -70,19 +70,23 @@
 
 	var _Icon2 = _interopRequireDefault(_Icon);
 
-	var _Sections = __webpack_require__(28);
+	var _Time = __webpack_require__(28);
+
+	var _Time2 = _interopRequireDefault(_Time);
+
+	var _Sections = __webpack_require__(29);
 
 	var _Sections2 = _interopRequireDefault(_Sections);
 
-	var _ErrorDisplay = __webpack_require__(29);
+	var _ErrorDisplay = __webpack_require__(30);
 
 	var _ErrorDisplay2 = _interopRequireDefault(_ErrorDisplay);
 
-	var _Poster = __webpack_require__(30);
+	var _Poster = __webpack_require__(31);
 
 	var _Poster2 = _interopRequireDefault(_Poster);
 
-	var _FullscreenApi = __webpack_require__(31);
+	var _FullscreenApi = __webpack_require__(32);
 
 	var _FullscreenApi2 = _interopRequireDefault(_FullscreenApi);
 
@@ -94,7 +98,7 @@
 
 	var _utils = __webpack_require__(13);
 
-	var _MediaError = __webpack_require__(32);
+	var _MediaError = __webpack_require__(33);
 
 	var _MediaError2 = _interopRequireDefault(_MediaError);
 
@@ -676,6 +680,7 @@
 			}, {
 				key: 'source',
 				set: function set(src) {
+					if (src == null) return;
 					if (this.source && this.source.url === src.url) return;
 					var time = this._video.currentTime;
 					var rate = this._video.playbackRate;
@@ -785,13 +790,22 @@
 
 			/** TODO: Use promise to async run this */
 			this.initDom();
+
+			// Create video link
 			this.video = new Video(this, element);
+
+			// Create controls
+			// TODO: move this action to the initDom
 			this.initControls();
+
+			// Listen hotkeys
 			this.initHotKeys();
+
 			this.initSections().then(function (data) {
 				_this5.sections = data.sectionsComponent;
 				_this5.trigger('sectionsinit', data);
 			});
+
 			this.video.init().then(function () {
 				_this5.trigger('inited');
 				_this5._initPlugins();
@@ -812,6 +826,12 @@
 			}
 		};
 
+		/**
+	  * Init sections, get ajax or json with sections data and create Sections object and added them to the DOM
+	  *
+	  * @access private
+	  * @returns {jqPromise} jQuery promise
+	  */
 		this.initSections = function () {
 			var _this6 = this;
 
@@ -860,12 +880,19 @@
 			return dfd.promise();
 		};
 
+		/**
+	  * Remove unnecessary attributes, and set some attrs from options (loop, poster etc...). Create main DOM objects
+	  *
+	  * @access private
+	  */
 		this.initDom = function () {
 			var _this7 = this;
 
 			var options = this.options;
 			this.errorDisplay = new _ErrorDisplay2.default(this);
 			this.playButton = new _PlayButton2.default(this);
+
+			//element.width(this.video.width);
 
 			[
 
@@ -909,6 +936,12 @@
 				this.miniPlayer = new _MiniPlayer2.default(this);
 			}
 
+			var lastTimer = new _Time2.default(this, {
+				fn: function fn(player) {
+					var video = player.video;
+					return (0, _utils.secondsToTime)(video.duration - video.currentTime);
+				}
+			});
 			this.innerElement = (0, _jquery2.default)('<div />').addClass('leplayer__inner').append(this.videoContainer).append((0, _utils.createEl)('div', {
 				className: 'leplayer__info'
 			}).append((0, _utils.createEl)('div', {
@@ -917,7 +950,10 @@
 			})).append((0, _utils.createEl)('div', {
 				className: 'leplayer__video-info',
 				html: this.options.videoInfo || ""
-			})).append(this.miniPlayer && this.miniPlayer.element));
+			})).append((0, _utils.createEl)('div', {
+				className: 'leplayer__last',
+				html: '\u0412\u0438\u0434\u0435\u043E \u0437\u0430\u043A\u043E\u043D\u0447\u0438\u0442\u0441\u044F \u0447\u0435\u0440\u0435\u0437 '
+			}).append(lastTimer.element)).append(this.miniPlayer && this.miniPlayer.element));
 			//.append($('leplayer__video-info')
 			//.text(this.options.videoInfo || ""))
 
@@ -957,6 +993,14 @@
 			});
 		};
 
+		/**
+	  * Get options from video's attribute ( height, width, poster, preload etc...)
+	  * Get source video from src attr or <source> element with data attr 'data-quality'
+	  * Also get sources for different quality from <source> element with data attr 'data-quality'
+	  *
+	  * @access public
+	  * @returns {Object} options
+	  */
 		this.optionsFromElement = function () {
 			// Copy video attrs to the opitons
 			var attrOptions = ['height', 'width', 'poster', 'autoplay', 'loop', 'muted', 'preload'].reduce(function (obj, item) {
@@ -990,19 +1034,30 @@
 				});
 			});
 
-			if (attrOptions.src == null && attrOptions.sources.length > 0) {
-				attrOptions.src = attrOptions.sources[0];
-			}
-
 			return attrOptions;
 		};
 
+		/**
+	  * Merge defaultOptions with attrOptions and user's options;
+	  *
+	  * And complement two objects: controls and excludeControls
+	  *
+	  * @access private
+	  */
 		this.initOptions = function () {
 			var _this9 = this;
 
 			var attrOptions = this.optionsFromElement();
 			// Merge default options + video attributts + user options
 			this.options = _jquery2.default.extend(true, defaultOptions, attrOptions, options);
+
+			if (this.options.sources && !Array.isArray(this.options.sources)) {
+				this.options.sources = [this.options.sources];
+			}
+
+			if (this.options.src == null && this.options.sources.length > 0) {
+				this.options.src = this.options.sources[0];
+			}
 
 			if (this.options.src == null) {
 				this.setError(new _MediaError2.default('No sources found'));
@@ -4609,6 +4664,86 @@
 
 	'use strict';
 	/**
+	 * @file Time.js
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _Component2 = __webpack_require__(3);
+
+	var _Component3 = _interopRequireDefault(_Component2);
+
+	var _utils = __webpack_require__(13);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	// TODO: Использовать этот блок в TimeControl
+	/**
+	 * @param {Player} player Main player
+	 * @param {Object} [options]
+	 * @class Time
+	 * @extends Control
+	 */
+	var Time = function (_Component) {
+		_inherits(Time, _Component);
+
+		function Time(player) {
+			var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+			_classCallCheck(this, Time);
+
+			options = _jquery2.default.extend({}, {
+				fn: function fn(player) {
+					var video = player.video;
+					return (0, _utils.secondsToTime)(video.currentTime);
+				}
+			}, options);
+
+			var _this = _possibleConstructorReturn(this, (Time.__proto__ || Object.getPrototypeOf(Time)).call(this, player, options));
+
+			_this.player.on('timeupdate', _this.updateText.bind(_this));
+			_this.player.on('inited', _this.updateText.bind(_this));
+			return _this;
+		}
+
+		_createClass(Time, [{
+			key: 'updateText',
+			value: function updateText(e, data) {
+				this.element.text(this.options.fn(this.player));
+			}
+		}, {
+			key: 'createElement',
+			value: function createElement() {
+				this.element = (0, _utils.createEl)('div', { className: 'leplayer-time' });
+				return this.element;
+			}
+		}]);
+
+		return Time;
+	}(_Component3.default);
+
+	exports.default = Time;
+
+/***/ },
+/* 29 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
 	 * @file Sections.js
 	 */
 
@@ -4674,7 +4809,9 @@
 
 			_this.player.on('timeupdate', _this.onTimeUpdate.bind(_this));
 
-			_this.player.on('inited', _this.onPlayerInited.bind(_this));
+			_this.player.on('inited', _this.updateSectionDuration.bind(_this));
+
+			_this.player.on('durationchange', _this.updateSectionDuration.bind(_this));
 
 			return _ret = _this, _possibleConstructorReturn(_this, _ret);
 		}
@@ -4719,16 +4856,20 @@
 	   */
 
 		}, {
-			key: 'onPlayerInited',
-			value: function onPlayerInited() {
-
+			key: 'updateSectionDuration',
+			value: function updateSectionDuration() {
 				if (this.items != null && this.items.length > 0) {
-					this.items[this.items.length - 1].end = this.player.video.duration;
+					var length = this.items.length;
+					this.items[length - 1].end = this.player.video.duration;
+
+					// TODO: Продумать функцияю updateSection
+					//this.updateSection(this.items[length - 1], length - 1);
 				}
 			}
 		}, {
 			key: 'onSectionClick',
 			value: function onSectionClick(e) {
+				console.log('click');
 				var video = this.player.video;
 				var section = (0, _jquery2.default)(e.target).closest('.leplayer-section');
 				video.currentTime = section.attr('data-begin');
@@ -4793,13 +4934,42 @@
 					this.element.addClass('leplayer-sections--hidden');
 				}
 			}
+
+			/**
+	   * Create HTML of section by data and index section
+	   *
+	   * @returns {String} HTML
+	   */
+
+		}, {
+			key: 'createSection',
+			value: function createSection(section, index) {
+				var items = this.items || this.options.items;
+				var item = ('\n\t\t\t<div class="leplayer-section ' + (!index ? 'leplayer-section--active' : '') + '"\n\t\t\t\tdata-begin="' + section.begin + '"\n\t\t\t\tdata-index="' + index.toString() + '"\n\t\t\t\tdata-end="' + section.end + '">\n\t\t\t\t<div class="leplayer-section-time">' + (0, _utils.secondsToTime)(section.begin) + '</div>\n\t\t\t\t<div class="leplayer-section-info">\n\t\t\t\t\t<div class="leplayer-section-next-info">\n\t\t\t\t\t\t' + (section.nextInfo || 'Следующая секция начнется через') + '\n\t\t\t\t\t\t<span class="time">' + (0, _utils.secondsToTime)(items[0].end) + '</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t' + (section.title != null ? '<div class="leplayer-section-title">' + section.title + '</div>' : '') + '\n\t\t\t\t\t' + (section.description != null ? '<div class="leplayer-section-description">' + section.description + '</div>' : '') + '\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t').trim();
+				return item;
+			}
+
+			// TODO: Придумать что сделать с событиями после обновления полносью секции
+			/**
+	   * Find section by index and update him using data
+	   *
+	   * @param {Object} data
+	   * @param {Number} index
+	   */
+
+		}, {
+			key: 'updateSection',
+			value: function updateSection(data, index) {
+				this.getSectionByIndex(index).replaceWith(this.createSection(data, index)).on('click', this.onSectionClick.bind(this));
+			}
 		}, {
 			key: '_createSections',
 			value: function _createSections(items) {
+				var _this2 = this;
+
 				var result = '';
 				items.forEach(function (section, index) {
-					var item = ('\n\t\t\t\t<div class="leplayer-section ' + (!index ? 'leplayer-section--active' : '') + '"\n\t\t\t\t\tdata-begin="' + section.begin + '"\n\t\t\t\t\tdata-index="' + index.toString() + '"\n\t\t\t\t\tdata-end="' + section.end + '">\n\t\t\t\t\t<div class="leplayer-section-time">' + (0, _utils.secondsToTime)(section.begin) + '</div>\n\t\t\t\t\t<div class="leplayer-section-info">\n\t\t\t\t\t\t<div class="leplayer-section-next-info">\n\t\t\t\t\t\t\t\u0421\u043B\u0435\u0434\u0443\u044E\u0449\u0430\u044F \u0441\u0435\u043A\u0446\u0438\u044F \u043D\u0430\u0447\u043D\u0435\u0442\u0441\u044F \u0447\u0435\u0440\u0435\u0437\n\t\t\t\t\t\t\t<span class="time">' + (0, _utils.secondsToTime)(items[0].end) + '</span>\n\t\t\t\t\t\t</div>\n\t\t\t\t\t\t' + (section.title != null ? '<div class="leplayer-section-title">' + section.title + '</div>' : '') + '\n\t\t\t\t\t\t' + (section.description != null ? '<div class="leplayer-section-description">' + section.description + '</div>' : '') + '\n\t\t\t\t\t</div>\n\t\t\t\t</div>\n\t\t\t').trim();
-					result += item;
+					result += _this2.createSection(section, index);
 				});
 				return result;
 			}
@@ -4811,7 +4981,7 @@
 	exports.default = Sections;
 
 /***/ },
-/* 29 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4895,7 +5065,7 @@
 	exports.default = ErrorDisplay;
 
 /***/ },
-/* 30 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4965,7 +5135,7 @@
 	exports.default = Poster;
 
 /***/ },
-/* 31 */
+/* 32 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -5021,7 +5191,7 @@
 	exports.default = FullscreenApi;
 
 /***/ },
-/* 32 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
