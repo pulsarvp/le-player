@@ -25,10 +25,10 @@ class Control extends Component {
 
 	constructor(player, options) {
 		super(player, options);
-		this.disable = true
+		this.disable = this.options.disable != null? this.options.disable : true;
 
 		this.player.on('inited', (e) => {
-			this.disable = this.options.disable || false;
+			this.disable = this.options.disable != null? this.options.disable : false;
 		})
 
 		this.element.on({
@@ -129,7 +129,7 @@ class Control extends Component {
 		var controlClass = this.getControl(name);
 		if(controlClass == null) {
 			console.error(`Control ${name} doesn't exist`);
-			return;
+			return null;
 		}
 
 		return new controlClass(player, options);
