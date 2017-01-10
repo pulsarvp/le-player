@@ -5,8 +5,8 @@
 
 import $ from 'jquery';
 import Component from './Component';
+import Control from './Control';
 
-import controlFactory, { C_TIMELINE } from '../ControlFactory';
 import { createEl } from '../utils';
 
 
@@ -48,12 +48,13 @@ class ControlCollection extends Component {
 			})
 			let hasTimeline = false;
 			row.forEach(controlName => {
-				if(controlName == C_TIMELINE) {
+				if(controlName == 'timeline') {
 					hasTimeline = true
 				}
-				const control = controlFactory(this.player, controlName, {
+				const control = Control.create(this.player, controlName, {
 					collection : this.options.name
 				});
+
 				elemRow.append(control.element);
 			});
 			if (!hasTimeline) {
@@ -84,4 +85,5 @@ class ControlCollection extends Component {
 	}
 }
 
+Component.registerComponent('ControlCollection', ControlCollection);
 export default ControlCollection;

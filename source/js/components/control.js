@@ -101,7 +101,42 @@ class Control extends Component {
 
 	}
 
+	static registerControl(name, control) {
+		if(name == null) {
+			return;
+		}
+
+		if(Control._controls == null) {
+			Control._controls = {};
+		}
+
+		Control._controls[name] = control;
+
+		return control;
+	}
+
+	static getControl(name) {
+		if(name == null) {
+			return;
+		}
+
+		if(Control._controls && Control._controls[name]) {
+			return Control._controls[name];
+		}
+	}
+
+	static create(player, name, options) {
+		var controlClass = this.getControl(name);
+		if(controlClass == null) {
+			console.error(`Control ${name} doesn't exist`);
+			return;
+		}
+
+		return new controlClass(player, options);
+	}
+
 }
 
+Component.registerComponent('Control', Control);
+Control.registerControl('control', Control);
 export default Control;
-

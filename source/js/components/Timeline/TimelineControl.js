@@ -4,6 +4,7 @@
  */
 
 import $ from 'jquery';
+import Component from '../Component';
 import Control from '../Control';
 import ControlText from '../ControlText';
 import BufferedRanges from './BufferedRanges.js'
@@ -283,4 +284,6 @@ class TimelineControl extends Control {
 
 }
 
+Component.registerComponent('TimelineControl', TimelineControl);
+Control.registerControl('timeline', TimelineControl);
 export default TimelineControl;

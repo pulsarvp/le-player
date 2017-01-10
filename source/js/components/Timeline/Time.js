@@ -40,4 +40,5 @@ class Time extends Component {
 
 }
 
+Component.registerComponent('Time', Time);
 export default Time;

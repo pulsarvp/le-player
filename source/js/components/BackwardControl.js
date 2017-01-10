@@ -6,6 +6,7 @@
  */
 
 import $ from 'jquery';
+import Component from './Component';
 import Control from './Control';
 
 /**
@@ -34,4 +35,6 @@ class BackwardControl extends Control {
 	}
 }
 
+Component.registerComponent('BackwardControl', BackwardControl);
+Control.registerControl('backward', BackwardControl);
 export default BackwardControl;

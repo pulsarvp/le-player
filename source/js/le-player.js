@@ -1,23 +1,44 @@
 'use strict';
 
 import $ from 'jquery';
-import ControlCollection from './components/ControlCollection';
+
+
+import Control from './components/Control';
 import MiniPlayer from './components/MiniPlayer';
 import PlayButton from './components/PlayButton'
 
 import Icon from './components/Icon';
 import Time from './components/Timeline/Time';
+import ControlCollection from './components/ControlCollection';
 import Sections from './components/Sections';
 import ErrorDisplay from './components/ErrorDisplay';
 import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
-import { C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
 import { createEl, secondsToTime } from './utils';
 
 import MediaError from './MediaError';
 
+// Register common controls
+import './components/PlayControl';
+import './components/VolumeControl';
+import './components/Timeline/TimelineControl';
+import './components/SectionControl';
+import './components/FullscreenControl';
+import './components/RateControl';
+import './components/BackwardControl';
+import './components/SourceControl';
+import './components/SubtitleControl';
+import './components/DownloadControl';
+import './components/KeybindingInfoControl';
+import './components/TimeInfoControl';
+
+Control.registerControl('divider', function() {
+	return {
+		element : $('<div/>').addClass('divider')
+	};
+});
 
 
 /**
@@ -68,10 +89,10 @@ const defaultOptions = {
 	controls : {
 		common : [
 			[ 'play', 'volume', 'divider', 'timeline',  'divider', 'section', 'divider', 'fullscreen' ],
-			[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO ]
+			[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'keybinding info' ]
 		],
 		fullscreen : [
-			[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', C_KEYBINDING_INFO,  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen' ]
+			[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'keybinding info',  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen' ]
 		],
 		mini : [
 			[ 'play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']

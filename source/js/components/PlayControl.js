@@ -4,6 +4,7 @@
  */
 
 import $ from 'jquery';
+import Component from './Component';
 import Control from './Control';
 
 /**
@@ -55,4 +56,6 @@ class PlayControl extends Control {
 	}
 }
 
+Component.registerComponent('PlayControl', PlayControl);
+Control.registerControl('play', PlayControl);
 export default PlayControl;

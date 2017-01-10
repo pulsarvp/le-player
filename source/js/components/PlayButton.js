@@ -4,6 +4,7 @@
  */
 
 import Control from './Control';
+import Component from './Component';
 import Icon from './Icon';
 import { createEl } from '../utils';
 
@@ -50,4 +51,6 @@ class PlayButton extends Control {
 
 }
 
+Component.registerComponent('PlayButton', PlayButton);
+Control.registerControl('play button', PlayButton);
 export default PlayButton;

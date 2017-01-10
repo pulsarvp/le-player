@@ -69,4 +69,5 @@ class Icon extends Component {
 
 }
 
+Component.registerComponent('Icon', Icon);
 export default Icon;

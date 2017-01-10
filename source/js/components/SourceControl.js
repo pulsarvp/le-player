@@ -4,6 +4,8 @@
  */
 
 import $ from 'jquery';
+import Component from './Component';
+import Control from './Control';
 import ControlContainer from './ControlContainer';
 
 /**
@@ -64,4 +66,6 @@ class SourceControl extends ControlContainer {
 	}
 }
 
+Component.registerComponent('SourceControl', SourceControl);
+Control.registerControl('source', SourceControl);
 export default SourceControl;
