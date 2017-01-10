@@ -573,6 +573,7 @@
 .leplayer-video video {
   display: block;
   max-width: 100%;
+  width: 100%;
   outline: 0;
   height: auto;
 }
