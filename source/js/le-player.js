@@ -4,8 +4,9 @@ import $ from 'jquery';
 
 
 import Control from './components/Control';
+import Component from './components/Component';
 import MiniPlayer from './components/MiniPlayer';
-import PlayButton from './components/PlayButton'
+import PlayButton from './components/PlayButton';
 
 import Icon from './components/Icon';
 import Time from './components/Timeline/Time';
@@ -1001,7 +1002,7 @@ let Player = function (element, options) {
 	this.initOptions = function () {
 		const attrOptions = this.optionsFromElement();
 		// Merge default options + video attributts + user options
-		this.options = $.extend(true, defaultOptions, attrOptions, options);
+		this.options = $.extend(true, {}, defaultOptions, attrOptions, options);
 
 		if(this.options.sources && !Array.isArray(this.options.sources)) {
 			this.options.sources = [this.options.sources]
@@ -1014,6 +1015,9 @@ let Player = function (element, options) {
 		if (this.options.src == null) {
 			this.setError(new MediaError('No sources found'));
 		}
+
+		// Merge correctly controls, without deep merge
+		this.options.controls = $.extend({}, defaultOptions.controls, options.controls);
 
 		// exclude controls option
 		for (const name in this.options.excludeControls) {
@@ -1071,25 +1075,6 @@ Player.prototype._initPlugins = function() {
 	}
 
 	return this;
-}
-
-/**
- * Static helper for creating a plugins for leplayer
- *
- * @access public
- * @static
- * @param {String} name The name of plugin
- * @param {Function} fn Plugin init function
- *
- * @example
- * Player.plugin('helloWorld', function(pluginOptions) {
- *    const player = this;
- *    player.on('click', () => console.log('Hello world'));
- * })
- *
- */
-Player.plugin = function(name, fn) {
-	Player.prototype[name] = fn;
 }
 
 /**
@@ -1454,6 +1439,49 @@ Player.prototype.getHeight = function() {
 Player.prototype.getWidth = function() {
 	return this.element.width()
 }
+
+/**
+ * Static helper for creating a plugins for leplayer
+ *
+ * @access public
+ * @static
+ * @param {String} name The name of plugin
+ * @param {Function} fn Plugin init function
+ *
+ * @example
+ * Player.plugin('helloWorld', function(pluginOptions) {
+ *    const player = this;
+ *    player.on('click', () => console.log('Hello world'));
+ * })
+ *
+ */
+Player.plugin = function(name, fn) {
+	Player.prototype[name] = fn;
+}
+
+/**
+ * @access public
+ * @static
+ */
+Player.getComponent = Component.getComponent;
+
+/**
+ * @access public
+ * @static
+ */
+Player.registerComponent = Component.registerComponent;
+
+/**
+ * @access public
+ * @static
+ */
+Player.getControl = Control.getControl;
+
+/**
+ * @access public
+ * @static
+ */
+Player.registerControl = Control.registerControl;
 
 window.$.fn.lePlayer = function (options) {
 	return this.each(function () {
