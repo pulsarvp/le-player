@@ -14,6 +14,7 @@ import { createEl } from '../utils';
  * @param {Player} player Main player
  * @param {Object} [options] Options of component
  * @param {jQuery} [options.controls] Array of rows of control's name
+ * @param {Object} [options.controlOptions] Control options
  * @property {Array} Array of rows of control's name
  * @pr
  *
@@ -22,6 +23,7 @@ class ControlCollection extends Component {
 	constructor (player, options) {
 		options = $.extend({}, {
 			controls : player.options.controls[options.name] || [],
+			controlOptions : {}
 		}, options);
 		super(player, options);
 		this.controls = [];
@@ -32,6 +34,16 @@ class ControlCollection extends Component {
 	}
 
 
+	_getControlOptions(name) {
+		const { controlOptions } = this.options;
+		let result = controlOptions.control || {};
+
+		if(controlOptions[name]) {
+			result = $.extend(true, {}, result, controlOptions[name]);
+		}
+
+		return result;
+	}
 	/**
 	 * @override
 	 */
@@ -52,8 +64,14 @@ class ControlCollection extends Component {
 					hasTimeline = true
 				}
 				const control = Control.create(this.player, controlName, {
-					collection : this.options.name
+					collection : this.options.name,
+					...this._getControlOptions(name)
 				});
+				console.log(control);
+
+				if(control == null) {
+					return;
+				}
 
 				elemRow.append(control.element);
 			});
