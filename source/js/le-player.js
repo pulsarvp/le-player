@@ -759,15 +759,7 @@ let Player = function (element, options) {
 					return;
 				}
 
-				for ( let i = 0; i < sections.length; i++) {
-					let endSection;
-					if (i < (sections.length - 1)) {
-						endSection = sections[i+1].begin
-					} else {
-						endSection = this.video.duration;
-					}
-					sections[i].end = endSection;
-				}
+				sections = this.completeSections(sections);
 
 				const sectionsComponent = new Sections(this, {
 
@@ -1153,6 +1145,10 @@ Player.prototype.toggleClass = function(className, flag) {
 	return this;
 }
 
+Player.prototype.hasClass = function(className) {
+	return this.element.hasClass(className);
+}
+
 /**
  * Set player view
  *
@@ -1440,6 +1436,23 @@ Player.prototype.getWidth = function() {
 	return this.element.width()
 }
 
+Player.prototype.completeSections = function(sections) {
+	if (sections == null || sections.length == 0) {
+		return
+	}
+	let newSections = [].concat(sections)
+	for ( let i = 0; i < newSections.length; i++) {
+		let endSection;
+		if (i < (newSections.length - 1)) {
+			endSection = newSections[i+1].begin
+		} else {
+			endSection = this.video.duration;
+		}
+		newSections[i].end = endSection;
+	}
+	return newSections;
+}
+
 /**
  * Static helper for creating a plugins for leplayer
  *
@@ -1482,6 +1495,11 @@ Player.getControl = Control.getControl;
  * @static
  */
 Player.registerControl = Control.registerControl;
+
+
+Player.secondsToTime = secondsToTime;
+
+
 
 window.$.fn.lePlayer = function (options) {
 	return this.each(function () {
