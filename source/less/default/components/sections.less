@@ -32,18 +32,18 @@
 	{
 		background: @color-section-2n;
 	}
-	&:hover
+	&--active
 	{
-		background: @color-section-hover;
-	}
-	&.leplayer-section--active
-	{
-		background: @color-section-hover;
+		background: @color-section-active;
 
 		.leplayer-section-description
 		{
 			display: block;
 		}
+	}
+	&:hover
+	{
+		background: @color-section-hover;
 	}
 }
 
@@ -132,13 +132,13 @@
 		{
 			background: fade(@color-section-2n,80%);
 		}
-		&:hover
-		{
-			background: fade(@color-section-hover,80%);
-		}
 		&.leplayer-section--active
 		{
 			background: fade(@color-section-active, 80%);
+		}
+		&:hover
+		{
+			background: fade(@color-section-hover,80%);
 		}
 	}
 }
@@ -194,6 +194,10 @@
 			{
 				background: @color-fs-section-2n-active;
 			}
+		}
+		&:hover
+		{
+			background: @color-fs-section-hover;
 		}
 	}
 
