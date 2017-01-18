@@ -419,12 +419,30 @@
 		//transition: left @timeline-transition;
 		width: 2px;
 		z-index: @z-index-base + 7;
+		&:before
+		{
+			content: '';
+			width: 4px;
+			height: 100%;
+			position: absolute;
+			left: -1px;
+			background: transparent;
+		}
+		&--drag:before,
+		&:hover:before
+		{
+			background: @color-marker;
+		}
 		&.shadow
 		{
 			background: @color-marker-shadow;
 			border-right: 1px solid @color-marker-shadow-border;
 			transition: none;
 			z-index: @z-index-base + 6;
+			&:before
+			{
+				content: none;
+			}
 		}
 		.time
 		{
