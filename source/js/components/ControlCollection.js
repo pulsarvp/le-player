@@ -26,7 +26,7 @@ class ControlCollection extends Component {
 			controlOptions : {}
 		}, options);
 		super(player, options);
-		this.controls = [];
+
 		this.active = options.active || false;
 		this.name = options.name;
 
@@ -44,6 +44,69 @@ class ControlCollection extends Component {
 
 		return result;
 	}
+
+	addControl(indexRow, name, options) {
+		const control = Control.create(this.player, name, {
+			collection : this.options.name,
+			...options
+		});
+
+		if(control == null) {
+			return;
+		}
+
+		while(indexRow > this._rows.length) {
+			this.addRow();
+		}
+
+		const elemRow = this._rows[indexRow];
+		elemRow.append(control.element);
+
+		if (this.controls == null) {
+			this.controls = [];
+		}
+		if (this.controls[indexRow] == null) {
+			this.controls[indexRow] = {};
+		}
+
+		this.controls[indexRow][name] = control;
+	}
+
+	getControl(first, second) {
+		if(second == null) {
+			const name = first;
+			for(let i = 0; i < this.controls.length; i++) {
+				if(this.controls[i][name] != undefined) {
+					return this.controls[i][name];
+				}
+			}
+		} else {
+			const name = first;
+			const indexRow = second;
+			return this.controls[indexRow][name];
+		}
+
+		return null;
+	}
+
+	addRow() {
+		const elemRow = createEl('div', {
+			className : `leplayer-controls controls-${this.options.name}`
+		});
+
+		if (this._rows == null) {
+			this._rows = []
+		}
+		this._rows.push(elemRow);
+		this.element.append(elemRow);
+
+		return elemRow;
+	}
+
+	getRow(indexRow) {
+		return this._rows[indexRow || 0];
+	}
+
 	/**
 	 * @override
 	 */
@@ -54,42 +117,23 @@ class ControlCollection extends Component {
 			className: `leplayer-control-collection leplayer-control-collection--${name}`
 		})
 
-		controls.forEach( row => {
-			let elemRow = createEl('div', {
-				className : `leplayer-controls controls-${name}`
-			})
+		controls.forEach( ( row, indexRow ) => {
+			const elemRow = this.addRow();
 			let hasTimeline = false;
 			row.forEach(controlName => {
 				if(controlName == 'timeline') {
 					hasTimeline = true
 				}
-				const control = Control.create(this.player, controlName, {
-					collection : this.options.name,
-					...this._getControlOptions(name)
-				});
-				console.log(control);
 
-				if(control == null) {
-					return;
-				}
-
-				elemRow.append(control.element);
+				this.addControl(indexRow, controlName, this._getControlOptions(name));
 			});
+
 			if (!hasTimeline) {
 				elemRow.css('width', '1px');
 			}
 			elemRow.find('.divider + .divider').remove();
-			this.element.append(elemRow);
 		})
 		return this.element;
-
-	}
-
-	set disable (value) {
-		for (let i in this.items) {
-			if (!this.items.hasOwnProperty(i)) continue;
-			this.items[ i ].disable = value;
-		}
 	}
 
 	hide () {
