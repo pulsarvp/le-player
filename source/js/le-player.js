@@ -7,6 +7,7 @@ import Control from './components/Control';
 import Component from './components/Component';
 import MiniPlayer from './components/MiniPlayer';
 import PlayButton from './components/PlayButton';
+import SplashIcon from './components/SplashIcon';
 
 import Icon from './components/Icon';
 import Time from './components/Timeline/Time';
@@ -70,10 +71,7 @@ const defaultOptions = {
 	preload : 'metadata',
 	poster : null,
 	svgPath : '../dist/svg/svg-defs.svg',
-	innactivityTimeout : 10000,
-	fullscreen : {
-		hideTimelineTime : 10000
-	},
+	innactivityTimeout : 5000,
 	rate : {
 		step : 0.25,
 		min : 0.5,
@@ -119,6 +117,7 @@ const defaultOptions = {
 			description : `Перемотать на 10 секунд назад`,
 			fn : (player) => {
 				player.video.currentTime -= player.options.playback.step.medium;
+				player.splashIcon.show('undo');
 			}
 		},
 		{
@@ -127,6 +126,7 @@ const defaultOptions = {
 			description : `Перемотать на 10 секунд вперёд`,
 			fn : (player) => {
 				player.video.currentTime += player.options.playback.step.medium;
+				player.splashIcon.show('redo');
 			}
 		},
 		{
@@ -160,6 +160,9 @@ const defaultOptions = {
 			description : 'Увеличить громкость',
 			fn : (player) => {
 				player.video.volume += player.options.volume.step;
+
+				player.splashIcon.show(player._calcVolumeIcon(player.video.volume));
+
 			}
 		},
 
@@ -169,6 +172,8 @@ const defaultOptions = {
 			description : 'Уменьшить громкость',
 			fn : (player) => {
 				player.video.volume -= player.options.volume.step;
+
+				player.splashIcon.show(player._calcVolumeIcon(player.video.volume));
 			}
 		},
 
@@ -208,8 +213,6 @@ const defaultOptions = {
  * @param {String} [options.preload='metadata'] Can be ('auto'|'metadata'|'none')
  * @param {String} [options.poster] Path to poster of video
  * @param {String} [options.svgPath] Path to svg sprite for icons
- * @param {Number} [options.fullscreen] Fullscreen options
- * @param {Number} [options.fullscreen.hideTimelineTime=10000] Delay before hide timeline in fullscreen view
  * @param {Object} [options.rate] Rate options
  * @param {Number} [options.rate.step=0.25] Step of increase/decrease by rate control
  * @param {Number} [options.rate.min=0.5] Min of rate
@@ -276,7 +279,6 @@ let Player = function (element, options) {
 			this.subtitles = [];
 			this.bufferRanges = [];
 			this.playbackRate = this._video.playbackRate;
-			this._initHtmlEvents();
 
 			if($(this._video).attr('src') == null) {
 				this.source = this.player.options.src;
@@ -369,6 +371,10 @@ let Player = function (element, options) {
 				else
 					this._video.textTracks[ i ].mode = 'hidden';
 			}
+		}
+
+		get paused() {
+			return this._video.paused;
 		}
 
 		get volume () {
@@ -571,122 +577,6 @@ let Player = function (element, options) {
 			}
 		}
 
-		_initHtmlEvents () {
-			let mediaElement = $(this._video);
-
-			mediaElement.one({
-				'play' : (e) => {
-					this.player.trigger('firstplay');
-					this.player.removeClass('leplayer--virgin');
-				}
-			});
-
-			mediaElement.on({
-
-				'loadstart' : (e) => {
-					this.player.removeClass('leplayer--ended');
-
-					this.player.setError(null);
-
-					this.player.trigger('loadstart');
-				},
-
-				'durationchange' : (e) => {
-					this.player.trigger('durationchange');
-				},
-
-				'timeupdate' : (e) => {
-					if ( this.currentTime > 0 ) {
-						this.player.removeClass('leplayer--virgin');
-					}
-
-					this.player.trigger('timeupdate', { time : this.currentTime, duration : this.duration });
-
-				},
-
-				'seeking' : (e) => {
-					this.player.addClass('leplayer--seeking');
-					this.player.trigger('seeking');
-				},
-
-				'seeked' : (e) => {
-					this.player.removeClass('leplayer--seeking');
-					this.player.trigger('seeked');
-				},
-
-				'progress' : () => {
-					this.player.trigger('progress');
-				},
-
-				'dblclick' : () => {
-					this.player.trigger('dblclick');
-				},
-
-				'click' : () => {
-					this.player.trigger('click')
-				},
-
-				'volumechange' : (e) => {
-					this.player.trigger('volumechange', { volume : this.volume });
-				},
-
-				'play' : (e) => {
-					this.player.removeClass('leplayer--ended');
-					this.player.removeClass('leplayer--paused');
-					this.player.addClass('leplayer--playing');
-
-					this.player.trigger('play');
-				},
-
-				'pause' : (e) => {
-					this.player.removeClass('leplayer--playing');
-					this.player.addClass('leplayer--paused');
-					this.player.trigger('pause');
-					//overlay.show()
-				},
-
-				'playing' : (e) => {
-					this.player.removeClass('leplayer--waiting');
-					this.player.trigger('playing');
-				},
-
-				'ratechange' : (e) => {
-					this.player.trigger('ratechange', { rate : this.rate });
-				},
-
-				'canplay' : (e) => {
-					//loader.hide();
-					this.player.trigger('canplay');
-				},
-
-				'ended' : (e) => {
-					this.player.addClass('leplayer--ended')
-
-					if(this.player.options.loop) {
-						this.currentTime(0);
-						this.play();
-					} else if (!this._video.paused) {
-						this.pause();
-					}
-
-					this.player.trigger('ended');
-				},
-				'canplaythrough' : (e) => {
-					this.player.removeClass('leplayer--waiting');
-					this.player.trigger('canplaythrough');
-				},
-
-				'waiting' : (e) => {
-					this.player.addClass('leplayer--waiting');
-					this.player.one('timeupdate', () => this.player.removeClass('leplayer--waiting'));
-					this.player.trigger('waiting');
-				},
-
-				'error' : (e) => {
-					this.player.setError(new MediaError(e.target.error.code));
-				}
-			});
-		}
 	}
 
 
@@ -790,10 +680,6 @@ let Player = function (element, options) {
 	 */
 	this.initDom = function () {
 		const options = this.options;
-		this.errorDisplay = new ErrorDisplay(this);
-		this.playButton = new PlayButton(this);
-
-		//element.width(this.video.width);
 
 		[
 
@@ -826,9 +712,17 @@ let Player = function (element, options) {
 			$(item).remove();
 		})
 
+		this.element = this.element
+			.addClass('leplayer')
+			.attr('tabindex', 0)
+			.css('width', '100%')
+			.css('max-width', (options.width || this.video.width) + 'px')
+
+		this.errorDisplay = new ErrorDisplay(this);
+
+		this.playButton = new PlayButton(this);
 
 		// TODO: Вынести это в отдельнеый компонент
-
 		this.loader = $('<div />')
 			.addClass('leplayer-loader-container')
 			.append(new Icon(this, {
@@ -837,11 +731,15 @@ let Player = function (element, options) {
 				}).element);
 
 
+		this.splashIcon = new SplashIcon(this);
+
 		this.videoContainer = createEl('div', {
 				className : 'leplayer-video'
 			})
+			.append(this.errorDisplay.element)
 			.append(this.playButton.element)
-			.append(this.loader);
+			.append(this.loader)
+			.append(this.splashIcon.element)
 
 		if(options.poster) {
 			this.poster = new Poster(this);
@@ -860,10 +758,12 @@ let Player = function (element, options) {
 				return secondsToTime(video.duration - video.currentTime);
 			}
 		})
+
 		this.innerElement = $('<div />')
 			.addClass('leplayer__inner')
 			.append(this.videoContainer)
-			.append(createEl('div', {
+			.append(
+				createEl('div', {
 					className : 'leplayer__info'
 				})
 				.append(createEl('div', {
@@ -884,12 +784,7 @@ let Player = function (element, options) {
 				//.text(this.options.videoInfo || ""))
 
 		this.element = this.element
-			.addClass('leplayer')
 			.append(this.innerElement)
-			.append(this.errorDisplay.element)
-			.attr('tabindex', 0)
-			.css('width', '100%')
-			.css('max-width', (options.width || this.video.width) + 'px')
 
 		this.addClass('leplayer--paused');
 		this.addClass('leplayer--virgin');
@@ -1032,19 +927,158 @@ let Player = function (element, options) {
 
 	this._listenUserActivity();
 
-	$(document).on(fsApi.fullscreenchange, this._onEntityFullscrenChange.bind(this));
+	const mediaElement = this.video.element;
 
+	mediaElement.one({
+		'play' : (e) => {
+			this.trigger('firstplay');
+			this.removeClass('leplayer--virgin');
+		}
+	});
+
+	mediaElement.on({
+
+		'loadstart' : (e) => {
+			this.removeClass('leplayer--ended');
+
+			this.setError(null);
+
+			this.trigger('loadstart');
+		},
+
+		'durationchange' : (e) => {
+			this.trigger('durationchange');
+		},
+
+		'timeupdate' : (e) => {
+			if ( this.video.currentTime > 0 ) {
+				this.removeClass('leplayer--virgin');
+			}
+
+			this.trigger('timeupdate', { time : this.video.currentTime, duration : this.video.duration });
+
+		},
+
+		'seeking' : (e) => {
+			this._startWaiting();
+			this.trigger('seeking');
+
+		},
+
+		'seeked' : (e) => {
+			this._stopWayting();
+			this.trigger('seeked');
+		},
+
+		'progress' : () => {
+			this.trigger('progress');
+		},
+
+		'dblclick' : () => {
+			this.trigger('dblclick');
+		},
+
+		'click' : () => {
+			this.trigger('click')
+		},
+
+		'volumechange' : (e) => {
+			this.trigger('volumechange', { volume : this.video.volume });
+		},
+
+		'play' : (e) => {
+			this.removeClass('leplayer--ended');
+			this.removeClass('leplayer--paused');
+			this.addClass('leplayer--playing');
+
+			this.trigger('play');
+		},
+
+		'pause' : (e) => {
+			this.removeClass('leplayer--playing');
+			this.addClass('leplayer--paused');
+			this.trigger('pause');
+			//overlay.show()
+		},
+
+		'playing' : (e) => {
+			this._stopWayting();
+			this.trigger('playing');
+		},
+
+		'ratechange' : (e) => {
+			this.trigger('ratechange', { rate : this.video.rate });
+		},
+
+		'canplay' : (e) => {
+			//loader.hide();
+			this.trigger('canplay');
+		},
+
+		'ended' : (e) => {
+			this.addClass('leplayer--ended')
+
+			if(this.options.loop) {
+				this.currentTime(0);
+				this.video.play();
+			} else if (!this.video.paused) {
+				this.video.pause();
+			}
+
+			this.trigger('ended');
+		},
+
+		'canplaythrough' : (e) => {
+			this._stopWayting();
+			this.trigger('canplaythrough');
+		},
+
+		'waiting' : (e) => {
+			this._startWaiting()
+
+			this.one('timeupdate', () => this._stopWayting());
+
+			this.trigger('waiting');
+		},
+
+		'error' : (e) => {
+			this.setError(new MediaError(e.target.error.code));
+		}
+	});
 
 	this.on('fullscreenchange', this.onFullscreenChange.bind(this));
 	this.on('click', this._onClick.bind(this));
 	this.on('dblclick', this._onDbclick.bind(this));
-	//this.on('waiting', this._onWaiting.bind(this));
 	this.on('inited', this._onInited.bind(this));
+	this.on('play', this._onPlay.bind(this));
+	this.on('pause', this._onPause.bind(this));
+
+	$(document).on(fsApi.fullscreenchange, this._onEntityFullscrenChange.bind(this));
 
 	return this;
 };
 
+Player.prototype._waitingTimeouts = [];
 
+Player.prototype._stopWayting = function() {
+	this._waitingTimeouts.forEach( item => clearTimeout(item));
+	this._waitingTimeouts = [];
+	this.removeClass('leplayer--waiting');
+}
+
+Player.prototype._startWaiting = function() {
+	this._waitingTimeouts.push(setTimeout(() => {
+		this.addClass('leplayer--waiting');
+	}, 300));
+}
+
+Player.prototype._onPlay = function() {
+	this.splashIcon.show('play');
+}
+
+Player.prototype._onPause = function() {
+	this.splashIcon.show('pause');
+}
 /**
  * @access private
  *
@@ -1073,6 +1107,22 @@ Player.prototype._initPlugins = function() {
  * @access private
  */
 Player.prototype._view = 'common';
+
+
+/**
+ * @access private
+ */
+Player.prototype._calcVolumeIcon = function(value) {
+	const volume = value || this.video.volume;
+
+	if (volume < this.options.volume.mutelimit) {
+		return 'volume-off';
+	} else if (value < 0.5) {
+		return 'volume-down';
+	} else {
+		return 'volume-up';
+	}
+}
 
 /**
  * Emit a player event (the name of event would be a leplayer_smth)
