@@ -787,6 +787,49 @@
 	}
 }
 
+
+@keyframes leplayer-splashicon-fadeout {
+    0% {
+        opacity: 1
+    }
+    to {
+        opacity: 0;
+        transform: scale(2);
+    }
+}
+.leplayer-splashicon
+{
+	display: none;
+	position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 52px;
+    height: 52px;
+    z-index: 17;
+    margin-left: -26px;
+    margin-top: -26px;
+    background: rgba(0,0,0,.5);
+    border-radius: 26px;
+	color: white;
+	justify-content: center;
+	align-items: center;
+    animation: leplayer-splashicon-fadeout .5s linear 1 normal forwards;
+
+	&--active
+	{
+		display: flex;
+	}
+}
+
+.leplayer--virgin
+{
+	.leplayer-splashicon
+	{
+		display: none
+	}
+}
+
+
 @import "components/video.less";
 @import "components/play-button.less";
 @import "components/loader-container.less";
