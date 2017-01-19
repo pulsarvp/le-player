@@ -48,10 +48,7 @@ const defaultOptions = {
 	preload : 'metadata',
 	poster : null,
 	svgPath : '../dist/svg/svg-defs.svg',
-	innactivityTimeout : 10000,
-	fullscreen : {
-		hideTimelineTime : 10000
-	},
+	innactivityTimeout : 5000,
 	rate : {
 		step : 0.25,
 		min : 0.5,
@@ -186,8 +183,6 @@ const defaultOptions = {
  * @param {String} [options.preload='metadata'] Can be ('auto'|'metadata'|'none')
  * @param {String} [options.poster] Path to poster of video
  * @param {String} [options.svgPath] Path to svg sprite for icons
- * @param {Number} [options.fullscreen] Fullscreen options
- * @param {Number} [options.fullscreen.hideTimelineTime=10000] Delay before hide timeline in fullscreen view
  * @param {Object} [options.rate] Rate options
  * @param {Number} [options.rate.step=0.25] Step of increase/decrease by rate control
  * @param {Number} [options.rate.min=0.5] Min of rate

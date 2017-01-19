@@ -188,8 +188,8 @@ class TimelineControl extends Control {
 			const item = $('<div />')
 				.addClass('leplayer-timeline-section')
 				.css({
-					width: length / duration * 99 + '%',
-					left: section.begin / duration * 99 + '%'
+					width: length / duration * 100 + '%',
+					left: section.begin / duration * 100 + '%'
 				});
 			result.append(item);
 		})
@@ -230,7 +230,9 @@ class TimelineControl extends Control {
 	updateLabels() {
 		const video = this.player.video;
 		this.totalTime.text = secondsToTime(0, Math.floor(video.duration / 3600) > 0);
+		const isVisible = this.element.is(':visible');
 		const width = this.totalTime.element.width();
+
 		this.totalTime.text = secondsToTime(video.duration);
 		this.currentTime.text = secondsToTime(video.currentTime || 0);
 		this.currentTime.element.css({
