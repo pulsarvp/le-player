@@ -248,9 +248,15 @@ const defaultOptions = {
  */
 let Player = function (element, options) {
 
-	let player = this;
+	if (element.prop('tagName').toLowerCase() != 'video') {
+		console.warn('Incorrect element selected.');
+		return this;
+	}
 
+	const player = this;
 	const fsApi = FullscreenApi;
+
+	this._element = element;
 
 	// key -> contol collection name, valuy -> ControlCollection
 	this.controls = {};
@@ -264,8 +270,6 @@ let Player = function (element, options) {
 	 */
 
 	this.element = createEl('div');
-	let sectionContainer = null;
-	this._userActivity = false;
 
 	this.innerElement = createEl('div');
 
@@ -278,7 +282,6 @@ let Player = function (element, options) {
 			this.element = $(this._video);
 			this.subtitles = [];
 			this.bufferRanges = [];
-			this.playbackRate = this._video.playbackRate;
 
 			if($(this._video).attr('src') == null) {
 				this.source = this.player.options.src;
@@ -339,10 +342,11 @@ let Player = function (element, options) {
 		set source (src) {
 			if(src == null) return;
 			if(this.source && this.source.url === src.url) return;
-			const time = this._video.currentTime;
-			const rate = this._video.playbackRate;
-			const stop = this._video.paused;
+			const time = this.currentTime;
+			const rate = this.rate;
+			const stop = this.paused;
 
+			console.log(src.url);
 			$(this._video).attr('src', src.url);
 
 			this._video = this._ctx[0];
@@ -580,42 +584,6 @@ let Player = function (element, options) {
 	}
 
 
-	/* TODO: Вынести все методы в прототип */
-	this.init = function () {
-		// Check if element is correctly selected.
-		if (element.prop('tagName').toLowerCase() != 'video') {
-			console.warn('Incorrect element selected.');
-			return this;
-		}
-
-		this.initOptions();
-
-
-		/** TODO: Use promise to async run this */
-		this.initDom();
-
-		// Create video link
-		this.video = new Video(this, element);
-
-		// Create controls
-		// TODO: move this action to the initDom
-		this.initControls();
-
-		// Listen hotkeys
-		this.initHotKeys();
-
-		this.initSections().then((data) => {
-			this.sections = data.sectionsComponent;
-			this.trigger('sectionsinit', data);
-		});
-
-		this.video.init().then(() => {
-			this.trigger('inited');
-			this._initPlugins();
-		});
-
-	};
-
 	this.initControls = function () {
 		//controls = new Controls(player);
 		for (const name of ['common', 'fullscreen']) {
@@ -642,7 +610,7 @@ let Player = function (element, options) {
 			this.getSectionData().done(sections => {
 				sections = [...sections];
 
-				const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
+				const isSectionOutside = (this.sectionsContainer && this.sectionsContainer.length > 0);
 
 				if (sections == null || sections.length == 0) {
 					dfd.reject(null);
@@ -663,7 +631,7 @@ let Player = function (element, options) {
 					const outsideSections = new Sections(player, {
 						items : sections,
 					});
-					sectionContainer.append(outsideSections.element);
+					this.sectionsContainer.append(outsideSections.element);
 				}
 				dfd.resolve({ sectionsComponent, items : sections });
 			})
@@ -673,130 +641,6 @@ let Player = function (element, options) {
 	}
 
 
-	/**
-	 * Remove unnecessary attributes, and set some attrs from options (loop, poster etc...). Create main DOM objects
-	 *
-	 * @access private
-	 */
-	this.initDom = function () {
-		const options = this.options;
-
-		[
-
-			// Remove controls because we dont not support native controls yet
-			'controls',
-			'poster',
-
-			// It is unnecessary attrs, this functionality solve CSS
-			'height',
-			'width'
-
-		].forEach( item => {
-			element.removeAttr(item);
-		});
-
-		// Set attrs from options
-		[
-			'preload',
-			'autoplay',
-			'loop',
-			'muted'
-		].forEach(item => {
-			if(this.options[item]) {
-				element.attr(item, this.options[item]);
-				element.prop(item, this.options[item]);
-			}
-		})
-
-		element.find('source[data-quality]').each((i, item) => {
-			$(item).remove();
-		})
-
-		this.element = this.element
-			.addClass('leplayer')
-			.attr('tabindex', 0)
-			.css('width', '100%')
-			.css('max-width', (options.width || this.video.width) + 'px')
-
-		this.errorDisplay = new ErrorDisplay(this);
-
-		this.playButton = new PlayButton(this);
-
-		// TODO: Вынести это в отдельнеый компонент
-		this.loader = $('<div />')
-			.addClass('leplayer-loader-container')
-			.append(new Icon(this, {
-					iconName : 'refresh',
-					className : 'leplayer-loader-container__icon'
-				}).element);
-
-
-		this.splashIcon = new SplashIcon(this);
-
-		this.videoContainer = createEl('div', {
-				className : 'leplayer-video'
-			})
-			.append(this.errorDisplay.element)
-			.append(this.playButton.element)
-			.append(this.loader)
-			.append(this.splashIcon.element)
-
-		if(options.poster) {
-			this.poster = new Poster(this);
-			this.videoContainer.append(this.poster.element);
-		}
-
-
-		if(options.miniplayer) {
-			this.miniPlayer = new MiniPlayer(this)
-		}
-
-
-		const lastTimer = new Time(this, {
-			fn : (player) => {
-				const video = player.video
-				return secondsToTime(video.duration - video.currentTime);
-			}
-		})
-
-		this.innerElement = $('<div />')
-			.addClass('leplayer__inner')
-			.append(this.videoContainer)
-			.append(
-				createEl('div', {
-					className : 'leplayer__info'
-				})
-				.append(createEl('div', {
-						className : 'leplayer__title',
-						html : this.options.title || ""
-					}))
-				.append(createEl('div', {
-						className : 'leplayer__video-info',
-						html : this.options.videoInfo || ""
-					}))
-				.append(createEl('div', {
-						className : 'leplayer__last',
-						html : `Видео закончится через `,
-					}).append(lastTimer.element))
-				.append(this.miniPlayer && this.miniPlayer.element)
-			)
-			//.append($('leplayer__video-info')
-				//.text(this.options.videoInfo || ""))
-
-		this.element = this.element
-			.append(this.innerElement)
-
-		this.addClass('leplayer--paused');
-		this.addClass('leplayer--virgin');
-
-
-		if(options.sectionContainer) {
-			sectionContainer = $(options.sectionContainer);
-		}
-
-		element.before(this.element);
-		this.videoContainer.append(element);
-	};
 
 	this.initHotKeys = function () {
 
@@ -833,6 +677,7 @@ let Player = function (element, options) {
 	 */
 	this.optionsFromElement = function() {
 		// Copy video attrs to the opitons
+		const  element = this._element;
 		let attrOptions = [
 			'height',
 			'width',
@@ -923,7 +768,32 @@ let Player = function (element, options) {
 		return (focused.length > 0) || $(this.element).is(':focus');
 	}
 
-	this.init();
+	// Check if element is correctly selected.
+
+	this.initOptions();
+
+	/** TODO: Use promise to async run this */
+	this.createElement();
+
+	// Create video link
+	this.video = new Video(this, element);
+
+	// Create controls
+	// TODO: move this action to the createElement
+	this.initControls();
+
+	// Listen hotkeys
+	this.initHotKeys();
+
+	this.initSections().then((data) => {
+		this.sections = data.sectionsComponent;
+		this.trigger('sectionsinit', data);
+	});
+
+	this.video.init().then(() => {
+		this.trigger('inited');
+		this._initPlugins();
+	});
 
 	this._listenUserActivity();
 
@@ -1046,7 +916,7 @@ let Player = function (element, options) {
 		}
 	});
 
-	this.on('fullscreenchange', this.onFullscreenChange.bind(this));
+	this.on('fullscreenchange', this._onFullscreenChange.bind(this));
 	this.on('click', this._onClick.bind(this));
 	this.on('dblclick', this._onDbclick.bind(this));
 	this.on('inited', this._onInited.bind(this));
@@ -1058,27 +928,208 @@ let Player = function (element, options) {
 	return this;
 };
 
-Player.prototype._waitingTimeouts = [];
-
-Player.prototype._stopWayting = function() {
-	this._waitingTimeouts.forEach( item => clearTimeout(item));
-	this._waitingTimeouts = [];
-	this.removeClass('leplayer--waiting');
+/**
+ * Static helper for creating a plugins for leplayer
+ *
+ * @access public
+ * @static
+ * @param {String} name The name of plugin
+ * @param {Function} fn Plugin init function
+ *
+ * @example
+ * Player.plugin('helloWorld', function(pluginOptions) {
+ *    const player = this;
+ *    player.on('click', () => console.log('Hello world'));
+ * })
+ *
+ */
+Player.plugin = function(name, fn) {
+	Player.prototype[name] = fn;
 }
 
-Player.prototype._startWaiting = function() {
-	this._waitingTimeouts.push(setTimeout(() => {
-		this.addClass('leplayer--waiting');
-	}, 300));
-}
+/**
+ * Get by name registered component
+ *
+ * @access public
+ * @static
+ * @param {String} name
+ * @returns {Component}
+ */
+Player.getComponent = Component.getComponent;
 
-Player.prototype._onPlay = function() {
-	this.splashIcon.show('play');
-}
+/**
+ * Register component
+ *
+ * @access public
+ * @static
+ * @param {String} name
+ * @param {Component} component
+ *
+ * @example
+ * Player.registerComponent('ErrorDisplay', ErrorDisplay);
+ */
+Player.registerComponent = Component.registerComponent;
 
-Player.prototype._onPause = function() {
-	this.splashIcon.show('pause');
-}
+/**
+ * Register control
+ *
+ * @access public
+ * @static
+ * @param {String} name
+ * @param {Control} control
+ */
+Player.getControl = Control.getControl;
+
+/**
+ * Get by name registered control
+ *
+ * @access public
+ * @static
+ * @param {String} name
+ * @returns {Control}
+ *
+ * @example
+ * Player.registerControl('backward', BackwardControl);
+ */
+Player.registerControl = Control.registerControl;
+
+
+/**
+ * Convert seconds to format string 'hh?:mm:ss'
+ *
+ * @access public
+ * @param {Number} seconds Seconds
+ * @param {Boolean} showHours convert to format 'hh:mm:ss'
+ * @returns {String}
+ */
+Player.secondsToTime = secondsToTime;
+/**
+ * Remove unnecessary attributes, and set some attrs from options (loop, poster etc...). Create main DOM objects
+ *
+ * @access private
+ */
+Player.prototype.createElement = function() {
+	const options = this.options;
+	const element = this._element;
+
+	[
+
+		// Remove controls because we dont not support native controls yet
+		'controls',
+		'poster',
+
+		// It is unnecessary attrs, this functionality solve CSS
+		'height',
+		'width'
+
+	].forEach( item => {
+		element.removeAttr(item);
+	});
+
+	// Set attrs from options
+	[
+		'preload',
+		'autoplay',
+		'loop',
+		'muted'
+	].forEach(item => {
+		if(this.options[item]) {
+			element.attr(item, this.options[item]);
+			element.prop(item, this.options[item]);
+		}
+	})
+
+	element.find('source[data-quality]').each((i, item) => {
+		$(item).remove();
+	})
+
+	this.element = this.element
+		.addClass('leplayer')
+		.attr('tabindex', 0)
+		.css('width', '100%')
+		.css('max-width', (options.width || this.video.width) + 'px')
+
+	this.errorDisplay = new ErrorDisplay(this);
+
+	this.playButton = new PlayButton(this);
+
+	// TODO: Вынести это в отдельнеый компонент
+	this.loader = $('<div />')
+		.addClass('leplayer-loader-container')
+		.append(new Icon(this, {
+				iconName : 'refresh',
+				className : 'leplayer-loader-container__icon'
+			}).element);
+
+
+	this.splashIcon = new SplashIcon(this);
+
+	this.videoContainer = createEl('div', {
+			className : 'leplayer-video'
+		})
+		.append(this.errorDisplay.element)
+		.append(this.playButton.element)
+		.append(this.loader)
+		.append(this.splashIcon.element)
+
+	if(options.poster) {
+		this.poster = new Poster(this);
+		this.videoContainer.append(this.poster.element);
+	}
+
+
+	if(options.miniplayer) {
+		this.miniPlayer = new MiniPlayer(this)
+	}
+
+
+	const lastTimer = new Time(this, {
+		fn : (player) => {
+			const video = player.video
+			return secondsToTime(video.duration - video.currentTime);
+		}
+	})
+
+	this.innerElement = $('<div />')
+		.addClass('leplayer__inner')
+		.append(this.videoContainer)
+		.append(
+			createEl('div', {
+				className : 'leplayer__info'
+			})
+			.append(createEl('div', {
+					className : 'leplayer__title',
+					html : this.options.title || ""
+				}))
+			.append(createEl('div', {
+					className : 'leplayer__video-info',
+					html : this.options.videoInfo || ""
+				}))
+			.append(createEl('div', {
+					className : 'leplayer__last',
+					html : `Видео закончится через `,
+				}).append(lastTimer.element))
+			.append(this.miniPlayer && this.miniPlayer.element)
+		)
+		//.append($('leplayer__video-info')
+			//.text(this.options.videoInfo || ""))
+
+	this.element = this.element
+		.append(this.innerElement)
+
+	this.addClass('leplayer--paused');
+	this.addClass('leplayer--virgin');
+
+
+	if(options.sectionContainer) {
+		this.sectionsContainer = $(options.sectionContainer);
+	}
+
+	element.before(this.element);
+	this.videoContainer.append(element);
+	return this.element;
+};
+
 /**
  * @access private
  *
@@ -1107,22 +1158,6 @@ Player.prototype._initPlugins = function() {
  * @access private
  */
 Player.prototype._view = 'common';
-
-
-/**
- * @access private
- */
-Player.prototype._calcVolumeIcon = function(value) {
-	const volume = value || this.video.volume;
-
-	if (volume < this.options.volume.mutelimit) {
-		return 'volume-off';
-	} else if (value < 0.5) {
-		return 'volume-down';
-	} else {
-		return 'volume-up';
-	}
-}
 
 /**
  * Emit a player event (the name of event would be a leplayer_smth)
@@ -1248,96 +1283,6 @@ Player.prototype.setError = function(value) {
 }
 
 /**
- * @access private
- */
-Player.prototype._listenUserActivity = function() {
-	let mouseInProgress;
-	let lastMoveX;
-	let lastMoveY;
-
-	const onMouseMove = (e) => {
-		if(e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
-			lastMoveX = e.screenX;
-			lastMoveY = e.screenY;
-			this._userActivity = true
-		}
-	}
-
-	const onMouseDown = (e) => {
-		this._userActivity = true
-
-		// While user is pressing mouse or touch, dispatch user activity
-		clearInterval(mouseInProgress);
-
-		mouseInProgress = setInterval(() => {
-			this._userActivity = true
-		}, 250);
-	}
-
-	const onMouseUp = (e) => {
-		this._userActivity = true
-		clearInterval(mouseInProgress);
-	}
-
-	this.element.on('mousemove', onMouseMove);
-
-	this.element.on('mousedown', onMouseDown);
-
-	this.element.on('mouseup', onMouseUp);
-
-	this.element.on('keydown', (e) => this._userActivity = true );
-	this.element.on('keyup', (e) => this._userActivity = true );
-
-	// See http://ejohn.org/blog/learning-from-twitter/
-	let inactivityTimeout;
-	const delay = this.options.innactivityTimeout;
-	setInterval(() => {
-		if (this._userActivity) {
-
-			// Reset user activuty tracker
-			this._userActivity = false;
-
-			this.setUserActive(true);
-
-			clearTimeout(inactivityTimeout);
-
-			if (delay > 0) {
-
-				inactivityTimeout = setTimeout(() => {
-					if (!this._userActivity) {
-						this.setUserActive(false)
-					}
-				}, delay);
-			}
-		}
-	}, 250)
-}
-
-/**
- * @access private
- */
-Player.prototype._dblclickTimerId = null;
-
-Player.prototype._onClick = function(e) {
-	clearTimeout(this._dblclickTimerId);
-	this._dblclickTimerId = setTimeout(() => {
-		this.video.element.focus()
-		this.togglePlay();
-	}, 300);
-};
-
-/**
- * On dblclick on the video player event handler
- *
- * @access private
- * @param {Event} e
- */
-Player.prototype._onDbclick = function(e) {
-	clearTimeout(this._dblclickTimerId);
-	this.toggleFullscreen();
-}
-
-/**
  * @access public
  * @params {Boolean} value
  */
@@ -1435,12 +1380,6 @@ Player.prototype.toggleFullscreen = function() {
 	}
 }
 
-Player.prototype._onEntityFullscrenChange = function() {
-	const fsApi = FullscreenApi;
-	const isFs = !!document[fsApi.fullscreenElement];
-	this.trigger('fullscreenchange', isFs);
-}
-
 /**
  * Get ControlCollection of Player by name (e.x 'common', 'fullscreen')
  *
@@ -1450,20 +1389,6 @@ Player.prototype._onEntityFullscrenChange = function() {
  */
 Player.prototype.getControls = function(name) {
 	return this.controls[name];
-}
-
-Player.prototype.onFullscreenChange = function(e, isFs) {
-	if(isFs) {
-		this.setView('fullscreen');
-	} else {
-		this.setView('common');
-	}
-}
-
-Player.prototype._onInited = function(e) {
-	this.addClass('leplayer--inited');
-
-	this.options.onPlayerInited.call(this, e);
 }
 
 /**
@@ -1503,53 +1428,201 @@ Player.prototype.completeSections = function(sections) {
 	return newSections;
 }
 
+Player.prototype._userActivity = false;
+
 /**
- * Static helper for creating a plugins for leplayer
- *
- * @access public
- * @static
- * @param {String} name The name of plugin
- * @param {Function} fn Plugin init function
- *
- * @example
- * Player.plugin('helloWorld', function(pluginOptions) {
- *    const player = this;
- *    player.on('click', () => console.log('Hello world'));
- * })
- *
+ * @access private
  */
-Player.plugin = function(name, fn) {
-	Player.prototype[name] = fn;
+Player.prototype._listenUserActivity = function() {
+	let mouseInProgress;
+	let lastMoveX;
+	let lastMoveY;
+
+	const onMouseMove = (e) => {
+		if(e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
+			lastMoveX = e.screenX;
+			lastMoveY = e.screenY;
+			this._userActivity = true
+		}
+	}
+
+	const onMouseDown = (e) => {
+		this._userActivity = true
+
+		// While user is pressing mouse or touch, dispatch user activity
+		clearInterval(mouseInProgress);
+
+		mouseInProgress = setInterval(() => {
+			this._userActivity = true
+		}, 250);
+	}
+
+	const onMouseUp = (e) => {
+		this._userActivity = true
+		clearInterval(mouseInProgress);
+	}
+
+	this.element.on('mousemove', onMouseMove);
+
+	this.element.on('mousedown', onMouseDown);
+
+	this.element.on('mouseup', onMouseUp);
+
+	this.element.on('keydown', (e) => this._userActivity = true );
+	this.element.on('keyup', (e) => this._userActivity = true );
+
+	// See http://ejohn.org/blog/learning-from-twitter/
+	let inactivityTimeout;
+	const delay = this.options.innactivityTimeout;
+	setInterval(() => {
+		if (this._userActivity) {
+
+			// Reset user activuty tracker
+			this._userActivity = false;
+
+			this.setUserActive(true);
+
+			clearTimeout(inactivityTimeout);
+
+			if (delay > 0) {
+
+				inactivityTimeout = setTimeout(() => {
+					if (!this._userActivity) {
+						this.setUserActive(false)
+					}
+				}, delay);
+			}
+		}
+	}, 250)
+}
+
+Player.prototype._waitingTimeouts = [];
+
+/**
+ * Stop showing spinner and clear delay of showing spinner
+ *
+ * @access private
+ */
+Player.prototype._stopWayting = function() {
+	this._waitingTimeouts.forEach( item => clearTimeout(item));
+	this._waitingTimeouts = [];
+	this.removeClass('leplayer--waiting');
 }
 
 /**
- * @access public
- * @static
+ * Show spinner with delay in 300ms
+ *
+ * @access private
  */
-Player.getComponent = Component.getComponent;
+Player.prototype._startWaiting = function() {
+	this._waitingTimeouts.push(setTimeout(() => {
+		this.addClass('leplayer--waiting');
+	}, 300));
+}
+
 
 /**
- * @access public
- * @static
+ * On inited player event handler
+ *
+ * @access private
+ * @param {Player Event} e
  */
-Player.registerComponent = Component.registerComponent;
+Player.prototype._onInited = function(e) {
+	this.addClass('leplayer--inited');
+
+	this.options.onPlayerInited.call(this, e);
+}
 
 /**
- * @access public
- * @static
+ * @access private
  */
-Player.getControl = Control.getControl;
+Player.prototype._dblclickTimeout = null;
 
 /**
- * @access public
- * @static
+ * On click video event handler. Focus on video and togglePlay
+ *
+ * @access private
+ * @param {Player Event} e
  */
-Player.registerControl = Control.registerControl;
+Player.prototype._onClick = function(e) {
+	clearTimeout(this._dblclickTimeout);
+	this._dblclickTimeout = setTimeout(() => {
+		this.video.element.focus()
+		this.togglePlay();
+	}, 300);
+};
+
+/**
+ * On dblclick on the video player event handler
+ *
+ * @access private
+ * @param {Player Event} e
+ */
+Player.prototype._onDbclick = function(e) {
+	clearTimeout(this._dblclickTimeout);
+	this.toggleFullscreen();
+}
+
+/**
+ * On fullscreen change player event handler
+ *
+ * @access public
+ * @param {Player Event} e
+ */
+Player.prototype._onFullscreenChange = function(e, isFs) {
+	if(isFs) {
+		this.setView('fullscreen');
+	} else {
+		this.setView('common');
+	}
+}
 
 
-Player.secondsToTime = secondsToTime;
+/**
+ * On play event handler
+ *
+ * @access private
+ * @param {Player Event} e
+ */
+Player.prototype._onPlay = function() {
+	this.splashIcon.show('play');
+}
 
+/**
+ * On pause player event handler
+ * Show pause icon in the center of video
+ *
+ * @access private
+ */
+Player.prototype._onPause = function() {
+	this.splashIcon.show('pause');
+}
 
+Player.prototype._onEntityFullscrenChange = function() {
+	const fsApi = FullscreenApi;
+	const isFs = !!document[fsApi.fullscreenElement];
+	this.trigger('fullscreenchange', isFs);
+}
+
+/**
+ * Return a name of icon. If less then 0.1 return volume-off,
+ * if less then 0.5 return volume down, else return volume-up
+ *
+ * @access private
+ * @param {Number} value Volume value
+ * @returns {String} Icon name
+ */
+Player.prototype._calcVolumeIcon = function(value) {
+	const volume = value || this.video.volume;
+
+	if (volume < this.options.volume.mutelimit) {
+		return 'volume-off';
+	} else if (value < 0.5) {
+		return 'volume-down';
+	} else {
+		return 'volume-up';
+	}
+}
 
 window.$.fn.lePlayer = function (options) {
 	return this.each(function () {
