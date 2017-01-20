@@ -279,6 +279,7 @@ let Player = function (element, options) {
 			this.player = player;
 			this._ctx = ctx;
 			this._video = ctx[0];
+
 			this.element = $(this._video);
 			this.subtitles = [];
 			this.bufferRanges = [];
@@ -464,13 +465,41 @@ let Player = function (element, options) {
 				})
 		}
 
+		supportsFullScreen() {
+			if (typeof this._video.webkitEnterFullScreen === 'function') {
+				const userAgent = window.navigator && window.navigator.userAgent || '';
+
+				// Seems to be broken in Chromium/Chrome && Safari in Leopard
+				if ((/Android/).test(userAgent) || !(/Chrome|Mac OS X 10.5/).test(userAgent)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		enterFullscreen() {
+			const video = this._video;
+			if (video.paused && video.networkState <= video.HAVE_METADATA) {
+				// attempt to prime the video element for programmatic access
+				// this isn't necessary on the desktop but shouldn't hurt
+				this.play();
+
+				// playing and pausing synchronously during the transition to fullscreen
+				// can get iOS ~6.1 devices into a play/pause loop
+				setTimeout(() => {
+					this.pause();
+					video.webkitEnterFullScreen();
+				}, 0);
+			} else {
+				video.webkitEnterFullScreen();
+			}
+		}
+
+		exitFullscreen() {
+			this._video.webkitExitFullScreen();
+		}
+
 		togglePlay () {
-			/** In safari it doesn't work */
-			// if (this._video.readyState < 2) {
-			// 	overlay.hide();
-			// 	_showNotification('Error!');
-			// 	return;
-			// }
 			if (!this._video.played || this._video.paused) {
 				this.play();
 			} else {
@@ -1358,6 +1387,8 @@ Player.prototype.requestFullscreen = function() {
 		this.element[0][fsApi.requestFullscreen]();
 
 		this.trigger('fullscreenchange', true);
+	} else if (this.video.supportsFullScreen()) {
+		this.video.enterFullscreen();
 	}
 }
 
@@ -1366,6 +1397,8 @@ Player.prototype.exitFullscreen = function() {
 
 	if(fsApi.exitFullscreen) {
 		document[fsApi.exitFullscreen]();
+	} else if (this.video.supportsFullScreen()) {
+		this.video.exitFullscreen();
 	}
 
 	this.trigger('fullscreenchange', false);
