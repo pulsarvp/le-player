@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import Component from '../Component';
 
 class Marker extends Component {

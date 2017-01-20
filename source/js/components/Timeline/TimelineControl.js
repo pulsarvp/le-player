@@ -153,6 +153,7 @@ class TimelineControl extends Control {
 	_onLineClick(e) {
 		if (e.which !== 1) return;
 		if (this.drag) return;
+		const video = this.player.video;
 		this.hardMove(this.getPosition(e.pageX));
 		video.currentTime = (video.duration * this.getPosition(e.pageX));
 	}
@@ -226,7 +227,6 @@ class TimelineControl extends Control {
 	updateLabels() {
 		const video = this.player.video;
 		this.totalTime.text = secondsToTime(0, Math.floor(video.duration / 3600) > 0);
-		const isVisible = this.element.is(':visible');
 		const width = this.totalTime.element.width();
 
 		this.totalTime.text = secondsToTime(video.duration);
