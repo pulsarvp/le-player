@@ -5,6 +5,7 @@
 
 import $ from 'jquery';
 import Control from './Control';
+import Component from './Component';
 
 /**
  * @param {Player} player Main player
@@ -50,4 +51,6 @@ class ControlText extends Control {
 	}
 }
 
+Component.registerComponent('ControlText', ControlText);
+Control.registerControl('text', ControlText);
 export default ControlText;

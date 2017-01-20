@@ -6,6 +6,7 @@
 
 import $ from 'jquery';
 import Control from './Control';
+import Component from './Component';
 
 /**
  * @class ControlDropdown
@@ -47,4 +48,6 @@ class ControlDropdown extends Control {
 
 }
 
+Component.registerComponent('ControlDropdown', ControlDropdown);
+Control.registerControl('dropdown', ControlDropdown);
 export default ControlDropdown;

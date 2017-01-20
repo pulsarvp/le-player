@@ -7,6 +7,7 @@
 
 import $ from 'jquery';
 import Control from './Control';
+import Component from './Component';
 import Icon from './Icon';
 
 /**
@@ -74,4 +75,6 @@ class DownloadControl extends Control {
 
 }
 
+Component.registerComponent('DownloadControl', DownloadControl);
+Control.registerControl('download', DownloadControl);
 export default DownloadControl;

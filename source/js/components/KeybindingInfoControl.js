@@ -7,6 +7,8 @@
  */
 
 import $ from 'jquery';
+import Component from './Component';
+import Control from './Control';
 import ControlDropdown from './ControlDropdown';
 
 /**
@@ -59,4 +61,6 @@ class KeyBindingInfoControl extends ControlDropdown {
 	}
 }
 
+Component.registerComponent('KeyBindingInfoControl', KeyBindingInfoControl);
+Control.registerControl('keybinding info', KeyBindingInfoControl);
 export default KeyBindingInfoControl;

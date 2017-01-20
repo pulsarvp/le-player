@@ -5,6 +5,7 @@
 
 
 import Control from './Control';
+import Component from './Component';
 
 /**
  * @param {Player} player Main player
@@ -73,4 +74,6 @@ class ControlCheckbox extends Control {
 
 }
 
+Component.registerComponent('ControlCheckbox', ControlCheckbox);
+Control.registerControl('checkbox', ControlCheckbox);
 export default ControlCheckbox;

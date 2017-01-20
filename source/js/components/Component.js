@@ -48,7 +48,33 @@ class Component {
 		return ''
 	}
 
+	static registerComponent(name, component) {
+		if(name == null) {
+			return;
+		}
+
+		if(Component._components == null) {
+			Component._components = {};
+		}
+
+		Component._components[name] = component;
+
+		return component;
+	}
+
+	static getComponent(name) {
+		if(name == null) {
+			return;
+		}
+
+		if(Component._components && Component._components[name]) {
+			return Component._components[name];
+		}
+
+	}
+
 
 }
 
+Component.registerComponent('Component', Component);
 export default Component;

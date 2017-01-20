@@ -1,24 +1,46 @@
 'use strict';
 
 import $ from 'jquery';
-import ControlCollection from './components/ControlCollection';
+
+
+import Control from './components/Control';
+import Component from './components/Component';
 import MiniPlayer from './components/MiniPlayer';
 import PlayButton from './components/PlayButton';
 import SplashIcon from './components/SplashIcon';
 
 import Icon from './components/Icon';
 import Time from './components/Timeline/Time';
+import ControlCollection from './components/ControlCollection';
 import Sections from './components/Sections';
 import ErrorDisplay from './components/ErrorDisplay';
 import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
-import { C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
 import { createEl, secondsToTime } from './utils';
 
 import MediaError from './MediaError';
 
+// Register common controls
+import './components/PlayControl';
+import './components/VolumeControl';
+import './components/Timeline/TimelineControl';
+import './components/SectionControl';
+import './components/FullscreenControl';
+import './components/RateControl';
+import './components/BackwardControl';
+import './components/SourceControl';
+import './components/SubtitleControl';
+import './components/DownloadControl';
+import './components/KeybindingInfoControl';
+import './components/TimeInfoControl';
+
+Control.registerControl('divider', function() {
+	return {
+		element : $('<div/>').addClass('divider')
+	};
+});
 
 
 /**
@@ -66,10 +88,10 @@ const defaultOptions = {
 	controls : {
 		common : [
 			[ 'play', 'volume', 'divider', 'timeline',  'divider', 'section', 'divider', 'fullscreen' ],
-			[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO ]
+			[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'keybinding info' ]
 		],
 		fullscreen : [
-			[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', C_KEYBINDING_INFO,  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen' ]
+			[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'keybinding info',  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen' ]
 		],
 		mini : [
 			[ 'play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
@@ -627,15 +649,7 @@ let Player = function (element, options) {
 					return;
 				}
 
-				for ( let i = 0; i < sections.length; i++) {
-					let endSection;
-					if (i < (sections.length - 1)) {
-						endSection = sections[i+1].begin
-					} else {
-						endSection = this.video.duration;
-					}
-					sections[i].end = endSection;
-				}
+				sections = this.completeSections(sections);
 
 				const sectionsComponent = new Sections(this, {
 
@@ -875,7 +889,7 @@ let Player = function (element, options) {
 	this.initOptions = function () {
 		const attrOptions = this.optionsFromElement();
 		// Merge default options + video attributts + user options
-		this.options = $.extend(true, defaultOptions, attrOptions, options);
+		this.options = $.extend(true, {}, defaultOptions, attrOptions, options);
 
 		if(this.options.sources && !Array.isArray(this.options.sources)) {
 			this.options.sources = [this.options.sources]
@@ -888,6 +902,9 @@ let Player = function (element, options) {
 		if (this.options.src == null) {
 			this.setError(new MediaError('No sources found'));
 		}
+
+		// Merge correctly controls, without deep merge
+		this.options.controls = $.extend({}, defaultOptions.controls, options.controls);
 
 		// exclude controls option
 		for (const name in this.options.excludeControls) {
@@ -1087,25 +1104,6 @@ Player.prototype._initPlugins = function() {
 }
 
 /**
- * Static helper for creating a plugins for leplayer
- *
- * @access public
- * @static
- * @param {String} name The name of plugin
- * @param {Function} fn Plugin init function
- *
- * @example
- * Player.plugin('helloWorld', function(pluginOptions) {
- *    const player = this;
- *    player.on('click', () => console.log('Hello world'));
- * })
- *
- */
-Player.plugin = function(name, fn) {
-	Player.prototype[name] = fn;
-}
-
-/**
  * @access private
  */
 Player.prototype._view = 'common';
@@ -1195,6 +1193,10 @@ Player.prototype.removeClass = function(className) {
 Player.prototype.toggleClass = function(className, flag) {
 	this.element.toggleClass(className, flag);
 	return this;
+}
+
+Player.prototype.hasClass = function(className) {
+	return this.element.hasClass(className);
 }
 
 /**
@@ -1483,6 +1485,71 @@ Player.prototype.getHeight = function() {
 Player.prototype.getWidth = function() {
 	return this.element.width()
 }
+
+Player.prototype.completeSections = function(sections) {
+	if (sections == null || sections.length == 0) {
+		return
+	}
+	let newSections = [].concat(sections)
+	for ( let i = 0; i < newSections.length; i++) {
+		let endSection;
+		if (i < (newSections.length - 1)) {
+			endSection = newSections[i+1].begin
+		} else {
+			endSection = this.video.duration;
+		}
+		newSections[i].end = endSection;
+	}
+	return newSections;
+}
+
+/**
+ * Static helper for creating a plugins for leplayer
+ *
+ * @access public
+ * @static
+ * @param {String} name The name of plugin
+ * @param {Function} fn Plugin init function
+ *
+ * @example
+ * Player.plugin('helloWorld', function(pluginOptions) {
+ *    const player = this;
+ *    player.on('click', () => console.log('Hello world'));
+ * })
+ *
+ */
+Player.plugin = function(name, fn) {
+	Player.prototype[name] = fn;
+}
+
+/**
+ * @access public
+ * @static
+ */
+Player.getComponent = Component.getComponent;
+
+/**
+ * @access public
+ * @static
+ */
+Player.registerComponent = Component.registerComponent;
+
+/**
+ * @access public
+ * @static
+ */
+Player.getControl = Control.getControl;
+
+/**
+ * @access public
+ * @static
+ */
+Player.registerControl = Control.registerControl;
+
+
+Player.secondsToTime = secondsToTime;
+
+
 
 window.$.fn.lePlayer = function (options) {
 	return this.each(function () {

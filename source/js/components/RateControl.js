@@ -4,6 +4,7 @@
  */
 
 import $ from 'jquery';
+import Component from './Component';
 import Control from './Control';
 import ControlText from './ControlText';
 import Cookie from '../utils/cookie';
@@ -133,4 +134,6 @@ class RateControl extends Control {
 
 }
 
+Component.registerComponent('RateControl', RateControl);
+Control.registerControl('rate', RateControl);
 export default RateControl;

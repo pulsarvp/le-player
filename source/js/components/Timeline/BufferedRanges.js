@@ -51,5 +51,5 @@ class BufferedRanges extends Component {
 		}
 	}
 }
-
+Component.registerComponent('BufferedRanges', BufferedRanges);
 export default BufferedRanges;

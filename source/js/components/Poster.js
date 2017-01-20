@@ -35,4 +35,5 @@ class Poster extends Component {
 
 }
 
+Component.registerComponent('Poster', Poster);
 export default Poster;

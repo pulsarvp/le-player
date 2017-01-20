@@ -4,6 +4,8 @@
  */
 
 import $ from 'jquery';
+import Component from './Component';
+import Control from './Control';
 import ControlDropdown from './ControlDropdown';
 
 /**
@@ -107,4 +109,6 @@ class VolumeControl extends ControlDropdown {
 
 }
 
+Component.registerComponent('VolumeControl', VolumeControl);
+Control.registerControl('volume', VolumeControl);
 export default VolumeControl;

@@ -43,4 +43,5 @@ class ErrorDisplay extends Component {
 	}
 }
 
+Component.registerComponent('ErrorDisplay', ErrorDisplay);
 export default ErrorDisplay;

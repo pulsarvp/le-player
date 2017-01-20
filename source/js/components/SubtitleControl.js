@@ -6,6 +6,8 @@
  */
 
 import $ from 'jquery';
+import Component from './Component';
+import Control from './Control';
 import ControlContainer from './ControlContainer';
 
 /**
@@ -57,4 +59,6 @@ class SubtitleControl extends ControlContainer {
 	}
 }
 
+Component.registerComponent('SubtitleControl', SubtitleControl);
+Control.registerControl('subtitle', SubtitleControl);
 export default SubtitleControl;
