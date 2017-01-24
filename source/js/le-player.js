@@ -1558,7 +1558,7 @@ Player.prototype._startWaiting = function() {
  * On inited player event handler
  *
  * @access private
- * @param {Player Event} e
+ * @param {PlayerEvent} e
  */
 Player.prototype._onInited = function(e) {
 	this.addClass('leplayer--inited');
@@ -1575,7 +1575,7 @@ Player.prototype._dblclickTimeout = null;
  * On click video event handler. Focus on video and togglePlay
  *
  * @access private
- * @param {Player Event} e
+ * @param {PlayerEvent} e
  */
 Player.prototype._onClick = function(e) {
 	clearTimeout(this._dblclickTimeout);
@@ -1589,7 +1589,7 @@ Player.prototype._onClick = function(e) {
  * On dblclick on the video player event handler
  *
  * @access private
- * @param {Player Event} e
+ * @param {PlayerEvent} e
  */
 Player.prototype._onDbclick = function(e) {
 	clearTimeout(this._dblclickTimeout);
@@ -1600,7 +1600,7 @@ Player.prototype._onDbclick = function(e) {
  * On fullscreen change player event handler
  *
  * @access public
- * @param {Player Event} e
+ * @param {PlayerEvent} e
  */
 Player.prototype._onFullscreenChange = function(e, isFs) {
 	if(isFs) {
@@ -1615,7 +1615,7 @@ Player.prototype._onFullscreenChange = function(e, isFs) {
  * On play event handler
  *
  * @access private
- * @param {Player Event} e
+ * @param {PlayerEvent} e
  */
 Player.prototype._onPlay = function() {
 	this.splashIcon.show('play');
