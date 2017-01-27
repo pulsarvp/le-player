@@ -186,14 +186,8 @@ const defaultOptions = {
 			}
 		}
 	],
-	miniplayer : {
-		width: '100%',
-		offsetShow : (player) => {
-			// 80px - it's height of common controls container
-			const offset = player.element.offset().top + player.element.outerHeight() - player.getControls('common').element.height();
-
-			return offset;
-		}
+	plugins : {
+		miniplayer : {}
 	},
 	onPlayerInited : function() {}
 };
@@ -347,7 +341,6 @@ let Player = function (element, options) {
 			const rate = this.rate;
 			const stop = this.paused;
 
-			console.log(src.url);
 			$(this._video).attr('src', src.url);
 
 			this._video = this._ctx[0];
@@ -841,7 +834,6 @@ let Player = function (element, options) {
 			this.removeClass('leplayer--ended');
 
 			this.setError(null);
-
 			this.trigger('loadstart');
 		},
 
@@ -1107,9 +1099,9 @@ Player.prototype.createElement = function() {
 	}
 
 
-	if(options.miniplayer) {
-		this.miniPlayer = new MiniPlayer(this)
-	}
+	//if(options.miniplayer) {
+		//this.miniPlayer = new MiniPlayer(this)
+	//}
 
 
 	const lastTimer = new Time(this, {
@@ -1119,29 +1111,26 @@ Player.prototype.createElement = function() {
 		}
 	})
 
+	this.infoElement = createEl('div', {
+		className : 'leplayer__info'
+	})
+	.append(createEl('div', {
+			className : 'leplayer__title',
+			html : this.options.title || ""
+		}))
+	.append(createEl('div', {
+			className : 'leplayer__video-info',
+			html : this.options.videoInfo || ""
+		}))
+	.append(createEl('div', {
+			className : 'leplayer__last',
+			html : `Видео закончится через `,
+		}).append(lastTimer.element))
+
 	this.innerElement = $('<div />')
 		.addClass('leplayer__inner')
 		.append(this.videoContainer)
-		.append(
-			createEl('div', {
-				className : 'leplayer__info'
-			})
-			.append(createEl('div', {
-					className : 'leplayer__title',
-					html : this.options.title || ""
-				}))
-			.append(createEl('div', {
-					className : 'leplayer__video-info',
-					html : this.options.videoInfo || ""
-				}))
-			.append(createEl('div', {
-					className : 'leplayer__last',
-					html : `Видео закончится через `,
-				}).append(lastTimer.element))
-			.append(this.miniPlayer && this.miniPlayer.element)
-		)
-		//.append($('leplayer__video-info')
-			//.text(this.options.videoInfo || ""))
+		.append(this.infoElement)
 
 	this.element = this.element
 		.append(this.innerElement)
@@ -1274,10 +1263,40 @@ Player.prototype.setView = function(view) {
 	this.element
 		.removeClass(`leplayer--${this._view}`)
 		.addClass(`leplayer--${view}`)
+
+	this.trigger(`delview.${this._view}`);
+	this.trigger(`setview.${view}`);
+
 	this._view = view;
+
 	return this;
 }
 
+/**
+ * On set view callback
+ *
+ * @access public
+ * @param {String} view View name
+ * @returns {Player} this
+ */
+Player.prototype.onSetView = function(view, ...args) {
+	this.on(`setview.${view}`, ...args);
+
+	return this;
+}
+
+/**
+ * On del view callback
+ *
+ * @access public
+ * @param {String} view View name
+ * @returns {Player} this
+ */
+Player.prototype.onDelView = function(view, ...args) {
+	this.on(`delview.${view}`, ...args);
+
+	return this;
+}
 /**
  * Return the view of player
  *
@@ -1666,3 +1685,117 @@ window.$.fn.lePlayer = function (options) {
 window.$.lePlayer = Player;
 
 window.lePlayer = Player;
+
+
+Player.plugin('miniplayer', function(pluginOptions) {
+	const player = this;
+
+	// Мержим с this.options.miniplayer, чтобы не сломать обратную совместимось, так как раньше
+	// миниплеер не был плагином плеера.
+	const options = $.extend({}, {
+		width: '100%',
+		offsetShow : (player) => {
+			const offset = player.element.offset().top
+				+ player.element.outerHeight()
+				- player.getControls('common').element.height();
+
+			return offset;
+		}
+	}, this.options.miniplayer, pluginOptions);
+
+	const controls = new ControlCollection(this, {
+		name : 'mini',
+		controls : options.controls,
+		controlOptions : {
+			control : {
+				disable : false
+			}
+		}
+	});
+
+	// Вставляем в infoElement под title и description
+	this.infoElement.append(controls.element);
+
+	/**
+	 * Return offset on oY , when miniplayer should showing or hiding
+	 *
+	 * @returns {Number}
+	 */
+	const offsetShow = () => {
+		if ($.isFunction(options.offsetShow)) {
+			return options.offsetShow(player);
+		}
+
+		return options.offsetShow
+	}
+
+	const getWidth = () => {
+		return options.width || this.element.width();
+	}
+
+	const onFullscreenChange = (e, data) => {
+		console.log(data);
+		if (data == true) {
+			this.hideMiniPlayer();
+		}
+	}
+
+	this._updateMiniPlayer = () => {
+		const scrollTop = $(window).scrollTop();
+
+		if(scrollTop > offsetShow()) {
+			this.showMiniPlayer();
+		} else {
+			this.hideMiniPlayer();
+		}
+	}
+
+	/**
+	 * Show mini player
+	 * @param {Boolean} force
+	 *
+	 * @public
+	 */
+	this.showMiniPlayer = (force) => {
+		if (!force && this.getView() === 'mini') {
+			return;
+		}
+
+		// Added empty space
+		this.element.css('padding-top', this.videoContainer.height());
+
+		this.setView('mini');
+	}
+
+	/**
+	 * Hide mini player
+	 * @param {Boolean} force
+	 *
+	 * @public
+	 */
+	this.hideMiniPlayer = (force) => {
+		if(!force && this.getView() !== 'mini') {
+			return;
+		}
+		this.setView('common');
+	}
+
+	$(window).on('scroll', this._updateMiniPlayer.bind(this));
+	$(window).on('resize', this._updateMiniPlayer.bind(this));
+	this.on('inited', this._updateMiniPlayer.bind(this));
+
+	this.onSetView('mini', () => {
+		this.innerElement.css('max-width', getWidth());
+		this.innerElement.css('height', this.video.height);
+	});
+
+	this.onDelView('mini', () => {
+		this.innerElement.css('max-width', '')
+		this.innerElement.css('height', '')
+
+		this.element.css('padding-top', '');
+	});
+
+
+	this._updateMiniPlayer();
+});
