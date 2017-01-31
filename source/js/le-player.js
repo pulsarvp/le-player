@@ -1162,7 +1162,9 @@ Player.prototype._initPlugins = function() {
 			if(!this.options.plugins.hasOwnProperty(name)) return;
 			const pluginOptions = this.options.plugins[name];
 			if(this[name]) {
-				this[name](pluginOptions);
+				if(pluginOptions) {
+					this[name](pluginOptions);
+				}
 			} else {
 				console.error(`Plugin '${name}' doesn't exist`);
 			}
