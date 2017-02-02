@@ -38,6 +38,14 @@ HTML:
 <video id="video1" src="sample1.mp4"></video>
 ```
 
+Так же для удобства можно задать options через атрибуты тэга video.
+
+HTML:
+```HTML
+<video id="video1" src="sample1.mp4" height="900" width="300" poster="./video.png" autoplay loop muted></video>
+```
+
+
 JS:
 ```javascript
 $('#video1').lePlayer({
@@ -47,6 +55,7 @@ $('#video1').lePlayer({
 // или
 
 const player = new lePlayer($('#video1'), { //..options });
+
 
 // Дефолтные настройки
 const defaultOptions = {
