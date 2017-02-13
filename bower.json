@@ -1,9 +1,9 @@
 {
   "name": "le-player",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "authors": [
     "Anna Manaenkova <anna.manaenkova@phystech.edu>",
-	"Vadim Kostin <vadim.kostin@phystech.edu>"
+	  "Vadim Kostin <vadim.kostin@phystech.edu>"
   ],
   "description": "The best HTML5 player made for Lectoriy.",
   "main": [
