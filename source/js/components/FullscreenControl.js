@@ -4,6 +4,7 @@
  */
 
 import $ from 'jquery';
+import Component from './Component';
 import Control from './Control';
 
 /**
@@ -31,4 +32,6 @@ class FullscreenControl extends Control {
 	}
 }
 
+Component.registerComponent('FullscreenControl', FullscreenControl);
+Control.registerControl('fullscreen', FullscreenControl);
 export default FullscreenControl;

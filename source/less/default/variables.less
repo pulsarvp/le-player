@@ -64,27 +64,28 @@
 @color-text-checked: @color-background;
 @color-text-active: @color-background;
 
-
-
-
-
-
-// FULLSCREEN COLOURS(FS)
 @color-fs-active: white;
-@color-fs-background: #465264;
+@color-fs-primary: hsl(215, 20%, 35%);
+// #465264;
+@color-fs-background: @color-fs-primary;
 @color-fs-background-hover: darken(@color-fs-background, 10%);
 
 // video-line
-@color-fs-background-line: #768496;
+// #768496
+//hsl(215, 20%, 55%)
+@color-fs-background-line: lighten(@color-fs-primary, 20%);
 @color-fs-background-line-active: rgba(0, 0, 0, 0.25);
 @color-fs-background-line-buffered: fade(red, 40%);
 
 // play btn
-@color-fs-background-play: #384150;
+// #384150;
+@color-fs-background-play: darken(@color-fs-background, 15%);
 @color-fs-background-play-hovered: @color-fs-background-hover;
 
 // disabled
-@color-fs-disabled: #4b6b9b;
+// #4b6b9b;
+// hsl(215, 35%, 45%);
+@color-fs-disabled: desaturate(lighten(@color-fs-primary, 10%), 15%);
 
 // control
 @color-fs-control: @color-fs-background;
@@ -98,14 +99,30 @@
 @color-fs-inner-item-active: @color-fs-background-play;
 
 // marker
-@color-fs-marker: #2a313c;
-@color-fs-marker-border: rgba(225, 232, 239, 0.7);
-@color-fs-marker-shadow: rgba(26, 74, 126, 0.8);
-@color-fs-marker-shadow-border: rgba(225, 232, 239, 0.5);
-@color-fs-marker-shadow-time: rgba(118, 138, 167, 0.8);
+// #2a313c;
+@color-fs-marker: darken(@color-fs-primary, 15%);
+
+// rgba(225, 232, 239, 0.7);
+// hsl(215, 30%, 90%)
+@color-fs-marker-border: fade(desaturate(lighten(@color-fs-primary, 55%), 10%), 70%);
+
+// rgba(26, 74, 126, 0.8);
+// hsla(215, 30%, 65%, 0.8)
+@color-fs-marker-shadow: fade(desaturate(lighten(@color-fs-primary, 30%), 10%), 70%);
+
+// rgba(225, 232, 239, 0.5);
+// hsla(215, 30%, 95%, 0.5)
+@color-fs-marker-shadow-border: fade(desaturate(lighten(@color-fs-primary, 60%), 10%), 50%);
+
+
+//rgba(118, 138, 167, 0.8);
+//hsla(215, 20%, 56%, 0.8)
+@color-fs-marker-shadow-time: fade(lighten(@color-fs-primary, 20%), 80%);
 
 // text
-@color-fs-text: #e1e8ef;
+//#e1e8ef;
+//hsl(215, 30%, 91%)
+@color-fs-text: desaturate(lighten(@color-primary, 55%), 10%);
 @color-fs-text-hovered: @color-fs-text;
 @color-fs-text-active: @color-fs-background;
 @color-fs-text-checked: @color-fs-background;
@@ -115,23 +132,19 @@
 @color-section-active: @color-disabled;
 // hsl(211,23%,70%)
 // rgb(157, 178, 200)
-@color-section-hover: desaturate(lighten(@color-primary, 40%), 35%);
+@color-section-hover: darken(@color-section-active, 10%);
 @color-section-2n: desaturate(lighten(@color-primary, 60%), 32%);
-@color-fs-section: fade(black, 70%);
-@color-fs-section-active: black;
-@color-fs-section-2n: rgba(47,52,63,.7);
-@color-fs-section-2n-active: rgb(47,52,63);
 
-
-
-
+@color-fs-section: fade(@color-fs-section-active, 70%);
+@color-fs-section-active: darken(@color-fs-primary, 20%);
+@color-fs-section-hover: darken(@color-fs-primary, 25%);
+// hsl(215, 20%, 22%);
+@color-fs-section-2n: fade(@color-fs-section-2n-active, 70%);
+@color-fs-section-2n-active: darken(@color-fs-primary, 10%);
+@color-fs-section-2n-hover: darken(@color-fs-primary, 15%);
 
 // MINIPLAYER
 @color-miniplayer-bg: #f5f8fa;
-
-
-
-
 
 // SIZES
 @control-font-size: 16px;
@@ -142,27 +155,16 @@
 @divider-width: 10px;
 @miniplayer-height: 127px;
 
-
-
-
 // FONTS
 @font-main: "PT Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
 
-
 @divider-width: 10px;
 @timeline-transition: 0s 0.1s ease-in-out;
-
-
-
 
 // Z-INDEX
 @z-index-base: 10;
 @z-index-miniplayer: @z-index-base + 10;
 @z-index-fullscreen: 1000;
-
-
-
-
 
 // ANIMATION
 @timeline-transition: 0s 0.1s ease-in-out;

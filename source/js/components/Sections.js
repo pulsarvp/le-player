@@ -90,9 +90,7 @@ class Sections extends Component {
 	}
 
 
-
 	onSectionClick(e) {
-		console.log('click')
 		const video = this.player.video;
 		const section = $(e.target).closest('.leplayer-section');
 		video.currentTime = section.attr('data-begin');
@@ -219,4 +217,5 @@ class Sections extends Component {
 	}
 }
 
+Component.registerComponent('Sections', Sections);
 export default Sections;

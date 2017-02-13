@@ -293,7 +293,7 @@
 			background: @color-background;
 			padding: 10px;
 			color: black;
-			font-size: 12px;
+			font-size: @control-text-font-size;
 			/*left: 50%;*/
 			min-width: 300px;
 			/*transform: translateX(-50%);*/
@@ -307,7 +307,7 @@
 	.control-container
 	{
 		display: table-cell;
-		height: 32px;
+		height: @control-height;
 		position: relative;
 		width: 1%;
 
@@ -419,12 +419,30 @@
 		//transition: left @timeline-transition;
 		width: 2px;
 		z-index: @z-index-base + 7;
+		&:before
+		{
+			content: '';
+			width: 4px;
+			height: 100%;
+			position: absolute;
+			left: -1px;
+			background: transparent;
+		}
+		&--drag:before,
+		&:hover:before
+		{
+			background: @color-marker;
+		}
 		&.shadow
 		{
 			background: @color-marker-shadow;
 			border-right: 1px solid @color-marker-shadow-border;
 			transition: none;
 			z-index: @z-index-base + 6;
+			&:before
+			{
+				content: none;
+			}
 		}
 		.time
 		{
@@ -531,6 +549,11 @@
 }
 
 
+.leplayer-control-collection
+{
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
 
 .leplayer-control-collection--fullscreen
 {
@@ -786,6 +809,49 @@
 		min-width: 34px;
 	}
 }
+
+
+@keyframes leplayer-splashicon-fadeout {
+    0% {
+        opacity: 1
+    }
+    to {
+        opacity: 0;
+        transform: scale(2);
+    }
+}
+.leplayer-splashicon
+{
+	display: none;
+	position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 52px;
+    height: 52px;
+    z-index: 17;
+    margin-left: -26px;
+    margin-top: -26px;
+    background: rgba(0,0,0,.5);
+    border-radius: 26px;
+	color: white;
+	justify-content: center;
+	align-items: center;
+    animation: leplayer-splashicon-fadeout .5s linear 1 normal forwards;
+
+	&--active
+	{
+		display: flex;
+	}
+}
+
+.leplayer--virgin
+{
+	.leplayer-splashicon
+	{
+		display: none
+	}
+}
+
 
 @import "components/video.less";
 @import "components/play-button.less";

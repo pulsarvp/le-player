@@ -18,6 +18,7 @@ class BufferedRanges extends Component {
 		super(player, options);
 
 		this.player.on('progress', this.update.bind(this));
+		this.player.on('seeked', this.update.bind(this));
 	}
 
 	/**
@@ -43,7 +44,6 @@ class BufferedRanges extends Component {
 		}
 
 		if (duration > 0) {
-
 			this.range.css({
 				width : percentify(end, duration) * 100 + '%'
 			})
@@ -51,5 +51,5 @@ class BufferedRanges extends Component {
 		}
 	}
 }
-
+Component.registerComponent('BufferedRanges', BufferedRanges);
 export default BufferedRanges;

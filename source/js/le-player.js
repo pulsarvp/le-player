@@ -1,23 +1,46 @@
 'use strict';
 
 import $ from 'jquery';
-import ControlCollection from './components/ControlCollection';
+
+
+import Control from './components/Control';
+import Component from './components/Component';
 import MiniPlayer from './components/MiniPlayer';
-import PlayButton from './components/PlayButton'
+import PlayButton from './components/PlayButton';
+import SplashIcon from './components/SplashIcon';
 
 import Icon from './components/Icon';
 import Time from './components/Timeline/Time';
+import ControlCollection from './components/ControlCollection';
 import Sections from './components/Sections';
 import ErrorDisplay from './components/ErrorDisplay';
 import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
-import { C_KEYBINDING_INFO } from './ControlFactory';
 import Cookie from './utils/cookie';
 import { createEl, secondsToTime } from './utils';
 
 import MediaError from './MediaError';
 
+// Register common controls
+import './components/PlayControl';
+import './components/VolumeControl';
+import './components/Timeline/TimelineControl';
+import './components/SectionControl';
+import './components/FullscreenControl';
+import './components/RateControl';
+import './components/BackwardControl';
+import './components/SourceControl';
+import './components/SubtitleControl';
+import './components/DownloadControl';
+import './components/KeybindingInfoControl';
+import './components/TimeInfoControl';
+
+Control.registerControl('divider', function() {
+	return {
+		element : $('<div/>').addClass('divider')
+	};
+});
 
 
 /**
@@ -48,10 +71,7 @@ const defaultOptions = {
 	preload : 'metadata',
 	poster : null,
 	svgPath : '../dist/svg/svg-defs.svg',
-	innactivityTimeout : 10000,
-	fullscreen : {
-		hideTimelineTime : 10000
-	},
+	innactivityTimeout : 5000,
 	rate : {
 		step : 0.25,
 		min : 0.5,
@@ -68,10 +88,10 @@ const defaultOptions = {
 	controls : {
 		common : [
 			[ 'play', 'volume', 'divider', 'timeline',  'divider', 'section', 'divider', 'fullscreen' ],
-			[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', C_KEYBINDING_INFO ]
+			[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'keybinding info' ]
 		],
 		fullscreen : [
-			[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', C_KEYBINDING_INFO,  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen' ]
+			[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'keybinding info',  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen' ]
 		],
 		mini : [
 			[ 'play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
@@ -97,6 +117,7 @@ const defaultOptions = {
 			description : `Перемотать на 10 секунд назад`,
 			fn : (player) => {
 				player.video.currentTime -= player.options.playback.step.medium;
+				player.splashIcon.show('undo');
 			}
 		},
 		{
@@ -105,6 +126,7 @@ const defaultOptions = {
 			description : `Перемотать на 10 секунд вперёд`,
 			fn : (player) => {
 				player.video.currentTime += player.options.playback.step.medium;
+				player.splashIcon.show('redo');
 			}
 		},
 		{
@@ -138,6 +160,9 @@ const defaultOptions = {
 			description : 'Увеличить громкость',
 			fn : (player) => {
 				player.video.volume += player.options.volume.step;
+
+				player.splashIcon.show(player._calcVolumeIcon(player.video.volume));
+
 			}
 		},
 
@@ -147,6 +172,8 @@ const defaultOptions = {
 			description : 'Уменьшить громкость',
 			fn : (player) => {
 				player.video.volume -= player.options.volume.step;
+
+				player.splashIcon.show(player._calcVolumeIcon(player.video.volume));
 			}
 		},
 
@@ -186,8 +213,6 @@ const defaultOptions = {
  * @param {String} [options.preload='metadata'] Can be ('auto'|'metadata'|'none')
  * @param {String} [options.poster] Path to poster of video
  * @param {String} [options.svgPath] Path to svg sprite for icons
- * @param {Number} [options.fullscreen] Fullscreen options
- * @param {Number} [options.fullscreen.hideTimelineTime=10000] Delay before hide timeline in fullscreen view
  * @param {Object} [options.rate] Rate options
  * @param {Number} [options.rate.step=0.25] Step of increase/decrease by rate control
  * @param {Number} [options.rate.min=0.5] Min of rate
@@ -223,9 +248,15 @@ const defaultOptions = {
  */
 let Player = function (element, options) {
 
-	let player = this;
+	if (element.prop('tagName').toLowerCase() != 'video') {
+		console.warn('Incorrect element selected.');
+		return this;
+	}
 
+	const player = this;
 	const fsApi = FullscreenApi;
+
+	this._element = element;
 
 	// key -> contol collection name, valuy -> ControlCollection
 	this.controls = {};
@@ -239,8 +270,6 @@ let Player = function (element, options) {
 	 */
 
 	this.element = createEl('div');
-	let sectionContainer = null;
-	this._userActivity = false;
 
 	this.innerElement = createEl('div');
 
@@ -250,11 +279,10 @@ let Player = function (element, options) {
 			this.player = player;
 			this._ctx = ctx;
 			this._video = ctx[0];
+
 			this.element = $(this._video);
 			this.subtitles = [];
 			this.bufferRanges = [];
-			this.playbackRate = this._video.playbackRate;
-			this._initHtmlEvents();
 
 			if($(this._video).attr('src') == null) {
 				this.source = this.player.options.src;
@@ -315,10 +343,11 @@ let Player = function (element, options) {
 		set source (src) {
 			if(src == null) return;
 			if(this.source && this.source.url === src.url) return;
-			const time = this._video.currentTime;
-			const rate = this._video.playbackRate;
-			const stop = this._video.paused;
+			const time = this.currentTime;
+			const rate = this.rate;
+			const stop = this.paused;
 
+			console.log(src.url);
 			$(this._video).attr('src', src.url);
 
 			this._video = this._ctx[0];
@@ -347,6 +376,10 @@ let Player = function (element, options) {
 				else
 					this._video.textTracks[ i ].mode = 'hidden';
 			}
+		}
+
+		get paused() {
+			return this._video.paused;
 		}
 
 		get volume () {
@@ -432,13 +465,41 @@ let Player = function (element, options) {
 				})
 		}
 
+		supportsFullScreen() {
+			if (typeof this._video.webkitEnterFullScreen === 'function') {
+				const userAgent = window.navigator && window.navigator.userAgent || '';
+
+				// Seems to be broken in Chromium/Chrome && Safari in Leopard
+				if ((/Android/).test(userAgent) || !(/Chrome|Mac OS X 10.5/).test(userAgent)) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		enterFullscreen() {
+			const video = this._video;
+			if (video.paused && video.networkState <= video.HAVE_METADATA) {
+				// attempt to prime the video element for programmatic access
+				// this isn't necessary on the desktop but shouldn't hurt
+				this.play();
+
+				// playing and pausing synchronously during the transition to fullscreen
+				// can get iOS ~6.1 devices into a play/pause loop
+				setTimeout(() => {
+					this.pause();
+					video.webkitEnterFullScreen();
+				}, 0);
+			} else {
+				video.webkitEnterFullScreen();
+			}
+		}
+
+		exitFullscreen() {
+			this._video.webkitExitFullScreen();
+		}
+
 		togglePlay () {
-			/** In safari it doesn't work */
-			// if (this._video.readyState < 2) {
-			// 	overlay.hide();
-			// 	_showNotification('Error!');
-			// 	return;
-			// }
 			if (!this._video.played || this._video.paused) {
 				this.play();
 			} else {
@@ -549,160 +610,8 @@ let Player = function (element, options) {
 			}
 		}
 
-		_initHtmlEvents () {
-			let mediaElement = $(this._video);
-
-			mediaElement.one({
-				'play' : (e) => {
-					this.player.trigger('firstplay');
-					this.player.removeClass('leplayer--virgin');
-				}
-			});
-
-			mediaElement.on({
-
-				'loadstart' : (e) => {
-					this.player.removeClass('leplayer--ended');
-
-					this.player.setError(null);
-
-					this.player.trigger('loadstart');
-				},
-
-				'durationchange' : (e) => {
-					this.player.trigger('durationchange');
-				},
-
-				'timeupdate' : (e) => {
-					if ( this.currentTime > 0 ) {
-						this.player.removeClass('leplayer--virgin');
-					}
-
-					this.player.trigger('timeupdate', { time : this.currentTime, duration : this.duration });
-
-				},
-
-				'seeking' : (e) => {
-					this.player.addClass('leplayer--seeking');
-					this.player.trigger('seeking');
-				},
-
-				'seeked' : (e) => {
-					this.player.removeClass('leplayer--seeking');
-					this.player.trigger('seeked');
-				},
-
-				'progress' : () => {
-					this.player.trigger('progress');
-				},
-
-				'dblclick' : () => {
-					this.player.trigger('dblclick');
-				},
-
-				'click' : () => {
-					this.player.trigger('click')
-				},
-
-				'volumechange' : (e) => {
-					this.player.trigger('volumechange', { volume : this.volume });
-				},
-
-				'play' : (e) => {
-					this.player.removeClass('leplayer--ended');
-					this.player.removeClass('leplayer--paused');
-					this.player.addClass('leplayer--playing');
-
-					this.player.trigger('play');
-				},
-
-				'pause' : (e) => {
-					this.player.removeClass('leplayer--playing');
-					this.player.addClass('leplayer--paused');
-					this.player.trigger('pause');
-					//overlay.show()
-				},
-
-				'playing' : (e) => {
-					this.player.removeClass('leplayer--waiting');
-					this.player.trigger('playing');
-				},
-
-				'ratechange' : (e) => {
-					this.player.trigger('ratechange', { rate : this.rate });
-				},
-
-				'canplay' : (e) => {
-					//loader.hide();
-					this.player.trigger('canplay');
-				},
-
-				'ended' : (e) => {
-					this.player.addClass('leplayer--ended')
-
-					if(this.player.options.loop) {
-						this.currentTime(0);
-						this.play();
-					} else if (!this._video.paused) {
-						this.pause();
-					}
-
-					this.player.trigger('ended');
-				},
-				'canplaythrough' : (e) => {
-					this.player.removeClass('leplayer--waiting');
-					this.player.trigger('canplaythrough');
-				},
-
-				'waiting' : (e) => {
-					this.player.addClass('leplayer--waiting');
-					this.player.one('timeupdate', () => this.player.removeClass('leplayer--waiting'));
-					this.player.trigger('waiting');
-				},
-
-				'error' : (e) => {
-					this.player.setError(new MediaError(e.target.error.code));
-				}
-			});
-		}
 	}
 
-
-	/* TODO: Вынести все методы в прототип */
-	this.init = function () {
-		// Check if element is correctly selected.
-		if (element.prop('tagName').toLowerCase() != 'video') {
-			console.warn('Incorrect element selected.');
-			return this;
-		}
-
-		this.initOptions();
-
-
-		/** TODO: Use promise to async run this */
-		this.initDom();
-
-		// Create video link
-		this.video = new Video(this, element);
-
-		// Create controls
-		// TODO: move this action to the initDom
-		this.initControls();
-
-		// Listen hotkeys
-		this.initHotKeys();
-
-		this.initSections().then((data) => {
-			this.sections = data.sectionsComponent;
-			this.trigger('sectionsinit', data);
-		});
-
-		this.video.init().then(() => {
-			this.trigger('inited');
-			this._initPlugins();
-		});
-
-	};
 
 	this.initControls = function () {
 		//controls = new Controls(player);
@@ -730,22 +639,14 @@ let Player = function (element, options) {
 			this.getSectionData().done(sections => {
 				sections = [...sections];
 
-				const isSectionOutside = (sectionContainer && sectionContainer.length > 0);
+				const isSectionOutside = (this.sectionsContainer && this.sectionsContainer.length > 0);
 
 				if (sections == null || sections.length == 0) {
 					dfd.reject(null);
 					return;
 				}
 
-				for ( let i = 0; i < sections.length; i++) {
-					let endSection;
-					if (i < (sections.length - 1)) {
-						endSection = sections[i+1].begin
-					} else {
-						endSection = this.video.duration;
-					}
-					sections[i].end = endSection;
-				}
+				sections = this.completeSections(sections);
 
 				const sectionsComponent = new Sections(this, {
 
@@ -759,7 +660,7 @@ let Player = function (element, options) {
 					const outsideSections = new Sections(player, {
 						items : sections,
 					});
-					sectionContainer.append(outsideSections.element);
+					this.sectionsContainer.append(outsideSections.element);
 				}
 				dfd.resolve({ sectionsComponent, items : sections });
 			})
@@ -769,125 +670,6 @@ let Player = function (element, options) {
 	}
 
 
-	/**
-	 * Remove unnecessary attributes, and set some attrs from options (loop, poster etc...). Create main DOM objects
-	 *
-	 * @access private
-	 */
-	this.initDom = function () {
-		const options = this.options;
-		this.errorDisplay = new ErrorDisplay(this);
-		this.playButton = new PlayButton(this);
-
-		//element.width(this.video.width);
-
-		[
-
-			// Remove controls because we dont not support native controls yet
-			'controls',
-			'poster',
-
-			// It is unnecessary attrs, this functionality solve CSS
-			'height',
-			'width'
-
-		].forEach( item => {
-			element.removeAttr(item);
-		});
-
-		// Set attrs from options
-		[
-			'preload',
-			'autoplay',
-			'loop',
-			'muted'
-		].forEach(item => {
-			if(this.options[item]) {
-				element.attr(item, this.options[item]);
-				element.prop(item, this.options[item]);
-			}
-		})
-
-		element.find('source[data-quality]').each((i, item) => {
-			$(item).remove();
-		})
-
-
-		// TODO: Вынести это в отдельнеый компонент
-
-		this.loader = $('<div />')
-			.addClass('leplayer-loader-container')
-			.append(new Icon(this, {
-					iconName : 'refresh',
-					className : 'leplayer-loader-container__icon'
-				}).element);
-
-
-		this.videoContainer = createEl('div', {
-				className : 'leplayer-video'
-			})
-			.append(this.playButton.element)
-			.append(this.loader);
-
-		if(options.poster) {
-			this.poster = new Poster(this);
-			this.videoContainer.append(this.poster.element);
-		}
-
-
-		if(options.miniplayer) {
-			this.miniPlayer = new MiniPlayer(this)
-		}
-
-
-		const lastTimer = new Time(this, {
-			fn : (player) => {
-				const video = player.video
-				return secondsToTime(video.duration - video.currentTime);
-			}
-		})
-		this.innerElement = $('<div />')
-			.addClass('leplayer__inner')
-			.append(this.videoContainer)
-			.append(createEl('div', {
-					className : 'leplayer__info'
-				})
-				.append(createEl('div', {
-						className : 'leplayer__title',
-						html : this.options.title || ""
-					}))
-				.append(createEl('div', {
-						className : 'leplayer__video-info',
-						html : this.options.videoInfo || ""
-					}))
-				.append(createEl('div', {
-						className : 'leplayer__last',
-						html : `Видео закончится через `,
-					}).append(lastTimer.element))
-				.append(this.miniPlayer && this.miniPlayer.element)
-			)
-			//.append($('leplayer__video-info')
-				//.text(this.options.videoInfo || ""))
-
-		this.element = this.element
-			.addClass('leplayer')
-			.append(this.innerElement)
-			.append(this.errorDisplay.element)
-			.attr('tabindex', 0)
-			.css('width', '100%')
-			.css('max-width', (options.width || this.video.width) + 'px')
-
-		this.addClass('leplayer--paused');
-		this.addClass('leplayer--virgin');
-
-
-		if(options.sectionContainer) {
-			sectionContainer = $(options.sectionContainer);
-		}
-
-		element.before(this.element);
-		this.videoContainer.append(element);
-	};
 
 	this.initHotKeys = function () {
 
@@ -924,6 +706,7 @@ let Player = function (element, options) {
 	 */
 	this.optionsFromElement = function() {
 		// Copy video attrs to the opitons
+		const  element = this._element;
 		let attrOptions = [
 			'height',
 			'width',
@@ -980,7 +763,7 @@ let Player = function (element, options) {
 	this.initOptions = function () {
 		const attrOptions = this.optionsFromElement();
 		// Merge default options + video attributts + user options
-		this.options = $.extend(true, defaultOptions, attrOptions, options);
+		this.options = $.extend(true, {}, defaultOptions, attrOptions, options);
 
 		if(this.options.sources && !Array.isArray(this.options.sources)) {
 			this.options.sources = [this.options.sources]
@@ -993,6 +776,9 @@ let Player = function (element, options) {
 		if (this.options.src == null) {
 			this.setError(new MediaError('No sources found'));
 		}
+
+		// Merge correctly controls, without deep merge
+		this.options.controls = $.extend({}, defaultOptions.controls, options.controls);
 
 		// exclude controls option
 		for (const name in this.options.excludeControls) {
@@ -1011,22 +797,367 @@ let Player = function (element, options) {
 		return (focused.length > 0) || $(this.element).is(':focus');
 	}
 
-	this.init();
+	// Check if element is correctly selected.
+
+	this.initOptions();
+
+	/** TODO: Use promise to async run this */
+	this.createElement();
+
+	// Create video link
+	this.video = new Video(this, element);
+
+	// Create controls
+	// TODO: move this action to the createElement
+	this.initControls();
+
+	// Listen hotkeys
+	this.initHotKeys();
+
+	this.initSections().then((data) => {
+		this.sections = data.sectionsComponent;
+		this.trigger('sectionsinit', data);
+	});
+
+	this.video.init().then(() => {
+		this.trigger('inited');
+		this._initPlugins();
+	});
 
 	this._listenUserActivity();
 
-	$(document).on(fsApi.fullscreenchange, this._onEntityFullscrenChange.bind(this));
+	const mediaElement = this.video.element;
 
+	mediaElement.one({
+		'play' : (e) => {
+			this.trigger('firstplay');
+			this.removeClass('leplayer--virgin');
+		}
+	});
 
-	this.on('fullscreenchange', this.onFullscreenChange.bind(this));
+	mediaElement.on({
+
+		'loadstart' : (e) => {
+			this.removeClass('leplayer--ended');
+
+			this.setError(null);
+
+			this.trigger('loadstart');
+		},
+
+		'durationchange' : (e) => {
+			this.trigger('durationchange');
+		},
+
+		'timeupdate' : (e) => {
+			if ( this.video.currentTime > 0 ) {
+				this.removeClass('leplayer--virgin');
+			}
+
+			this.trigger('timeupdate', { time : this.video.currentTime, duration : this.video.duration });
+
+		},
+
+		'seeking' : (e) => {
+			this._startWaiting();
+			this.trigger('seeking');
+
+		},
+
+		'seeked' : (e) => {
+			this._stopWayting();
+			this.trigger('seeked');
+		},
+
+		'progress' : () => {
+			this.trigger('progress');
+		},
+
+		'dblclick' : () => {
+			this.trigger('dblclick');
+		},
+
+		'click' : () => {
+			this.trigger('click')
+		},
+
+		'volumechange' : (e) => {
+			this.trigger('volumechange', { volume : this.video.volume });
+		},
+
+		'play' : (e) => {
+			this.removeClass('leplayer--ended');
+			this.removeClass('leplayer--paused');
+			this.addClass('leplayer--playing');
+
+			this.trigger('play');
+		},
+
+		'pause' : (e) => {
+			this.removeClass('leplayer--playing');
+			this.addClass('leplayer--paused');
+			this.trigger('pause');
+			//overlay.show()
+		},
+
+		'playing' : (e) => {
+			this._stopWayting();
+			this.trigger('playing');
+		},
+
+		'ratechange' : (e) => {
+			this.trigger('ratechange', { rate : this.video.rate });
+		},
+
+		'canplay' : (e) => {
+			//loader.hide();
+			this.trigger('canplay');
+		},
+
+		'ended' : (e) => {
+			this.addClass('leplayer--ended')
+
+			if(this.options.loop) {
+				this.currentTime(0);
+				this.video.play();
+			} else if (!this.video.paused) {
+				this.video.pause();
+			}
+
+			this.trigger('ended');
+		},
+
+		'canplaythrough' : (e) => {
+			this._stopWayting();
+			this.trigger('canplaythrough');
+		},
+
+		'waiting' : (e) => {
+			this._startWaiting()
+
+			this.one('timeupdate', () => this._stopWayting());
+
+			this.trigger('waiting');
+		},
+
+		'error' : (e) => {
+			this.setError(new MediaError(e.target.error.code));
+		}
+	});
+
+	this.on('fullscreenchange', this._onFullscreenChange.bind(this));
 	this.on('click', this._onClick.bind(this));
 	this.on('dblclick', this._onDbclick.bind(this));
-	//this.on('waiting', this._onWaiting.bind(this));
 	this.on('inited', this._onInited.bind(this));
+	this.on('play', this._onPlay.bind(this));
+	this.on('pause', this._onPause.bind(this));
+
+	$(document).on(fsApi.fullscreenchange, this._onEntityFullscrenChange.bind(this));
 
 	return this;
 };
 
+/**
+ * Static helper for creating a plugins for leplayer
+ *
+ * @access public
+ * @static
+ * @param {String} name The name of plugin
+ * @param {Function} fn Plugin init function
+ *
+ * @example
+ * Player.plugin('helloWorld', function(pluginOptions) {
+ *    const player = this;
+ *    player.on('click', () => console.log('Hello world'));
+ * })
+ *
+ */
+Player.plugin = function(name, fn) {
+	Player.prototype[name] = fn;
+}
+
+/**
+ * Get by name registered component
+ *
+ * @access public
+ * @static
+ * @param {String} name
+ * @returns {Component}
+ */
+Player.getComponent = Component.getComponent;
+
+/**
+ * Register component
+ *
+ * @access public
+ * @static
+ * @param {String} name
+ * @param {Component} component
+ *
+ * @example
+ * Player.registerComponent('ErrorDisplay', ErrorDisplay);
+ */
+Player.registerComponent = Component.registerComponent;
+
+/**
+ * Register control
+ *
+ * @access public
+ * @static
+ * @param {String} name
+ * @param {Control} control
+ */
+Player.getControl = Control.getControl;
+
+/**
+ * Get by name registered control
+ *
+ * @access public
+ * @static
+ * @param {String} name
+ * @returns {Control}
+ *
+ * @example
+ * Player.registerControl('backward', BackwardControl);
+ */
+Player.registerControl = Control.registerControl;
+
+
+/**
+ * Convert seconds to format string 'hh?:mm:ss'
+ *
+ * @access public
+ * @param {Number} seconds Seconds
+ * @param {Boolean} showHours convert to format 'hh:mm:ss'
+ * @returns {String}
+ */
+Player.secondsToTime = secondsToTime;
+/**
+ * Remove unnecessary attributes, and set some attrs from options (loop, poster etc...). Create main DOM objects
+ *
+ * @access private
+ */
+Player.prototype.createElement = function() {
+	const options = this.options;
+	const element = this._element;
+
+	[
+
+		// Remove controls because we dont not support native controls yet
+		'controls',
+		'poster',
+
+		// It is unnecessary attrs, this functionality solve CSS
+		'height',
+		'width'
+
+	].forEach( item => {
+		element.removeAttr(item);
+	});
+
+	// Set attrs from options
+	[
+		'preload',
+		'autoplay',
+		'loop',
+		'muted'
+	].forEach(item => {
+		if(this.options[item]) {
+			element.attr(item, this.options[item]);
+			element.prop(item, this.options[item]);
+		}
+	})
+
+	element.find('source[data-quality]').each((i, item) => {
+		$(item).remove();
+	})
+
+	this.element = this.element
+		.addClass('leplayer')
+		.attr('tabindex', 0)
+		.css('width', '100%')
+		.css('max-width', (options.width || this.video.width) + 'px')
+
+	this.errorDisplay = new ErrorDisplay(this);
+
+	this.playButton = new PlayButton(this);
+
+	// TODO: Вынести это в отдельнеый компонент
+	this.loader = $('<div />')
+		.addClass('leplayer-loader-container')
+		.append(new Icon(this, {
+				iconName : 'refresh',
+				className : 'leplayer-loader-container__icon'
+			}).element);
+
+
+	this.splashIcon = new SplashIcon(this);
+
+	this.videoContainer = createEl('div', {
+			className : 'leplayer-video'
+		})
+		.append(this.errorDisplay.element)
+		.append(this.playButton.element)
+		.append(this.loader)
+		.append(this.splashIcon.element)
+
+	if(options.poster) {
+		this.poster = new Poster(this);
+		this.videoContainer.append(this.poster.element);
+	}
+
+
+	if(options.miniplayer) {
+		this.miniPlayer = new MiniPlayer(this)
+	}
+
+
+	const lastTimer = new Time(this, {
+		fn : (player) => {
+			const video = player.video
+			return secondsToTime(video.duration - video.currentTime);
+		}
+	})
+
+	this.innerElement = $('<div />')
+		.addClass('leplayer__inner')
+		.append(this.videoContainer)
+		.append(
+			createEl('div', {
+				className : 'leplayer__info'
+			})
+			.append(createEl('div', {
+					className : 'leplayer__title',
+					html : this.options.title || ""
+				}))
+			.append(createEl('div', {
+					className : 'leplayer__video-info',
+					html : this.options.videoInfo || ""
+				}))
+			.append(createEl('div', {
+					className : 'leplayer__last',
+					html : `Видео закончится через `,
+				}).append(lastTimer.element))
+			.append(this.miniPlayer && this.miniPlayer.element)
+		)
+		//.append($('leplayer__video-info')
+			//.text(this.options.videoInfo || ""))
+
+	this.element = this.element
+		.append(this.innerElement)
+
+	this.addClass('leplayer--paused');
+	this.addClass('leplayer--virgin');
+
+
+	if(options.sectionContainer) {
+		this.sectionsContainer = $(options.sectionContainer);
+	}
+
+	element.before(this.element);
+	this.videoContainer.append(element);
+	return this.element;
+};
 
 /**
  * @access private
@@ -1050,25 +1181,6 @@ Player.prototype._initPlugins = function() {
 	}
 
 	return this;
-}
-
-/**
- * Static helper for creating a plugins for leplayer
- *
- * @access public
- * @static
- * @param {String} name The name of plugin
- * @param {Function} fn Plugin init function
- *
- * @example
- * Player.plugin('helloWorld', function(pluginOptions) {
- *    const player = this;
- *    player.on('click', () => console.log('Hello world'));
- * })
- *
- */
-Player.plugin = function(name, fn) {
-	Player.prototype[name] = fn;
 }
 
 /**
@@ -1147,6 +1259,10 @@ Player.prototype.toggleClass = function(className, flag) {
 	return this;
 }
 
+Player.prototype.hasClass = function(className) {
+	return this.element.hasClass(className);
+}
+
 /**
  * Set player view
  *
@@ -1193,96 +1309,6 @@ Player.prototype.setError = function(value) {
 	this.trigger('error', { error : this._error});
 
 	return this;
-}
-
-/**
- * @access private
- */
-Player.prototype._listenUserActivity = function() {
-	let mouseInProgress;
-	let lastMoveX;
-	let lastMoveY;
-
-	const onMouseMove = (e) => {
-		if(e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
-			lastMoveX = e.screenX;
-			lastMoveY = e.screenY;
-			this._userActivity = true
-		}
-	}
-
-	const onMouseDown = (e) => {
-		this._userActivity = true
-
-		// While user is pressing mouse or touch, dispatch user activity
-		clearInterval(mouseInProgress);
-
-		mouseInProgress = setInterval(() => {
-			this._userActivity = true
-		}, 250);
-	}
-
-	const onMouseUp = (e) => {
-		this._userActivity = true
-		clearInterval(mouseInProgress);
-	}
-
-	this.element.on('mousemove', onMouseMove);
-
-	this.element.on('mousedown', onMouseDown);
-
-	this.element.on('mouseup', onMouseUp);
-
-	this.element.on('keydown', (e) => this._userActivity = true );
-	this.element.on('keyup', (e) => this._userActivity = true );
-
-	// See http://ejohn.org/blog/learning-from-twitter/
-	let inactivityTimeout;
-	const delay = this.options.innactivityTimeout;
-	setInterval(() => {
-		if (this._userActivity) {
-
-			// Reset user activuty tracker
-			this._userActivity = false;
-
-			this.setUserActive(true);
-
-			clearTimeout(inactivityTimeout);
-
-			if (delay > 0) {
-
-				inactivityTimeout = setTimeout(() => {
-					if (!this._userActivity) {
-						this.setUserActive(false)
-					}
-				}, delay);
-			}
-		}
-	}, 250)
-}
-
-/**
- * @access private
- */
-Player.prototype._dblclickTimerId = null;
-
-Player.prototype._onClick = function(e) {
-	clearTimeout(this._dblclickTimerId);
-	this._dblclickTimerId = setTimeout(() => {
-		this.video.element.focus()
-		this.togglePlay();
-	}, 300);
-};
-
-/**
- * On dblclick on the video player event handler
- *
- * @access private
- * @param {Event} e
- */
-Player.prototype._onDbclick = function(e) {
-	clearTimeout(this._dblclickTimerId);
-	this.toggleFullscreen();
 }
 
 /**
@@ -1361,6 +1387,8 @@ Player.prototype.requestFullscreen = function() {
 		this.element[0][fsApi.requestFullscreen]();
 
 		this.trigger('fullscreenchange', true);
+	} else if (this.video.supportsFullScreen()) {
+		this.video.enterFullscreen();
 	}
 }
 
@@ -1369,6 +1397,8 @@ Player.prototype.exitFullscreen = function() {
 
 	if(fsApi.exitFullscreen) {
 		document[fsApi.exitFullscreen]();
+	} else if (this.video.supportsFullScreen()) {
+		this.video.exitFullscreen();
 	}
 
 	this.trigger('fullscreenchange', false);
@@ -1383,12 +1413,6 @@ Player.prototype.toggleFullscreen = function() {
 	}
 }
 
-Player.prototype._onEntityFullscrenChange = function() {
-	const fsApi = FullscreenApi;
-	const isFs = !!document[fsApi.fullscreenElement];
-	this.trigger('fullscreenchange', isFs);
-}
-
 /**
  * Get ControlCollection of Player by name (e.x 'common', 'fullscreen')
  *
@@ -1398,20 +1422,6 @@ Player.prototype._onEntityFullscrenChange = function() {
  */
 Player.prototype.getControls = function(name) {
 	return this.controls[name];
-}
-
-Player.prototype.onFullscreenChange = function(e, isFs) {
-	if(isFs) {
-		this.setView('fullscreen');
-	} else {
-		this.setView('common');
-	}
-}
-
-Player.prototype._onInited = function(e) {
-	this.addClass('leplayer--inited');
-
-	this.options.onPlayerInited.call(this, e);
 }
 
 /**
@@ -1432,6 +1442,219 @@ Player.prototype.getHeight = function() {
  */
 Player.prototype.getWidth = function() {
 	return this.element.width()
+}
+
+Player.prototype.completeSections = function(sections) {
+	if (sections == null || sections.length == 0) {
+		return
+	}
+	let newSections = [].concat(sections)
+	for ( let i = 0; i < newSections.length; i++) {
+		let endSection;
+		if (i < (newSections.length - 1)) {
+			endSection = newSections[i+1].begin
+		} else {
+			endSection = this.video.duration;
+		}
+		newSections[i].end = endSection;
+	}
+	return newSections;
+}
+
+Player.prototype._userActivity = false;
+
+/**
+ * @access private
+ */
+Player.prototype._listenUserActivity = function() {
+	let mouseInProgress;
+	let lastMoveX;
+	let lastMoveY;
+
+	const onMouseMove = (e) => {
+		if(e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
+			lastMoveX = e.screenX;
+			lastMoveY = e.screenY;
+			this._userActivity = true
+		}
+	}
+
+	const onMouseDown = (e) => {
+		this._userActivity = true
+
+		// While user is pressing mouse or touch, dispatch user activity
+		clearInterval(mouseInProgress);
+
+		mouseInProgress = setInterval(() => {
+			this._userActivity = true
+		}, 250);
+	}
+
+	const onMouseUp = (e) => {
+		this._userActivity = true
+		clearInterval(mouseInProgress);
+	}
+
+	this.element.on('mousemove', onMouseMove);
+
+	this.element.on('mousedown', onMouseDown);
+
+	this.element.on('mouseup', onMouseUp);
+
+	this.element.on('keydown', (e) => this._userActivity = true );
+	this.element.on('keyup', (e) => this._userActivity = true );
+
+	// See http://ejohn.org/blog/learning-from-twitter/
+	let inactivityTimeout;
+	const delay = this.options.innactivityTimeout;
+	setInterval(() => {
+		if (this._userActivity) {
+
+			// Reset user activuty tracker
+			this._userActivity = false;
+
+			this.setUserActive(true);
+
+			clearTimeout(inactivityTimeout);
+
+			if (delay > 0) {
+
+				inactivityTimeout = setTimeout(() => {
+					if (!this._userActivity) {
+						this.setUserActive(false)
+					}
+				}, delay);
+			}
+		}
+	}, 250)
+}
+
+Player.prototype._waitingTimeouts = [];
+
+/**
+ * Stop showing spinner and clear delay of showing spinner
+ *
+ * @access private
+ */
+Player.prototype._stopWayting = function() {
+	this._waitingTimeouts.forEach( item => clearTimeout(item));
+	this._waitingTimeouts = [];
+	this.removeClass('leplayer--waiting');
+}
+
+/**
+ * Show spinner with delay in 300ms
+ *
+ * @access private
+ */
+Player.prototype._startWaiting = function() {
+	this._waitingTimeouts.push(setTimeout(() => {
+		this.addClass('leplayer--waiting');
+	}, 300));
+}
+
+
+/**
+ * On inited player event handler
+ *
+ * @access private
+ * @param {PlayerEvent} e
+ */
+Player.prototype._onInited = function(e) {
+	this.addClass('leplayer--inited');
+
+	this.options.onPlayerInited.call(this, e);
+}
+
+/**
+ * @access private
+ */
+Player.prototype._dblclickTimeout = null;
+
+/**
+ * On click video event handler. Focus on video and togglePlay
+ *
+ * @access private
+ * @param {PlayerEvent} e
+ */
+Player.prototype._onClick = function(e) {
+	clearTimeout(this._dblclickTimeout);
+	this._dblclickTimeout = setTimeout(() => {
+		this.video.element.focus()
+		this.togglePlay();
+	}, 300);
+};
+
+/**
+ * On dblclick on the video player event handler
+ *
+ * @access private
+ * @param {PlayerEvent} e
+ */
+Player.prototype._onDbclick = function(e) {
+	clearTimeout(this._dblclickTimeout);
+	this.toggleFullscreen();
+}
+
+/**
+ * On fullscreen change player event handler
+ *
+ * @access public
+ * @param {PlayerEvent} e
+ */
+Player.prototype._onFullscreenChange = function(e, isFs) {
+	if(isFs) {
+		this.setView('fullscreen');
+	} else {
+		this.setView('common');
+	}
+}
+
+
+/**
+ * On play event handler
+ *
+ * @access private
+ * @param {PlayerEvent} e
+ */
+Player.prototype._onPlay = function() {
+	this.splashIcon.show('play');
+}
+
+/**
+ * On pause player event handler
+ * Show pause icon in the center of video
+ *
+ * @access private
+ */
+Player.prototype._onPause = function() {
+	this.splashIcon.show('pause');
+}
+
+Player.prototype._onEntityFullscrenChange = function() {
+	const fsApi = FullscreenApi;
+	const isFs = !!document[fsApi.fullscreenElement];
+	this.trigger('fullscreenchange', isFs);
+}
+
+/**
+ * Return a name of icon. If less then 0.1 return volume-off,
+ * if less then 0.5 return volume down, else return volume-up
+ *
+ * @access private
+ * @param {Number} value Volume value
+ * @returns {String} Icon name
+ */
+Player.prototype._calcVolumeIcon = function(value) {
+	const volume = value || this.video.volume;
+
+	if (volume < this.options.volume.mutelimit) {
+		return 'volume-off';
+	} else if (value < 0.5) {
+		return 'volume-down';
+	} else {
+		return 'volume-up';
+	}
 }
 
 window.$.fn.lePlayer = function (options) {

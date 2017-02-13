@@ -4,6 +4,7 @@
  */
 
 import $ from 'jquery';
+import Component from './Component';
 import Control from './Control';
 import ControlText from './ControlText';
 import { secondsToTime } from '../utils';
@@ -66,4 +67,6 @@ class TimeInfoControl extends Control {
 	}
 }
 
+Component.registerComponent('TimeInfoControl', TimeInfoControl);
+Control.registerControl('timeinfo', TimeInfoControl);
 export default TimeInfoControl;

@@ -4,6 +4,8 @@
  */
 
 import $ from 'jquery';
+import Component from './Component';
+import Control from './Control';
 import ControlDropdown from './ControlDropdown';
 
 /**
@@ -75,13 +77,7 @@ class VolumeControl extends ControlDropdown {
 
 
 	set value (value) {
-		if (value < this.player.options.volume.mutelimit) {
-			this.icon.iconName = 'volume-off';
-		} else if (value < 0.5) {
-			this.icon.iconName = 'volume-down';
-		} else {
-			this.icon.iconName = 'volume-up';
-		}
+		this.icon.iconName = this.player._calcVolumeIcon(value);
 
 		let p = Math.round(value * 100).toString() + '%';
 		this.active.css('height', p);
@@ -113,4 +109,6 @@ class VolumeControl extends ControlDropdown {
 
 }
 
+Component.registerComponent('VolumeControl', VolumeControl);
+Control.registerControl('volume', VolumeControl);
 export default VolumeControl;

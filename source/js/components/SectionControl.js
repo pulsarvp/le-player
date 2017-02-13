@@ -4,6 +4,8 @@
  */
 
 import $ from 'jquery';
+import Component from './Component';
+import Control from './Control';
 import ControlCheckbox from './ControlCheckbox';
 
 /**
@@ -41,4 +43,6 @@ class SectionControl extends ControlCheckbox {
 	}
 }
 
+Component.registerComponent('SectionControl', SectionControl);
+Control.registerControl('section', SectionControl);
 export default SectionControl;
