@@ -32,7 +32,7 @@
 	{
 		background: @color-section-2n;
 	}
-	&--active
+	&.leplayer-section--active
 	{
 		background: @color-section-active;
 
@@ -189,10 +189,14 @@
 		{
 			background: @color-fs-section-2n;
 
-			&.leplayer-section--active,
-			&:hover
+			&.leplayer-section--active
 			{
 				background: @color-fs-section-2n-active;
+			}
+
+			&:hover
+			{
+				background: @color-fs-section-2n-hover;
 			}
 		}
 		&:hover
