@@ -18,7 +18,7 @@ import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
 import Cookie from './utils/cookie';
-import { createEl, secondsToTime } from './utils';
+import { createEl, secondsToTime, noop } from './utils';
 
 import MediaError from './MediaError';
 
@@ -41,6 +41,7 @@ Control.registerControl('divider', function() {
 		element : $('<div/>').addClass('divider')
 	};
 });
+
 
 
 /**
@@ -189,7 +190,7 @@ const defaultOptions = {
 	plugins : {
 		miniplayer : {}
 	},
-	onPlayerInited : function() {}
+	onPlayerInited : noop
 };
 
 /**
@@ -665,6 +666,7 @@ let Player = function (element, options) {
 
 
 	this.initHotKeys = function () {
+		$(this.element).off('keydown.leplayer.hotkey');
 
 		const isKeyBinding = (e, binding) => {
 			return ((e.which === binding.key) || (e.key === binding.key)) &&
@@ -755,8 +757,15 @@ let Player = function (element, options) {
 	 */
 	this.initOptions = function () {
 		const attrOptions = this.optionsFromElement();
-		// Merge default options + video attributts + user options
-		this.options = $.extend(true, {}, defaultOptions, attrOptions, options);
+		let themeOptions = {};
+
+		if (options.theme) {
+			themeOptions = Player.getTheme(options.theme).options;
+		}
+
+
+		// Merge default options + theme options + video attributts+ user options
+		this.options = $.extend(true, {}, defaultOptions, themeOptions, attrOptions, options);
 
 		if(this.options.sources && !Array.isArray(this.options.sources)) {
 			this.options.sources = [this.options.sources]
@@ -771,7 +780,7 @@ let Player = function (element, options) {
 		}
 
 		// Merge correctly controls, without deep merge
-		this.options.controls = $.extend({}, defaultOptions.controls, options.controls);
+		this.options.controls = $.extend({}, defaultOptions.controls, themeOptions.controls, options.controls);
 
 		// exclude controls option
 		for (const name in this.options.excludeControls) {
@@ -782,6 +791,10 @@ let Player = function (element, options) {
 					this.options.controls[name][index] = excludeArray(this.options.controls[name][index], row);
 				}
 			})
+		}
+
+		if (options.theme) {
+			Player.getTheme(options.theme).initOptions();
 		}
 	};
 
@@ -1024,12 +1037,40 @@ Player.registerControl = Control.registerControl;
  * @returns {String}
  */
 Player.secondsToTime = secondsToTime;
+
+
+Player.theme = function(name, obj) {
+	if(typeof obj === 'object') {
+		Player._themes[name] = $.extend({}, {
+			options : {},
+			initOptions : noop
+		}, obj);
+	} else if (typeof obj === 'function') {
+		Player._themes[name] = obj();
+	}
+};
+
+
+Player.getTheme = function(name) {
+	if(Player._themes[name]) {
+		return Player._themes[name];
+	} else {
+		console.error(`Theme ${name} doesn't exist`);
+		return null;
+	}
+}
+
+
+Player._themes = {};
+
+
 /**
  * Remove unnecessary attributes, and set some attrs from options (loop, poster etc...). Create main DOM objects
  *
  * @access private
  */
 Player.prototype.createElement = function() {
+
 	const options = this.options;
 	const element = this._element;
 
@@ -1148,6 +1189,7 @@ Player.prototype.createElement = function() {
 	return this.element;
 };
 
+
 /**
  * @access private
  *
@@ -1173,6 +1215,7 @@ Player.prototype._initPlugins = function() {
 
 	return this;
 }
+
 
 /**
  * @access private
@@ -1481,6 +1524,7 @@ Player.prototype.completeSections = function(sections) {
 	}
 	return newSections;
 }
+
 
 Player.prototype._userActivity = false;
 
@@ -1801,3 +1845,6 @@ Player.plugin('miniplayer', function(pluginOptions) {
 
 	this._updateMiniPlayer();
 });
+
+
+Player.theme('vps', require('./themes/vps.js').theme);

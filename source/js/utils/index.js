@@ -55,3 +55,6 @@ export function createEl(tag='div', props) {
 	}
 	return $(`<${tag}/>`, props);
 }
+
+
+export function noop() {}
