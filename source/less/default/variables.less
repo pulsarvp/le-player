@@ -31,6 +31,7 @@
 @color-control: lime;
 @color-control-hovered: @color-text;
 @color-control-active: orange;
+@color-control-checked: @color-text;
 
 // dropdown
 
@@ -90,6 +91,7 @@
 // control
 @color-fs-control: @color-fs-background;
 @color-fs-control-hovered: @color-fs-background-hover;
+@color-fs-control-checked: @color-fs-control-hovered;
 
 // dropdown
 @color-fs-dropdown: @color-fs-background;
@@ -134,6 +136,8 @@
 // rgb(157, 178, 200)
 @color-section-hover: darken(@color-section-active, 10%);
 @color-section-2n: desaturate(lighten(@color-primary, 60%), 32%);
+@color-section-muted: #555;
+@color-section-text: black;
 
 @color-fs-section: fade(@color-fs-section-active, 70%);
 @color-fs-section-active: darken(@color-fs-primary, 20%);
@@ -142,6 +146,7 @@
 @color-fs-section-2n: fade(@color-fs-section-2n-active, 70%);
 @color-fs-section-2n-active: darken(@color-fs-primary, 10%);
 @color-fs-section-2n-hover: darken(@color-fs-primary, 15%);
+@color-fs-section-text: @color-fs-text;
 
 // MINIPLAYER
 @color-miniplayer-bg: #f5f8fa;
