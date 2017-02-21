@@ -32,8 +32,8 @@ class Control extends Component {
 		})
 
 		this.element.on({
-			'click' : this._onClick.bind(this),
-			'leplayer_control_click' : this.onClick.bind(this)
+			click : this._onClick.bind(this),
+			leplayer_control_click : this.onClick.bind(this)
 		});
 
 		this.player.on('inited', this.onPlayerInited.bind(this))
@@ -91,7 +91,7 @@ class Control extends Component {
 	 */
 	onClick (e) {
 		e.preventDefault();
-		if (typeof this.options.onClick == 'function') {
+		if (typeof this.options.onClick === 'function') {
 			this.options.onClick.call(this, arguments);
 		}
 	}

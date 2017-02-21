@@ -55,12 +55,12 @@ class VolumeControl extends ControlDropdown {
 		this.icon.element.attr('title', 'Отключить звук');
 
 		this.marker.on('mousedown', (e) => {
-			if (e.which != 1) return;
+			if (e.which !== 1) return;
 			drag = true;
 		});
 
 		$(document).on({
-			'mousemove' : (e) => {
+			mousemove : (e) => {
 				if (!drag) return;
 				let p = this.getPosition(e.pageY);
 				if (p >= 0 && p <= 1) {
@@ -68,7 +68,7 @@ class VolumeControl extends ControlDropdown {
 				}
 			},
 
-			'mouseup' : (e) => {
+			mouseup : (e) => {
 				drag = false;
 			}
 		});
@@ -87,7 +87,7 @@ class VolumeControl extends ControlDropdown {
 	toggleMuted () {
 		const { video } = this.player;
 
-		if (video.volume == 0) {
+		if (video.volume === 0) {
 			video.volume = video.defaultVolume;
 		} else {
 			video.volume = 0;

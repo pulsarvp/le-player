@@ -27,7 +27,7 @@ export function secondsToTime (seconds, showHours) {
 	}
 	out = `${m}:${s}`;
 
-	if(h > 0 || showHours ) {
+	if(h > 0 || showHours) {
 		out = `${h}:` + out
 	}
 	return out;
@@ -43,7 +43,7 @@ export function secondsToTime (seconds, showHours) {
  */
 export function percentify (length, end) {
 	// or zero beacase NaN
-	const percent = (length / end ) || 0;
+	const percent = (length / end) || 0;
 	return (percent >= 1) ? 1 : percent;
 }
 

@@ -27,7 +27,7 @@ class Component {
 		} else {
 			this.createElement();
 		}
-		if (this.element.length != 1) {
+		if (this.element.length !== 1) {
 			console.error(`Component.prototype.element.length must equal 1, not ${this.element.length}\n`, this.element);
 		}
 		this.element[0].__node = this;

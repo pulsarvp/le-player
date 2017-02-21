@@ -80,7 +80,7 @@ class Sections extends Component {
 	 * @override
 	 */
 	updateSectionDuration() {
-		if(this.items != null && this.items.length > 0 ) {
+		if(this.items != null && this.items.length > 0) {
 			const length = this.items.length
 			this.items[length - 1].end = this.player.video.duration;
 
@@ -99,9 +99,9 @@ class Sections extends Component {
 
 	setActiveByIndex(index) {
 		if (
-			this.activeSection.length == 0 ||
-			this.activeSection.attr('data-index') == index ||
-			this.getSectionByIndex(index).length == 0
+			this.activeSection.length === 0 ||
+			this.activeSection.attr('data-index') === index ||
+			this.getSectionByIndex(index).length === 0
 		) {
 			return this
 		}
@@ -128,7 +128,7 @@ class Sections extends Component {
 
 
 	onTimeUpdate(e, data) {
-		if (this.activeSection.length == 0) {
+		if (this.activeSection.length === 0) {
 			return
 		}
 
@@ -136,7 +136,7 @@ class Sections extends Component {
 
 		// Update span with end section time
 		// TODO: Вынести это в отдельный компонент ShowTime или типо того
-		if(this.player.getView() === 'mini' ) {
+		if(this.player.getView() === 'mini') {
 			const endSectionTime = this.activeSection.attr('data-end');
 			this.activeSection
 				.next()

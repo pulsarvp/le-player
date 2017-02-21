@@ -5,7 +5,6 @@ import $ from 'jquery';
 
 import Control from './components/Control';
 import Component from './components/Component';
-import MiniPlayer from './components/MiniPlayer';
 import PlayButton from './components/PlayButton';
 import SplashIcon from './components/SplashIcon';
 
@@ -76,7 +75,7 @@ const defaultOptions = {
 		step : 0.25,
 		min : 0.5,
 		max : 4.0,
-		'default' : 1
+		default : 1
 	},
 	playback : {
 		step : {
@@ -87,14 +86,14 @@ const defaultOptions = {
 	},
 	controls : {
 		common : [
-			[ 'play', 'volume', 'divider', 'timeline',  'divider', 'section', 'divider', 'fullscreen' ],
-			[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'keybinding info' ]
+			['play', 'volume', 'divider', 'timeline',  'divider', 'section', 'divider', 'fullscreen'],
+			['rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'keybinding info']
 		],
 		fullscreen : [
-			[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'keybinding info',  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen' ]
+			['play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'keybinding info',  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen']
 		],
 		mini : [
-			[ 'play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
+			['play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
 		]
 	},
 	volume : {
@@ -242,7 +241,7 @@ const defaultOptions = {
  */
 let Player = function (element, options) {
 
-	if (element.prop('tagName').toLowerCase() != 'video') {
+	if (element.prop('tagName').toLowerCase() !== 'video') {
 		console.warn('Incorrect element selected.');
 		return this;
 	}
@@ -291,7 +290,7 @@ let Player = function (element, options) {
 			let time;
 			if (value > this.duration) {
 				time = this.duration
-			} else if (value < 0 ) {
+			} else if (value < 0) {
 				time = 0
 			} else {
 				time = value;
@@ -325,7 +324,7 @@ let Player = function (element, options) {
 
 		set rate (value) {
 			const player = this.player;
-			if ( value <= player.options.rate.max && value >= player.options.rate.min ) {
+			if (value <= player.options.rate.max && value >= player.options.rate.min) {
 				this._video.playbackRate = value;
 				Cookie.set('rate', value);
 			}
@@ -364,7 +363,7 @@ let Player = function (element, options) {
 
 		set track (value) {
 			for (var i = 0; i < this._video.textTracks.length; i++) {
-				if (this._video.textTracks[ i ].language == value)
+				if (this._video.textTracks[ i ].language === value)
 					this._video.textTracks[ i ].mode = 'showing';
 				else
 					this._video.textTracks[ i ].mode = 'hidden';
@@ -449,10 +448,10 @@ let Player = function (element, options) {
 			const volume = this.volume;
 			this.volume = 0
 			return this.play()
-				.then( () => {
+				.then(() => {
 					return this.pause();
 				})
-				.then( () => {
+				.then(() => {
 					this.currentTime = 0;
 					this.volume = volume;
 				})
@@ -508,7 +507,7 @@ let Player = function (element, options) {
 			let dfd = $.Deferred();
 			const playPromise = this._video.play();
 
-			if( playPromise != null) {
+			if(playPromise != null) {
 				playPromise.then(function() {
 					dfd.resolve();
 				})
@@ -522,7 +521,7 @@ let Player = function (element, options) {
 			let dfd = $.Deferred();
 			const pausePromise = this._video.pause();
 
-			if( pausePromise != null) {
+			if(pausePromise != null) {
 				pausePromise.then(function() {
 					dfd.resolve();
 				})
@@ -587,7 +586,7 @@ let Player = function (element, options) {
 			// because it somehow resets track list
 			// for video element after DOM manipulation.
 
-			if (this._video.textTracks.length == 0 && this.subtitles.length > 0) {
+			if (this._video.textTracks.length === 0 && this.subtitles.length > 0) {
 				this._ctx.children('track[kind="subtitles"]').remove();
 				for (var i in this.subtitles) {
 					if (this.subtitles.hasOwnProperty(i)) {
@@ -634,7 +633,7 @@ let Player = function (element, options) {
 
 				const isSectionOutside = (this.sectionsContainer && this.sectionsContainer.length > 0);
 
-				if (sections == null || sections.length == 0) {
+				if (sections == null || sections.length === 0) {
 					dfd.reject(null);
 					return;
 				}
@@ -668,8 +667,8 @@ let Player = function (element, options) {
 
 		const isKeyBinding = (e, binding) => {
 			return ((e.which === binding.key) || (e.key === binding.key)) &&
-					(!!binding.shiftKey == e.shiftKey) &&
-					(!!binding.ctrlKey == e.ctrlKey)
+					(!!binding.shiftKey === e.shiftKey) &&
+					(!!binding.ctrlKey === e.ctrlKey)
 		}
 
 		$(this.element).bind('keydown.leplayer.hotkey', (e) => {
@@ -678,7 +677,7 @@ let Player = function (element, options) {
 
 				this.options.keyBinding.forEach(binding => {
 
-					if( isKeyBinding(e, binding) ) {
+					if(isKeyBinding(e, binding)) {
 						e.preventDefault();
 						binding.fn(this);
 						return false;
@@ -822,7 +821,7 @@ let Player = function (element, options) {
 	const mediaElement = this.video.element;
 
 	mediaElement.one({
-		'play' : (e) => {
+		play : (e) => {
 			this.trigger('firstplay');
 			this.removeClass('leplayer--virgin');
 		}
@@ -830,19 +829,19 @@ let Player = function (element, options) {
 
 	mediaElement.on({
 
-		'loadstart' : (e) => {
+		loadstart : (e) => {
 			this.removeClass('leplayer--ended');
 
 			this.setError(null);
 			this.trigger('loadstart');
 		},
 
-		'durationchange' : (e) => {
+		durationchange : (e) => {
 			this.trigger('durationchange');
 		},
 
-		'timeupdate' : (e) => {
-			if ( this.video.currentTime > 0 ) {
+		timeupdate : (e) => {
+			if (this.video.currentTime > 0) {
 				this.removeClass('leplayer--virgin');
 			}
 
@@ -850,34 +849,34 @@ let Player = function (element, options) {
 
 		},
 
-		'seeking' : (e) => {
+		seeking : (e) => {
 			this._startWaiting();
 			this.trigger('seeking');
 
 		},
 
-		'seeked' : (e) => {
+		seeked : (e) => {
 			this._stopWayting();
 			this.trigger('seeked');
 		},
 
-		'progress' : () => {
+		progress : () => {
 			this.trigger('progress');
 		},
 
-		'dblclick' : () => {
+		dblclick : () => {
 			this.trigger('dblclick');
 		},
 
-		'click' : () => {
+		click : () => {
 			this.trigger('click')
 		},
 
-		'volumechange' : (e) => {
+		volumechange : (e) => {
 			this.trigger('volumechange', { volume : this.video.volume });
 		},
 
-		'play' : (e) => {
+		play : (e) => {
 			this.removeClass('leplayer--ended');
 			this.removeClass('leplayer--paused');
 			this.addClass('leplayer--playing');
@@ -885,28 +884,28 @@ let Player = function (element, options) {
 			this.trigger('play');
 		},
 
-		'pause' : (e) => {
+		pause : (e) => {
 			this.removeClass('leplayer--playing');
 			this.addClass('leplayer--paused');
 			this.trigger('pause');
 			//overlay.show()
 		},
 
-		'playing' : (e) => {
+		playing : (e) => {
 			this._stopWayting();
 			this.trigger('playing');
 		},
 
-		'ratechange' : (e) => {
+		ratechange : (e) => {
 			this.trigger('ratechange', { rate : this.video.rate });
 		},
 
-		'canplay' : (e) => {
+		canplay : (e) => {
 			//loader.hide();
 			this.trigger('canplay');
 		},
 
-		'ended' : (e) => {
+		ended : (e) => {
 			this.addClass('leplayer--ended')
 
 			if(this.options.loop) {
@@ -919,12 +918,12 @@ let Player = function (element, options) {
 			this.trigger('ended');
 		},
 
-		'canplaythrough' : (e) => {
+		canplaythrough : (e) => {
 			this._stopWayting();
 			this.trigger('canplaythrough');
 		},
 
-		'waiting' : (e) => {
+		waiting : (e) => {
 			this._startWaiting()
 
 			this.one('timeupdate', () => this._stopWayting());
@@ -932,7 +931,7 @@ let Player = function (element, options) {
 			this.trigger('waiting');
 		},
 
-		'error' : (e) => {
+		error : (e) => {
 			this.setError(new MediaError(e.target.error.code));
 		}
 	});
@@ -1043,7 +1042,7 @@ Player.prototype.createElement = function() {
 		'height',
 		'width'
 
-	].forEach( item => {
+	].forEach(item => {
 		element.removeAttr(item);
 	});
 
@@ -1078,20 +1077,20 @@ Player.prototype.createElement = function() {
 	this.loader = $('<div />')
 		.addClass('leplayer-loader-container')
 		.append(new Icon(this, {
-				iconName : 'refresh',
-				className : 'leplayer-loader-container__icon'
-			}).element);
+			iconName : 'refresh',
+			className : 'leplayer-loader-container__icon'
+		}).element);
 
 
 	this.splashIcon = new SplashIcon(this);
 
 	this.videoContainer = createEl('div', {
-			className : 'leplayer-video'
-		})
-		.append(this.errorDisplay.element)
-		.append(this.playButton.element)
-		.append(this.loader)
-		.append(this.splashIcon.element)
+		className : 'leplayer-video'
+	})
+	.append(this.errorDisplay.element)
+	.append(this.playButton.element)
+	.append(this.loader)
+	.append(this.splashIcon.element)
 
 	if(options.poster) {
 		this.poster = new Poster(this);
@@ -1115,17 +1114,17 @@ Player.prototype.createElement = function() {
 		className : 'leplayer__info'
 	})
 	.append(createEl('div', {
-			className : 'leplayer__title',
-			html : this.options.title || ""
-		}))
+		className : 'leplayer__title',
+		html : this.options.title || ""
+	}))
 	.append(createEl('div', {
-			className : 'leplayer__video-info',
-			html : this.options.videoInfo || ""
-		}))
+		className : 'leplayer__video-info',
+		html : this.options.videoInfo || ""
+	}))
 	.append(createEl('div', {
-			className : 'leplayer__last',
-			html : `Видео закончится через `,
-		}).append(lastTimer.element))
+		className : 'leplayer__last',
+		html : `Видео закончится через `,
+	}).append(lastTimer.element))
 
 	this.innerElement = $('<div />')
 		.addClass('leplayer__inner')
@@ -1382,9 +1381,9 @@ Player.prototype.getData = function() {
 
 	if (typeof this.options.data === 'string') {
 		return $.ajax({
-			url: this.options.data,
-			method: 'GET',
-			dataType: 'json'
+			url : this.options.data,
+			method : 'GET',
+			dataType : 'json'
 		}).promise();
 
 	} else if (typeof this.options.data === 'object') {
@@ -1466,11 +1465,11 @@ Player.prototype.getWidth = function() {
 }
 
 Player.prototype.completeSections = function(sections) {
-	if (sections == null || sections.length == 0) {
+	if (sections == null || sections.length === 0) {
 		return
 	}
 	let newSections = [].concat(sections)
-	for ( let i = 0; i < newSections.length; i++) {
+	for (let i = 0; i < newSections.length; i++) {
 		let endSection;
 		if (i < (newSections.length - 1)) {
 			endSection = newSections[i+1].begin
@@ -1522,8 +1521,8 @@ Player.prototype._listenUserActivity = function() {
 
 	this.element.on('mouseup', onMouseUp);
 
-	this.element.on('keydown', (e) => this._userActivity = true );
-	this.element.on('keyup', (e) => this._userActivity = true );
+	this.element.on('keydown', (e) => this._userActivity = true);
+	this.element.on('keyup', (e) => this._userActivity = true);
 
 	// See http://ejohn.org/blog/learning-from-twitter/
 	let inactivityTimeout;
@@ -1558,7 +1557,7 @@ Player.prototype._waitingTimeouts = [];
  * @access private
  */
 Player.prototype._stopWayting = function() {
-	this._waitingTimeouts.forEach( item => clearTimeout(item));
+	this._waitingTimeouts.forEach(item => clearTimeout(item));
 	this._waitingTimeouts = [];
 	this.removeClass('leplayer--waiting');
 }
@@ -1695,7 +1694,7 @@ Player.plugin('miniplayer', function(pluginOptions) {
 	// Мержим с this.options.miniplayer, чтобы не сломать обратную совместимось, так как раньше
 	// миниплеер не был плагином плеера.
 	const options = $.extend({}, {
-		width: '100%',
+		width : '100%',
 		offsetShow : (player) => {
 			const offset = player.element.offset().top
 				+ player.element.outerHeight()
@@ -1735,12 +1734,6 @@ Player.plugin('miniplayer', function(pluginOptions) {
 		return options.width || this.element.width();
 	}
 
-	const onFullscreenChange = (e, data) => {
-		console.log(data);
-		if (data == true) {
-			this.hideMiniPlayer();
-		}
-	}
 
 	this._updateMiniPlayer = () => {
 		const scrollTop = $(window).scrollTop();

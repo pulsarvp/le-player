@@ -57,20 +57,5 @@
     "postcss-initial": "^1.5.2",
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1"
-  },
-  "eslintConfig": {
-    "extends": "eslint:recommended",
-	"rules": {
-		"no-unused-vars": ["error", { "args": "none" }],
-		"no-console": ["error", { "allow" : [ "warn", "error"] }]
-	},
-    "parserOptions": {
-      "ecmaVersion": 6,
-      "sourceType": "module"
-    },
-    "env": {
-      "browser": "true",
-      "es6": "true"
-    }
   }
 }
