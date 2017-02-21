@@ -759,7 +759,7 @@ let Player = function (element, options) {
 		const attrOptions = this.optionsFromElement();
 		let themeOptions = {};
 
-		if (options.theme) {
+		if (options.theme && Player.getTheme(options.theme)) {
 			themeOptions = Player.getTheme(options.theme).options;
 		}
 
@@ -793,7 +793,7 @@ let Player = function (element, options) {
 			})
 		}
 
-		if (options.theme) {
+		if (options.theme && Player.getTheme(options.theme)) {
 			Player.getTheme(options.theme).initOptions();
 		}
 	};
@@ -1848,3 +1848,5 @@ Player.plugin('miniplayer', function(pluginOptions) {
 
 
 Player.theme('vps', require('./themes/vps.js').theme);
+Player.theme('sms', require('./themes/sms.js').theme);
+Player.theme('compressed', require('./themes/compressed.js').theme);
