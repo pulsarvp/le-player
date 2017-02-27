@@ -42,13 +42,26 @@
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 	var Player = window.lePlayer || window.$.lePlayer;
+	var defaultOptions = {
+		videoPlayed: [25, 50, 100],
+		videoPlayedDelta: 5,
+		volumeChangeDelay: 1000,
+		rateChangeDelay: 2000
+	};
 
 	Player.plugin('ga', function (pluginOptions) {
+		var options = _jquery2.default.extend({}, defaultOptions, pluginOptions);
 		var player = this;
 
 		if (!window.ga) {
@@ -75,14 +88,45 @@
 			window.ga('send', 'event', 'Player Sections', 'Click', player.getView());
 		});
 
+		var volumeChangeTimeout = null;
+
+		player.on('volumechange', function (e, data) {
+			clearTimeout(volumeChangeTimeout);
+
+			volumeChangeTimeout = setTimeout(function () {
+				var value = data.volume;
+				window.ga('send', 'event', 'Player Volume Change', Number(value).toFixed(1));
+			}, options.volumeChangeDelay);
+		});
+
+		var rateChangeTimeout = null;
+		player.on('ratechange', function (e, data) {
+			clearTimeout(rateChangeTimeout);
+
+			rateChangeTimeout = setTimeout(function () {
+				var value = data.rate;
+				window.ga('send', 'event', 'Player Rate Change', value);
+			}, options.rateChangeDelay);
+		});
+
+		var playedEventsSent = {};
 		player.on('timeupdate', function () {
 			var percent = player.video.playedPercentage;
-			var delta = 5;
-			if (Math.abs(percent - 100) < delta) {
-				window.ga('send', 'event', 'Player Video Played', '95-100%');
-			}
+			var delta = options.videoPlayedDelta;
+			options.videoPlayed.forEach(function (item) {
+				if (!playedEventsSent[item] && Math.abs(percent - item) < delta) {
+					window.ga('send', 'event', 'Player Video Played', item - delta + '-' + item + '%');
+					playedEventsSent[item] = true;
+				}
+			});
 		});
 	});
+
+/***/ },
+/* 1 */
+/***/ function(module, exports) {
+
+	module.exports = $;
 
 /***/ }
 /******/ ]);

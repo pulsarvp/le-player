@@ -50,63 +50,106 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+	// Register common controls
+
+
 	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _ControlCollection = __webpack_require__(2);
+	var _Control = __webpack_require__(2);
 
-	var _ControlCollection2 = _interopRequireDefault(_ControlCollection);
+	var _Control2 = _interopRequireDefault(_Control);
 
-	var _MiniPlayer = __webpack_require__(26);
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _MiniPlayer = __webpack_require__(5);
 
 	var _MiniPlayer2 = _interopRequireDefault(_MiniPlayer);
 
-	var _PlayButton = __webpack_require__(27);
+	var _PlayButton = __webpack_require__(8);
 
 	var _PlayButton2 = _interopRequireDefault(_PlayButton);
 
-	var _Icon = __webpack_require__(7);
+	var _SplashIcon = __webpack_require__(9);
+
+	var _SplashIcon2 = _interopRequireDefault(_SplashIcon);
+
+	var _Icon = __webpack_require__(4);
 
 	var _Icon2 = _interopRequireDefault(_Icon);
 
-	var _Time = __webpack_require__(28);
+	var _Time = __webpack_require__(10);
 
 	var _Time2 = _interopRequireDefault(_Time);
 
-	var _Sections = __webpack_require__(29);
+	var _ControlCollection = __webpack_require__(6);
+
+	var _ControlCollection2 = _interopRequireDefault(_ControlCollection);
+
+	var _Sections = __webpack_require__(11);
 
 	var _Sections2 = _interopRequireDefault(_Sections);
 
-	var _ErrorDisplay = __webpack_require__(30);
+	var _ErrorDisplay = __webpack_require__(12);
 
 	var _ErrorDisplay2 = _interopRequireDefault(_ErrorDisplay);
 
-	var _Poster = __webpack_require__(31);
+	var _Poster = __webpack_require__(13);
 
 	var _Poster2 = _interopRequireDefault(_Poster);
 
-	var _FullscreenApi = __webpack_require__(32);
+	var _FullscreenApi = __webpack_require__(14);
 
 	var _FullscreenApi2 = _interopRequireDefault(_FullscreenApi);
 
-	var _ControlFactory = __webpack_require__(4);
-
-	var _cookie = __webpack_require__(18);
+	var _cookie = __webpack_require__(15);
 
 	var _cookie2 = _interopRequireDefault(_cookie);
 
-	var _utils = __webpack_require__(13);
+	var _utils = __webpack_require__(7);
 
-	var _MediaError = __webpack_require__(33);
+	var _MediaError = __webpack_require__(16);
 
 	var _MediaError2 = _interopRequireDefault(_MediaError);
+
+	__webpack_require__(17);
+
+	__webpack_require__(18);
+
+	__webpack_require__(20);
+
+	__webpack_require__(24);
+
+	__webpack_require__(26);
+
+	__webpack_require__(27);
+
+	__webpack_require__(28);
+
+	__webpack_require__(29);
+
+	__webpack_require__(31);
+
+	__webpack_require__(32);
+
+	__webpack_require__(33);
+
+	__webpack_require__(34);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	_Control2.default.registerControl('divider', function () {
+		return {
+			element: (0, _jquery2.default)('<div/>').addClass('divider')
+		};
+	});
 
 	/**
 	 * Return array with excluded dist's items from source array
@@ -136,10 +179,7 @@
 		preload: 'metadata',
 		poster: null,
 		svgPath: '../dist/svg/svg-defs.svg',
-		innactivityTimeout: 10000,
-		fullscreen: {
-			hideTimelineTime: 10000
-		},
+		innactivityTimeout: 5000,
 		rate: {
 			step: 0.25,
 			min: 0.5,
@@ -154,8 +194,8 @@
 			}
 		},
 		controls: {
-			common: [['play', 'volume', 'divider', 'timeline', 'divider', 'section', 'divider', 'fullscreen'], ['rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', _ControlFactory.C_KEYBINDING_INFO]],
-			fullscreen: [['play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', _ControlFactory.C_KEYBINDING_INFO, 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen']],
+			common: [['play', 'volume', 'divider', 'timeline', 'divider', 'section', 'divider', 'fullscreen'], ['rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'keybinding info']],
+			fullscreen: [['play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'keybinding info', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen']],
 			mini: [['play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']]
 		},
 		volume: {
@@ -176,6 +216,7 @@
 			description: '\u041F\u0435\u0440\u0435\u043C\u043E\u0442\u0430\u0442\u044C \u043D\u0430 10 \u0441\u0435\u043A\u0443\u043D\u0434 \u043D\u0430\u0437\u0430\u0434',
 			fn: function fn(player) {
 				player.video.currentTime -= player.options.playback.step.medium;
+				player.splashIcon.show('undo');
 			}
 		}, {
 			key: 39,
@@ -183,6 +224,7 @@
 			description: '\u041F\u0435\u0440\u0435\u043C\u043E\u0442\u0430\u0442\u044C \u043D\u0430 10 \u0441\u0435\u043A\u0443\u043D\u0434 \u0432\u043F\u0435\u0440\u0451\u0434',
 			fn: function fn(player) {
 				player.video.currentTime += player.options.playback.step.medium;
+				player.splashIcon.show('redo');
 			}
 		}, {
 			shiftKey: true,
@@ -212,6 +254,8 @@
 			description: 'Увеличить громкость',
 			fn: function fn(player) {
 				player.video.volume += player.options.volume.step;
+
+				player.splashIcon.show(player._calcVolumeIcon(player.video.volume));
 			}
 		}, {
 			key: 40,
@@ -219,6 +263,8 @@
 			description: 'Уменьшить громкость',
 			fn: function fn(player) {
 				player.video.volume -= player.options.volume.step;
+
+				player.splashIcon.show(player._calcVolumeIcon(player.video.volume));
 			}
 		}, {
 			key: 70,
@@ -255,8 +301,6 @@
 	 * @param {String} [options.preload='metadata'] Can be ('auto'|'metadata'|'none')
 	 * @param {String} [options.poster] Path to poster of video
 	 * @param {String} [options.svgPath] Path to svg sprite for icons
-	 * @param {Number} [options.fullscreen] Fullscreen options
-	 * @param {Number} [options.fullscreen.hideTimelineTime=10000] Delay before hide timeline in fullscreen view
 	 * @param {Object} [options.rate] Rate options
 	 * @param {Number} [options.rate.step=0.25] Step of increase/decrease by rate control
 	 * @param {Number} [options.rate.min=0.5] Min of rate
@@ -291,11 +335,17 @@
 	 * @param {Array} [options.data.sections] Sections array
 	 */
 	var Player = function Player(element, options) {
-		var _this10 = this;
+		var _this8 = this;
+
+		if (element.prop('tagName').toLowerCase() != 'video') {
+			console.warn('Incorrect element selected.');
+			return this;
+		}
 
 		var player = this;
-
 		var fsApi = _FullscreenApi2.default;
+
+		this._element = element;
 
 		// key -> contol collection name, valuy -> ControlCollection
 		this.controls = {};
@@ -309,8 +359,6 @@
 	  */
 
 		this.element = (0, _utils.createEl)('div');
-		var sectionContainer = null;
-		this._userActivity = false;
 
 		this.innerElement = (0, _utils.createEl)('div');
 
@@ -321,11 +369,10 @@
 				this.player = player;
 				this._ctx = ctx;
 				this._video = ctx[0];
+
 				this.element = (0, _jquery2.default)(this._video);
 				this.subtitles = [];
 				this.bufferRanges = [];
-				this.playbackRate = this._video.playbackRate;
-				this._initHtmlEvents();
 
 				if ((0, _jquery2.default)(this._video).attr('src') == null) {
 					this.source = this.player.options.src;
@@ -368,14 +415,47 @@
 					});
 				}
 			}, {
+				key: 'supportsFullScreen',
+				value: function supportsFullScreen() {
+					if (typeof this._video.webkitEnterFullScreen === 'function') {
+						var userAgent = window.navigator && window.navigator.userAgent || '';
+
+						// Seems to be broken in Chromium/Chrome && Safari in Leopard
+						if (/Android/.test(userAgent) || !/Chrome|Mac OS X 10.5/.test(userAgent)) {
+							return true;
+						}
+					}
+					return false;
+				}
+			}, {
+				key: 'enterFullscreen',
+				value: function enterFullscreen() {
+					var _this3 = this;
+
+					var video = this._video;
+					if (video.paused && video.networkState <= video.HAVE_METADATA) {
+						// attempt to prime the video element for programmatic access
+						// this isn't necessary on the desktop but shouldn't hurt
+						this.play();
+
+						// playing and pausing synchronously during the transition to fullscreen
+						// can get iOS ~6.1 devices into a play/pause loop
+						setTimeout(function () {
+							_this3.pause();
+							video.webkitEnterFullScreen();
+						}, 0);
+					} else {
+						video.webkitEnterFullScreen();
+					}
+				}
+			}, {
+				key: 'exitFullscreen',
+				value: function exitFullscreen() {
+					this._video.webkitExitFullScreen();
+				}
+			}, {
 				key: 'togglePlay',
 				value: function togglePlay() {
-					/** In safari it doesn't work */
-					// if (this._video.readyState < 2) {
-					// 	overlay.hide();
-					// 	_showNotification('Error!');
-					// 	return;
-					// }
 					if (!this._video.played || this._video.paused) {
 						this.play();
 					} else {
@@ -471,7 +551,7 @@
 			}, {
 				key: '_initVideo',
 				value: function _initVideo() {
-					var _this3 = this;
+					var _this4 = this;
 
 					var dfd = _jquery2.default.Deferred();
 					if (this._video.readyState > HTMLMediaElement.HAVE_NOTHING) {
@@ -480,7 +560,7 @@
 					} else {
 						(0, _jquery2.default)(this._video).one('loadedmetadata', function (e) {
 							dfd.resolve();
-							_this3._textTracksHack();
+							_this4._textTracksHack();
 						});
 					}
 					dfd.notify();
@@ -502,127 +582,6 @@
 							}
 						}
 					}
-				}
-			}, {
-				key: '_initHtmlEvents',
-				value: function _initHtmlEvents() {
-					var _this4 = this;
-
-					var mediaElement = (0, _jquery2.default)(this._video);
-
-					mediaElement.one({
-						'play': function play(e) {
-							_this4.player.trigger('firstplay');
-							_this4.player.removeClass('leplayer--virgin');
-						}
-					});
-
-					mediaElement.on({
-
-						'loadstart': function loadstart(e) {
-							_this4.player.removeClass('leplayer--ended');
-
-							_this4.player.setError(null);
-
-							_this4.player.trigger('loadstart');
-						},
-
-						'durationchange': function durationchange(e) {
-							_this4.player.trigger('durationchange');
-						},
-
-						'timeupdate': function timeupdate(e) {
-							if (_this4.currentTime > 0) {
-								_this4.player.removeClass('leplayer--virgin');
-							}
-
-							_this4.player.trigger('timeupdate', { time: _this4.currentTime, duration: _this4.duration });
-						},
-
-						'seeking': function seeking(e) {
-							_this4.player.addClass('leplayer--seeking');
-							_this4.player.trigger('seeking');
-						},
-
-						'seeked': function seeked(e) {
-							_this4.player.removeClass('leplayer--seeking');
-							_this4.player.trigger('seeked');
-						},
-
-						'progress': function progress() {
-							_this4.player.trigger('progress');
-						},
-
-						'dblclick': function dblclick() {
-							_this4.player.trigger('dblclick');
-						},
-
-						'click': function click() {
-							_this4.player.trigger('click');
-						},
-
-						'volumechange': function volumechange(e) {
-							_this4.player.trigger('volumechange', { volume: _this4.volume });
-						},
-
-						'play': function play(e) {
-							_this4.player.removeClass('leplayer--ended');
-							_this4.player.removeClass('leplayer--paused');
-							_this4.player.addClass('leplayer--playing');
-
-							_this4.player.trigger('play');
-						},
-
-						'pause': function pause(e) {
-							_this4.player.removeClass('leplayer--playing');
-							_this4.player.addClass('leplayer--paused');
-							_this4.player.trigger('pause');
-							//overlay.show()
-						},
-
-						'playing': function playing(e) {
-							_this4.player.removeClass('leplayer--waiting');
-							_this4.player.trigger('playing');
-						},
-
-						'ratechange': function ratechange(e) {
-							_this4.player.trigger('ratechange', { rate: _this4.rate });
-						},
-
-						'canplay': function canplay(e) {
-							//loader.hide();
-							_this4.player.trigger('canplay');
-						},
-
-						'ended': function ended(e) {
-							_this4.player.addClass('leplayer--ended');
-
-							if (_this4.player.options.loop) {
-								_this4.currentTime(0);
-								_this4.play();
-							} else if (!_this4._video.paused) {
-								_this4.pause();
-							}
-
-							_this4.player.trigger('ended');
-						},
-						'canplaythrough': function canplaythrough(e) {
-							_this4.player.removeClass('leplayer--waiting');
-							_this4.player.trigger('canplaythrough');
-						},
-
-						'waiting': function waiting(e) {
-							_this4.player.addClass('leplayer--waiting');
-							_this4.player.one('timeupdate', function () {
-								return _this4.player.removeClass('leplayer--waiting');
-							});
-							_this4.player.trigger('waiting');
-						},
-
-						'error': function error(e) {
-							_this4.player.setError(new _MediaError2.default(e.target.error.code));
-						}
-					});
 				}
 			}, {
 				key: 'currentTime',
@@ -682,10 +641,11 @@
 				set: function set(src) {
 					if (src == null) return;
 					if (this.source && this.source.url === src.url) return;
-					var time = this._video.currentTime;
-					var rate = this._video.playbackRate;
-					var stop = this._video.paused;
+					var time = this.currentTime;
+					var rate = this.rate;
+					var stop = this.paused;
 
+					console.log(src.url);
 					(0, _jquery2.default)(this._video).attr('src', src.url);
 
 					this._video = this._ctx[0];
@@ -711,6 +671,11 @@
 					for (var i = 0; i < this._video.textTracks.length; i++) {
 						if (this._video.textTracks[i].language == value) this._video.textTracks[i].mode = 'showing';else this._video.textTracks[i].mode = 'hidden';
 					}
+				}
+			}, {
+				key: 'paused',
+				get: function get() {
+					return this._video.paused;
 				}
 			}, {
 				key: 'volume',
@@ -774,44 +739,6 @@
 			return Video;
 		}();
 
-		/* TODO: Вынести все методы в прототип */
-
-
-		this.init = function () {
-			var _this5 = this;
-
-			// Check if element is correctly selected.
-			if (element.prop('tagName').toLowerCase() != 'video') {
-				console.warn('Incorrect element selected.');
-				return this;
-			}
-
-			this.initOptions();
-
-			/** TODO: Use promise to async run this */
-			this.initDom();
-
-			// Create video link
-			this.video = new Video(this, element);
-
-			// Create controls
-			// TODO: move this action to the initDom
-			this.initControls();
-
-			// Listen hotkeys
-			this.initHotKeys();
-
-			this.initSections().then(function (data) {
-				_this5.sections = data.sectionsComponent;
-				_this5.trigger('sectionsinit', data);
-			});
-
-			this.video.init().then(function () {
-				_this5.trigger('inited');
-				_this5._initPlugins();
-			});
-		};
-
 		this.initControls = function () {
 			//controls = new Controls(player);
 			var _arr = ['common', 'fullscreen'];
@@ -833,7 +760,7 @@
 	  * @returns {jqPromise} jQuery promise
 	  */
 		this.initSections = function () {
-			var _this6 = this;
+			var _this5 = this;
 
 			var dfd = _jquery2.default.Deferred();
 			if (this.options.data == null) {
@@ -842,36 +769,28 @@
 				this.getSectionData().done(function (sections) {
 					sections = [].concat(_toConsumableArray(sections));
 
-					var isSectionOutside = sectionContainer && sectionContainer.length > 0;
+					var isSectionOutside = _this5.sectionsContainer && _this5.sectionsContainer.length > 0;
 
 					if (sections == null || sections.length == 0) {
 						dfd.reject(null);
 						return;
 					}
 
-					for (var i = 0; i < sections.length; i++) {
-						var endSection = void 0;
-						if (i < sections.length - 1) {
-							endSection = sections[i + 1].begin;
-						} else {
-							endSection = _this6.video.duration;
-						}
-						sections[i].end = endSection;
-					}
+					sections = _this5.completeSections(sections);
 
-					var sectionsComponent = new _Sections2.default(_this6, {
+					var sectionsComponent = new _Sections2.default(_this5, {
 
 						items: sections,
 						fullscreenOnly: isSectionOutside
 					});
 
-					_this6.innerElement.append(sectionsComponent.element);
+					_this5.innerElement.append(sectionsComponent.element);
 
 					if (isSectionOutside) {
 						var outsideSections = new _Sections2.default(player, {
 							items: sections
 						});
-						sectionContainer.append(outsideSections.element);
+						_this5.sectionsContainer.append(outsideSections.element);
 					}
 					dfd.resolve({ sectionsComponent: sectionsComponent, items: sections });
 				});
@@ -880,98 +799,8 @@
 			return dfd.promise();
 		};
 
-		/**
-	  * Remove unnecessary attributes, and set some attrs from options (loop, poster etc...). Create main DOM objects
-	  *
-	  * @access private
-	  */
-		this.initDom = function () {
-			var _this7 = this;
-
-			var options = this.options;
-			this.errorDisplay = new _ErrorDisplay2.default(this);
-			this.playButton = new _PlayButton2.default(this);
-
-			//element.width(this.video.width);
-
-			[
-
-			// Remove controls because we dont not support native controls yet
-			'controls', 'poster',
-
-			// It is unnecessary attrs, this functionality solve CSS
-			'height', 'width'].forEach(function (item) {
-				element.removeAttr(item);
-			});
-
-			// Set attrs from options
-			['preload', 'autoplay', 'loop', 'muted'].forEach(function (item) {
-				if (_this7.options[item]) {
-					element.attr(item, _this7.options[item]);
-					element.prop(item, _this7.options[item]);
-				}
-			});
-
-			element.find('source[data-quality]').each(function (i, item) {
-				(0, _jquery2.default)(item).remove();
-			});
-
-			// TODO: Вынести это в отдельнеый компонент
-
-			this.loader = (0, _jquery2.default)('<div />').addClass('leplayer-loader-container').append(new _Icon2.default(this, {
-				iconName: 'refresh',
-				className: 'leplayer-loader-container__icon'
-			}).element);
-
-			this.videoContainer = (0, _utils.createEl)('div', {
-				className: 'leplayer-video'
-			}).append(this.playButton.element).append(this.loader);
-
-			if (options.poster) {
-				this.poster = new _Poster2.default(this);
-				this.videoContainer.append(this.poster.element);
-			}
-
-			if (options.miniplayer) {
-				this.miniPlayer = new _MiniPlayer2.default(this);
-			}
-
-			var lastTimer = new _Time2.default(this, {
-				fn: function fn(player) {
-					var video = player.video;
-					return (0, _utils.secondsToTime)(video.duration - video.currentTime);
-				}
-			});
-			this.innerElement = (0, _jquery2.default)('<div />').addClass('leplayer__inner').append(this.videoContainer).append((0, _utils.createEl)('div', {
-				className: 'leplayer__info'
-			}).append((0, _utils.createEl)('div', {
-				className: 'leplayer__title',
-				html: this.options.title || ""
-			})).append((0, _utils.createEl)('div', {
-				className: 'leplayer__video-info',
-				html: this.options.videoInfo || ""
-			})).append((0, _utils.createEl)('div', {
-				className: 'leplayer__last',
-				html: '\u0412\u0438\u0434\u0435\u043E \u0437\u0430\u043A\u043E\u043D\u0447\u0438\u0442\u0441\u044F \u0447\u0435\u0440\u0435\u0437 '
-			}).append(lastTimer.element)).append(this.miniPlayer && this.miniPlayer.element));
-			//.append($('leplayer__video-info')
-			//.text(this.options.videoInfo || ""))
-
-			this.element = this.element.addClass('leplayer').append(this.innerElement).append(this.errorDisplay.element).attr('tabindex', 0).css('width', '100%').css('max-width', (options.width || this.video.width) + 'px');
-
-			this.addClass('leplayer--paused');
-			this.addClass('leplayer--virgin');
-
-			if (options.sectionContainer) {
-				sectionContainer = (0, _jquery2.default)(options.sectionContainer);
-			}
-
-			element.before(this.element);
-			this.videoContainer.append(element);
-		};
-
 		this.initHotKeys = function () {
-			var _this8 = this;
+			var _this6 = this;
 
 			var isKeyBinding = function isKeyBinding(e, binding) {
 				return (e.which === binding.key || e.key === binding.key) && !!binding.shiftKey == e.shiftKey && !!binding.ctrlKey == e.ctrlKey;
@@ -981,11 +810,11 @@
 				var _isFocused = isFocused();
 				if (_isFocused) {
 
-					_this8.options.keyBinding.forEach(function (binding) {
+					_this6.options.keyBinding.forEach(function (binding) {
 
 						if (isKeyBinding(e, binding)) {
 							e.preventDefault();
-							binding.fn(_this8);
+							binding.fn(_this6);
 							return false;
 						}
 					});
@@ -1003,6 +832,7 @@
 	  */
 		this.optionsFromElement = function () {
 			// Copy video attrs to the opitons
+			var element = this._element;
 			var attrOptions = ['height', 'width', 'poster', 'autoplay', 'loop', 'muted', 'preload'].reduce(function (obj, item) {
 				var val = element.attr(item);
 				if (val != null) {
@@ -1045,11 +875,11 @@
 	  * @access private
 	  */
 		this.initOptions = function () {
-			var _this9 = this;
+			var _this7 = this;
 
 			var attrOptions = this.optionsFromElement();
 			// Merge default options + video attributts + user options
-			this.options = _jquery2.default.extend(true, defaultOptions, attrOptions, options);
+			this.options = _jquery2.default.extend(true, {}, defaultOptions, attrOptions, options);
 
 			if (this.options.sources && !Array.isArray(this.options.sources)) {
 				this.options.sources = [this.options.sources];
@@ -1063,16 +893,19 @@
 				this.setError(new _MediaError2.default('No sources found'));
 			}
 
+			// Merge correctly controls, without deep merge
+			this.options.controls = _jquery2.default.extend({}, defaultOptions.controls, options.controls);
+
 			// exclude controls option
 
 			var _loop = function _loop(name) {
-				if (!_this9.options.excludeControls.hasOwnProperty(name)) return {
+				if (!_this7.options.excludeControls.hasOwnProperty(name)) return {
 						v: void 0
 					};
-				var controlCollection = _this9.options.excludeControls[name];
+				var controlCollection = _this7.options.excludeControls[name];
 				controlCollection.forEach(function (row, index) {
-					if (_this9.options.controls[name] && _this9.options.controls[name][index]) {
-						_this9.options.controls[name][index] = excludeArray(_this9.options.controls[name][index], row);
+					if (_this7.options.controls[name] && _this7.options.controls[name][index]) {
+						_this7.options.controls[name][index] = excludeArray(_this7.options.controls[name][index], row);
 					}
 				});
 			};
@@ -1085,23 +918,338 @@
 		};
 
 		var isFocused = function isFocused() {
-			var focused = (0, _jquery2.default)(_this10.element).find(':focus');
-			return focused.length > 0 || (0, _jquery2.default)(_this10.element).is(':focus');
+			var focused = (0, _jquery2.default)(_this8.element).find(':focus');
+			return focused.length > 0 || (0, _jquery2.default)(_this8.element).is(':focus');
 		};
 
-		this.init();
+		// Check if element is correctly selected.
+
+		this.initOptions();
+
+		/** TODO: Use promise to async run this */
+		this.createElement();
+
+		// Create video link
+		this.video = new Video(this, element);
+
+		// Create controls
+		// TODO: move this action to the createElement
+		this.initControls();
+
+		// Listen hotkeys
+		this.initHotKeys();
+
+		this.initSections().then(function (data) {
+			_this8.sections = data.sectionsComponent;
+			_this8.trigger('sectionsinit', data);
+		});
+
+		this.video.init().then(function () {
+			_this8.trigger('inited');
+			_this8._initPlugins();
+		});
 
 		this._listenUserActivity();
 
-		(0, _jquery2.default)(document).on(fsApi.fullscreenchange, this._onEntityFullscrenChange.bind(this));
+		var mediaElement = this.video.element;
 
-		this.on('fullscreenchange', this.onFullscreenChange.bind(this));
+		mediaElement.one({
+			'play': function play(e) {
+				_this8.trigger('firstplay');
+				_this8.removeClass('leplayer--virgin');
+			}
+		});
+
+		mediaElement.on({
+
+			'loadstart': function loadstart(e) {
+				_this8.removeClass('leplayer--ended');
+
+				_this8.setError(null);
+
+				_this8.trigger('loadstart');
+			},
+
+			'durationchange': function durationchange(e) {
+				_this8.trigger('durationchange');
+			},
+
+			'timeupdate': function timeupdate(e) {
+				if (_this8.video.currentTime > 0) {
+					_this8.removeClass('leplayer--virgin');
+				}
+
+				_this8.trigger('timeupdate', { time: _this8.video.currentTime, duration: _this8.video.duration });
+			},
+
+			'seeking': function seeking(e) {
+				_this8._startWaiting();
+				_this8.trigger('seeking');
+			},
+
+			'seeked': function seeked(e) {
+				_this8._stopWayting();
+				_this8.trigger('seeked');
+			},
+
+			'progress': function progress() {
+				_this8.trigger('progress');
+			},
+
+			'dblclick': function dblclick() {
+				_this8.trigger('dblclick');
+			},
+
+			'click': function click() {
+				_this8.trigger('click');
+			},
+
+			'volumechange': function volumechange(e) {
+				_this8.trigger('volumechange', { volume: _this8.video.volume });
+			},
+
+			'play': function play(e) {
+				_this8.removeClass('leplayer--ended');
+				_this8.removeClass('leplayer--paused');
+				_this8.addClass('leplayer--playing');
+
+				_this8.trigger('play');
+			},
+
+			'pause': function pause(e) {
+				_this8.removeClass('leplayer--playing');
+				_this8.addClass('leplayer--paused');
+				_this8.trigger('pause');
+				//overlay.show()
+			},
+
+			'playing': function playing(e) {
+				_this8._stopWayting();
+				_this8.trigger('playing');
+			},
+
+			'ratechange': function ratechange(e) {
+				_this8.trigger('ratechange', { rate: _this8.video.rate });
+			},
+
+			'canplay': function canplay(e) {
+				//loader.hide();
+				_this8.trigger('canplay');
+			},
+
+			'ended': function ended(e) {
+				_this8.addClass('leplayer--ended');
+
+				if (_this8.options.loop) {
+					_this8.currentTime(0);
+					_this8.video.play();
+				} else if (!_this8.video.paused) {
+					_this8.video.pause();
+				}
+
+				_this8.trigger('ended');
+			},
+
+			'canplaythrough': function canplaythrough(e) {
+				_this8._stopWayting();
+				_this8.trigger('canplaythrough');
+			},
+
+			'waiting': function waiting(e) {
+				_this8._startWaiting();
+
+				_this8.one('timeupdate', function () {
+					return _this8._stopWayting();
+				});
+
+				_this8.trigger('waiting');
+			},
+
+			'error': function error(e) {
+				_this8.setError(new _MediaError2.default(e.target.error.code));
+			}
+		});
+
+		this.on('fullscreenchange', this._onFullscreenChange.bind(this));
 		this.on('click', this._onClick.bind(this));
 		this.on('dblclick', this._onDbclick.bind(this));
-		//this.on('waiting', this._onWaiting.bind(this));
 		this.on('inited', this._onInited.bind(this));
+		this.on('play', this._onPlay.bind(this));
+		this.on('pause', this._onPause.bind(this));
+
+		(0, _jquery2.default)(document).on(fsApi.fullscreenchange, this._onEntityFullscrenChange.bind(this));
 
 		return this;
+	};
+
+	/**
+	 * Static helper for creating a plugins for leplayer
+	 *
+	 * @access public
+	 * @static
+	 * @param {String} name The name of plugin
+	 * @param {Function} fn Plugin init function
+	 *
+	 * @example
+	 * Player.plugin('helloWorld', function(pluginOptions) {
+	 *    const player = this;
+	 *    player.on('click', () => console.log('Hello world'));
+	 * })
+	 *
+	 */
+	Player.plugin = function (name, fn) {
+		Player.prototype[name] = fn;
+	};
+
+	/**
+	 * Get by name registered component
+	 *
+	 * @access public
+	 * @static
+	 * @param {String} name
+	 * @returns {Component}
+	 */
+	Player.getComponent = _Component2.default.getComponent;
+
+	/**
+	 * Register component
+	 *
+	 * @access public
+	 * @static
+	 * @param {String} name
+	 * @param {Component} component
+	 *
+	 * @example
+	 * Player.registerComponent('ErrorDisplay', ErrorDisplay);
+	 */
+	Player.registerComponent = _Component2.default.registerComponent;
+
+	/**
+	 * Register control
+	 *
+	 * @access public
+	 * @static
+	 * @param {String} name
+	 * @param {Control} control
+	 */
+	Player.getControl = _Control2.default.getControl;
+
+	/**
+	 * Get by name registered control
+	 *
+	 * @access public
+	 * @static
+	 * @param {String} name
+	 * @returns {Control}
+	 *
+	 * @example
+	 * Player.registerControl('backward', BackwardControl);
+	 */
+	Player.registerControl = _Control2.default.registerControl;
+
+	/**
+	 * Convert seconds to format string 'hh?:mm:ss'
+	 *
+	 * @access public
+	 * @param {Number} seconds Seconds
+	 * @param {Boolean} showHours convert to format 'hh:mm:ss'
+	 * @returns {String}
+	 */
+	Player.secondsToTime = _utils.secondsToTime;
+	/**
+	 * Remove unnecessary attributes, and set some attrs from options (loop, poster etc...). Create main DOM objects
+	 *
+	 * @access private
+	 */
+	Player.prototype.createElement = function () {
+		var _this9 = this;
+
+		var options = this.options;
+		var element = this._element;
+
+		[
+
+		// Remove controls because we dont not support native controls yet
+		'controls', 'poster',
+
+		// It is unnecessary attrs, this functionality solve CSS
+		'height', 'width'].forEach(function (item) {
+			element.removeAttr(item);
+		});
+
+		// Set attrs from options
+		['preload', 'autoplay', 'loop', 'muted'].forEach(function (item) {
+			if (_this9.options[item]) {
+				element.attr(item, _this9.options[item]);
+				element.prop(item, _this9.options[item]);
+			}
+		});
+
+		element.find('source[data-quality]').each(function (i, item) {
+			(0, _jquery2.default)(item).remove();
+		});
+
+		this.element = this.element.addClass('leplayer').attr('tabindex', 0).css('width', '100%').css('max-width', (options.width || this.video.width) + 'px');
+
+		this.errorDisplay = new _ErrorDisplay2.default(this);
+
+		this.playButton = new _PlayButton2.default(this);
+
+		// TODO: Вынести это в отдельнеый компонент
+		this.loader = (0, _jquery2.default)('<div />').addClass('leplayer-loader-container').append(new _Icon2.default(this, {
+			iconName: 'refresh',
+			className: 'leplayer-loader-container__icon'
+		}).element);
+
+		this.splashIcon = new _SplashIcon2.default(this);
+
+		this.videoContainer = (0, _utils.createEl)('div', {
+			className: 'leplayer-video'
+		}).append(this.errorDisplay.element).append(this.playButton.element).append(this.loader).append(this.splashIcon.element);
+
+		if (options.poster) {
+			this.poster = new _Poster2.default(this);
+			this.videoContainer.append(this.poster.element);
+		}
+
+		if (options.miniplayer) {
+			this.miniPlayer = new _MiniPlayer2.default(this);
+		}
+
+		var lastTimer = new _Time2.default(this, {
+			fn: function fn(player) {
+				var video = player.video;
+				return (0, _utils.secondsToTime)(video.duration - video.currentTime);
+			}
+		});
+
+		this.innerElement = (0, _jquery2.default)('<div />').addClass('leplayer__inner').append(this.videoContainer).append((0, _utils.createEl)('div', {
+			className: 'leplayer__info'
+		}).append((0, _utils.createEl)('div', {
+			className: 'leplayer__title',
+			html: this.options.title || ""
+		})).append((0, _utils.createEl)('div', {
+			className: 'leplayer__video-info',
+			html: this.options.videoInfo || ""
+		})).append((0, _utils.createEl)('div', {
+			className: 'leplayer__last',
+			html: '\u0412\u0438\u0434\u0435\u043E \u0437\u0430\u043A\u043E\u043D\u0447\u0438\u0442\u0441\u044F \u0447\u0435\u0440\u0435\u0437 '
+		}).append(lastTimer.element)).append(this.miniPlayer && this.miniPlayer.element));
+		//.append($('leplayer__video-info')
+		//.text(this.options.videoInfo || ""))
+
+		this.element = this.element.append(this.innerElement);
+
+		this.addClass('leplayer--paused');
+		this.addClass('leplayer--virgin');
+
+		if (options.sectionContainer) {
+			this.sectionsContainer = (0, _jquery2.default)(options.sectionContainer);
+		}
+
+		element.before(this.element);
+		this.videoContainer.append(element);
+		return this.element;
 	};
 
 	/**
@@ -1126,25 +1274,6 @@
 		}
 
 		return this;
-	};
-
-	/**
-	 * Static helper for creating a plugins for leplayer
-	 *
-	 * @access public
-	 * @static
-	 * @param {String} name The name of plugin
-	 * @param {Function} fn Plugin init function
-	 *
-	 * @example
-	 * Player.plugin('helloWorld', function(pluginOptions) {
-	 *    const player = this;
-	 *    player.on('click', () => console.log('Hello world'));
-	 * })
-	 *
-	 */
-	Player.plugin = function (name, fn) {
-		Player.prototype[name] = fn;
 	};
 
 	/**
@@ -1239,6 +1368,10 @@
 		return this;
 	};
 
+	Player.prototype.hasClass = function (className) {
+		return this.element.hasClass(className);
+	};
+
 	/**
 	 * Set player view
 	 *
@@ -1283,104 +1416,6 @@
 		this.trigger('error', { error: this._error });
 
 		return this;
-	};
-
-	/**
-	 * @access private
-	 */
-	Player.prototype._listenUserActivity = function () {
-		var _this11 = this;
-
-		var mouseInProgress = void 0;
-		var lastMoveX = void 0;
-		var lastMoveY = void 0;
-
-		var onMouseMove = function onMouseMove(e) {
-			if (e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
-				lastMoveX = e.screenX;
-				lastMoveY = e.screenY;
-				_this11._userActivity = true;
-			}
-		};
-
-		var onMouseDown = function onMouseDown(e) {
-			_this11._userActivity = true;
-
-			// While user is pressing mouse or touch, dispatch user activity
-			clearInterval(mouseInProgress);
-
-			mouseInProgress = setInterval(function () {
-				_this11._userActivity = true;
-			}, 250);
-		};
-
-		var onMouseUp = function onMouseUp(e) {
-			_this11._userActivity = true;
-			clearInterval(mouseInProgress);
-		};
-
-		this.element.on('mousemove', onMouseMove);
-
-		this.element.on('mousedown', onMouseDown);
-
-		this.element.on('mouseup', onMouseUp);
-
-		this.element.on('keydown', function (e) {
-			return _this11._userActivity = true;
-		});
-		this.element.on('keyup', function (e) {
-			return _this11._userActivity = true;
-		});
-
-		// See http://ejohn.org/blog/learning-from-twitter/
-		var inactivityTimeout = void 0;
-		var delay = this.options.innactivityTimeout;
-		setInterval(function () {
-			if (_this11._userActivity) {
-
-				// Reset user activuty tracker
-				_this11._userActivity = false;
-
-				_this11.setUserActive(true);
-
-				clearTimeout(inactivityTimeout);
-
-				if (delay > 0) {
-
-					inactivityTimeout = setTimeout(function () {
-						if (!_this11._userActivity) {
-							_this11.setUserActive(false);
-						}
-					}, delay);
-				}
-			}
-		}, 250);
-	};
-
-	/**
-	 * @access private
-	 */
-	Player.prototype._dblclickTimerId = null;
-
-	Player.prototype._onClick = function (e) {
-		var _this12 = this;
-
-		clearTimeout(this._dblclickTimerId);
-		this._dblclickTimerId = setTimeout(function () {
-			_this12.video.element.focus();
-			_this12.togglePlay();
-		}, 300);
-	};
-
-	/**
-	 * On dblclick on the video player event handler
-	 *
-	 * @access private
-	 * @param {Event} e
-	 */
-	Player.prototype._onDbclick = function (e) {
-		clearTimeout(this._dblclickTimerId);
-		this.toggleFullscreen();
 	};
 
 	/**
@@ -1456,6 +1491,8 @@
 			this.element[0][fsApi.requestFullscreen]();
 
 			this.trigger('fullscreenchange', true);
+		} else if (this.video.supportsFullScreen()) {
+			this.video.enterFullscreen();
 		}
 	};
 
@@ -1464,6 +1501,8 @@
 
 		if (fsApi.exitFullscreen) {
 			document[fsApi.exitFullscreen]();
+		} else if (this.video.supportsFullScreen()) {
+			this.video.exitFullscreen();
 		}
 
 		this.trigger('fullscreenchange', false);
@@ -1477,12 +1516,6 @@
 		}
 	};
 
-	Player.prototype._onEntityFullscrenChange = function () {
-		var fsApi = _FullscreenApi2.default;
-		var isFs = !!document[fsApi.fullscreenElement];
-		this.trigger('fullscreenchange', isFs);
-	};
-
 	/**
 	 * Get ControlCollection of Player by name (e.x 'common', 'fullscreen')
 	 *
@@ -1492,20 +1525,6 @@
 	 */
 	Player.prototype.getControls = function (name) {
 		return this.controls[name];
-	};
-
-	Player.prototype.onFullscreenChange = function (e, isFs) {
-		if (isFs) {
-			this.setView('fullscreen');
-		} else {
-			this.setView('common');
-		}
-	};
-
-	Player.prototype._onInited = function (e) {
-		this.addClass('leplayer--inited');
-
-		this.options.onPlayerInited.call(this, e);
 	};
 
 	/**
@@ -1526,6 +1545,229 @@
 	 */
 	Player.prototype.getWidth = function () {
 		return this.element.width();
+	};
+
+	Player.prototype.completeSections = function (sections) {
+		if (sections == null || sections.length == 0) {
+			return;
+		}
+		var newSections = [].concat(sections);
+		for (var i = 0; i < newSections.length; i++) {
+			var endSection = void 0;
+			if (i < newSections.length - 1) {
+				endSection = newSections[i + 1].begin;
+			} else {
+				endSection = this.video.duration;
+			}
+			newSections[i].end = endSection;
+		}
+		return newSections;
+	};
+
+	Player.prototype._userActivity = false;
+
+	/**
+	 * @access private
+	 */
+	Player.prototype._listenUserActivity = function () {
+		var _this10 = this;
+
+		var mouseInProgress = void 0;
+		var lastMoveX = void 0;
+		var lastMoveY = void 0;
+
+		var onMouseMove = function onMouseMove(e) {
+			if (e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
+				lastMoveX = e.screenX;
+				lastMoveY = e.screenY;
+				_this10._userActivity = true;
+			}
+		};
+
+		var onMouseDown = function onMouseDown(e) {
+			_this10._userActivity = true;
+
+			// While user is pressing mouse or touch, dispatch user activity
+			clearInterval(mouseInProgress);
+
+			mouseInProgress = setInterval(function () {
+				_this10._userActivity = true;
+			}, 250);
+		};
+
+		var onMouseUp = function onMouseUp(e) {
+			_this10._userActivity = true;
+			clearInterval(mouseInProgress);
+		};
+
+		this.element.on('mousemove', onMouseMove);
+
+		this.element.on('mousedown', onMouseDown);
+
+		this.element.on('mouseup', onMouseUp);
+
+		this.element.on('keydown', function (e) {
+			return _this10._userActivity = true;
+		});
+		this.element.on('keyup', function (e) {
+			return _this10._userActivity = true;
+		});
+
+		// See http://ejohn.org/blog/learning-from-twitter/
+		var inactivityTimeout = void 0;
+		var delay = this.options.innactivityTimeout;
+		setInterval(function () {
+			if (_this10._userActivity) {
+
+				// Reset user activuty tracker
+				_this10._userActivity = false;
+
+				_this10.setUserActive(true);
+
+				clearTimeout(inactivityTimeout);
+
+				if (delay > 0) {
+
+					inactivityTimeout = setTimeout(function () {
+						if (!_this10._userActivity) {
+							_this10.setUserActive(false);
+						}
+					}, delay);
+				}
+			}
+		}, 250);
+	};
+
+	Player.prototype._waitingTimeouts = [];
+
+	/**
+	 * Stop showing spinner and clear delay of showing spinner
+	 *
+	 * @access private
+	 */
+	Player.prototype._stopWayting = function () {
+		this._waitingTimeouts.forEach(function (item) {
+			return clearTimeout(item);
+		});
+		this._waitingTimeouts = [];
+		this.removeClass('leplayer--waiting');
+	};
+
+	/**
+	 * Show spinner with delay in 300ms
+	 *
+	 * @access private
+	 */
+	Player.prototype._startWaiting = function () {
+		var _this11 = this;
+
+		this._waitingTimeouts.push(setTimeout(function () {
+			_this11.addClass('leplayer--waiting');
+		}, 300));
+	};
+
+	/**
+	 * On inited player event handler
+	 *
+	 * @access private
+	 * @param {PlayerEvent} e
+	 */
+	Player.prototype._onInited = function (e) {
+		this.addClass('leplayer--inited');
+
+		this.options.onPlayerInited.call(this, e);
+	};
+
+	/**
+	 * @access private
+	 */
+	Player.prototype._dblclickTimeout = null;
+
+	/**
+	 * On click video event handler. Focus on video and togglePlay
+	 *
+	 * @access private
+	 * @param {PlayerEvent} e
+	 */
+	Player.prototype._onClick = function (e) {
+		var _this12 = this;
+
+		clearTimeout(this._dblclickTimeout);
+		this._dblclickTimeout = setTimeout(function () {
+			_this12.video.element.focus();
+			_this12.togglePlay();
+		}, 300);
+	};
+
+	/**
+	 * On dblclick on the video player event handler
+	 *
+	 * @access private
+	 * @param {PlayerEvent} e
+	 */
+	Player.prototype._onDbclick = function (e) {
+		clearTimeout(this._dblclickTimeout);
+		this.toggleFullscreen();
+	};
+
+	/**
+	 * On fullscreen change player event handler
+	 *
+	 * @access public
+	 * @param {PlayerEvent} e
+	 */
+	Player.prototype._onFullscreenChange = function (e, isFs) {
+		if (isFs) {
+			this.setView('fullscreen');
+		} else {
+			this.setView('common');
+		}
+	};
+
+	/**
+	 * On play event handler
+	 *
+	 * @access private
+	 * @param {PlayerEvent} e
+	 */
+	Player.prototype._onPlay = function () {
+		this.splashIcon.show('play');
+	};
+
+	/**
+	 * On pause player event handler
+	 * Show pause icon in the center of video
+	 *
+	 * @access private
+	 */
+	Player.prototype._onPause = function () {
+		this.splashIcon.show('pause');
+	};
+
+	Player.prototype._onEntityFullscrenChange = function () {
+		var fsApi = _FullscreenApi2.default;
+		var isFs = !!document[fsApi.fullscreenElement];
+		this.trigger('fullscreenchange', isFs);
+	};
+
+	/**
+	 * Return a name of icon. If less then 0.1 return volume-off,
+	 * if less then 0.5 return volume down, else return volume-up
+	 *
+	 * @access private
+	 * @param {Number} value Volume value
+	 * @returns {String} Icon name
+	 */
+	Player.prototype._calcVolumeIcon = function (value) {
+		var volume = value || this.video.volume;
+
+		if (volume < this.options.volume.mutelimit) {
+			return 'volume-off';
+		} else if (value < 0.5) {
+			return 'volume-down';
+		} else {
+			return 'volume-up';
+		}
 	};
 
 	window.$.fn.lePlayer = function (options) {
@@ -1550,455 +1792,6 @@
 
 	'use strict';
 	/**
-	 * @file ControlCollection.js
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _Component2 = __webpack_require__(3);
-
-	var _Component3 = _interopRequireDefault(_Component2);
-
-	var _ControlFactory = __webpack_require__(4);
-
-	var _ControlFactory2 = _interopRequireDefault(_ControlFactory);
-
-	var _utils = __webpack_require__(13);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * @param {Player} player Main player
-	 * @param {Object} [options] Options of component
-	 * @param {jQuery} [options.controls] Array of rows of control's name
-	 * @property {Array} Array of rows of control's name
-	 * @pr
-	 *
-	 */
-	var ControlCollection = function (_Component) {
-		_inherits(ControlCollection, _Component);
-
-		function ControlCollection(player, options) {
-			_classCallCheck(this, ControlCollection);
-
-			options = _jquery2.default.extend({}, {
-				controls: player.options.controls[options.name] || []
-			}, options);
-
-			var _this = _possibleConstructorReturn(this, (ControlCollection.__proto__ || Object.getPrototypeOf(ControlCollection)).call(this, player, options));
-
-			_this.controls = [];
-			_this.active = options.active || false;
-			_this.name = options.name;
-
-			_this.player.controls[_this.name] = _this;
-			return _this;
-		}
-
-		/**
-	  * @override
-	  */
-
-
-		_createClass(ControlCollection, [{
-			key: 'createElement',
-			value: function createElement() {
-				var _this2 = this;
-
-				var _options = this.options,
-				    name = _options.name,
-				    controls = _options.controls;
-
-
-				this.element = (0, _utils.createEl)('div', {
-					className: 'leplayer-control-collection leplayer-control-collection--' + name
-				});
-
-				controls.forEach(function (row) {
-					var elemRow = (0, _utils.createEl)('div', {
-						className: 'leplayer-controls controls-' + name
-					});
-					var hasTimeline = false;
-					row.forEach(function (controlName) {
-						if (controlName == _ControlFactory.C_TIMELINE) {
-							hasTimeline = true;
-						}
-						var control = (0, _ControlFactory2.default)(_this2.player, controlName, {
-							collection: _this2.options.name
-						});
-						elemRow.append(control.element);
-					});
-					if (!hasTimeline) {
-						elemRow.css('width', '1px');
-					}
-					elemRow.find('.divider + .divider').remove();
-					_this2.element.append(elemRow);
-				});
-				return this.element;
-			}
-		}, {
-			key: 'hide',
-			value: function hide() {
-				this.element.hide();
-				this.element.find('.leplayer-controls').hide();
-			}
-		}, {
-			key: 'show',
-			value: function show() {
-				this.element.show();
-				this.element.find('.leplayer-controls').show();
-			}
-		}, {
-			key: 'disable',
-			set: function set(value) {
-				for (var i in this.items) {
-					if (!this.items.hasOwnProperty(i)) continue;
-					this.items[i].disable = value;
-				}
-			}
-		}]);
-
-		return ControlCollection;
-	}(_Component3.default);
-
-	exports.default = ControlCollection;
-
-/***/ },
-/* 3 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	/**
-	 * @file Component.js
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	/**
-	 * Player component - Base class for all UI
-	 *
-	 * @param {Player} player Main player
-	 * @param {Object} [options] Options of component
-	 * @param {jQuery} [options.element] Элемент на котором можно иницилизовать класс.
-	 * @property {Object} options
-	 * @property {jQuery} element
-	 * @class Component
-	 */
-	var Component = function () {
-		function Component(player, options) {
-			_classCallCheck(this, Component);
-
-			/** TODO(adinvadim): Add options.component, for clone component instance */
-			options = this.options = _jquery2.default.extend({}, this.options, options);
-			this.player = player;
-
-			if (options.element) {
-				this.element = options.element;
-			} else {
-				this.createElement();
-			}
-			if (this.element.length != 1) {
-				console.error('Component.prototype.element.length must equal 1, not ' + this.element.length + '\n', this.element);
-			}
-			this.element[0].__node = this;
-		}
-
-		/**
-	  * @abstract
-	  */
-
-
-		_createClass(Component, [{
-			key: 'createElement',
-			value: function createElement() {
-
-				return '';
-			}
-
-			/**
-	   * @abstract
-	   */
-
-		}, {
-			key: 'buildCSSClass',
-			value: function buildCSSClass() {
-				return '';
-			}
-		}]);
-
-		return Component;
-	}();
-
-	exports.default = Component;
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	/**
-	 * @file control-factory.js
-	 *
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.C_TIME_INFO = exports.C_KEYBINDING_INFO = exports.C_SECTION = exports.C_VOLUME = exports.C_TIMELINE = exports.C_SUBTITLE = exports.C_SOURCE = exports.C_RATE = exports.C_PLAY = exports.C_FULLSCREEN = exports.C_FORWARD = exports.C_DOWNLOAD = exports.C_DIVIDER = exports.C_BACKWARD = undefined;
-	exports.default = controlFactory;
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _PlayControl = __webpack_require__(5);
-
-	var _PlayControl2 = _interopRequireDefault(_PlayControl);
-
-	var _VolumeControl = __webpack_require__(8);
-
-	var _VolumeControl2 = _interopRequireDefault(_VolumeControl);
-
-	var _TimelineControl = __webpack_require__(10);
-
-	var _TimelineControl2 = _interopRequireDefault(_TimelineControl);
-
-	var _SectionControl = __webpack_require__(14);
-
-	var _SectionControl2 = _interopRequireDefault(_SectionControl);
-
-	var _FullscreenControl = __webpack_require__(16);
-
-	var _FullscreenControl2 = _interopRequireDefault(_FullscreenControl);
-
-	var _RateControl = __webpack_require__(17);
-
-	var _RateControl2 = _interopRequireDefault(_RateControl);
-
-	var _BackwardControl = __webpack_require__(19);
-
-	var _BackwardControl2 = _interopRequireDefault(_BackwardControl);
-
-	var _SourceControl = __webpack_require__(20);
-
-	var _SourceControl2 = _interopRequireDefault(_SourceControl);
-
-	var _SubtitleControl = __webpack_require__(22);
-
-	var _SubtitleControl2 = _interopRequireDefault(_SubtitleControl);
-
-	var _DownloadControl = __webpack_require__(23);
-
-	var _DownloadControl2 = _interopRequireDefault(_DownloadControl);
-
-	var _KeybindingInfoControl = __webpack_require__(24);
-
-	var _KeybindingInfoControl2 = _interopRequireDefault(_KeybindingInfoControl);
-
-	var _TimeInfoControl = __webpack_require__(25);
-
-	var _TimeInfoControl2 = _interopRequireDefault(_TimeInfoControl);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	var C_BACKWARD = exports.C_BACKWARD = 'backward';var C_DIVIDER = exports.C_DIVIDER = 'divider';
-	var C_DOWNLOAD = exports.C_DOWNLOAD = 'download';
-	var C_FORWARD = exports.C_FORWARD = 'forward';
-	var C_FULLSCREEN = exports.C_FULLSCREEN = 'fullscreen';
-	var C_PLAY = exports.C_PLAY = 'play';
-	var C_RATE = exports.C_RATE = 'rate';
-	var C_SOURCE = exports.C_SOURCE = 'source';
-	var C_SUBTITLE = exports.C_SUBTITLE = 'subtitle';
-	var C_TIMELINE = exports.C_TIMELINE = 'timeline';
-	var C_VOLUME = exports.C_VOLUME = 'volume';
-	var C_SECTION = exports.C_SECTION = 'section';
-	var C_KEYBINDING_INFO = exports.C_KEYBINDING_INFO = 'keybinding info';
-	var C_TIME_INFO = exports.C_TIME_INFO = 'timeinfo';
-
-	function controlFactory(player, name, options) {
-		switch (name) {
-			case C_BACKWARD:
-				return new _BackwardControl2.default(player, options);
-
-			case C_DIVIDER:
-				return {
-					element: (0, _jquery2.default)('<div/>').addClass('divider')
-				};
-
-			case C_DOWNLOAD:
-				return new _DownloadControl2.default(player, options);
-
-			case C_FULLSCREEN:
-				return new _FullscreenControl2.default(player, options);
-
-			case C_PLAY:
-				return new _PlayControl2.default(player, options);
-
-			case C_RATE:
-				return new _RateControl2.default(player, options);
-
-			case C_SOURCE:
-				return new _SourceControl2.default(player, options);
-
-			case C_SUBTITLE:
-				return new _SubtitleControl2.default(player, options);
-
-			case C_TIMELINE:
-				return new _TimelineControl2.default(player, options);
-
-			case C_VOLUME:
-				return new _VolumeControl2.default(player, options);
-
-			case C_SECTION:
-				return new _SectionControl2.default(player, options);
-
-			case C_KEYBINDING_INFO:
-				return new _KeybindingInfoControl2.default(player, options);
-
-			case C_TIME_INFO:
-				return new _TimeInfoControl2.default(player, options);
-
-			default:
-				console.error('Control ' + name + ' doesn\'t exist');
-				return null;
-		}
-	}
-
-/***/ },
-/* 5 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	/**
-	 * @file PlayControl.js
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _Control2 = __webpack_require__(6);
-
-	var _Control3 = _interopRequireDefault(_Control2);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * @class PlayControl
-	 * @param {Player} player Main player
-	 * @extends Control
-	 */
-	var PlayControl = function (_Control) {
-		_inherits(PlayControl, _Control);
-
-		function PlayControl(player) {
-			var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-			_classCallCheck(this, PlayControl);
-
-			options = _jquery2.default.extend({}, {
-				iconName: 'play',
-				title: 'Воспроизвести видео',
-				className: 'play',
-				name: 'play'
-			}, options);
-
-			var _this = _possibleConstructorReturn(this, (PlayControl.__proto__ || Object.getPrototypeOf(PlayControl)).call(this, player, options));
-
-			_this.player.on('play', function (e) {
-				_this.play();
-			});
-
-			_this.player.on('pause', function (e) {
-				_this.pause();
-			});
-			return _this;
-		}
-
-		/**
-	  * Pause the video
-	  */
-
-
-		_createClass(PlayControl, [{
-			key: 'pause',
-			value: function pause() {
-				this.icon.iconName = 'play';
-				this.element.attr('title', this.options.title);
-			}
-
-			/**
-	   * Play the video
-	   */
-
-		}, {
-			key: 'play',
-			value: function play() {
-				this.icon.iconName = 'pause';
-				this.element.attr('title', 'Поставить на паузу');
-			}
-
-			/**
-	   * @override
-	   */
-
-		}, {
-			key: 'onClick',
-			value: function onClick(e) {
-				//super.onClick(e);
-				this.player.video.togglePlay();
-			}
-		}]);
-
-		return PlayControl;
-	}(_Control3.default);
-
-	exports.default = PlayControl;
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	/**
 	 * @file Control.js
 	 */
 
@@ -2018,7 +1811,7 @@
 
 	var _Component3 = _interopRequireDefault(_Component2);
 
-	var _Icon = __webpack_require__(7);
+	var _Icon = __webpack_require__(4);
 
 	var _Icon2 = _interopRequireDefault(_Icon);
 
@@ -2052,10 +1845,10 @@
 
 			var _this = _possibleConstructorReturn(this, (Control.__proto__ || Object.getPrototypeOf(Control)).call(this, player, options));
 
-			_this.disable = true;
+			_this.disable = _this.options.disable != null ? _this.options.disable : true;
 
 			_this.player.on('inited', function (e) {
-				_this.disable = _this.options.disable || false;
+				_this.disable = _this.options.disable != null ? _this.options.disable : false;
 			});
 
 			_this.element.on({
@@ -2134,15 +1927,161 @@
 			get: function get() {
 				return this._disable;
 			}
+		}], [{
+			key: 'registerControl',
+			value: function registerControl(name, control) {
+				if (name == null) {
+					return;
+				}
+
+				if (Control._controls == null) {
+					Control._controls = {};
+				}
+
+				Control._controls[name] = control;
+
+				return control;
+			}
+		}, {
+			key: 'getControl',
+			value: function getControl(name) {
+				if (name == null) {
+					return;
+				}
+
+				if (Control._controls && Control._controls[name]) {
+					return Control._controls[name];
+				}
+			}
+		}, {
+			key: 'create',
+			value: function create(player, name, options) {
+				var controlClass = this.getControl(name);
+				if (controlClass == null) {
+					console.error('Control ' + name + ' doesn\'t exist');
+					return null;
+				}
+
+				return new controlClass(player, options);
+			}
 		}]);
 
 		return Control;
 	}(_Component3.default);
 
+	_Component3.default.registerComponent('Control', Control);
+	Control.registerControl('control', Control);
 	exports.default = Control;
 
 /***/ },
-/* 7 */
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
+	 * @file Component.js
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	/**
+	 * Player component - Base class for all UI
+	 *
+	 * @param {Player} player Main player
+	 * @param {Object} [options] Options of component
+	 * @param {jQuery} [options.element] Элемент на котором можно иницилизовать класс.
+	 * @property {Object} options
+	 * @property {jQuery} element
+	 * @class Component
+	 */
+	var Component = function () {
+		function Component(player, options) {
+			_classCallCheck(this, Component);
+
+			/** TODO(adinvadim): Add options.component, for clone component instance */
+			options = this.options = _jquery2.default.extend({}, this.options, options);
+			this.player = player;
+
+			if (options.element) {
+				this.element = options.element;
+			} else {
+				this.createElement();
+			}
+			if (this.element.length != 1) {
+				console.error('Component.prototype.element.length must equal 1, not ' + this.element.length + '\n', this.element);
+			}
+			this.element[0].__node = this;
+		}
+
+		/**
+	  * @abstract
+	  */
+
+
+		_createClass(Component, [{
+			key: 'createElement',
+			value: function createElement() {
+
+				return '';
+			}
+
+			/**
+	   * @abstract
+	   */
+
+		}, {
+			key: 'buildCSSClass',
+			value: function buildCSSClass() {
+				return '';
+			}
+		}], [{
+			key: 'registerComponent',
+			value: function registerComponent(name, component) {
+				if (name == null) {
+					return;
+				}
+
+				if (Component._components == null) {
+					Component._components = {};
+				}
+
+				Component._components[name] = component;
+
+				return component;
+			}
+		}, {
+			key: 'getComponent',
+			value: function getComponent(name) {
+				if (name == null) {
+					return;
+				}
+
+				if (Component._components && Component._components[name]) {
+					return Component._components[name];
+				}
+			}
+		}]);
+
+		return Component;
+	}();
+
+	Component.registerComponent('Component', Component);
+	exports.default = Component;
+
+/***/ },
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2252,10 +2191,1424 @@
 		return Icon;
 	}(_Component3.default);
 
+	_Component3.default.registerComponent('Icon', Icon);
 	exports.default = Icon;
 
 /***/ },
+/* 5 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
+	 * @file MiniPlayer.js
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _Component2 = __webpack_require__(3);
+
+	var _Component3 = _interopRequireDefault(_Component2);
+
+	var _ControlCollection = __webpack_require__(6);
+
+	var _ControlCollection2 = _interopRequireDefault(_ControlCollection);
+
+	var _utils = __webpack_require__(7);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	// TODO: Сделать это в качестве плагина для плеера
+
+	/**
+	 * @class MiniPlayer
+	 * @param {Player} player Main player
+	 * @param {Object} [options]
+	 * @extends Control
+	 */
+	var MiniPlayer = function (_Component) {
+		_inherits(MiniPlayer, _Component);
+
+		function MiniPlayer(player, options) {
+			_classCallCheck(this, MiniPlayer);
+
+			// Merge options
+			options = _jquery2.default.extend({}, {
+				visible: false
+			}, player.options.miniplayer, options);
+
+			var _this = _possibleConstructorReturn(this, (MiniPlayer.__proto__ || Object.getPrototypeOf(MiniPlayer)).call(this, player, options));
+
+			if (options.visible) {
+				_this.show();
+			}
+
+			(0, _jquery2.default)(window).on('scroll', _this.update.bind(_this));
+			(0, _jquery2.default)(window).on('resize', _this.update.bind(_this));
+			_this.player.on('fullscreenchange', _this._onFullscreenChange.bind(_this));
+			_this.player.on('inited', _this._onPlayerInited.bind(_this));
+			return _this;
+		}
+
+		_createClass(MiniPlayer, [{
+			key: 'update',
+			value: function update() {
+				var scrollTop = (0, _jquery2.default)(window).scrollTop();
+
+				if (scrollTop > this.offsetShow) {
+					this.show();
+				} else {
+					this.hide();
+				}
+			}
+		}, {
+			key: 'show',
+
+
+			/**
+	   * Show mini player
+	   * @param {Boolean} force
+	   *
+	   * @public
+	   */
+			value: function show(force) {
+				if (!force && this.player.getView() === 'mini') {
+					return;
+				}
+
+				// Added empty space
+				this.player.element.css('padding-top', this.player.videoContainer.height());
+
+				this.player.setView('mini');
+				this.player.innerElement.css('max-width', this.width);
+				this.player.innerElement.css('height', this.player.video.height);
+			}
+
+			/**
+	   * Hide mini player
+	   * @param {Boolean} force
+	   *
+	   * @public
+	   */
+
+		}, {
+			key: 'hide',
+			value: function hide(force) {
+				if (!force && this.player.getView() !== 'mini') {
+					return;
+				}
+				this.player.setView('common');
+
+				this.player.innerElement.css('max-width', '');
+				this.player.innerElement.css('height', '');
+
+				this.player.element.css('padding-top', '');
+			}
+
+			/**
+	   * @override
+	   */
+
+		}, {
+			key: 'createElement',
+			value: function createElement() {
+				var controls = new _ControlCollection2.default(this.player, { name: 'mini' });
+				return this.element = (0, _utils.createEl)('div', {
+					className: 'leplayer-miniplayer'
+				}).append(controls.element);
+			}
+		}, {
+			key: '_onFullscreenChange',
+			value: function _onFullscreenChange(e, data) {
+				if (data == true) {
+					this.hide();
+				}
+			}
+		}, {
+			key: '_onPlayerInited',
+			value: function _onPlayerInited(e) {
+				var scrollTop = (0, _jquery2.default)(window).scrollTop();
+
+				if (scrollTop > this.offsetShow) {
+					this.show(true);
+				} else {
+					this.hide();
+				}
+			}
+		}, {
+			key: 'offsetShow',
+			get: function get() {
+				if (_jquery2.default.isFunction(this.options.offsetShow)) {
+					return this.options.offsetShow(this.player);
+				}
+
+				return this.options.offsetShow;
+			}
+		}, {
+			key: 'height',
+			get: function get() {
+				return this.player.element.height();
+			}
+		}, {
+			key: 'width',
+			get: function get() {
+				return this.options.width || this.player.element.width();
+			}
+		}]);
+
+		return MiniPlayer;
+	}(_Component3.default);
+
+	exports.default = MiniPlayer;
+
+/***/ },
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
+	 * @file ControlCollection.js
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _Component2 = __webpack_require__(3);
+
+	var _Component3 = _interopRequireDefault(_Component2);
+
+	var _Control = __webpack_require__(2);
+
+	var _Control2 = _interopRequireDefault(_Control);
+
+	var _utils = __webpack_require__(7);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * @param {Player} player Main player
+	 * @param {Object} [options] Options of component
+	 * @param {jQuery} [options.controls] Array of rows of control's name
+	 * @param {Object} [options.controlOptions] Control options
+	 * @property {Array} Array of rows of control's name
+	 * @pr
+	 *
+	 */
+	var ControlCollection = function (_Component) {
+		_inherits(ControlCollection, _Component);
+
+		function ControlCollection(player, options) {
+			_classCallCheck(this, ControlCollection);
+
+			options = _jquery2.default.extend({}, {
+				controls: player.options.controls[options.name] || [],
+				controlOptions: {}
+			}, options);
+
+			var _this = _possibleConstructorReturn(this, (ControlCollection.__proto__ || Object.getPrototypeOf(ControlCollection)).call(this, player, options));
+
+			_this.active = options.active || false;
+			_this.name = options.name;
+
+			_this.player.controls[_this.name] = _this;
+			return _this;
+		}
+
+		_createClass(ControlCollection, [{
+			key: '_getControlOptions',
+			value: function _getControlOptions(name) {
+				var controlOptions = this.options.controlOptions;
+
+				var result = controlOptions.control || {};
+
+				if (controlOptions[name]) {
+					result = _jquery2.default.extend(true, {}, result, controlOptions[name]);
+				}
+
+				return result;
+			}
+		}, {
+			key: 'addControl',
+			value: function addControl(indexRow, name, options) {
+				var control = _Control2.default.create(this.player, name, _extends({
+					collection: this.options.name
+				}, options));
+
+				if (control == null) {
+					return;
+				}
+
+				while (indexRow > this._rows.length) {
+					this.addRow();
+				}
+
+				var elemRow = this._rows[indexRow];
+				elemRow.append(control.element);
+
+				if (this.controls == null) {
+					this.controls = [];
+				}
+				if (this.controls[indexRow] == null) {
+					this.controls[indexRow] = {};
+				}
+
+				this.controls[indexRow][name] = control;
+			}
+		}, {
+			key: 'getControl',
+			value: function getControl(first, second) {
+				if (second == null) {
+					var name = first;
+					for (var i = 0; i < this.controls.length; i++) {
+						if (this.controls[i][name] != undefined) {
+							return this.controls[i][name];
+						}
+					}
+				} else {
+					var _name = first;
+					var indexRow = second;
+					return this.controls[indexRow][_name];
+				}
+
+				return null;
+			}
+		}, {
+			key: 'addRow',
+			value: function addRow() {
+				var elemRow = (0, _utils.createEl)('div', {
+					className: 'leplayer-controls controls-' + this.options.name
+				});
+
+				if (this._rows == null) {
+					this._rows = [];
+				}
+				this._rows.push(elemRow);
+				this.element.append(elemRow);
+
+				return elemRow;
+			}
+		}, {
+			key: 'getRow',
+			value: function getRow(indexRow) {
+				return this._rows[indexRow || 0];
+			}
+
+			/**
+	   * @override
+	   */
+
+		}, {
+			key: 'createElement',
+			value: function createElement() {
+				var _this2 = this;
+
+				var _options = this.options,
+				    name = _options.name,
+				    controls = _options.controls;
+
+
+				this.element = (0, _utils.createEl)('div', {
+					className: 'leplayer-control-collection leplayer-control-collection--' + name
+				});
+
+				controls.forEach(function (row, indexRow) {
+					var elemRow = _this2.addRow();
+					var hasTimeline = false;
+					row.forEach(function (controlName) {
+						if (controlName == 'timeline') {
+							hasTimeline = true;
+						}
+
+						_this2.addControl(indexRow, controlName, _this2._getControlOptions(name));
+					});
+
+					if (!hasTimeline) {
+						elemRow.css('width', '1px');
+					}
+					elemRow.find('.divider + .divider').remove();
+				});
+				return this.element;
+			}
+		}, {
+			key: 'hide',
+			value: function hide() {
+				this.element.hide();
+				this.element.find('.leplayer-controls').hide();
+			}
+		}, {
+			key: 'show',
+			value: function show() {
+				this.element.show();
+				this.element.find('.leplayer-controls').show();
+			}
+		}]);
+
+		return ControlCollection;
+	}(_Component3.default);
+
+	_Component3.default.registerComponent('ControlCollection', ControlCollection);
+	exports.default = ControlCollection;
+
+/***/ },
+/* 7 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
+	 * @file time.js
+	 *
+	 * @module time
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.secondsToTime = secondsToTime;
+	exports.percentify = percentify;
+	exports.createEl = createEl;
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	/**
+	 * Convert seconds to format string 'hh?:mm:ss'
+	 *
+	 * @access public
+	 * @param {Number} seconds Seconds
+	 * @param {Boolean} showHours convert to format 'hh:mm:ss'
+	 * @returns {String}
+	 */
+	function secondsToTime(seconds, showHours) {
+		var h = Math.floor(seconds / 3600);
+		var m = Math.floor(seconds % 3600 / 60);
+		var s = Math.floor(seconds % 3600 % 60);
+		var out = '';
+		if (m < 10) {
+			m = '0' + m;
+		}
+		if (s < 10) {
+			s = '0' + s;
+		}
+		out = m + ':' + s;
+
+		if (h > 0 || showHours) {
+			out = h + ':' + out;
+		}
+		return out;
+	}
+
+	/**
+	 * Return length / end
+	 *
+	 * @access public
+	 * @param {Number} length
+	 * @param {Nubmer} end
+	 */
+	function percentify(length, end) {
+		// or zero beacase NaN
+		var percent = length / end || 0;
+		return percent >= 1 ? 1 : percent;
+	}
+
+	function createEl() {
+		var tag = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'div';
+		var props = arguments[1];
+
+		if (props && props.className) {
+			props["class"] = props.className;
+			delete props.className;
+		}
+		return (0, _jquery2.default)('<' + tag + '/>', props);
+	}
+
+/***/ },
 /* 8 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
+	 * @file PlayButton.js
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+	var _Control2 = __webpack_require__(2);
+
+	var _Control3 = _interopRequireDefault(_Control2);
+
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Icon = __webpack_require__(4);
+
+	var _Icon2 = _interopRequireDefault(_Icon);
+
+	var _utils = __webpack_require__(7);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * @param {Player} player Main player
+	 */
+	var PlayButton = function (_Control) {
+		_inherits(PlayButton, _Control);
+
+		function PlayButton(player, options) {
+			_classCallCheck(this, PlayButton);
+
+			var _this = _possibleConstructorReturn(this, (PlayButton.__proto__ || Object.getPrototypeOf(PlayButton)).call(this, player, options));
+
+			_this.element.on('dblclick', _this._onDbclick.bind(_this));
+			return _this;
+		}
+
+		_createClass(PlayButton, [{
+			key: 'createElement',
+			value: function createElement() {
+				var inner = (0, _utils.createEl)('div', {
+					className: 'leplayer-play-button__button'
+				}).append(new _Icon2.default(this.player, { iconName: 'play' }).element);
+
+				this.element = (0, _utils.createEl)('div', {
+					className: this.buildCSSClass
+				}).append(inner);
+
+				return this.element;
+			}
+		}, {
+			key: 'onClick',
+			value: function onClick(e) {
+				_get(PlayButton.prototype.__proto__ || Object.getPrototypeOf(PlayButton.prototype), 'onClick', this).call(this, e);
+				this.player.trigger('click');
+			}
+		}, {
+			key: '_onDbclick',
+			value: function _onDbclick() {
+				this.player.trigger('dblclick');
+			}
+
+			/**
+	   * @override
+	   */
+
+		}, {
+			key: 'buildCSSClass',
+			value: function buildCSSClass() {
+				return 'leplayer-play-button';
+			}
+		}]);
+
+		return PlayButton;
+	}(_Control3.default);
+
+	_Component2.default.registerComponent('PlayButton', PlayButton);
+	_Control3.default.registerControl('play button', PlayButton);
+	exports.default = PlayButton;
+
+/***/ },
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
+	 * @file SplashIcon.js
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _Component2 = __webpack_require__(3);
+
+	var _Component3 = _interopRequireDefault(_Component2);
+
+	var _Icon = __webpack_require__(4);
+
+	var _Icon2 = _interopRequireDefault(_Icon);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * @param {Player} player Main player
+	 * @param {Object} [options]
+	 * @class SplashIcon
+	 * @extends Component
+	 */
+	var SplashIcon = function (_Component) {
+		_inherits(SplashIcon, _Component);
+
+		function SplashIcon() {
+			_classCallCheck(this, SplashIcon);
+
+			return _possibleConstructorReturn(this, (SplashIcon.__proto__ || Object.getPrototypeOf(SplashIcon)).apply(this, arguments));
+		}
+
+		_createClass(SplashIcon, [{
+			key: 'show',
+			value: function show(name) {
+				var _this2 = this;
+
+				this.icon.iconName = name;
+				this.element.addClass('leplayer-splashicon--active');
+				setTimeout(function () {
+					return _this2.element.removeClass('leplayer-splashicon--active');
+				}, 300);
+			}
+
+			/**
+	   * @override
+	   */
+
+		}, {
+			key: 'createElement',
+			value: function createElement() {
+				this.icon = new _Icon2.default(this.player);
+				return this.element = (0, _jquery2.default)('<div />').addClass('leplayer-splashicon').append(this.icon.element);
+			}
+		}]);
+
+		return SplashIcon;
+	}(_Component3.default);
+
+	exports.default = SplashIcon;
+
+/***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
+	 * @file Time.js
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _Component2 = __webpack_require__(3);
+
+	var _Component3 = _interopRequireDefault(_Component2);
+
+	var _utils = __webpack_require__(7);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	// TODO: Использовать этот блок в TimeControl
+	/**
+	 * @param {Player} player Main player
+	 * @param {Object} [options]
+	 * @class Time
+	 * @extends Control
+	 */
+	var Time = function (_Component) {
+		_inherits(Time, _Component);
+
+		function Time(player) {
+			var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+			_classCallCheck(this, Time);
+
+			options = _jquery2.default.extend({}, {
+				fn: function fn(player) {
+					var video = player.video;
+					return (0, _utils.secondsToTime)(video.currentTime);
+				}
+			}, options);
+
+			var _this = _possibleConstructorReturn(this, (Time.__proto__ || Object.getPrototypeOf(Time)).call(this, player, options));
+
+			_this.player.on('timeupdate', _this.updateText.bind(_this));
+			_this.player.on('inited', _this.updateText.bind(_this));
+			return _this;
+		}
+
+		_createClass(Time, [{
+			key: 'updateText',
+			value: function updateText(e, data) {
+				this.element.text(this.options.fn(this.player));
+			}
+		}, {
+			key: 'createElement',
+			value: function createElement() {
+				this.element = (0, _utils.createEl)('div', { className: 'leplayer-time' });
+				return this.element;
+			}
+		}]);
+
+		return Time;
+	}(_Component3.default);
+
+	_Component3.default.registerComponent('Time', Time);
+	exports.default = Time;
+
+/***/ },
+/* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
+	 * @file Sections.js
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _Component2 = __webpack_require__(3);
+
+	var _Component3 = _interopRequireDefault(_Component2);
+
+	var _utils = __webpack_require__(7);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * @class Sections
+	 * @param {Player} player Main player
+	 * @param {Object} [options]
+	 * @param {Array} [options.items=[]} Data for sections
+	 * @param {Boolean} [options.views] Show section only in fullscreen
+	 * @extends Component
+	 */
+	var Sections = function (_Component) {
+		_inherits(Sections, _Component);
+
+		function Sections(player, options) {
+			var _ret;
+
+			_classCallCheck(this, Sections);
+
+			var _options$items = options.items,
+			    items = _options$items === undefined ? [] : _options$items;
+
+			items = [].concat(items);
+
+			//options.items = items;
+
+			var _this = _possibleConstructorReturn(this, (Sections.__proto__ || Object.getPrototypeOf(Sections)).call(this, player, options));
+
+			_this.activeSection = _this.getSectionByIndex(0);
+
+			_this.items = items;
+			_this.length = _this.items.length;
+
+			_this.setActiveByIndex(0);
+
+			_this.element.find('.leplayer-section').on('click', _this.onSectionClick.bind(_this));
+
+			_this.player.on('sectionstoggle', _this._onSectionsToggle.bind(_this));
+
+			_this.player.on('timeupdate', _this.onTimeUpdate.bind(_this));
+
+			_this.player.on('inited', _this.updateSectionDuration.bind(_this));
+
+			_this.player.on('durationchange', _this.updateSectionDuration.bind(_this));
+
+			return _ret = _this, _possibleConstructorReturn(_this, _ret);
+		}
+
+		_createClass(Sections, [{
+			key: 'next',
+			value: function next() {
+				var sectionIndex = parseInt(this.activeSection.attr('data-index'));
+				var newIndex = sectionIndex >= this.length ? this.length : sectionIndex + 1;
+
+				this.setActiveByIndex(newIndex);
+
+				this.player.video.currentTime = this.items[sectionIndex].end;
+			}
+		}, {
+			key: 'prev',
+			value: function prev() {
+				var sectionIndex = parseInt(this.activeSection.attr('data-index'));
+				var newIndex = sectionIndex <= 0 ? 0 : sectionIndex - 1;
+
+				this.setActiveByIndex(newIndex);
+				this.player.video.currentTime = this.items[newIndex].begin;
+			}
+
+			/**
+	   * @override
+	   */
+
+		}, {
+			key: 'createElement',
+			value: function createElement() {
+				this.element = (0, _jquery2.default)('<div />').addClass('leplayer-sections');
+				if (this.options.fullscreenOnly) {
+					this.element.addClass('leplayer-sections--fsonly');
+				}
+				this.element.append(this._createSections(this.options.items));
+				return this.element;
+			}
+
+			/**
+	   * @override
+	   */
+
+		}, {
+			key: 'updateSectionDuration',
+			value: function updateSectionDuration() {
+				if (this.items != null && this.items.length > 0) {
+					var length = this.items.length;
+					this.items[length - 1].end = this.player.video.duration;
+
+					// TODO: Продумать функцияю updateSection
+					//this.updateSection(this.items[length - 1], length - 1);
+				}
+			}
+		}, {
+			key: 'onSectionClick',
+			value: function onSectionClick(e) {
+				var video = this.player.video;
+				var section = (0, _jquery2.default)(e.target).closest('.leplayer-section');
+				video.currentTime = section.attr('data-begin');
+				this.player.trigger('sectionsclick', { section: this.items[section.attr('data-index')] });
+			}
+		}, {
+			key: 'setActiveByIndex',
+			value: function setActiveByIndex(index) {
+				if (this.activeSection.length == 0 || this.activeSection.attr('data-index') == index || this.getSectionByIndex(index).length == 0) {
+					return this;
+				}
+
+				this.activeSection.removeClass('leplayer-section--active');
+				this.activeSection = this.getSectionByIndex(index);
+				this.activeSection.addClass('leplayer-section--active');
+
+				var topPosition = this.activeSection.position().top;
+
+				this.element.animate({
+					scrollTop: this.element.scrollTop() + topPosition
+				}, 800);
+
+				this.player.trigger('sectionschange', { section: this.items[index] });
+
+				return this;
+			}
+		}, {
+			key: 'getSectionByIndex',
+			value: function getSectionByIndex(index) {
+				return this.element.find('.leplayer-section[data-index="' + index + '"]');
+			}
+		}, {
+			key: 'onTimeUpdate',
+			value: function onTimeUpdate(e, data) {
+				if (this.activeSection.length == 0) {
+					return;
+				}
+
+				var currentTime = data.time;
+
+				// Update span with end section time
+				// TODO: Вынести это в отдельный компонент ShowTime или типо того
+				if (this.player.getView() === 'mini') {
+					var endSectionTime = this.activeSection.attr('data-end');
+					this.activeSection.next().find('.time').text((0, _utils.secondsToTime)(endSectionTime - currentTime));
+				}
+
+				for (var i = 0; i < this.items.length; i++) {
+					var section = this.items[i];
+					if (currentTime < section.end) {
+						this.setActiveByIndex(i);
+						break;
+					}
+				}
+			}
+		}, {
+			key: '_onSectionsToggle',
+			value: function _onSectionsToggle(e, data) {
+				if (this.element.hasClass('leplayer-sections--hidden') && data.checked) {
+					this.element.removeClass('leplayer-sections--hidden');
+				} else if (!data.checked) {
+					this.element.addClass('leplayer-sections--hidden');
+				}
+			}
+
+			/**
+	   * Create HTML of section by data and index section
+	   *
+	   * @returns {String} HTML
+	   */
+
+		}, {
+			key: 'createSection',
+			value: function createSection(section, index) {
+				var items = this.items || this.options.items;
+				var item = ('\n\t\t\t<div class="leplayer-section ' + (!index ? 'leplayer-section--active' : '') + '"\n\t\t\t\tdata-begin="' + section.begin + '"\n\t\t\t\tdata-index="' + index.toString() + '"\n\t\t\t\tdata-end="' + section.end + '">\n\t\t\t\t<div class="leplayer-section-time">' + (0, _utils.secondsToTime)(section.begin) + '</div>\n\t\t\t\t<div class="leplayer-section-info">\n\t\t\t\t\t<div class="leplayer-section-next-info">\n\t\t\t\t\t\t' + (section.nextInfo || 'Следующая секция начнется через') + '\n\t\t\t\t\t\t<span class="time">' + (0, _utils.secondsToTime)(items[0].end) + '</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t' + (section.title != null ? '<div class="leplayer-section-title">' + section.title + '</div>' : '') + '\n\t\t\t\t\t' + (section.description != null ? '<div class="leplayer-section-description">' + section.description + '</div>' : '') + '\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t').trim();
+				return item;
+			}
+
+			// TODO: Придумать что сделать с событиями после обновления полносью секции
+			/**
+	   * Find section by index and update him using data
+	   *
+	   * @param {Object} data
+	   * @param {Number} index
+	   */
+
+		}, {
+			key: 'updateSection',
+			value: function updateSection(data, index) {
+				this.getSectionByIndex(index).replaceWith(this.createSection(data, index)).on('click', this.onSectionClick.bind(this));
+			}
+		}, {
+			key: '_createSections',
+			value: function _createSections(items) {
+				var _this2 = this;
+
+				var result = '';
+				items.forEach(function (section, index) {
+					result += _this2.createSection(section, index);
+				});
+				return result;
+			}
+		}]);
+
+		return Sections;
+	}(_Component3.default);
+
+	_Component3.default.registerComponent('Sections', Sections);
+	exports.default = Sections;
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
+	 * @file ErrorDisplay.js
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _Component2 = __webpack_require__(3);
+
+	var _Component3 = _interopRequireDefault(_Component2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * @param {Player} player Main player
+	 * @param {Object} [options]
+	 * @class ErrorDisplay
+	 * @extends Component
+	 */
+	var ErrorDisplay = function (_Component) {
+		_inherits(ErrorDisplay, _Component);
+
+		function ErrorDisplay(player) {
+			var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+			_classCallCheck(this, ErrorDisplay);
+
+			var _this = _possibleConstructorReturn(this, (ErrorDisplay.__proto__ || Object.getPrototypeOf(ErrorDisplay)).call(this, player, options));
+
+			if (_this.player._error != null) {
+				_this.message = _this.player._error.message;
+				_this.element.show();
+			}
+			_this.player.on('error', _this.onPlayerError.bind(_this));
+			return _this;
+		}
+
+		/**
+	  * @override
+	  */
+
+
+		_createClass(ErrorDisplay, [{
+			key: 'createElement',
+			value: function createElement() {
+				this.element = (0, _jquery2.default)('<div />').addClass('leplayer-error-display');
+			}
+		}, {
+			key: 'onPlayerError',
+			value: function onPlayerError(e, data) {
+				var error = data.error;
+				this.message = error.message;
+				this.element.show();
+			}
+		}, {
+			key: 'message',
+			set: function set(value) {
+				this.element.html(value);
+			}
+		}]);
+
+		return ErrorDisplay;
+	}(_Component3.default);
+
+	_Component3.default.registerComponent('ErrorDisplay', ErrorDisplay);
+	exports.default = ErrorDisplay;
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
+	 * @file ErrorDisplay.js
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _Component2 = __webpack_require__(3);
+
+	var _Component3 = _interopRequireDefault(_Component2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * @param {Player} player Main player
+	 * @param {Object} [options]
+	 * @param {String} [options.imgUrl] path to poster image
+	 * @class Poster
+	 * @extends Component
+	 */
+	var Poster = function (_Component) {
+		_inherits(Poster, _Component);
+
+		function Poster(player) {
+			var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+			_classCallCheck(this, Poster);
+
+			options = _jquery2.default.extend({}, {
+				imgUrl: player.options.poster
+			}, options);
+
+			return _possibleConstructorReturn(this, (Poster.__proto__ || Object.getPrototypeOf(Poster)).call(this, player, options));
+		}
+
+		/**
+	  * @override
+	  */
+
+
+		_createClass(Poster, [{
+			key: 'createElement',
+			value: function createElement() {
+				this.element = (0, _jquery2.default)('<div />').css('background-image', 'url("' + this.options.imgUrl + '")').addClass('leplayer-poster');
+			}
+		}]);
+
+		return Poster;
+	}(_Component3.default);
+
+	_Component3.default.registerComponent('Poster', Poster);
+	exports.default = Poster;
+
+/***/ },
+/* 14 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	/**
+	 * @file fullscreen-api.js
+	 */
+
+	/*
+	 * Store the browser-specific methods for the fullscreen API
+	 * @type {Object|undefined}
+	 * @private
+	 */
+	var FullscreenApi = {};
+
+	// browser API methods
+	// map approach from Screenful.js - https://github.com/sindresorhus/screenfull.js
+	var apiMap = [
+	// Spec: https://dvcs.w3.org/hg/fullscreen/raw-file/tip/Overview.html
+	['requestFullscreen', 'exitFullscreen', 'fullscreenElement', 'fullscreenEnabled', 'fullscreenchange', 'fullscreenerror'],
+	// WebKit
+	['webkitRequestFullscreen', 'webkitExitFullscreen', 'webkitFullscreenElement', 'webkitFullscreenEnabled', 'webkitfullscreenchange', 'webkitfullscreenerror'],
+	// Old WebKit (Safari 5.1)
+	['webkitRequestFullScreen', 'webkitCancelFullScreen', 'webkitCurrentFullScreenElement', 'webkitCancelFullScreen', 'webkitfullscreenchange', 'webkitfullscreenerror'],
+	// Mozilla
+	['mozRequestFullScreen', 'mozCancelFullScreen', 'mozFullScreenElement', 'mozFullScreenEnabled', 'mozfullscreenchange', 'mozfullscreenerror'],
+	// Microsoft
+	['msRequestFullscreen', 'msExitFullscreen', 'msFullscreenElement', 'msFullscreenEnabled', 'MSFullscreenChange', 'MSFullscreenError']];
+
+	var specApi = apiMap[0];
+
+	var browserApi = void 0;
+
+	// determine the supported set of functions
+	for (var i = 0; i < apiMap.length; i++) {
+		// check for exitFullscreen function
+		if (apiMap[i][1] in document) {
+			browserApi = apiMap[i];
+			break;
+		}
+	}
+
+	// map the browser API names to the spec API names
+	if (browserApi) {
+		for (var _i = 0; _i < browserApi.length; _i++) {
+			FullscreenApi[specApi[_i]] = browserApi[_i];
+		}
+	}
+
+	exports.default = FullscreenApi;
+
+/***/ },
+/* 15 */
+/***/ function(module, exports) {
+
+	'use strict';
+	/**
+	 * @file cookie-control.js
+	 *
+	 * @clas Cookie
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Cookie = function () {
+		function Cookie() {
+			_classCallCheck(this, Cookie);
+		}
+
+		_createClass(Cookie, null, [{
+			key: 'get',
+
+			/**
+	   * @public
+	   *
+	   * @param {String} name Name of cookie
+	   * @param {String} [dflt] Return default value if this field is empty
+	   *
+	   */
+			value: function get(name, dflt) {
+				var cookies = document.cookie.split(';');
+				for (var i in cookies) {
+					var d = cookies[i].trim().split('=');
+					if (d[0] == 'leplayer_' + name) return d[1];
+				}
+				return dflt;
+			}
+
+			/**
+	   * @public
+	   *
+	   * @param {String} name Key
+	   * @param {String} value Value
+	   */
+
+		}, {
+			key: 'set',
+			value: function set(name, value) {
+				var d = new Date();
+				d.setDate(d.year + 1);
+				document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
+			}
+		}]);
+
+		return Cookie;
+	}();
+
+	exports.default = Cookie;
+
+/***/ },
+/* 16 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var MediaError = function MediaError(value) {
+		_classCallCheck(this, MediaError);
+
+		if (value instanceof MediaError) {
+			return value;
+		}
+		if (typeof value === 'number') {
+			this.code = value;
+		} else if (typeof value === 'string') {
+			// default code is zero, so this is a custom error
+			this.message = value;
+		} else if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
+
+			// We assign the `code` property manually because native MediaError objects
+			// do not expose it as an own/enumerable property of the object.
+			if (typeof value.code === 'number') {
+				this.code = value.code;
+			}
+
+			_jquery2.default.extend(this, value);
+		}
+
+		if (!this.message) {
+			this.message = MediaError.defaultMessages[this.code] || '';
+		}
+	};
+
+	MediaError.prototype.code = 0;
+
+	MediaError.prototype.message = '';
+
+	MediaError.errorTypes = ['MEDIA_ERR_CUSTOM', 'MEDIA_ERR_ABORTED', 'MEDIA_ERR_NETWORK', 'MEDIA_ERR_DECODE', 'MEDIA_ERR_SRC_NOT_SUPPORTED', 'MEDIA_ERR_ENCRYPTED'];
+
+	MediaError.defaultMessages = {
+		1: 'Вы прервали загрузку видео.',
+		2: 'Загрузка видео прервана из-за потери соединения.',
+		3: 'Загрузка видео остановлена из-за проблем с видеофайлом или из-за того, что ваш браузер не поддерживает воспроизведение данного файла.',
+		4: 'Видео не может быть загружено из-за проблем с интернет-соединением или проблем на сервере. Или формат файла не поддерживается вашим браузером.',
+		5: 'Видео зашифровано, и мы не можем его расшифровать.'
+	};
+
+	// Add types as properties on MediaError
+	// e.g. MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED = 4;
+	for (var errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
+		MediaError[MediaError.errorTypes[errNum]] = errNum;
+		// values should be accessible on both the class and instance
+		MediaError.prototype[MediaError.errorTypes[errNum]] = errNum;
+	}
+
+	exports.default = MediaError;
+
+/***/ },
+/* 17 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
+	 * @file PlayControl.js
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Control2 = __webpack_require__(2);
+
+	var _Control3 = _interopRequireDefault(_Control2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * @class PlayControl
+	 * @param {Player} player Main player
+	 * @extends Control
+	 */
+	var PlayControl = function (_Control) {
+		_inherits(PlayControl, _Control);
+
+		function PlayControl(player) {
+			var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+			_classCallCheck(this, PlayControl);
+
+			options = _jquery2.default.extend({}, {
+				iconName: 'play',
+				title: 'Воспроизвести видео',
+				className: 'play',
+				name: 'play'
+			}, options);
+
+			var _this = _possibleConstructorReturn(this, (PlayControl.__proto__ || Object.getPrototypeOf(PlayControl)).call(this, player, options));
+
+			_this.player.on('play', function (e) {
+				_this.play();
+			});
+
+			_this.player.on('pause', function (e) {
+				_this.pause();
+			});
+			return _this;
+		}
+
+		/**
+	  * Pause the video
+	  */
+
+
+		_createClass(PlayControl, [{
+			key: 'pause',
+			value: function pause() {
+				this.icon.iconName = 'play';
+				this.element.attr('title', this.options.title);
+			}
+
+			/**
+	   * Play the video
+	   */
+
+		}, {
+			key: 'play',
+			value: function play() {
+				this.icon.iconName = 'pause';
+				this.element.attr('title', 'Поставить на паузу');
+			}
+
+			/**
+	   * @override
+	   */
+
+		}, {
+			key: 'onClick',
+			value: function onClick(e) {
+				//super.onClick(e);
+				this.player.video.togglePlay();
+			}
+		}]);
+
+		return PlayControl;
+	}(_Control3.default);
+
+	_Component2.default.registerComponent('PlayControl', PlayControl);
+	_Control3.default.registerControl('play', PlayControl);
+	exports.default = PlayControl;
+
+/***/ },
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2275,7 +3628,15 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _ControlDropdown2 = __webpack_require__(9);
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Control = __webpack_require__(2);
+
+	var _Control2 = _interopRequireDefault(_Control);
+
+	var _ControlDropdown2 = __webpack_require__(19);
 
 	var _ControlDropdown3 = _interopRequireDefault(_ControlDropdown2);
 
@@ -2389,13 +3750,7 @@
 		}, {
 			key: 'value',
 			set: function set(value) {
-				if (value < this.player.options.volume.mutelimit) {
-					this.icon.iconName = 'volume-off';
-				} else if (value < 0.5) {
-					this.icon.iconName = 'volume-down';
-				} else {
-					this.icon.iconName = 'volume-up';
-				}
+				this.icon.iconName = this.player._calcVolumeIcon(value);
 
 				var p = Math.round(value * 100).toString() + '%';
 				this.active.css('height', p);
@@ -2406,10 +3761,12 @@
 		return VolumeControl;
 	}(_ControlDropdown3.default);
 
+	_Component2.default.registerComponent('VolumeControl', VolumeControl);
+	_Control2.default.registerControl('volume', VolumeControl);
 	exports.default = VolumeControl;
 
 /***/ },
-/* 9 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2429,9 +3786,13 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(6);
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
+
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2495,10 +3856,12 @@
 		return ControlDropdown;
 	}(_Control3.default);
 
+	_Component2.default.registerComponent('ControlDropdown', ControlDropdown);
+	_Control3.default.registerControl('dropdown', ControlDropdown);
 	exports.default = ControlDropdown;
 
 /***/ },
-/* 10 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2518,19 +3881,27 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(6);
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
-	var _ControlText = __webpack_require__(11);
+	var _ControlText = __webpack_require__(21);
 
 	var _ControlText2 = _interopRequireDefault(_ControlText);
 
-	var _BufferedRanges = __webpack_require__(12);
+	var _BufferedRanges = __webpack_require__(22);
 
 	var _BufferedRanges2 = _interopRequireDefault(_BufferedRanges);
 
-	var _utils = __webpack_require__(13);
+	var _Marker = __webpack_require__(23);
+
+	var _Marker2 = _interopRequireDefault(_Marker);
+
+	var _utils = __webpack_require__(7);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2563,6 +3934,10 @@
 
 			var _this = _possibleConstructorReturn(this, (TimelineControl.__proto__ || Object.getPrototypeOf(TimelineControl)).call(this, player, options));
 
+			_this.marker.element.on('leplayer_mousemove', _this._onMarkerMousemove.bind(_this));
+
+			_this.marker.element.on('leplayer_mousedown', _this._onMarkerMousedown.bind(_this));
+
 			_this.player.on('sectionsinit', _this.onSectionsInit.bind(_this));
 
 			_this.player.on('timeupdate', _this._onTimeUpdate.bind(_this));
@@ -2574,6 +3949,22 @@
 		}
 
 		_createClass(TimelineControl, [{
+			key: '_onMarkerMousedown',
+			value: function _onMarkerMousedown(e) {
+				this.markerShadow.element.hide();
+			}
+		}, {
+			key: '_onMarkerMousemove',
+			value: function _onMarkerMousemove(e, data) {
+				var x = data.x;
+				var p = this.getPosition(x);
+				var video = this.player.video;
+				if (p > 0 && p < 1) {
+					this.marker.markerTime.show().html((0, _utils.secondsToTime)(video.duration * p));
+					video.seek(video.duration * p);
+				}
+			}
+		}, {
 			key: '_onTimeUpdate',
 			value: function _onTimeUpdate(e, data) {
 				var time = data.time;
@@ -2603,20 +3994,14 @@
 
 				// Create line with markers and played range
 
-				// Marker of current time on timeline
-				this.markerTime = (0, _jquery2.default)('<div />').addClass('time').hide();
-
-				this.marker = (0, _jquery2.default)('<div />').addClass('time-marker').append(this.markerTime).on('mousedown', function (e) {
-					if (e.which !== 1) return;
-					e.preventDefault();
-					_this2.markerShadow.hide();
-					_this2.drag = true;
+				this.marker = new _Marker2.default(this.player, {
+					drag: true
 				});
 
-				// Shadow marker, show on timeline's mousemove
-				this.markerShadowTime = (0, _jquery2.default)('<div />').addClass('time');
-
-				this.markerShadow = (0, _jquery2.default)('<div />').addClass('time-marker shadow').append(this.markerShadowTime).hide();
+				this.markerShadow = new _Marker2.default(this.player, {
+					className: 'shadow'
+				});
+				this.markerShadow.element.hide();
 
 				// Played ranges
 				this.playedRanges = (0, _jquery2.default)('<div />').addClass('time-played');
@@ -2624,53 +4009,32 @@
 				// Buffered ranges
 				this.bufferedRanges = new _BufferedRanges2.default(this.player).element;
 
-				this.line = (0, _jquery2.default)('<div />').addClass('timeline').append(this.marker).append(this.markerShadow).append(this.playedRanges).append(this.bufferedRanges).on({
+				this.line = (0, _jquery2.default)('<div />').addClass('timeline').append(this.marker.element).append(this.markerShadow.element).append(this.playedRanges).append(this.bufferedRanges).on({
 					'mousemove': function mousemove(e) {
-						if (_this2.drag) return;
+						if (_this2.marker.drag) return;
 
 						var p = _this2.getPosition(e.pageX);
 						if (p > 0 && p < 1) {
-							_this2.markerShadow.show();
-							_this2.markerShadow.css('left', p * 100 + '%');
-							_this2.markerShadowTime.html((0, _utils.secondsToTime)(video.duration * p));
-						} else _this2.markerShadow.hide();
+							_this2.markerShadow.element.show().css('left', p * 100 + '%');
+							_this2.markerShadow.markerTime.show().html((0, _utils.secondsToTime)(video.duration * p));
+						} else {
+							_this2.markerShadow.element.hide();
+						}
 					},
 
 					'mouseleave': function mouseleave(e) {
 						if (_this2.drag) return;
-						_this2.markerShadow.hide();
+						_this2.markerShadow.element.hide();
 					},
 
 					'mousedown': function mousedown(e) {},
 
-					'click': function click(e) {
-						if (e.which !== 1) return;
-						if (_this2.drag) return;
-						_this2.hardMove(_this2.getPosition(e.pageX));
-						video.currentTime = video.duration * _this2.getPosition(e.pageX);
-					},
+					'click': this._onLineClick.bind(this),
 
 					'touchmove': function touchmove(e) {}
 				});
 
 				this.element.addClass('timeline-container').append((0, _jquery2.default)('<div />').addClass('timeline-subcontainer').append(this.currentTime.element).append(this.line).append(this.totalTime.element));
-
-				(0, _jquery2.default)(document).on({
-
-					'mousemove': function mousemove(e) {
-						if (!_this2.drag) return;
-						var p = _this2.getPosition(e.pageX);
-						if (p > 0 && p < 1) {
-							_this2.markerTime.show().html((0, _utils.secondsToTime)(video.duration * p));
-							video.seek(video.duration * p);
-						}
-					},
-
-					'mouseup': function mouseup(e) {
-						_this2.markerTime.hide();
-						_this2.drag = false;
-					}
-				});
 			}
 
 			/**
@@ -2681,6 +4045,15 @@
 			key: '_onClick',
 			value: function _onClick(e) {
 				e.preventDefault();
+			}
+		}, {
+			key: '_onLineClick',
+			value: function _onLineClick(e) {
+				if (e.which !== 1) return;
+				if (this.drag) return;
+				var video = this.player.video;
+				this.hardMove(this.getPosition(e.pageX));
+				video.currentTime = video.duration * this.getPosition(e.pageX);
 			}
 		}, {
 			key: 'onSectionsInit',
@@ -2711,8 +4084,8 @@
 				items.forEach(function (section) {
 					var length = section.end - section.begin;
 					var item = (0, _jquery2.default)('<div />').addClass('leplayer-timeline-section').css({
-						width: length / duration * 99 + '%',
-						left: section.begin / duration * 99 + '%'
+						width: length / duration * 100 + '%',
+						left: section.begin / duration * 100 + '%'
 					});
 					result.append(item);
 				});
@@ -2735,7 +4108,7 @@
 				var currentTime = this.player.video.duration * percent;
 				if (isNaN(currentTime)) return;
 				percent = percent * 100;
-				this.marker.css('left', percent + '%');
+				this.marker.element.css('left', percent + '%');
 				this.playedRanges.css('width', percent + '%');
 				this.currentTime.text = (0, _utils.secondsToTime)(currentTime);
 			}
@@ -2751,7 +4124,7 @@
 				var percent = (video.currentTime / video.duration * 100).toFixed(2);
 				var currentTime = video.currentTime;
 				if (isNaN(currentTime)) return;
-				this.marker.css('left', percent + '%');
+				this.marker.element.css('left', percent + '%');
 				this.playedRanges.css('width', percent + '%');
 				this.currentTime.text = (0, _utils.secondsToTime)(currentTime);
 			}
@@ -2761,6 +4134,7 @@
 				var video = this.player.video;
 				this.totalTime.text = (0, _utils.secondsToTime)(0, Math.floor(video.duration / 3600) > 0);
 				var width = this.totalTime.element.width();
+
 				this.totalTime.text = (0, _utils.secondsToTime)(video.duration);
 				this.currentTime.text = (0, _utils.secondsToTime)(video.currentTime || 0);
 				this.currentTime.element.css({
@@ -2824,10 +4198,12 @@
 		return TimelineControl;
 	}(_Control3.default);
 
+	_Component2.default.registerComponent('TimelineControl', TimelineControl);
+	_Control3.default.registerControl('timeline', TimelineControl);
 	exports.default = TimelineControl;
 
 /***/ },
-/* 11 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2847,9 +4223,13 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(6);
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
+
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2919,10 +4299,12 @@
 		return ControlText;
 	}(_Control3.default);
 
+	_Component2.default.registerComponent('ControlText', ControlText);
+	_Control3.default.registerControl('text', ControlText);
 	exports.default = ControlText;
 
 /***/ },
-/* 12 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2936,7 +4318,7 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _utils = __webpack_require__(13);
+	var _utils = __webpack_require__(7);
 
 	var _Component2 = __webpack_require__(3);
 
@@ -2965,6 +4347,7 @@
 			var _this = _possibleConstructorReturn(this, (BufferedRanges.__proto__ || Object.getPrototypeOf(BufferedRanges)).call(this, player, options));
 
 			_this.player.on('progress', _this.update.bind(_this));
+			_this.player.on('seeked', _this.update.bind(_this));
 			return _this;
 		}
 
@@ -2995,7 +4378,6 @@
 				}
 
 				if (duration > 0) {
-
 					this.range.css({
 						width: (0, _utils.percentify)(end, duration) * 100 + '%'
 					});
@@ -3006,85 +4388,106 @@
 		return BufferedRanges;
 	}(_Component3.default);
 
+	_Component3.default.registerComponent('BufferedRanges', BufferedRanges);
 	exports.default = BufferedRanges;
 
 /***/ },
-/* 13 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-	/**
-	 * @file time.js
-	 *
-	 * @module time
-	 */
 
 	Object.defineProperty(exports, "__esModule", {
 		value: true
 	});
-	exports.secondsToTime = secondsToTime;
-	exports.percentify = percentify;
-	exports.createEl = createEl;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
+	var _Component2 = __webpack_require__(3);
+
+	var _Component3 = _interopRequireDefault(_Component2);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	/**
-	 * Convert seconds to format string 'hh?:mm:ss'
-	 *
-	 * @access public
-	 * @param {Number} seconds Seconds
-	 * @param {Boolean} showHours convert to format 'hh:mm:ss'
-	 * @returns {String}
-	 */
-	function secondsToTime(seconds, showHours) {
-		var h = Math.floor(seconds / 3600);
-		var m = Math.floor(seconds % 3600 / 60);
-		var s = Math.floor(seconds % 3600 % 60);
-		var out = '';
-		if (m < 10) {
-			m = '0' + m;
-		}
-		if (s < 10) {
-			s = '0' + s;
-		}
-		out = m + ':' + s;
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-		if (h > 0 || showHours) {
-			out = h + ':' + out;
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Marker = function (_Component) {
+		_inherits(Marker, _Component);
+
+		function Marker(player, options) {
+			_classCallCheck(this, Marker);
+
+			options = _jquery2.default.extend({}, {
+				drag: false,
+				className: ''
+			}, options);
+
+			var _this = _possibleConstructorReturn(this, (Marker.__proto__ || Object.getPrototypeOf(Marker)).call(this, player, options));
+
+			_this.element.on('mousedown', _this._onMousedown.bind(_this));
+
+			(0, _jquery2.default)(document).on({
+
+				'mousemove': function mousemove(e) {
+					if (!_this.drag) return;
+					_this.element.trigger('leplayer_mousemove', { x: e.pageX });
+				},
+
+				'mouseup': function mouseup(e) {
+					if (!_this.drag) return;
+					_this.drag = false;
+					_this.markerTime.hide();
+					_this.element.trigger('leplayer_mouseup', { x: e.pageX });
+				}
+			});
+			return _this;
 		}
-		return out;
-	}
 
-	/**
-	 * Return length / end
-	 *
-	 * @access public
-	 * @param {Number} length
-	 * @param {Nubmer} end
-	 */
-	function percentify(length, end) {
-		// or zero beacase NaN
-		var percent = length / end || 0;
-		return percent >= 1 ? 1 : percent;
-	}
+		_createClass(Marker, [{
+			key: '_onMousedown',
+			value: function _onMousedown(e) {
+				if (e.which !== 1) return;
+				e.preventDefault();
+				if (this.options.drag) {
+					this.drag = true;
+				}
+				this.element.trigger('leplayer_mousedown');
+			}
+		}, {
+			key: 'createElement',
+			value: function createElement() {
+				// Marker of current time on timeline
+				this.markerTime = (0, _jquery2.default)('<div />').addClass('time').hide();
 
-	function createEl() {
-		var tag = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'div';
-		var props = arguments[1];
+				return this.element = (0, _jquery2.default)('<div />').addClass('time-marker ' + this.options.className).append(this.markerTime);
+			}
+		}, {
+			key: 'drag',
+			set: function set(value) {
+				this._drag = value;
+				this.element.toggleClass('time-marker--drag', value);
+			},
+			get: function get() {
+				return this._drag;
+			}
+		}]);
 
-		if (props && props.className) {
-			props["class"] = props.className;
-			delete props.className;
-		}
-		return (0, _jquery2.default)('<' + tag + '/>', props);
-	}
+		return Marker;
+	}(_Component3.default);
+
+	_Component3.default.registerComponent('Marker', Marker);
+	exports.default = Marker;
 
 /***/ },
-/* 14 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3104,7 +4507,15 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _ControlCheckbox2 = __webpack_require__(15);
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Control = __webpack_require__(2);
+
+	var _Control2 = _interopRequireDefault(_Control);
+
+	var _ControlCheckbox2 = __webpack_require__(25);
 
 	var _ControlCheckbox3 = _interopRequireDefault(_ControlCheckbox2);
 
@@ -3165,10 +4576,12 @@
 		return SectionControl;
 	}(_ControlCheckbox3.default);
 
+	_Component2.default.registerComponent('SectionControl', SectionControl);
+	_Control2.default.registerControl('section', SectionControl);
 	exports.default = SectionControl;
 
 /***/ },
-/* 15 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3184,9 +4597,13 @@
 
 	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
 
-	var _Control2 = __webpack_require__(6);
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
+
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3282,10 +4699,12 @@
 		return ControlCheckbox;
 	}(_Control3.default);
 
+	_Component2.default.registerComponent('ControlCheckbox', ControlCheckbox);
+	_Control3.default.registerControl('checkbox', ControlCheckbox);
 	exports.default = ControlCheckbox;
 
 /***/ },
-/* 16 */
+/* 26 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3305,7 +4724,11 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(6);
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
@@ -3355,10 +4778,12 @@
 		return FullscreenControl;
 	}(_Control3.default);
 
+	_Component2.default.registerComponent('FullscreenControl', FullscreenControl);
+	_Control3.default.registerControl('fullscreen', FullscreenControl);
 	exports.default = FullscreenControl;
 
 /***/ },
-/* 17 */
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3378,15 +4803,19 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(6);
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
-	var _ControlText = __webpack_require__(11);
+	var _ControlText = __webpack_require__(21);
 
 	var _ControlText2 = _interopRequireDefault(_ControlText);
 
-	var _cookie = __webpack_require__(18);
+	var _cookie = __webpack_require__(15);
 
 	var _cookie2 = _interopRequireDefault(_cookie);
 
@@ -3542,74 +4971,12 @@
 		return RateControl;
 	}(_Control3.default);
 
+	_Component2.default.registerComponent('RateControl', RateControl);
+	_Control3.default.registerControl('rate', RateControl);
 	exports.default = RateControl;
 
 /***/ },
-/* 18 */
-/***/ function(module, exports) {
-
-	'use strict';
-	/**
-	 * @file cookie-control.js
-	 *
-	 * @clas Cookie
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var Cookie = function () {
-		function Cookie() {
-			_classCallCheck(this, Cookie);
-		}
-
-		_createClass(Cookie, null, [{
-			key: 'get',
-
-			/**
-	   * @public
-	   *
-	   * @param {String} name Name of cookie
-	   * @param {String} [dflt] Return default value if this field is empty
-	   *
-	   */
-			value: function get(name, dflt) {
-				var cookies = document.cookie.split(';');
-				for (var i in cookies) {
-					var d = cookies[i].trim().split('=');
-					if (d[0] == 'leplayer_' + name) return d[1];
-				}
-				return dflt;
-			}
-
-			/**
-	   * @public
-	   *
-	   * @param {String} name Key
-	   * @param {String} value Value
-	   */
-
-		}, {
-			key: 'set',
-			value: function set(name, value) {
-				var d = new Date();
-				d.setDate(d.year + 1);
-				document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
-			}
-		}]);
-
-		return Cookie;
-	}();
-
-	exports.default = Cookie;
-
-/***/ },
-/* 19 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3631,7 +4998,11 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(6);
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
@@ -3682,10 +5053,12 @@
 		return BackwardControl;
 	}(_Control3.default);
 
+	_Component2.default.registerComponent('BackwardControl', BackwardControl);
+	_Control3.default.registerControl('backward', BackwardControl);
 	exports.default = BackwardControl;
 
 /***/ },
-/* 20 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3705,7 +5078,15 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _ControlContainer2 = __webpack_require__(21);
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Control = __webpack_require__(2);
+
+	var _Control2 = _interopRequireDefault(_Control);
+
+	var _ControlContainer2 = __webpack_require__(30);
 
 	var _ControlContainer3 = _interopRequireDefault(_ControlContainer2);
 
@@ -3790,10 +5171,12 @@
 		return SourceControl;
 	}(_ControlContainer3.default);
 
+	_Component2.default.registerComponent('SourceControl', SourceControl);
+	_Control2.default.registerControl('source', SourceControl);
 	exports.default = SourceControl;
 
 /***/ },
-/* 21 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3813,7 +5196,15 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _ControlDropdown2 = __webpack_require__(9);
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Control = __webpack_require__(2);
+
+	var _Control2 = _interopRequireDefault(_Control);
+
+	var _ControlDropdown2 = __webpack_require__(19);
 
 	var _ControlDropdown3 = _interopRequireDefault(_ControlDropdown2);
 
@@ -3964,10 +5355,12 @@
 		return ControlContainer;
 	}(_ControlDropdown3.default);
 
+	_Component2.default.registerComponent('ControlContainer', ControlContainer);
+	_Control2.default.registerControl('container', ControlContainer);
 	exports.default = ControlContainer;
 
 /***/ },
-/* 22 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3989,7 +5382,15 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _ControlContainer2 = __webpack_require__(21);
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Control = __webpack_require__(2);
+
+	var _Control2 = _interopRequireDefault(_Control);
+
+	var _ControlContainer2 = __webpack_require__(30);
 
 	var _ControlContainer3 = _interopRequireDefault(_ControlContainer2);
 
@@ -4063,10 +5464,12 @@
 		return SubtitleControl;
 	}(_ControlContainer3.default);
 
+	_Component2.default.registerComponent('SubtitleControl', SubtitleControl);
+	_Control2.default.registerControl('subtitle', SubtitleControl);
 	exports.default = SubtitleControl;
 
 /***/ },
-/* 23 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4088,11 +5491,15 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(6);
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
-	var _Icon = __webpack_require__(7);
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Icon = __webpack_require__(4);
 
 	var _Icon2 = _interopRequireDefault(_Icon);
 
@@ -4185,10 +5592,12 @@
 		return DownloadControl;
 	}(_Control3.default);
 
+	_Component2.default.registerComponent('DownloadControl', DownloadControl);
+	_Control3.default.registerControl('download', DownloadControl);
 	exports.default = DownloadControl;
 
 /***/ },
-/* 24 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -4211,7 +5620,15 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _ControlDropdown2 = __webpack_require__(9);
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Control = __webpack_require__(2);
+
+	var _Control2 = _interopRequireDefault(_Control);
+
+	var _ControlDropdown2 = __webpack_require__(19);
 
 	var _ControlDropdown3 = _interopRequireDefault(_ControlDropdown2);
 
@@ -4274,10 +5691,12 @@
 		return KeyBindingInfoControl;
 	}(_ControlDropdown3.default);
 
+	_Component2.default.registerComponent('KeyBindingInfoControl', KeyBindingInfoControl);
+	_Control2.default.registerControl('keybinding info', KeyBindingInfoControl);
 	exports.default = KeyBindingInfoControl;
 
 /***/ },
-/* 25 */
+/* 34 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4295,15 +5714,19 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	var _Control2 = __webpack_require__(6);
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Control2 = __webpack_require__(2);
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
-	var _ControlText = __webpack_require__(11);
+	var _ControlText = __webpack_require__(21);
 
 	var _ControlText2 = _interopRequireDefault(_ControlText);
 
-	var _utils = __webpack_require__(13);
+	var _utils = __webpack_require__(7);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4385,881 +5808,9 @@
 		return TimeInfoControl;
 	}(_Control3.default);
 
+	_Component2.default.registerComponent('TimeInfoControl', TimeInfoControl);
+	_Control3.default.registerControl('timeinfo', TimeInfoControl);
 	exports.default = TimeInfoControl;
-
-/***/ },
-/* 26 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	/**
-	 * @file MiniPlayer.js
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _Component2 = __webpack_require__(3);
-
-	var _Component3 = _interopRequireDefault(_Component2);
-
-	var _ControlCollection = __webpack_require__(2);
-
-	var _ControlCollection2 = _interopRequireDefault(_ControlCollection);
-
-	var _utils = __webpack_require__(13);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	// TODO: Сделать это в качестве плагина для плеера
-
-	/**
-	 * @class MiniPlayer
-	 * @param {Player} player Main player
-	 * @param {Object} [options]
-	 * @extends Control
-	 */
-	var MiniPlayer = function (_Component) {
-		_inherits(MiniPlayer, _Component);
-
-		function MiniPlayer(player, options) {
-			_classCallCheck(this, MiniPlayer);
-
-			// Merge options
-			options = _jquery2.default.extend({}, {
-				visible: false
-			}, player.options.miniplayer, options);
-
-			var _this = _possibleConstructorReturn(this, (MiniPlayer.__proto__ || Object.getPrototypeOf(MiniPlayer)).call(this, player, options));
-
-			if (options.visible) {
-				_this.show();
-			}
-
-			(0, _jquery2.default)(window).on('scroll', _this.update.bind(_this));
-			(0, _jquery2.default)(window).on('resize', _this.update.bind(_this));
-			_this.player.on('fullscreenchange', _this._onFullscreenChange.bind(_this));
-			_this.player.on('inited', _this._onPlayerInited.bind(_this));
-			return _this;
-		}
-
-		_createClass(MiniPlayer, [{
-			key: 'update',
-			value: function update() {
-				var scrollTop = (0, _jquery2.default)(window).scrollTop();
-
-				if (scrollTop > this.offsetShow) {
-					this.show();
-				} else {
-					this.hide();
-				}
-			}
-		}, {
-			key: 'show',
-
-
-			/**
-	   * Show mini player
-	   * @param {Boolean} force
-	   *
-	   * @public
-	   */
-			value: function show(force) {
-				if (!force && this.player.getView() === 'mini') {
-					return;
-				}
-
-				// Added empty space
-				this.player.element.css('padding-top', this.player.videoContainer.height());
-
-				this.player.setView('mini');
-				this.player.innerElement.css('max-width', this.width);
-				this.player.innerElement.css('height', this.player.video.height);
-			}
-
-			/**
-	   * Hide mini player
-	   * @param {Boolean} force
-	   *
-	   * @public
-	   */
-
-		}, {
-			key: 'hide',
-			value: function hide(force) {
-				if (!force && this.player.getView() !== 'mini') {
-					return;
-				}
-				this.player.setView('common');
-
-				this.player.innerElement.css('max-width', '');
-				this.player.innerElement.css('height', '');
-
-				this.player.element.css('padding-top', '');
-			}
-
-			/**
-	   * @override
-	   */
-
-		}, {
-			key: 'createElement',
-			value: function createElement() {
-				var controls = new _ControlCollection2.default(this.player, { name: 'mini' });
-				return this.element = (0, _utils.createEl)('div', {
-					className: 'leplayer-miniplayer'
-				}).append(controls.element);
-			}
-		}, {
-			key: '_onFullscreenChange',
-			value: function _onFullscreenChange(e, data) {
-				if (data == true) {
-					this.hide();
-				}
-			}
-		}, {
-			key: '_onPlayerInited',
-			value: function _onPlayerInited(e) {
-				var scrollTop = (0, _jquery2.default)(window).scrollTop();
-
-				if (scrollTop > this.offsetShow) {
-					this.show(true);
-				} else {
-					this.hide();
-				}
-			}
-		}, {
-			key: 'offsetShow',
-			get: function get() {
-				if (_jquery2.default.isFunction(this.options.offsetShow)) {
-					return this.options.offsetShow(this.player);
-				}
-
-				return this.options.offsetShow;
-			}
-		}, {
-			key: 'height',
-			get: function get() {
-				return this.player.element.height();
-			}
-		}, {
-			key: 'width',
-			get: function get() {
-				return this.options.width || this.player.element.width();
-			}
-		}]);
-
-		return MiniPlayer;
-	}(_Component3.default);
-
-	exports.default = MiniPlayer;
-
-/***/ },
-/* 27 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	/**
-	 * @file PlayButton.js
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
-	var _Control2 = __webpack_require__(6);
-
-	var _Control3 = _interopRequireDefault(_Control2);
-
-	var _Icon = __webpack_require__(7);
-
-	var _Icon2 = _interopRequireDefault(_Icon);
-
-	var _utils = __webpack_require__(13);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * @param {Player} player Main player
-	 */
-	var PlayButton = function (_Control) {
-		_inherits(PlayButton, _Control);
-
-		function PlayButton(player, options) {
-			_classCallCheck(this, PlayButton);
-
-			var _this = _possibleConstructorReturn(this, (PlayButton.__proto__ || Object.getPrototypeOf(PlayButton)).call(this, player, options));
-
-			_this.element.on('dblclick', _this._onDbclick.bind(_this));
-			return _this;
-		}
-
-		_createClass(PlayButton, [{
-			key: 'createElement',
-			value: function createElement() {
-				var inner = (0, _utils.createEl)('div', {
-					className: 'leplayer-play-button__button'
-				}).append(new _Icon2.default(this.player, { iconName: 'play' }).element);
-
-				this.element = (0, _utils.createEl)('div', {
-					className: this.buildCSSClass
-				}).append(inner);
-
-				return this.element;
-			}
-		}, {
-			key: 'onClick',
-			value: function onClick(e) {
-				_get(PlayButton.prototype.__proto__ || Object.getPrototypeOf(PlayButton.prototype), 'onClick', this).call(this, e);
-				this.player.trigger('click');
-			}
-		}, {
-			key: '_onDbclick',
-			value: function _onDbclick() {
-				this.player.trigger('dblclick');
-			}
-
-			/**
-	   * @override
-	   */
-
-		}, {
-			key: 'buildCSSClass',
-			value: function buildCSSClass() {
-				return 'leplayer-play-button';
-			}
-		}]);
-
-		return PlayButton;
-	}(_Control3.default);
-
-	exports.default = PlayButton;
-
-/***/ },
-/* 28 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	/**
-	 * @file Time.js
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _Component2 = __webpack_require__(3);
-
-	var _Component3 = _interopRequireDefault(_Component2);
-
-	var _utils = __webpack_require__(13);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	// TODO: Использовать этот блок в TimeControl
-	/**
-	 * @param {Player} player Main player
-	 * @param {Object} [options]
-	 * @class Time
-	 * @extends Control
-	 */
-	var Time = function (_Component) {
-		_inherits(Time, _Component);
-
-		function Time(player) {
-			var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-			_classCallCheck(this, Time);
-
-			options = _jquery2.default.extend({}, {
-				fn: function fn(player) {
-					var video = player.video;
-					return (0, _utils.secondsToTime)(video.currentTime);
-				}
-			}, options);
-
-			var _this = _possibleConstructorReturn(this, (Time.__proto__ || Object.getPrototypeOf(Time)).call(this, player, options));
-
-			_this.player.on('timeupdate', _this.updateText.bind(_this));
-			_this.player.on('inited', _this.updateText.bind(_this));
-			return _this;
-		}
-
-		_createClass(Time, [{
-			key: 'updateText',
-			value: function updateText(e, data) {
-				this.element.text(this.options.fn(this.player));
-			}
-		}, {
-			key: 'createElement',
-			value: function createElement() {
-				this.element = (0, _utils.createEl)('div', { className: 'leplayer-time' });
-				return this.element;
-			}
-		}]);
-
-		return Time;
-	}(_Component3.default);
-
-	exports.default = Time;
-
-/***/ },
-/* 29 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	/**
-	 * @file Sections.js
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _Component2 = __webpack_require__(3);
-
-	var _Component3 = _interopRequireDefault(_Component2);
-
-	var _utils = __webpack_require__(13);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * @class Sections
-	 * @param {Player} player Main player
-	 * @param {Object} [options]
-	 * @param {Array} [options.items=[]} Data for sections
-	 * @param {Boolean} [options.views] Show section only in fullscreen
-	 * @extends Component
-	 */
-	var Sections = function (_Component) {
-		_inherits(Sections, _Component);
-
-		function Sections(player, options) {
-			var _ret;
-
-			_classCallCheck(this, Sections);
-
-			var _options$items = options.items,
-			    items = _options$items === undefined ? [] : _options$items;
-
-			items = [].concat(items);
-
-			//options.items = items;
-
-			var _this = _possibleConstructorReturn(this, (Sections.__proto__ || Object.getPrototypeOf(Sections)).call(this, player, options));
-
-			_this.activeSection = _this.getSectionByIndex(0);
-
-			_this.items = items;
-			_this.length = _this.items.length;
-
-			_this.setActiveByIndex(0);
-
-			_this.element.find('.leplayer-section').on('click', _this.onSectionClick.bind(_this));
-
-			_this.player.on('sectionstoggle', _this._onSectionsToggle.bind(_this));
-
-			_this.player.on('timeupdate', _this.onTimeUpdate.bind(_this));
-
-			_this.player.on('inited', _this.updateSectionDuration.bind(_this));
-
-			_this.player.on('durationchange', _this.updateSectionDuration.bind(_this));
-
-			return _ret = _this, _possibleConstructorReturn(_this, _ret);
-		}
-
-		_createClass(Sections, [{
-			key: 'next',
-			value: function next() {
-				var sectionIndex = parseInt(this.activeSection.attr('data-index'));
-				var newIndex = sectionIndex >= this.length ? this.length : sectionIndex + 1;
-
-				this.setActiveByIndex(newIndex);
-
-				this.player.video.currentTime = this.items[sectionIndex].end;
-			}
-		}, {
-			key: 'prev',
-			value: function prev() {
-				var sectionIndex = parseInt(this.activeSection.attr('data-index'));
-				var newIndex = sectionIndex <= 0 ? 0 : sectionIndex - 1;
-
-				this.setActiveByIndex(newIndex);
-				this.player.video.currentTime = this.items[newIndex].begin;
-			}
-
-			/**
-	   * @override
-	   */
-
-		}, {
-			key: 'createElement',
-			value: function createElement() {
-				this.element = (0, _jquery2.default)('<div />').addClass('leplayer-sections');
-				if (this.options.fullscreenOnly) {
-					this.element.addClass('leplayer-sections--fsonly');
-				}
-				this.element.append(this._createSections(this.options.items));
-				return this.element;
-			}
-
-			/**
-	   * @override
-	   */
-
-		}, {
-			key: 'updateSectionDuration',
-			value: function updateSectionDuration() {
-				if (this.items != null && this.items.length > 0) {
-					var length = this.items.length;
-					this.items[length - 1].end = this.player.video.duration;
-
-					// TODO: Продумать функцияю updateSection
-					//this.updateSection(this.items[length - 1], length - 1);
-				}
-			}
-		}, {
-			key: 'onSectionClick',
-			value: function onSectionClick(e) {
-				console.log('click');
-				var video = this.player.video;
-				var section = (0, _jquery2.default)(e.target).closest('.leplayer-section');
-				video.currentTime = section.attr('data-begin');
-				this.player.trigger('sectionsclick', { section: this.items[section.attr('data-index')] });
-			}
-		}, {
-			key: 'setActiveByIndex',
-			value: function setActiveByIndex(index) {
-				if (this.activeSection.length == 0 || this.activeSection.attr('data-index') == index || this.getSectionByIndex(index).length == 0) {
-					return this;
-				}
-
-				this.activeSection.removeClass('leplayer-section--active');
-				this.activeSection = this.getSectionByIndex(index);
-				this.activeSection.addClass('leplayer-section--active');
-
-				var topPosition = this.activeSection.position().top;
-
-				this.element.animate({
-					scrollTop: this.element.scrollTop() + topPosition
-				}, 800);
-
-				this.player.trigger('sectionschange', { section: this.items[index] });
-
-				return this;
-			}
-		}, {
-			key: 'getSectionByIndex',
-			value: function getSectionByIndex(index) {
-				return this.element.find('.leplayer-section[data-index="' + index + '"]');
-			}
-		}, {
-			key: 'onTimeUpdate',
-			value: function onTimeUpdate(e, data) {
-				if (this.activeSection.length == 0) {
-					return;
-				}
-
-				var currentTime = data.time;
-
-				// Update span with end section time
-				// TODO: Вынести это в отдельный компонент ShowTime или типо того
-				if (this.player.getView() === 'mini') {
-					var endSectionTime = this.activeSection.attr('data-end');
-					this.activeSection.next().find('.time').text((0, _utils.secondsToTime)(endSectionTime - currentTime));
-				}
-
-				for (var i = 0; i < this.items.length; i++) {
-					var section = this.items[i];
-					if (currentTime < section.end) {
-						this.setActiveByIndex(i);
-						break;
-					}
-				}
-			}
-		}, {
-			key: '_onSectionsToggle',
-			value: function _onSectionsToggle(e, data) {
-				if (this.element.hasClass('leplayer-sections--hidden') && data.checked) {
-					this.element.removeClass('leplayer-sections--hidden');
-				} else if (!data.checked) {
-					this.element.addClass('leplayer-sections--hidden');
-				}
-			}
-
-			/**
-	   * Create HTML of section by data and index section
-	   *
-	   * @returns {String} HTML
-	   */
-
-		}, {
-			key: 'createSection',
-			value: function createSection(section, index) {
-				var items = this.items || this.options.items;
-				var item = ('\n\t\t\t<div class="leplayer-section ' + (!index ? 'leplayer-section--active' : '') + '"\n\t\t\t\tdata-begin="' + section.begin + '"\n\t\t\t\tdata-index="' + index.toString() + '"\n\t\t\t\tdata-end="' + section.end + '">\n\t\t\t\t<div class="leplayer-section-time">' + (0, _utils.secondsToTime)(section.begin) + '</div>\n\t\t\t\t<div class="leplayer-section-info">\n\t\t\t\t\t<div class="leplayer-section-next-info">\n\t\t\t\t\t\t' + (section.nextInfo || 'Следующая секция начнется через') + '\n\t\t\t\t\t\t<span class="time">' + (0, _utils.secondsToTime)(items[0].end) + '</span>\n\t\t\t\t\t</div>\n\t\t\t\t\t' + (section.title != null ? '<div class="leplayer-section-title">' + section.title + '</div>' : '') + '\n\t\t\t\t\t' + (section.description != null ? '<div class="leplayer-section-description">' + section.description + '</div>' : '') + '\n\t\t\t\t</div>\n\t\t\t</div>\n\t\t').trim();
-				return item;
-			}
-
-			// TODO: Придумать что сделать с событиями после обновления полносью секции
-			/**
-	   * Find section by index and update him using data
-	   *
-	   * @param {Object} data
-	   * @param {Number} index
-	   */
-
-		}, {
-			key: 'updateSection',
-			value: function updateSection(data, index) {
-				this.getSectionByIndex(index).replaceWith(this.createSection(data, index)).on('click', this.onSectionClick.bind(this));
-			}
-		}, {
-			key: '_createSections',
-			value: function _createSections(items) {
-				var _this2 = this;
-
-				var result = '';
-				items.forEach(function (section, index) {
-					result += _this2.createSection(section, index);
-				});
-				return result;
-			}
-		}]);
-
-		return Sections;
-	}(_Component3.default);
-
-	exports.default = Sections;
-
-/***/ },
-/* 30 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	/**
-	 * @file ErrorDisplay.js
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _Component2 = __webpack_require__(3);
-
-	var _Component3 = _interopRequireDefault(_Component2);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * @param {Player} player Main player
-	 * @param {Object} [options]
-	 * @class ErrorDisplay
-	 * @extends Component
-	 */
-	var ErrorDisplay = function (_Component) {
-		_inherits(ErrorDisplay, _Component);
-
-		function ErrorDisplay(player) {
-			var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-			_classCallCheck(this, ErrorDisplay);
-
-			var _this = _possibleConstructorReturn(this, (ErrorDisplay.__proto__ || Object.getPrototypeOf(ErrorDisplay)).call(this, player, options));
-
-			if (_this.player._error != null) {
-				_this.message = _this.player._error.message;
-				_this.element.show();
-			}
-			_this.player.on('error', _this.onPlayerError.bind(_this));
-			return _this;
-		}
-
-		/**
-	  * @override
-	  */
-
-
-		_createClass(ErrorDisplay, [{
-			key: 'createElement',
-			value: function createElement() {
-				this.element = (0, _jquery2.default)('<div />').addClass('leplayer-error-display');
-			}
-		}, {
-			key: 'onPlayerError',
-			value: function onPlayerError(e, data) {
-				var error = data.error;
-				this.message = error.message;
-				this.element.show();
-			}
-		}, {
-			key: 'message',
-			set: function set(value) {
-				this.element.html(value);
-			}
-		}]);
-
-		return ErrorDisplay;
-	}(_Component3.default);
-
-	exports.default = ErrorDisplay;
-
-/***/ },
-/* 31 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	/**
-	 * @file ErrorDisplay.js
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _Component2 = __webpack_require__(3);
-
-	var _Component3 = _interopRequireDefault(_Component2);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * @param {Player} player Main player
-	 * @param {Object} [options]
-	 * @param {String} [options.imgUrl] path to poster image
-	 * @class Poster
-	 * @extends Component
-	 */
-	var Poster = function (_Component) {
-		_inherits(Poster, _Component);
-
-		function Poster(player) {
-			var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-			_classCallCheck(this, Poster);
-
-			options = _jquery2.default.extend({}, {
-				imgUrl: player.options.poster
-			}, options);
-
-			return _possibleConstructorReturn(this, (Poster.__proto__ || Object.getPrototypeOf(Poster)).call(this, player, options));
-		}
-
-		/**
-	  * @override
-	  */
-
-
-		_createClass(Poster, [{
-			key: 'createElement',
-			value: function createElement() {
-				this.element = (0, _jquery2.default)('<div />').css('background-image', 'url("' + this.options.imgUrl + '")').addClass('leplayer-poster');
-			}
-		}]);
-
-		return Poster;
-	}(_Component3.default);
-
-	exports.default = Poster;
-
-/***/ },
-/* 32 */
-/***/ function(module, exports) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	/**
-	 * @file fullscreen-api.js
-	 */
-
-	/*
-	 * Store the browser-specific methods for the fullscreen API
-	 * @type {Object|undefined}
-	 * @private
-	 */
-	var FullscreenApi = {};
-
-	// browser API methods
-	// map approach from Screenful.js - https://github.com/sindresorhus/screenfull.js
-	var apiMap = [
-	// Spec: https://dvcs.w3.org/hg/fullscreen/raw-file/tip/Overview.html
-	['requestFullscreen', 'exitFullscreen', 'fullscreenElement', 'fullscreenEnabled', 'fullscreenchange', 'fullscreenerror'],
-	// WebKit
-	['webkitRequestFullscreen', 'webkitExitFullscreen', 'webkitFullscreenElement', 'webkitFullscreenEnabled', 'webkitfullscreenchange', 'webkitfullscreenerror'],
-	// Old WebKit (Safari 5.1)
-	['webkitRequestFullScreen', 'webkitCancelFullScreen', 'webkitCurrentFullScreenElement', 'webkitCancelFullScreen', 'webkitfullscreenchange', 'webkitfullscreenerror'],
-	// Mozilla
-	['mozRequestFullScreen', 'mozCancelFullScreen', 'mozFullScreenElement', 'mozFullScreenEnabled', 'mozfullscreenchange', 'mozfullscreenerror'],
-	// Microsoft
-	['msRequestFullscreen', 'msExitFullscreen', 'msFullscreenElement', 'msFullscreenEnabled', 'MSFullscreenChange', 'MSFullscreenError']];
-
-	var specApi = apiMap[0];
-
-	var browserApi = void 0;
-
-	// determine the supported set of functions
-	for (var i = 0; i < apiMap.length; i++) {
-		// check for exitFullscreen function
-		if (apiMap[i][1] in document) {
-			browserApi = apiMap[i];
-			break;
-		}
-	}
-
-	// map the browser API names to the spec API names
-	if (browserApi) {
-		for (var _i = 0; _i < browserApi.length; _i++) {
-			FullscreenApi[specApi[_i]] = browserApi[_i];
-		}
-	}
-
-	exports.default = FullscreenApi;
-
-/***/ },
-/* 33 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var MediaError = function MediaError(value) {
-		_classCallCheck(this, MediaError);
-
-		if (value instanceof MediaError) {
-			return value;
-		}
-		if (typeof value === 'number') {
-			this.code = value;
-		} else if (typeof value === 'string') {
-			// default code is zero, so this is a custom error
-			this.message = value;
-		} else if ((typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object') {
-
-			// We assign the `code` property manually because native MediaError objects
-			// do not expose it as an own/enumerable property of the object.
-			if (typeof value.code === 'number') {
-				this.code = value.code;
-			}
-
-			_jquery2.default.extend(this, value);
-		}
-
-		if (!this.message) {
-			this.message = MediaError.defaultMessages[this.code] || '';
-		}
-	};
-
-	MediaError.prototype.code = 0;
-
-	MediaError.prototype.message = '';
-
-	MediaError.errorTypes = ['MEDIA_ERR_CUSTOM', 'MEDIA_ERR_ABORTED', 'MEDIA_ERR_NETWORK', 'MEDIA_ERR_DECODE', 'MEDIA_ERR_SRC_NOT_SUPPORTED', 'MEDIA_ERR_ENCRYPTED'];
-
-	MediaError.defaultMessages = {
-		1: 'Вы прервали загрузку видео.',
-		2: 'Загрузка видео прервана из-за потери соединения.',
-		3: 'Загрузка видео остановлена из-за проблем с видеофайлом или из-за того, что ваш браузер не поддерживает воспроизведение данного файла.',
-		4: 'Видео не может быть загружено из-за проблем с интернет-соединением или проблем на сервере. Или формат файла не поддерживается вашим браузером.',
-		5: 'Видео зашифровано, и мы не можем его расшифровать.'
-	};
-
-	// Add types as properties on MediaError
-	// e.g. MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED = 4;
-	for (var errNum = 0; errNum < MediaError.errorTypes.length; errNum++) {
-		MediaError[MediaError.errorTypes[errNum]] = errNum;
-		// values should be accessible on both the class and instance
-		MediaError.prototype[MediaError.errorTypes[errNum]] = errNum;
-	}
-
-	exports.default = MediaError;
 
 /***/ }
 /******/ ]);

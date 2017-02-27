@@ -37,79 +37,79 @@
   z-index: 1007;
 }
 .leplayer-controls.controls-fullscreen .control {
-  background: #465264;
-  color: #e1e8ef;
+  background: #47566b;
+  color: #c4d8ee;
 }
 .leplayer-controls.controls-fullscreen .control:hover {
-  background: #313946;
-  color: #e1e8ef;
+  background: #333e4c;
+  color: #c4d8ee;
 }
 .leplayer-controls.controls-fullscreen .control.disabled {
-  color: #4b6b9b;
+  color: #6d7278;
 }
 .leplayer-controls.controls-fullscreen .control.disabled:hover {
-  background: #465264;
-  color: #4b6b9b;
+  background: #47566b;
+  color: #6d7278;
 }
 .leplayer-controls.controls-fullscreen .control.play {
-  background: #384150;
+  background: #29313d;
   color: white;
 }
 .leplayer-controls.controls-fullscreen .control.play:hover {
-  background: #313946;
+  background: #333e4c;
 }
 .leplayer-controls.controls-fullscreen .control-dropdown__content {
-  background: #465264;
+  background: #47566b;
   z-index: 1008;
 }
 .leplayer-controls.controls-fullscreen .control-checkbox--checked {
-  background: #465264;
+  background: #47566b;
 }
 .leplayer-controls.controls-fullscreen .info-control__content {
-  background: #465264;
+  background: #47566b;
   color: white;
 }
 .leplayer-controls.controls-fullscreen .control-text {
-  background: #465264;
-  color: #e1e8ef;
+  background: #47566b;
+  color: #c4d8ee;
 }
 .leplayer-controls.controls-fullscreen .control-container__item {
-  color: #e1e8ef;
+  color: #c4d8ee;
 }
 .leplayer-controls.controls-fullscreen .control-container__item:hover {
   background: rgba(0, 0, 0, 0.15) !important;
-  color: #e1e8ef;
+  color: #c4d8ee;
 }
 .leplayer-controls.controls-fullscreen .control-container__item--active {
-  background: #384150;
-  color: #465264;
+  background: #29313d;
+  color: #47566b;
 }
 .leplayer-controls.controls-fullscreen .timeline {
-  background: #768496;
+  background: #7588a3;
   margin: 0;
 }
 .leplayer-controls.controls-fullscreen .timeline-container {
-  background: #465264;
+  background: #47566b;
 }
 .leplayer-controls.controls-fullscreen .timeline-container .control-text {
   height: auto;
   position: relative;
 }
 .leplayer-controls.controls-fullscreen .timeline-container:hover {
-  background: #465264;
+  background: #47566b;
 }
 .leplayer-controls.controls-fullscreen .time-marker {
-  background: #2a313c;
-  border-right: 1px solid rgba(225, 232, 239, 0.7);
+  background: #29313d;
+  border-right: 1px solid rgba(227, 229, 232, 0.7);
   z-index: 1007;
 }
 .leplayer-controls.controls-fullscreen .time-marker.shadow {
-  background: rgba(26, 74, 126, 0.8);
-  border-right: 1px solid rgba(225, 232, 239, 0.5);
+  background: rgba(157, 164, 175, 0.7);
+  border-right: 1px solid rgba(241, 242, 244, 0.5);
   z-index: 1006;
 }
 .leplayer-controls.controls-fullscreen .time-marker .time {
-  background: rgba(118, 138, 167, 0.8);
+  background: rgba(117, 136, 163, 0.8);
   z-index: 1003;
 }
 .leplayer-controls.controls-fullscreen .time-played {
@@ -127,11 +127,11 @@
   height: 144px;
 }
 .leplayer-controls.controls-fullscreen .volume-line {
-  background: #768496;
+  background: #7588a3;
 }
 .leplayer-controls.controls-fullscreen .volume-marker {
-  background: #2a313c;
-  border-top: 1px solid rgba(225, 232, 239, 0.7);
+  background: #29313d;
+  border-top: 1px solid rgba(227, 229, 232, 0.7);
 }
 .leplayer-controls .control {
   background: #dee5ed;
@@ -300,11 +300,26 @@
   width: 2px;
   z-index: 17;
 }
+.leplayer-controls .time-marker:before {
+  content: '';
+  width: 4px;
+  height: 100%;
+  position: absolute;
+  left: -1px;
+  background: transparent;
+}
+.leplayer-controls .time-marker--drag:before,
+.leplayer-controls .time-marker:hover:before {
+  background: #1b4b7e;
+}
 .leplayer-controls .time-marker.shadow {
   background: rgba(27, 75, 126, 0.8);
   border-right: 1px solid rgba(222, 229, 237, 0.5);
   transition: none;
   z-index: 16;
+}
+.leplayer-controls .time-marker.shadow:before {
+  content: none;
 }
 .leplayer-controls .time-marker .time {
   background: rgba(117, 139, 163, 0.8);
@@ -384,6 +399,10 @@
   margin-bottom: -1px;
   right: -4px;
   position: absolute;
+}
+.leplayer-control-collection {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 .leplayer-control-collection--fullscreen {
   display: none;
@@ -562,6 +581,41 @@
 .leplayer-miniplayer .rate-current {
   min-width: 34px;
 }
+@keyframes leplayer-splashicon-fadeout {
+  0% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+.leplayer-splashicon {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 52px;
+  height: 52px;
+  z-index: 17;
+  margin-left: -26px;
+  margin-top: -26px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 26px;
+  color: white;
+  -ms-flex-pack: center;
+      justify-content: center;
+  -ms-flex-align: center;
+      align-items: center;
+  animation: leplayer-splashicon-fadeout 0.5s linear 1 normal forwards;
+}
+.leplayer-splashicon--active {
+  display: -ms-flexbox;
+  display: flex;
+}
+.leplayer--virgin .leplayer-splashicon {
+  display: none;
+}
 .leplayer-video {
   background: #000;
   display: block;
@@ -643,7 +697,7 @@
   position: relative;
   left: 4px;
 }
-.leplayer--inited .leplayer-play-button {
+.leplayer--inited.leplayer--virgin .leplayer-play-button {
   display: -ms-flexbox;
   display: flex;
 }
@@ -666,8 +720,7 @@
 }
 .leplayer--playing .leplayer-play-button,
 .leplayer--error .leplayer-play-button,
-.leplayer--waiting .leplayer-play-button,
-.leplayer--seeking .leplayer-play-button {
+.leplayer--waiting .leplayer-play-button {
   display: none;
 }
 .leplayer-loader-container {
@@ -693,13 +746,11 @@
 .leplayer--error .leplayer-loader-container__icon {
   animation: none;
 }
-.leplayer--waiting .leplayer-loader-container,
-.leplayer--seeking .leplayer-loader-container {
+.leplayer--waiting .leplayer-loader-container {
   display: -ms-flexbox;
   display: flex;
 }
-.leplayer--waiting .leplayer-loader-container__icon,
-.leplayer--seeking .leplayer-loader-container__icon {
+.leplayer--waiting .leplayer-loader-container__icon {
   animation: leplayer-spin 2s infinite linear;
 }
 @keyframes leplayer-spin {
@@ -735,14 +786,14 @@
 .leplayer-section:nth-child(2n) {
   background: #dde5ee;
 }
-.leplayer-section:hover {
-  background: #9cb2c9;
-}
 .leplayer-section.leplayer-section--active {
-  background: #9cb2c9;
+  background: #94a5b8;
 }
 .leplayer-section.leplayer-section--active .leplayer-section-description {
   display: block;
+}
+.leplayer-section:hover {
+  background: #758ba3;
 }
 .leplayer-section-time {
   color: #555;
@@ -804,11 +855,11 @@
 .leplayer__inner .leplayer-section:nth-child(2n) {
   background: rgba(221, 229, 238, 0.8);
 }
-.leplayer__inner .leplayer-section:hover {
-  background: rgba(156, 178, 201, 0.8);
-}
 .leplayer__inner .leplayer-section.leplayer-section--active {
   background: rgba(148, 165, 184, 0.8);
+}
+.leplayer__inner .leplayer-section:hover {
+  background: rgba(117, 139, 163, 0.8);
 }
 .leplayer--fullscreen .leplayer-sections {
   display: none;
@@ -829,19 +880,24 @@
   display: none;
 }
 .leplayer--fullscreen .leplayer-section {
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(31, 37, 46, 0.7);
   color: white;
 }
 .leplayer--fullscreen .leplayer-section.leplayer-section--active,
 .leplayer--fullscreen .leplayer-section:hover {
-  background: black;
+  background: #1f252e;
 }
 .leplayer--fullscreen .leplayer-section:nth-child(2n) {
-  background: rgba(47, 52, 63, 0.7);
+  background: rgba(51, 62, 76, 0.7);
 }
-.leplayer--fullscreen .leplayer-section:nth-child(2n).leplayer-section--active,
+.leplayer--fullscreen .leplayer-section:nth-child(2n).leplayer-section--active {
+  background: #333e4c;
+}
 .leplayer--fullscreen .leplayer-section:nth-child(2n):hover {
-  background: #2f343f;
+  background: #29313d;
+}
+.leplayer--fullscreen .leplayer-section:hover {
+  background: #14191f;
 }
 .leplayer--fullscreen .leplayer-section-time {
   color: white;
@@ -873,7 +929,7 @@
   background: #dde5ee;
 }
 .leplayer--mini .leplayer__inner .leplayer-section:hover {
-  background: #9cb2c9;
+  background: #758ba3;
 }
 .leplayer--mini .leplayer__inner .leplayer-sections {
   overflow: hidden;

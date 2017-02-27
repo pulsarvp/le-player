@@ -300,11 +300,26 @@
   width: 2px;
   z-index: 507;
 }
+.leplayer-controls .time-marker:before {
+  content: '';
+  width: 4px;
+  height: 100%;
+  position: absolute;
+  left: -1px;
+  background: transparent;
+}
+.leplayer-controls .time-marker--drag:before,
+.leplayer-controls .time-marker:hover:before {
+  background: #0170bc;
+}
 .leplayer-controls .time-marker.shadow {
   background: #0170bc;
   border-right: 1px solid #4a4a4a;
   transition: none;
   z-index: 506;
+}
+.leplayer-controls .time-marker.shadow:before {
+  content: none;
 }
 .leplayer-controls .time-marker .time {
   background: #0170bc;
@@ -384,6 +399,10 @@
   margin-bottom: -1px;
   right: -4px;
   position: absolute;
+}
+.leplayer-control-collection {
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 .leplayer-control-collection--fullscreen {
   display: none;
@@ -562,6 +581,41 @@
 .leplayer-miniplayer .rate-current {
   min-width: 34px;
 }
+@keyframes leplayer-splashicon-fadeout {
+  0% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+.leplayer-splashicon {
+  display: none;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 52px;
+  height: 52px;
+  z-index: 17;
+  margin-left: -26px;
+  margin-top: -26px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 26px;
+  color: white;
+  -ms-flex-pack: center;
+      justify-content: center;
+  -ms-flex-align: center;
+      align-items: center;
+  animation: leplayer-splashicon-fadeout 0.5s linear 1 normal forwards;
+}
+.leplayer-splashicon--active {
+  display: -ms-flexbox;
+  display: flex;
+}
+.leplayer--virgin .leplayer-splashicon {
+  display: none;
+}
 .leplayer-video {
   background: #000;
   display: block;
@@ -643,7 +697,7 @@
   position: relative;
   left: 4px;
 }
-.leplayer--inited .leplayer-play-button {
+.leplayer--inited.leplayer--virgin .leplayer-play-button {
   display: -ms-flexbox;
   display: flex;
 }
@@ -666,8 +720,7 @@
 }
 .leplayer--playing .leplayer-play-button,
 .leplayer--error .leplayer-play-button,
-.leplayer--waiting .leplayer-play-button,
-.leplayer--seeking .leplayer-play-button {
+.leplayer--waiting .leplayer-play-button {
   display: none;
 }
 .leplayer-loader-container {
@@ -693,13 +746,11 @@
 .leplayer--error .leplayer-loader-container__icon {
   animation: none;
 }
-.leplayer--waiting .leplayer-loader-container,
-.leplayer--seeking .leplayer-loader-container {
+.leplayer--waiting .leplayer-loader-container {
   display: -ms-flexbox;
   display: flex;
 }
-.leplayer--waiting .leplayer-loader-container__icon,
-.leplayer--seeking .leplayer-loader-container__icon {
+.leplayer--waiting .leplayer-loader-container__icon {
   animation: leplayer-spin 2s infinite linear;
 }
 @keyframes leplayer-spin {
@@ -735,14 +786,14 @@
 .leplayer-section:nth-child(2n) {
   background: #f2f8fd;
 }
-.leplayer-section:hover {
-  background: #9fccea;
-}
 .leplayer-section.leplayer-section--active {
-  background: #9fccea;
+  background: #e0e0e0;
 }
 .leplayer-section.leplayer-section--active .leplayer-section-description {
   display: block;
+}
+.leplayer-section:hover {
+  background: #9fccea;
 }
 .leplayer-section-time {
   color: #555;
@@ -804,11 +855,11 @@
 .leplayer__inner .leplayer-section:nth-child(2n) {
   background: rgba(242, 248, 253, 0.8);
 }
-.leplayer__inner .leplayer-section:hover {
-  background: rgba(159, 204, 234, 0.8);
-}
 .leplayer__inner .leplayer-section.leplayer-section--active {
   background: rgba(224, 224, 224, 0.8);
+}
+.leplayer__inner .leplayer-section:hover {
+  background: rgba(159, 204, 234, 0.8);
 }
 .leplayer--fullscreen .leplayer-sections {
   display: none;
@@ -839,9 +890,14 @@
 .leplayer--fullscreen .leplayer-section:nth-child(2n) {
   background: rgba(47, 52, 63, 0.7);
 }
-.leplayer--fullscreen .leplayer-section:nth-child(2n).leplayer-section--active,
-.leplayer--fullscreen .leplayer-section:nth-child(2n):hover {
+.leplayer--fullscreen .leplayer-section:nth-child(2n).leplayer-section--active {
   background: #2f343f;
+}
+.leplayer--fullscreen .leplayer-section:nth-child(2n):hover {
+  background: #29313d;
+}
+.leplayer--fullscreen .leplayer-section:hover {
+  background: #14191f;
 }
 .leplayer--fullscreen .leplayer-section-time {
   color: white;
