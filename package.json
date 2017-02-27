@@ -1,6 +1,6 @@
 {
   "name": "le-player",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "The best HTML5 video player made for Lectoriy.",
   "main": "dist/js/le-player.min.js",
   "directories": {
@@ -63,10 +63,23 @@
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
-	"rules": {
-		"no-unused-vars": ["error", { "args": "none" }],
-		"no-console": ["error", { "allow" : [ "warn", "error"] }]
-	},
+    "rules": {
+      "no-unused-vars": [
+        "error",
+        {
+          "args": "none"
+        }
+      ],
+      "no-console": [
+        "error",
+        {
+          "allow": [
+            "warn",
+            "error"
+          ]
+        }
+      ]
+    },
     "parserOptions": {
       "ecmaVersion": 6,
       "sourceType": "module"
