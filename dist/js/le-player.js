@@ -5047,6 +5047,7 @@
 			value: function onClick(e) {
 				_get(BackwardControl.prototype.__proto__ || Object.getPrototypeOf(BackwardControl.prototype), 'onClick', this).call(this, e);
 				this.player.video.currentTime -= this.player.options.playback.step.medium;
+				this.player.splashIcon.show('undo');
 			}
 		}]);
 
