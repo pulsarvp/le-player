@@ -164,16 +164,8 @@ class Html5 extends Component {
 		this._initSubtitles();
 		this._initVideo()
 			.done(() => {
-				//this.fullscreen = new Fullscreen(this.player);
-				//this.fullscreen.init();
 				this._initRate();
 				this._initVolume();
-
-
-				// temporary solution for poster usage
-				// this.startBuffering();
-
-
 				dfd.resolve();
 			});
 		return dfd.promise();

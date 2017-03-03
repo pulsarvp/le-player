@@ -77,7 +77,7 @@ class VolumeControl extends ControlDropdown {
 
 
 	set value (value) {
-		this.icon.iconName = this.player._calcVolumeIcon(value);
+		this.icon.iconName = this.player.calcVolumeIcon(value);
 
 		let p = Math.round(value * 100).toString() + '%';
 		this.active.css('height', p);
