@@ -16,7 +16,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
-import { createEl, secondsToTime } from './utils';
+import { createEl, secondsToTime, noop } from './utils';
 
 import MediaError from './MediaError';
 import Html5 from './entity/Html5.js';
@@ -40,6 +40,7 @@ Control.registerControl('divider', function() {
 		element : $('<div/>').addClass('divider')
 	};
 });
+
 
 
 /**
@@ -188,7 +189,7 @@ const defaultOptions = {
 	plugins : {
 		miniplayer : {}
 	},
-	onPlayerInited : function() {}
+	onPlayerInited : noop
 };
 
 /**
@@ -328,6 +329,7 @@ let Player = function (element, options) {
 
 
 	this.initHotKeys = function () {
+		$(this.element).off('keydown.leplayer.hotkey');
 
 		const isKeyBinding = (e, binding) => {
 			return ((e.which === binding.key) || (e.key === binding.key)) &&
@@ -418,8 +420,15 @@ let Player = function (element, options) {
 	 */
 	this.initOptions = function () {
 		const attrOptions = this.optionsFromElement();
-		// Merge default options + video attributts + user options
-		this.options = $.extend(true, {}, defaultOptions, attrOptions, options);
+		let presetOptions = {};
+
+		if (options.preset && Player.getPreset(options.preset)) {
+			presetOptions = Player.getPreset(options.preset).options;
+		}
+
+
+		// Merge default options + preset options + video attributts+ user options
+		this.options = $.extend(true, {}, defaultOptions, presetOptions, attrOptions, options);
 
 		if(this.options.sources && !Array.isArray(this.options.sources)) {
 			this.options.sources = [this.options.sources]
@@ -434,7 +443,7 @@ let Player = function (element, options) {
 		}
 
 		// Merge correctly controls, without deep merge
-		this.options.controls = $.extend({}, defaultOptions.controls, options.controls);
+		this.options.controls = $.extend({}, defaultOptions.controls, presetOptions.controls, options.controls);
 
 		// exclude controls option
 		for (const name in this.options.excludeControls) {
@@ -445,6 +454,10 @@ let Player = function (element, options) {
 					this.options.controls[name][index] = excludeArray(this.options.controls[name][index], row);
 				}
 			})
+		}
+
+		if (options.preset && Player.getPreset(options.preset)) {
+			Player.getPreset(options.preset).initOptions();
 		}
 	};
 
@@ -687,12 +700,40 @@ Player.registerControl = Control.registerControl;
  * @returns {String}
  */
 Player.secondsToTime = secondsToTime;
+
+
+Player.preset = function(name, obj) {
+	if(typeof obj === 'object') {
+		Player._presets[name] = $.extend({}, {
+			options : {},
+			initOptions : noop
+		}, obj);
+	} else if (typeof obj === 'function') {
+		Player._presets[name] = obj();
+	}
+};
+
+
+Player.getPreset = function(name) {
+	if(Player._presets[name]) {
+		return Player._presets[name];
+	} else {
+		console.error(`preset ${name} doesn't exist`);
+		return null;
+	}
+}
+
+
+Player._presets = {};
+
+
 /**
  * Remove unnecessary attributes, and set some attrs from options (loop, poster etc...). Create main DOM objects
  *
  * @access private
  */
 Player.prototype.createElement = function() {
+
 	const options = this.options;
 	const element = this._element;
 
@@ -811,6 +852,7 @@ Player.prototype.createElement = function() {
 	return this.element;
 };
 
+
 /**
  * @access private
  *
@@ -836,6 +878,7 @@ Player.prototype._initPlugins = function() {
 
 	return this;
 }
+
 
 /**
  * @access private
@@ -1144,6 +1187,7 @@ Player.prototype.completeSections = function(sections) {
 	}
 	return newSections;
 }
+
 
 Player.prototype._userActivity = false;
 
@@ -1458,3 +1502,8 @@ Player.plugin('miniplayer', function(pluginOptions) {
 
 	this._updateMiniPlayer();
 });
+
+
+Player.preset('vps', require('./presets/vps.js').preset);
+Player.preset('sms', require('./presets/sms.js').preset);
+Player.preset('compressed', require('./presets/compressed.js').preset);
