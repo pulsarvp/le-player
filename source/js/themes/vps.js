@@ -3,11 +3,11 @@ export const theme = {
 		width : '100%',
 		controls : {
 			common : [
-				[ 'play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen' ],
-				[ 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'download' ]
+				['play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen'],
+				['rate', 'divider', 'backward', 'divider', 'source', 'divider', 'download']
 			],
 			fullscreen : [
-				[ 'play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'download', 'divider', 'fullscreen' ]
+				['play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'download', 'divider', 'fullscreen']
 			]
 		}
 	},
