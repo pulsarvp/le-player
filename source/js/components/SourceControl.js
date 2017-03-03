@@ -33,7 +33,7 @@ class SourceControl extends ControlContainer {
 		super.onClick(e);
 		const defaultItem = this.getByIndex(0);
 
-		this.player.video.source = {
+		this.player.video.src = {
 			url : defaultItem.data('url'),
 			title : defaultItem.data('title')
 		}
@@ -44,7 +44,7 @@ class SourceControl extends ControlContainer {
 	onItemClick(e) {
 		super.onItemClick(e);
 		let item = $(e.target);
-		this.player.video.source = {
+		this.player.video.src = {
 			url : item.data('url'),
 			title : item.data('title')
 		}

@@ -248,11 +248,14 @@ class Player extends Component {
 
 		super(null, options);
 
-		/**
-		 * DOM container to hold video and all other stuff.
-		 * @type object
-		 */
 		this._element = element;
+
+		/**
+		 * DOM container to hold inner of player
+		 *
+		 * @memberof! Player#
+		 * @type {jQuery}
+		 */
 		this.innerElement = createEl('div');
 
 		// Users options
@@ -261,9 +264,20 @@ class Player extends Component {
 
 		this._view = 'common';
 
+		/**
+		 * DOM container to hold all player
+		 *
+		 * @memberof! Player#
+		 * @type {jQuery}
+		 */
 		this.element = this.createElement();
 
-		// Create entity link
+		/**
+		 * Video html5 component
+		 *
+		 * @memberof! Player#
+		 * @type {Html5}
+		 */
 		this.video = new Html5(this, { element });
 
 		// Create controls
@@ -471,7 +485,7 @@ class Player extends Component {
 				this.addClass('leplayer--ended')
 
 				if(this.options.loop) {
-					this.currentTime(0);
+					this.currentTime = 0;
 					this.video.play();
 				} else if (!this.video.paused) {
 					this.video.pause();
@@ -500,6 +514,11 @@ class Player extends Component {
 
 				this.one('timeupdate', () => this._stopWayting());
 
+				/**
+				 * waiting html5 media event
+				 *
+				 * @event Player#waiting
+				 */
 				this.trigger('waiting');
 			},
 
@@ -521,6 +540,8 @@ class Player extends Component {
 
 	/**
 	 * Starts playing the video
+	 *
+	 * @access public
 	 */
 	play() {
 		return this.video.play();
@@ -528,13 +549,29 @@ class Player extends Component {
 
 	/**
 	 * Pauses the currently playing video
+	 *
+	 * @access public
 	 */
 	pause() {
 		return this.video.pause();
 	}
 
+	/**
+	 * Toggle the currently playing video
+	 *
+	 * @access public
+	 */
 	togglePlay() {
 		return this.video.togglePlay();
+	}
+
+	/**
+	 * Begin loading the src data
+	 *
+	 * @access public
+	 */
+	load() {
+		return this.video.load();
 	}
 
 	/**
@@ -600,6 +637,7 @@ class Player extends Component {
 	/**
 	 * Request fullscreen
 	 *
+	 * @access public
 	 * @fires Player#fullscreenchange
 	 */
 	requestFullscreen() {
@@ -623,6 +661,7 @@ class Player extends Component {
 	/**
 	 * Exit fullscreen
 	 *
+	 * @access public
 	 * @fires Player#fullscreenchange
 	 */
 	exitFullscreen() {
@@ -638,6 +677,12 @@ class Player extends Component {
 
 	}
 
+	/**
+	 * Toggle fullscreen
+	 *
+	 * @access public
+	 * @fires Player#fullscreenchange
+	 */
 	toggleFullscreen() {
 		if(this.view === 'fullscreen') {
 			this.exitFullscreen()
@@ -650,7 +695,7 @@ class Player extends Component {
 	 * Get ControlCollection of Player by name (e.x 'common', 'fullscreen')
 	 *
 	 * @access public
-	 * @param {String} name Name of ControlCollection
+	 * @param {String} name - Name of ControlCollection
 	 * @returns {ControlCollection}
 	 */
 	getControls(name) {
@@ -667,6 +712,13 @@ class Player extends Component {
 		return this.element.width()
 	}
 
+	/**
+	 * Complete the sections, by the additional field 'end' in each section
+	 *
+	 * @access public
+	 * @param {Object} sections - Sections
+	 * @returns {Object} New sections
+	 */
 	completeSections(sections) {
 		if (sections == null || sections.length === 0) {
 			return
@@ -683,8 +735,14 @@ class Player extends Component {
 		}
 		return newSections;
 	}
+
 	/**
-	 * Sets or returns the current playback position in the audio/video (in seconds)
+	 * Get and set the current playback position in the audio/video (in seconds)
+	 * Getter and setter
+	 *
+	 * @access public
+	 * @memberof! Player#
+	 * @type {Nubmer}
 	 */
 	get currentTime() {
 		return this.video.currentTime;
@@ -696,6 +754,11 @@ class Player extends Component {
 
 	/**
 	 * Returns the length of the current audio/video (in seconds)
+	 * Getter
+	 *
+	 * @access public
+	 * @memberof! Player#
+	 * @type {Nubmer}
 	 */
 	get duration() {
 		return this.video.duration;
@@ -703,22 +766,28 @@ class Player extends Component {
 
 	/**
 	 * Returns whether the playback of the audio/video has ended or not
+	 * Getter
+	 *
+	 * @memberof! Player#
+	 * @type {Boolean}
 	 */
 	get ended() {
 		return this.video.ended;
 	}
 
+	/**
+	 * Returns and set whether the playback of the audio/video has ended or not
+	 * Getter and setter
+	 *
+	 * @access public
+	 * @memberof! Player#
+	 * @type {MediaError|String}
+	 * @fires Player#error
+	 */
 	get error() {
 		return this._error || null;
 	}
 
-	/**
-	 * Show player error if param value not null. Also trigger player event 'error'
-	 *
-	 * @fires Player#error
-	 * @param {String|MediaError} value
-	 * @returns {Player} this
-	 */
 	set error(value) {
 		if (value === null) {
 			this._error = null;
@@ -747,7 +816,8 @@ class Player extends Component {
 	 * Return the height of player. If you want get height only of video element, use this.video.height or whatever
 	 *
 	 * @access public
-	 * @returns {Number} Height in px
+	 * @type {Number}
+	 * @memberof! Player#
 	 */
 	get height() {
 		return this.element.height()
@@ -755,6 +825,9 @@ class Player extends Component {
 
 	/**
 	 * Return unnecessary video heigth
+	 * @access public
+	 * @type {Number}
+	 * @memberof! Player#
 	 */
 	get videoHeight() {
 		return this.video.height;
@@ -763,8 +836,13 @@ class Player extends Component {
 
 	/**
 	 * @access public
-	 * @params {Boolean} value
+	 * @type {Boolean}
+	 * @mebmerof! Player#
 	 */
+	get userActive() {
+		return this._userActive || false;
+	}
+
 	set userActive(value) {
 		if(value !== this.getUserActive) {
 			this._userActive = value;
@@ -778,27 +856,18 @@ class Player extends Component {
 		}
 	}
 
-	get userActive() {
-		return this._userActive || false;
-	}
 
 	/**
-	 * Return the view of player
+	 * Set and get player view. View Can be 'common', 'fullscreen', 'mini'w
 	 *
 	 * @access public
-	 * @returns {String}
+	 * @type {String}
+	 * @memberof! Player#
 	 */
 	get view() {
 		return this._view;
 	}
 
-	/**
-	 * Set player view
-	 *
-	 * @access public
-	 * @param {String} view Can be 'common', 'fullscreen', 'mini'
-	 * @returns {Player} this
-	 */
 	set view(view) {
 		if(this.view != null) {
 			this.removeClass(`leplayer--${this.view}`);
@@ -852,7 +921,8 @@ class Player extends Component {
 
 		element.find('source[data-quality]').each((i, item) => {
 			$(item).remove();
-		})
+		});
+
 
 		this.element = this.element
 			.addClass('leplayer')
@@ -860,8 +930,21 @@ class Player extends Component {
 			.css('width', '100%')
 			.css('max-width', (options.width || this.video.width) + 'px')
 
+		/**
+		 * Error display component.
+		 *
+		 * @type {ErrorDisplay}
+		 * @memberof! Player#
+		 */
 		this.errorDisplay = new ErrorDisplay(this);
 
+
+		/**
+		 * Play button component.
+		 *
+		 * @type {PlayButton}
+		 * @memberof! Player#
+		 */
 		this.playButton = new PlayButton(this);
 
 		// TODO: Вынести это в отдельнеый компонент
@@ -873,6 +956,12 @@ class Player extends Component {
 			}).element);
 
 
+		/**
+		 * Splash icon component.
+		 *
+		 * @type {SplashIcon}
+		 * @memberof! Player#
+		 */
 		this.splashIcon = new SplashIcon(this);
 
 		this.videoContainer = createEl('div', {
@@ -887,11 +976,6 @@ class Player extends Component {
 			this.poster = new Poster(this);
 			this.videoContainer.append(this.poster.element);
 		}
-
-
-		//if(options.miniplayer) {
-			//this.miniPlayer = new MiniPlayer(this)
-		//}
 
 
 		const lastTimer = new Time(this, {
@@ -1017,7 +1101,7 @@ class Player extends Component {
 
 
 	/**
-	 * Merge defaultOptions with attrOptions and user's options;
+	 * Merge defaultOptions, presetOptions with attrOptions and user's options;
 	 *
 	 * And complement two objects: controls and excludeControls
 	 *
@@ -1043,10 +1127,6 @@ class Player extends Component {
 			this.options.src = this.options.sources[0]
 		}
 
-		if (this.options.src == null) {
-			this.error = new MediaError('No sources found');
-		}
-
 		// Merge correctly controls, without deep merge
 		this.options.controls = $.extend({}, defaultOptions.controls, presetOptions.controls, this._userOptions.controls);
 
@@ -1066,6 +1146,11 @@ class Player extends Component {
 		}
 	}
 
+	/**
+	 * Create and init all controls
+	 *
+	 * @access private
+	 */
 	_initControls() {
 		for (const name of ['common', 'fullscreen']) {
 			if (!this.options.controls.hasOwnProperty(name)) return;
@@ -1366,10 +1451,8 @@ Player.plugin = function(name, fn) {
 /**
  * Get by name registered component
  *
- * @access public
- * @static
- * @param {String} name
- * @returns {Component}
+ * @param {String} name - Name of component
+ * @return {Component}
  */
 Player.getComponent = Component.getComponent;
 
@@ -1421,6 +1504,22 @@ Player.registerControl = Control.registerControl;
 Player.secondsToTime = secondsToTime;
 
 
+/**
+ * Static helper for creating a plugins for leplayer
+ *
+ * @access public
+ * @static
+ * @param {String} name The name of plugin
+ * @param {Function|Object} fn Plugin init function
+ *
+ * @example
+ * Player.preset('common', {
+ *     width : '100%',
+ *     plugins : {
+ *         miniplayer : true
+ *     }
+ * });
+ */
 Player.preset = function(name, obj) {
 	if(typeof obj === 'object') {
 		Player._presets[name] = $.extend({}, {
@@ -1519,12 +1618,6 @@ Player.plugin('miniplayer', function(pluginOptions) {
 		}
 	}
 
-	/**
-	 * Show mini player
-	 * @param {Boolean} force
-	 *
-	 * @public
-	 */
 	this.showMiniPlayer = (force) => {
 		if (!force && this.view === 'mini') {
 			return;
@@ -1536,12 +1629,6 @@ Player.plugin('miniplayer', function(pluginOptions) {
 		this.view ='mini';
 	}
 
-	/**
-	 * Hide mini player
-	 * @param {Boolean} force
-	 *
-	 * @public
-	 */
 	this.hideMiniPlayer = (force) => {
 		if(!force && this.view !== 'mini') {
 			return;
@@ -1568,7 +1655,6 @@ Player.plugin('miniplayer', function(pluginOptions) {
 
 	this._updateMiniPlayer();
 });
-
 
 Player.preset('vps', require('./presets/vps.js').preset);
 Player.preset('sms', require('./presets/sms.js').preset);

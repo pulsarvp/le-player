@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import Cookie from '../utils/cookie';
 import Component from '../components/Component';
+import MediaError from '../MediaError';
 
 class Html5 extends Component {
 	constructor (player, options) {
@@ -10,6 +11,12 @@ class Html5 extends Component {
 
 		this.subtitles = [];
 		this.bufferRanges = [];
+
+		if (this.player.options.src == null) {
+			this.error = new MediaError('No sources found');
+		}
+
+		this.source = this.player.options.src;
 	}
 
 	/* TODO */
@@ -68,20 +75,19 @@ class Html5 extends Component {
 	}
 
 
-	set source (src) {
+	set src (src) {
 		if(src == null) return;
-		if(this.source && this.source.url === src.url) return;
+		if(this.src && this.src.url === src.url) return;
+
 		const time = this.currentTime;
 		const rate = this.rate;
 		const stop = this.paused;
 
-		$(this.media).attr('src', src.url);
+		this.media.src = src.url;
 
-		this.media = this.element[0];
+		this.playbackRate = rate;
 
-		this.media.playbackRate = rate;
-
-		this.media.currentTime = time;
+		this.currentTime = time;
 
 		this._source = src;
 
@@ -92,7 +98,7 @@ class Html5 extends Component {
 		}
 	}
 
-	get source () {
+	get src () {
 		return this._source
 	}
 
@@ -157,6 +163,10 @@ class Html5 extends Component {
 		}
 
 		return result / this.duration * 100
+	}
+
+	get currentSrc() {
+		return this.media.currentSrc;
 	}
 
 	init () {
@@ -258,14 +268,8 @@ class Html5 extends Component {
 		return dfd.promise();
 	}
 
-	trigger (eventName, ...args) {
-		this.player.trigger.call($(this.media), `leplayer_${eventName}`, ...args);
-		return this;
-	}
-
-	on (eventName, ...args) {
-		$(this.media).on.call($(this.media), `leplayer_${eventName}`, ...args);
-		return this;
+	load() {
+		return this.media.load()
 	}
 
 	_initRate () {
