@@ -756,15 +756,15 @@ let Player = function (element, options) {
 	 */
 	this.initOptions = function () {
 		const attrOptions = this.optionsFromElement();
-		let themeOptions = {};
+		let presetOptions = {};
 
-		if (options.theme && Player.getTheme(options.theme)) {
-			themeOptions = Player.getTheme(options.theme).options;
+		if (options.preset && Player.getPreset(options.preset)) {
+			presetOptions = Player.getPreset(options.preset).options;
 		}
 
 
-		// Merge default options + theme options + video attributts+ user options
-		this.options = $.extend(true, {}, defaultOptions, themeOptions, attrOptions, options);
+		// Merge default options + preset options + video attributts+ user options
+		this.options = $.extend(true, {}, defaultOptions, presetOptions, attrOptions, options);
 
 		if(this.options.sources && !Array.isArray(this.options.sources)) {
 			this.options.sources = [this.options.sources]
@@ -779,7 +779,7 @@ let Player = function (element, options) {
 		}
 
 		// Merge correctly controls, without deep merge
-		this.options.controls = $.extend({}, defaultOptions.controls, themeOptions.controls, options.controls);
+		this.options.controls = $.extend({}, defaultOptions.controls, presetOptions.controls, options.controls);
 
 		// exclude controls option
 		for (const name in this.options.excludeControls) {
@@ -792,8 +792,8 @@ let Player = function (element, options) {
 			})
 		}
 
-		if (options.theme && Player.getTheme(options.theme)) {
-			Player.getTheme(options.theme).initOptions();
+		if (options.preset && Player.getPreset(options.preset)) {
+			Player.getPreset(options.preset).initOptions();
 		}
 	};
 
@@ -1038,29 +1038,29 @@ Player.registerControl = Control.registerControl;
 Player.secondsToTime = secondsToTime;
 
 
-Player.theme = function(name, obj) {
+Player.preset = function(name, obj) {
 	if(typeof obj === 'object') {
-		Player._themes[name] = $.extend({}, {
+		Player._presets[name] = $.extend({}, {
 			options : {},
 			initOptions : noop
 		}, obj);
 	} else if (typeof obj === 'function') {
-		Player._themes[name] = obj();
+		Player._presets[name] = obj();
 	}
 };
 
 
-Player.getTheme = function(name) {
-	if(Player._themes[name]) {
-		return Player._themes[name];
+Player.getPreset = function(name) {
+	if(Player._presets[name]) {
+		return Player._presets[name];
 	} else {
-		console.error(`Theme ${name} doesn't exist`);
+		console.error(`preset ${name} doesn't exist`);
 		return null;
 	}
 }
 
 
-Player._themes = {};
+Player._presets = {};
 
 
 /**
@@ -1840,6 +1840,6 @@ Player.plugin('miniplayer', function(pluginOptions) {
 });
 
 
-Player.theme('vps', require('./themes/vps.js').theme);
-Player.theme('sms', require('./themes/sms.js').theme);
-Player.theme('compressed', require('./themes/compressed.js').theme);
+Player.preset('vps', require('./presets/vps.js').preset);
+Player.preset('sms', require('./presets/sms.js').preset);
+Player.preset('compressed', require('./presets/compressed.js').preset);

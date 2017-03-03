@@ -1,4 +1,4 @@
-export const theme = {
+export const preset = {
 	options : {
 		width : '100%',
 		controls : {
