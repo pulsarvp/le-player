@@ -46,6 +46,7 @@ Control.registerControl('divider', function() {
 /**
  * Return array with excluded dist's items from source array
  *
+ * @access private
  * @param {Array} source
  * @param {Array} dist
  * @return {Array}
@@ -194,6 +195,7 @@ const defaultOptions = {
 
 /**
  * @class Player
+ * @extends Component
  * @param {jQuery} element Element when player will init
  * @param {Object} [options]
  * @param {Boolean} [options.autoplay=false]
@@ -297,6 +299,10 @@ class Player extends Component {
 			 * Sections init event
 			 *
 			 * @event Player#sectionsinit
+			 * @example
+			 * const player = new Player($('#video'), options);
+			 * player.on('sectionsinit', (e, data) => cosnole.log(data));
+			 *
 			 */
 			this.trigger('sectionsinit', data);
 		});
@@ -542,6 +548,9 @@ class Player extends Component {
 	 * Starts playing the video
 	 *
 	 * @access public
+	 * @example
+	 * const player = new Player($("#video"),options);
+	 * $('.some-button').on('click', () => player.play());
 	 */
 	play() {
 		return this.video.play();
@@ -580,6 +589,11 @@ class Player extends Component {
 	 * @access public
 	 * @param {String} view View name
 	 * @returns {Player} this
+	 * @example
+	 * const player = new Player($('#video'), options);
+	 * player.onSetView('mini', () => console.log('Miniplayer yeah!')
+	 *     .onSetView('fullscreen', () => console.log('Fullscreen boom!')
+	 *     .onSetView('common', () => console.log('Common view - lol');
 	 */
 	onSetView(view, ...args) {
 		this.on(`setview.${view}`, ...args);
@@ -593,6 +607,9 @@ class Player extends Component {
 	 * @access public
 	 * @param {String} view View name
 	 * @returns {Player} this
+	 * @example
+	 * const player = new Player($('#video'), options);
+	 * player.onDelView('mini', () => console.log('Exit miniplayer')
 	 */
 	onDelView(view, ...args) {
 		this.on(`delview.${view}`, ...args);
@@ -715,11 +732,11 @@ class Player extends Component {
 	/**
 	 * Complete the sections, by the additional field 'end' in each section
 	 *
-	 * @access public
+	 * @access private
 	 * @param {Object} sections - Sections
 	 * @returns {Object} New sections
 	 */
-	completeSections(sections) {
+	_completeSections(sections) {
 		if (sections == null || sections.length === 0) {
 			return
 		}
@@ -806,6 +823,9 @@ class Player extends Component {
 		 *
 		 * @event Player#error
 		 * @property {MediaError} error
+		 * @example
+		 * const player = new Player($('#video'), options);
+		 * player.on('error', (e, data) => console.error(data.error));
 		 */
 		this.trigger('error', { error : this._error});
 
@@ -1028,10 +1048,10 @@ class Player extends Component {
 	 * Get source video from src attr or <source> element with data attr 'data-quality'
 	 * Also get sources for different quality from <source> element with data attr 'data-quality'
 	 *
-	 * @access public
+	 * @access private
 	 * @returns {Object} options
 	 */
-	optionsFromElement() {
+	_optionsFromElement() {
 		// Copy video attrs to the opitons
 		const  element = this._element;
 		let attrOptions = [
@@ -1108,7 +1128,7 @@ class Player extends Component {
 	 * @access private
 	 */
 	_initOptions() {
-		const attrOptions = this.optionsFromElement();
+		const attrOptions = this._optionsFromElement();
 		let presetOptions = {};
 
 		if (this._userOptions.preset && Player.getPreset(this._userOptions.preset)) {
@@ -1210,7 +1230,7 @@ class Player extends Component {
 					return;
 				}
 
-				sections = this.completeSections(sections);
+				sections = this._completeSections(sections);
 
 				const sectionsComponent = new Sections(this, {
 
