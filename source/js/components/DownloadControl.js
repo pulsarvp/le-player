@@ -70,7 +70,7 @@ class DownloadControl extends Control {
 
 
 	onLoadStart(e, data) {
-		this.link = this.player.video.source.url
+		this.link = this.player.video.src.url
 	}
 
 }

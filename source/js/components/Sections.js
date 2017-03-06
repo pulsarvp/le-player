@@ -136,7 +136,7 @@ class Sections extends Component {
 
 		// Update span with end section time
 		// TODO: Вынести это в отдельный компонент ShowTime или типо того
-		if(this.player.getView() === 'mini') {
+		if(this.player.view === 'mini') {
 			const endSectionTime = this.activeSection.attr('data-end');
 			this.activeSection
 				.next()

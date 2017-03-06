@@ -33,7 +33,7 @@ class SectionControl extends ControlCheckbox {
 		super.onChecked(e);
 		this.player.trigger('sectionstoggle', {
 			checked : data.checked,
-			view : this.player.getView()
+			view : this.player.view
 		});
 	}
 

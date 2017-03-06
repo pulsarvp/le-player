@@ -47,7 +47,7 @@ Player.plugin('ga', function(pluginOptions) {
 			'event',
 			'Player Sections',
 			'Click',
-			player.getView()
+			player.view
 		)
 	});
 
