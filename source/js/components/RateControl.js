@@ -41,7 +41,7 @@ class RateControl extends Control {
 
 		this.downControl = new Control(this.player, {
 			className : 'rate-down',
-			name: 'rate-down',
+			name : 'rate-down',
 			iconName : 'backward',
 			collection : this.options.collection,
 			title : 'Уменьшить скорость проигрывания',

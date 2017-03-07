@@ -76,7 +76,7 @@ class ControlCollection extends Component {
 		if(second == null) {
 			const name = first;
 			for(let i = 0; i < this.controls.length; i++) {
-				if(this.controls[i][name] != undefined) {
+				if(this.controls[i][name] != null) {
 					return this.controls[i][name];
 				}
 			}
@@ -114,14 +114,14 @@ class ControlCollection extends Component {
 		const { name, controls } = this.options;
 
 		this.element = createEl('div', {
-			className: `leplayer-control-collection leplayer-control-collection--${name}`
+			className : `leplayer-control-collection leplayer-control-collection--${name}`
 		})
 
-		controls.forEach( ( row, indexRow ) => {
+		controls.forEach((row, indexRow) => {
 			const elemRow = this.addRow();
 			let hasTimeline = false;
 			row.forEach(controlName => {
-				if(controlName == 'timeline') {
+				if(controlName === 'timeline') {
 					hasTimeline = true
 				}
 

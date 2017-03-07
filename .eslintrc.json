@@ -1,0 +1,29 @@
+{
+	"extends": "eslint:recommended",
+	"rules": {
+		"indent" : ["error", "tab"],
+		"no-unused-vars": [ "error", { "args": "none" } ],
+		"no-console": [ "error", { "allow": [ "warn", "error" ] } ],
+		"array-bracket-spacing": ["error", "never"],
+		"space-unary-ops": [ "error", { "words": true, "nonwords": false } ],
+		"key-spacing": ["error", { "beforeColon": true }],
+		"no-empty": "error",
+		"array-callback-return": "error",
+		"eqeqeq" : ["error", "always", {"null": "ignore"}],
+		"space-in-parens": ["error", "never"],
+		"quote-props": ["error", "as-needed"]
+
+	},
+	"parserOptions": {
+		"ecmaVersion": 6,
+		"sourceType": "module",
+		"ecmaFeatures": {
+		"experimentalObjectRestSpread" : true
+		}
+	},
+	"env": {
+		"browser": "true",
+		"es6": "true",
+		"commonjs" : true
+	}
+}

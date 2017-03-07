@@ -16,7 +16,7 @@ class Cookie {
 		var cookies = document.cookie.split(';');
 		for (let i in cookies) {
 			var d = cookies[ i ].trim().split('=');
-			if (d[ 0 ] == 'leplayer_' + name)
+			if (d[ 0 ] === 'leplayer_' + name)
 				return d[ 1 ];
 		}
 		return dflt;

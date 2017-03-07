@@ -104,7 +104,7 @@ class TimelineControl extends Control {
 			.append(this.playedRanges)
 			.append(this.bufferedRanges)
 			.on({
-				'mousemove' : (e) => {
+				mousemove : (e) => {
 					if (this.marker.drag) return;
 
 					let p = this.getPosition(e.pageX);
@@ -121,17 +121,17 @@ class TimelineControl extends Control {
 					}
 				},
 
-				'mouseleave' : (e) => {
+				mouseleave : (e) => {
 					if (this.drag) return;
 					this.markerShadow.element.hide()
 				},
 
-				'mousedown' : (e) => {
+				mousedown : (e) => {
 				},
 
-				'click' : this._onLineClick.bind(this),
+				click : this._onLineClick.bind(this),
 
-				'touchmove' : (e) => {
+				touchmove : (e) => {
 				}
 			});
 
@@ -169,7 +169,7 @@ class TimelineControl extends Control {
 	}
 
 	updateSectionRanges(items) {
-		if(this.sections == null || this.sections.length == 0 ) {
+		if(this.sections == null || this.sections.length === 0) {
 			this.sections = this.createSectionRanges(items);
 			this.line.append(this.sections);
 		} else {
@@ -185,8 +185,8 @@ class TimelineControl extends Control {
 			const item = $('<div />')
 				.addClass('leplayer-timeline-section')
 				.css({
-					width: length / duration * 100 + '%',
-					left: section.begin / duration * 100 + '%'
+					width : length / duration * 100 + '%',
+					left : section.begin / duration * 100 + '%'
 				});
 			result.append(item);
 		})
@@ -256,8 +256,8 @@ class TimelineControl extends Control {
 			video.loaded.forEach(item => {
 				let domItem = $('<div />').addClass('time-buffered');
 				domItem.css({
-					'left' : item[START] * 100 + '%',
-					'width' : (item[END] - item[START]) * 100 + '%'
+					left : item[START] * 100 + '%',
+					width : (item[END] - item[START]) * 100 + '%'
 				});
 				result = result.add(domItem);
 			});

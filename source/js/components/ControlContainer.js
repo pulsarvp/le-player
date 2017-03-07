@@ -59,7 +59,7 @@ class ControlContainer extends ControlDropdown {
 	 * @type {jQuery}
 	 */
 	get active () {
-		if (this._active && this._active.length > 0 ) {
+		if (this._active && this._active.length > 0) {
 			return this._active;
 		}
 		this.list.forEach(item => {

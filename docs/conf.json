@@ -4,7 +4,7 @@
 		"dictionaries": [ "jsdoc" ]
 	},
 	"source": {
-		"include": [ "source/js/", "source/js/utils", "source/js/components/", "source/js/le-player.js" ],
+		"include": [ "source/js/le-player.js"],
 		"exclude": [ "node_modules", "bower_components" ],
 		"includePattern": ".+\\.js(doc)?$"
 	},

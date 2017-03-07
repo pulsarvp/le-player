@@ -47,7 +47,7 @@ Player.plugin('ga', function(pluginOptions) {
 			'event',
 			'Player Sections',
 			'Click',
-			player.getView()
+			player.view
 		)
 	});
 
@@ -57,7 +57,7 @@ Player.plugin('ga', function(pluginOptions) {
 	player.on('volumechange', (e, data) => {
 		clearTimeout(volumeChangeTimeout);
 
-		volumeChangeTimeout = setTimeout( () => {
+		volumeChangeTimeout = setTimeout(_ => {
 			const value = data.volume;
 			window.ga(
 				'send',
@@ -73,7 +73,7 @@ Player.plugin('ga', function(pluginOptions) {
 	player.on('ratechange', (e, data) => {
 		clearTimeout(rateChangeTimeout);
 
-		rateChangeTimeout = setTimeout( () => {
+		rateChangeTimeout = setTimeout(_ => {
 			const value = data.rate;
 			window.ga(
 				'send',
@@ -90,7 +90,7 @@ Player.plugin('ga', function(pluginOptions) {
 	player.on('timeupdate', () => {
 		const percent = player.video.playedPercentage;
 		const delta = options.videoPlayedDelta;
-		options.videoPlayed.forEach( item => {
+		options.videoPlayed.forEach(item => {
 			if (
 				!playedEventsSent[item] &&
 				Math.abs(percent - item) < delta
