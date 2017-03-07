@@ -71,7 +71,7 @@ const defaultOptions = {
 	muted : false,
 	preload : 'metadata',
 	poster : null,
-	svgPath : '../dist/svg/svg-defs.svg',
+	svgPath : '',
 	innactivityTimeout : 5000,
 	rate : {
 		step : 0.25,
@@ -263,6 +263,10 @@ class Player extends Component {
 		// Users options
 		this._userOptions = options;
 		this._initOptions();
+
+		if(this.options.svgPath === '') {
+			Player._loadSVGSprite(Player.defaultSprite);
+		}
 
 		this._view = 'common';
 
@@ -1563,6 +1567,15 @@ Player.getPreset = function(name) {
 
 
 Player._presets = {};
+
+
+Player._loadSVGSprite = function(svg) {
+	const hiddenElement = $('<div/>').hide();
+	$('body').prepend(hiddenElement.append(svg));
+	return hiddenElement;
+}
+
+Player.defaultSprite = require('../../dist/svg/svg-defs.svg');
 
 
 window.$.fn.lePlayer = function (options) {
