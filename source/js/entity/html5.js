@@ -16,7 +16,7 @@ class Html5 extends Component {
 			this.error = new MediaError('No sources found');
 		}
 
-		this.source = this.player.options.src;
+		this.src = this.player.options.src;
 	}
 
 	/* TODO */
