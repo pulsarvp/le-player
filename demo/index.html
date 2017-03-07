@@ -11,6 +11,16 @@
 			padding-top: 1.5rem;
 			padding-bottom: 1.5rem;
 		}
+
+		#editor {
+			margin-top: 40px;
+			height: 300px;
+		}
+
+		.bigDivider {
+			padding-top: 1000px;
+		}
+
 		</style>
 	</head>
 	<body>
@@ -41,13 +51,13 @@
 							<span class="caret"></span>
 						  </a>
 						  <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-							<li><a href="#" class="link-set-theme" data-name="default">Лекторий <span class="label label-default">Default</span></a></li>
-							<li><a href="#" class="link-set-theme" data-name="vps">video.mipt</a></li>
-							<li><a href="#" class="link-set-theme" data-name="ussr">СССР</a></li>
-							<li><a href="#" class="link-set-theme" data-name="vps-gray">Новый video.mipt</a></li>
-							<li><a href="#" class="link-set-theme" data-name="opus-green">ОТУС green</a></li>
-							<li><a href="#" class="link-set-theme" data-name="opus-orange">ОТУС orange</a></li>
-							<li><a href="#" class="link-set-theme" data-name="compressed">Compressed <span class="label label-success">New</span></a></li>
+							<li><a href="#default" class="link-set-theme" data-name="default">Лекторий <span class="label label-default">Default</span></a></li>
+							<li><a href="#vps" class="link-set-theme" data-name="vps">video.mipt</a></li>
+							<li><a href="#ussr" class="link-set-theme" data-name="ussr">СССР</a></li>
+							<li><a href="#vps-gray" class="link-set-theme" data-name="vps-gray">Новый video.mipt</a></li>
+							<li><a href="#opus-green" class="link-set-theme" data-name="opus-green">ОТУС green</a></li>
+							<li><a href="#opus-orange" class="link-set-theme" data-name="opus-orange">ОТУС orange</a></li>
+							<li><a href="#compressed" class="link-set-theme" data-name="compressed">Compressed <span class="label label-success">New</span></a></li>
 						  </ul>
 						</li>
 					</ul>
@@ -68,20 +78,42 @@
 					<div id="sections"></div>
 				</div>
 			</div>
-			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
-			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
-			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
-			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
-			<br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br> <br>
+			<div class="row">
+				<div class="col-sm-7">
+					<div id="editor">new Object({
+		title : 'Multiple videos with mini player',
+		width: '100%',
+		data : './data.json',
+		sectionContainer: "#sections",
+		poster : './poster.jpg',
+		preload : 'metadata',
+		//preset : 'sms',
+		plugins : {
+			'ga' : {},
+			'miniplayer' : false
+		},
+});</div>
+				</div>
+				<div class="col-sm-12" style="margin-top: 30px">
+					<button class="btn btn-success" id="editor-go">Save and Go</button>
+					<button class="btn" id="editor-save">Save</button>
+				</div>
+			</div>
+
+			<div class="bigDivider"></div>
+
 		</div>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" charset="utf-8"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js"></script>
 	<script>
 	(function(i,s,o,g,r,a,m) { i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() { (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o), m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m) } )(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 	ga('create', 'UA-5832386-17', {
 		'cookieDomain' : 'none'
 	});
+
 	ga('send', 'pageview');
+
 	</script>
 	<script src="index.js" charset="utf-8"></script>
 	<script src="../dist/js/le-player.js"></script>
@@ -91,26 +123,6 @@
 			if (window.location.protocol != 'http:') {
 				$('.warning-subtitle').show();
 			}
-
-			var player = new lePlayer($('#video'), {
-				title : 'Multiple videos with mini player',
-				width: '100%',
-				theme : 'sms',
-				data : './data.json',
-				sectionContainer: "#sections",
-				poster : './poster.jpg',
-				miniplayer: {
-					width : '1140px'
-				},
-				preload : 'metadata',
-				plugins : {
-					'ga' : {}
-				},
-				onPlayerInited : function(){
-					console.log("Player inited")
-				}
-				//dataUrl : './data.json'
-			});
 		});
 	</script>
 	</body>
