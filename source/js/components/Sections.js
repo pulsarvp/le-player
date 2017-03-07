@@ -6,8 +6,7 @@
 import $ from 'jquery';
 import Component from './Component';
 
-import { secondsToTime } from '../utils';
-
+import { secondsToTime, getScrollBarWidth } from '../utils';
 /**
  * @class Sections
  * @param {Player} player Main player
@@ -68,11 +67,28 @@ class Sections extends Component {
 	 * @override
 	 */
 	createElement() {
+		const { fullscreenOnly, hideScroll } = this.options;
+
+
 		this.element = $('<div />').addClass('leplayer-sections');
-		if(this.options.fullscreenOnly) {
+		this._innerElement = $('<div />').addClass('leplayer-sections__inner');
+
+		if(fullscreenOnly) {
 			this.element.addClass('leplayer-sections--fsonly');
 		}
-		this.element.append(this._createSections(this.options.items));
+
+		if(hideScroll) {
+			this.element.addClass('leplayer-sections--hide-scroll');
+			this._innerElement.css({
+				right : -1 * getScrollBarWidth()
+			})
+		}
+
+		this.element.append(
+			this._innerElement.append(this._createSections(this.options.items))
+		)
+
+
 		return this.element;
 	}
 

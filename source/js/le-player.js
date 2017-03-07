@@ -1233,16 +1233,16 @@ class Player extends Component {
 				sections = this._completeSections(sections);
 
 				const sectionsComponent = new Sections(this, {
-
 					items : sections,
 					fullscreenOnly : isSectionOutside,
+					hideScroll : true
 				});
 
 				this.innerElement.append(sectionsComponent.element);
 
 				if (isSectionOutside) {
 					const outsideSections = new Sections(this, {
-						items : sections,
+						items : sections
 					});
 					this.sectionsContainer.append(outsideSections.element);
 				}
