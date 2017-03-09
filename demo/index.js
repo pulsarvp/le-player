@@ -1,6 +1,6 @@
 $(function() {
 	var dropdown = $('#changeTheme');
-	var _currentTime = 'default';
+	var _currentTheme = 'default'
 
 
 	function parseParams(params) {
