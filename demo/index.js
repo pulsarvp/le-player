@@ -18,7 +18,6 @@ $(function() {
 			// Allow plus sign as a space
 			ret[hash[0]] = decodeURIComponent(hash[1].replace(/\+/g, ' '));
 		}
-		console.log(ret);
 
 		return ret;
 	}
@@ -69,6 +68,7 @@ $(function() {
 
 
 	var editor = ace.edit("editor");
+	editor.$blockScrolling = Infinity
     editor.setTheme("ace/theme/solarized_light");
     editor.getSession().setMode("ace/mode/javascript");
 
