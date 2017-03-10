@@ -58,3 +58,28 @@ export function createEl(tag='div', props) {
 
 
 export function noop() {}
+
+export const getScrollBarWidth = (function() {
+	let result;
+
+	return function() {
+
+		if(result != null) {
+			return result;
+		}
+
+		const outer = $('<div />').css({
+			visibility : 'hidden',
+			width : 100,
+			overflow : 'scroll'
+		}).appendTo('body');
+
+		const widthWithScroll = $('<div />').css({
+			width : '100%'
+		}).appendTo(outer).outerWidth();
+
+		outer.remove();
+		return result = 100 - widthWithScroll;
+	}
+
+}());

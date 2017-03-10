@@ -18,6 +18,22 @@
 	{
 		display: none;
 	}
+
+	&--hide-scroll
+	{
+		overflow: hidden;
+
+		.leplayer-sections__inner
+		{
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: -15px;
+			overflow-y: scroll;
+			box-sizing: content-box;
+		}
+	}
 }
 
 .leplayer-section
