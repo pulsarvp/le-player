@@ -13,7 +13,7 @@ class Html5 extends Component {
 		this.bufferRanges = [];
 
 		if (this.player.options.src == null) {
-			this.error = new MediaError('No sources found');
+			this.player.error = new MediaError('No sources found');
 		}
 
 		this.src = this.player.options.src;

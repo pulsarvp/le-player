@@ -1147,6 +1147,10 @@ class Player extends Component {
 			this.options.sources = [this.options.sources]
 		}
 
+		if(typeof this.options.src === 'string') {
+			this.options.src = { url : this.options.src }
+		}
+
 		if(this.options.src == null && this.options.sources.length > 0) {
 			this.options.src = this.options.sources[0]
 		}
