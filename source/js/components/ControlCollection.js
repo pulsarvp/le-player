@@ -14,17 +14,32 @@ import { createEl } from '../utils';
  * @param {Player} player Main player
  * @param {Object} [options] Options of component
  * @param {jQuery} [options.controls] Array of rows of control's name
- * @param {Object} [options.controlOptions] Control options
+ * @param {Object} [options.controlsOptions] Control options
  * @property {Array} Array of rows of control's name
  * @pr
  *
  */
 class ControlCollection extends Component {
 	constructor (player, options) {
+		const name = options.name;
+
+		let playerOptions = {
+			controls : player.options.controls[name],
+		}
+
+		if(player.options.controlsOptions[name]) {
+			playerOptions['align'] = player.options.controlsOptions[name].align;
+			playerOptions['controlsOptions'] = player.options.controlsOptions[name].controls;
+			playerOptions['inOneRow'] = player.options.controlsOptions[name].inOneRow;
+		}
+
 		options = $.extend({}, {
-			controls : player.options.controls[options.name] || [],
-			controlOptions : {}
-		}, options);
+			controls : [],
+			controlsOptions : {},
+			align : 'left',
+			inOneRow : false
+		}, playerOptions, options);
+
 		super(player, options);
 
 		this.active = options.active || false;
@@ -35,11 +50,11 @@ class ControlCollection extends Component {
 
 
 	_getControlOptions(name) {
-		const { controlOptions } = this.options;
-		let result = controlOptions.control || {};
+		const { controlsOptions } = this.options;
+		let result = controlsOptions.control || {};
 
-		if(controlOptions[name]) {
-			result = $.extend(true, {}, result, controlOptions[name]);
+		if(controlsOptions[name]) {
+			result = $.extend(true, {}, result, controlsOptions[name]);
 		}
 
 		return result;
@@ -111,28 +126,43 @@ class ControlCollection extends Component {
 	 * @override
 	 */
 	createElement() {
-		const { name, controls } = this.options;
+		const { name, controls, align, inOneRow } = this.options;
+		let globalAlign = null;
 
 		this.element = createEl('div', {
 			className : `leplayer-control-collection leplayer-control-collection--${name}`
 		})
 
+		if(inOneRow) {
+			this.element.addClass('leplayer-control-collection--one-row')
+		}
+
+		if(typeof align === 'string') {
+			globalAlign = align;
+		}
+
 		controls.forEach((row, indexRow) => {
 			const elemRow = this.addRow();
-			let hasTimeline = false;
+			let rowAlign = globalAlign;
+
+			if(Array.isArray(align) && align[indexRow]) {
+				rowAlign = align[indexRow]
+			}
+
 			row.forEach(controlName => {
-				if(controlName === 'timeline') {
-					hasTimeline = true
+
+				if(controlName === 'timeline' && rowAlign !== 'justify') {
+					console.warn('Conrols should have justify align, if there is the timeline in it');
 				}
 
 				this.addControl(indexRow, controlName, this._getControlOptions(name));
 			});
 
-			if (!hasTimeline) {
-				elemRow.css('width', '1px');
-			}
+			elemRow.addClass(`leplayer-controls--${rowAlign}`)
+
 			elemRow.find('.divider + .divider').remove();
-		})
+		});
+
 		return this.element;
 	}
 
