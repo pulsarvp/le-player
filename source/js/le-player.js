@@ -320,6 +320,10 @@ class Player extends Component {
 			 */
 			this.trigger('inited');
 
+			if(this.options.time) {
+				this.currentTime = this.options.time;
+			}
+
 			if(this.video.src != null && this.options.autoplay) {
 				this.play();
 			}
