@@ -961,8 +961,8 @@ class Player extends Component {
 		this.element = this.element
 			.addClass('leplayer')
 			.attr('tabindex', 0)
-			.css('width', '100%')
-			.css('max-width', (options.width || this.video.width) + 'px')
+			.css('width', options.width && '100%')
+			.css('max-width', options.width)
 
 		/**
 		 * Error display component.
