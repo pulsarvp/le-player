@@ -89,8 +89,10 @@
 
 		.control-checkbox--checked
 		{
-			background: @color-fs-text-checked;
+			background: @color-fs-control-checked;
+			color: @color-fs-text-hovered;
 		}
+
 		.info-control
 		{
 			&__content
@@ -98,11 +100,6 @@
 				background: @color-fs-background;
 				color: white;
 			}
-
-			&__item
-			{
-			}
-
 		}
 		.control-text
 		{
@@ -233,7 +230,7 @@
 
 	.control-checkbox--checked
 	{
-		background: @color-text;
+		background: @color-control-checked;
 		color: @color-text-checked;
 	}
 
@@ -292,7 +289,7 @@
 			text-align: left;
 			background: @color-background;
 			padding: 10px;
-			color: black;
+			color: @color-info-text;
 			font-size: @control-text-font-size;
 			/*left: 50%;*/
 			min-width: 300px;
