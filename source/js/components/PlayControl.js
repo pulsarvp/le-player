@@ -60,7 +60,6 @@ class PlayControl extends Control {
 		}
 		this._replay = false;
 
-		console.log(this.player.video.paused);
 		if(this.player.video.paused) {
 			this.showPlay();
 		} else {
