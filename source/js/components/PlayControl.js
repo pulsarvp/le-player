@@ -22,19 +22,18 @@ class PlayControl extends Control {
 		}, options);
 		super(player, options);
 
-		this.player.on('play', (e) => {
-			this.play();
-		})
+		this.player.on('play', this.showPause.bind(this))
+		this.player.on('pause', this.showPlay.bind(this));
+		this.player.on('ended', this.showReplay.bind(this));
 
-		this.player.on('pause', (e) => {
-			this.pause();
-		})
+		this.player.on('seeking play', this.removeReplay.bind(this));
 	}
+
 
 	/**
 	 * Pause the video
 	 */
-	pause () {
+	showPlay () {
 		this.icon.iconName = 'play';
 		this.element.attr('title', this.options.title);
 	}
@@ -42,9 +41,30 @@ class PlayControl extends Control {
 	/**
 	 * Play the video
 	 */
-	play () {
+	showPause () {
 		this.icon.iconName = 'pause';
 		this.element.attr('title', 'Поставить на паузу');
+	}
+
+	showReplay() {
+		if(this.player.duration !== Infinity) {
+			this._replay = true;
+			this.icon.iconName = 'refresh';
+			this.element.attr('title', 'Запустить заново')
+		}
+	}
+
+	removeReplay() {
+		if(!this._replay) {
+			return;
+		}
+		this._replay = false;
+
+		if(this.player.video.paused) {
+			this.showPlay();
+		} else {
+			this.showPause();
+		}
 	}
 
 	/**
