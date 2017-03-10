@@ -22,8 +22,8 @@ class PlayControl extends Control {
 		}, options);
 		super(player, options);
 
-		this.player.on('play', this.showPlay.bind(this))
-		this.player.on('pause', this.showPause.bind(this));
+		this.player.on('play', this.showPause.bind(this))
+		this.player.on('pause', this.showPlay.bind(this));
 		this.player.on('ended', this.showReplay.bind(this));
 
 		this.player.on('seeking play', this.removeReplay.bind(this));
@@ -33,7 +33,7 @@ class PlayControl extends Control {
 	/**
 	 * Pause the video
 	 */
-	showPause () {
+	showPlay () {
 		this.icon.iconName = 'play';
 		this.element.attr('title', this.options.title);
 	}
@@ -41,7 +41,7 @@ class PlayControl extends Control {
 	/**
 	 * Play the video
 	 */
-	showPlay () {
+	showPause () {
 		this.icon.iconName = 'pause';
 		this.element.attr('title', 'Поставить на паузу');
 	}
@@ -60,6 +60,7 @@ class PlayControl extends Control {
 		}
 		this._replay = false;
 
+		console.log(this.player.video.paused);
 		if(this.player.video.paused) {
 			this.showPlay();
 		} else {
