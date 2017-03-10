@@ -310,6 +310,7 @@ class Player extends Component {
 			 */
 			this.trigger('sectionsinit', data);
 		});
+		this._initPlugins();
 
 		this.video.init().then(() => {
 			/**
@@ -318,9 +319,15 @@ class Player extends Component {
 			 * @event Player#inited
 			 */
 			this.trigger('inited');
-			this._initPlugins();
-		});
 
+			if(this.options.time) {
+				this.currentTime = this.options.time;
+			}
+
+			if(this.video.src != null && this.options.autoplay) {
+				this.play();
+			}
+		});
 
 		this._listenHotKeys();
 
