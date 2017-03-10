@@ -30,14 +30,12 @@ class ControlCollection extends Component {
 		if(player.options.controlsOptions[name]) {
 			playerOptions['align'] = player.options.controlsOptions[name].align;
 			playerOptions['controlsOptions'] = player.options.controlsOptions[name].controls;
-			playerOptions['inOneRow'] = player.options.controlsOptions[name].inOneRow;
 		}
 
 		options = $.extend({}, {
 			controls : [],
 			controlsOptions : {},
 			align : 'left',
-			inOneRow : false
 		}, playerOptions, options);
 
 		super(player, options);
@@ -126,16 +124,12 @@ class ControlCollection extends Component {
 	 * @override
 	 */
 	createElement() {
-		const { name, controls, align, inOneRow } = this.options;
+		const { name, controls, align } = this.options;
 		let globalAlign = null;
 
 		this.element = createEl('div', {
 			className : `leplayer-control-collection leplayer-control-collection--${name}`
 		})
-
-		if(inOneRow) {
-			this.element.addClass('leplayer-control-collection--one-row')
-		}
 
 		if(typeof align === 'string') {
 			globalAlign = align;
