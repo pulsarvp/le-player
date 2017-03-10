@@ -34,6 +34,24 @@
 	position: relative;
 	width: 100%;
 
+
+	&--left
+	{
+		width: 1%;
+		margin-right: auto;
+	}
+
+	&--right
+	{
+		width: 1%;
+		margin-left: auto;
+	}
+
+	&--justify
+	{
+		width: auto;
+	}
+
 	&:not(:last-child)
 	{
 		margin-bottom: 10px;
@@ -550,6 +568,11 @@
 {
 	margin-top: 10px;
 	margin-bottom: 10px;
+
+	&--one-row
+	{
+		display: flex;
+	}
 }
 
 .leplayer-control-collection--fullscreen

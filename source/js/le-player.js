@@ -98,6 +98,16 @@ const defaultOptions = {
 			['play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
 		]
 	},
+	controlsOptions : {
+
+		common : {
+			align : ['justify', 'left']
+		},
+
+		fullscreen : {
+			align : 'justify'
+		}
+	},
 	volume : {
 		default : 0.4,
 		mutelimit : 0.05,
