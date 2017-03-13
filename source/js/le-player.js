@@ -1035,7 +1035,7 @@ class Player extends Component {
 		}))
 		.append(createEl('div', {
 			className : 'leplayer__video-info',
-			html : this.options.videoInfo || ""
+			html : this.options.description || ""
 		}))
 		.append(createEl('div', {
 			className : 'leplayer__last',
