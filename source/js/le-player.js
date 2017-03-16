@@ -17,6 +17,7 @@ import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
 import { createEl, secondsToTime, noop } from './utils';
+import { IS_ANDROID, IS_IOS } from './utils/browser';
 
 import MediaError from './MediaError';
 import Html5 from './entity/Html5.js';
@@ -96,6 +97,13 @@ const defaultOptions = {
 		],
 		mini : [
 			['play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
+		],
+		ios : [
+			['play', 'rate', 'timeline']
+		],
+		android : [
+			['timeline'],
+			['play', 'rate']
 		]
 	},
 	controlsOptions : {
@@ -1197,9 +1205,24 @@ class Player extends Component {
 	 * @access private
 	 */
 	_initControls() {
+		let controls = []
+
 		for (const name of ['common', 'fullscreen']) {
 			if (!this.options.controls.hasOwnProperty(name)) return;
-			const controlCollection = new ControlCollection(this, { name });
+			console.log(IS_IOS, IS_ANDROID);
+			if(IS_IOS) {
+				controls = this.options.controls['ios'];
+			} else if (IS_ANDROID) {
+				controls = this.options.controls['android'];
+			} else {
+				controls = this.options.controls[name];
+			}
+
+			const controlCollection = new ControlCollection(this, {
+				name,
+				controls
+			});
+
 			this.element.append(controlCollection.element);
 		}
 
