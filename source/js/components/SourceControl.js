@@ -33,10 +33,10 @@ class SourceControl extends ControlContainer {
 		super.onClick(e);
 		const defaultItem = this.getByIndex(0);
 
-		this.player.video.src = {
+		this.player.changeQuality({
 			url : defaultItem.data('url'),
 			title : defaultItem.data('title')
-		}
+		})
 		this.active = defaultItem;
 
 	}
@@ -44,10 +44,10 @@ class SourceControl extends ControlContainer {
 	onItemClick(e) {
 		super.onItemClick(e);
 		let item = $(e.target);
-		this.player.video.src = {
+		this.player.changeQuality({
 			url : item.data('url'),
 			title : item.data('title')
-		}
+		})
 
 	}
 

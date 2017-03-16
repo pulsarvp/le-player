@@ -76,26 +76,8 @@ class Html5 extends Component {
 
 
 	set src (src) {
-		if(src == null) return;
-		if(this.src && this.src.url === src.url) return;
-
-		const time = this.currentTime;
-		const rate = this.rate;
-		const stop = this.paused;
-
-		this.media.src = src.url;
-
-		this.playbackRate = rate;
-
-		this.currentTime = time;
-
 		this._source = src;
-
-		if (stop) {
-			this.pause();
-		} else {
-			this.play();
-		}
+		this.media.src = src.url;
 	}
 
 	get src () {
