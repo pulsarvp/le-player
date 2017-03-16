@@ -50,6 +50,11 @@
 	&--justify
 	{
 		width: auto;
+		&::after {
+			content: '';
+			width: 1px;
+			display: table-cell;
+		}
 	}
 
 	&:not(:last-child)
@@ -64,13 +69,7 @@
 
 	&.controls-fullscreen
 	{
-		bottom: 20px;
 		display: block;
-		left: 20px;
-		position: fixed;
-		right: 20px;
-		width: auto;
-		z-index: @z-index-fullscreen + 7;
 		.control
 		{
 			background: @color-fs-control;
@@ -566,8 +565,6 @@
 
 .leplayer-control-collection
 {
-	margin-top: 10px;
-	margin-bottom: 10px;
 
 	&--one-row
 	{
@@ -578,6 +575,12 @@
 .leplayer-control-collection--fullscreen
 {
 	display: none;
+	bottom: 20px;
+	left: 20px;
+	position: fixed;
+	right: 20px;
+	width: auto;
+	z-index: @z-index-fullscreen + 7;
 }
 
 .leplayer--fullscreen

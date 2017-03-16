@@ -102,7 +102,7 @@ const defaultOptions = {
 			['play', 'rate', 'timeline']
 		],
 		android : [
-			['timeline'],
+			['timeline', 'fullscreen'],
 			['play', 'rate']
 		]
 	},
