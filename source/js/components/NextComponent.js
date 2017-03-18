@@ -83,26 +83,33 @@ class NextComponent extends Component {
 			<div class="leplayer-next">
 				<div class="leplayer-next__header">
 					<div class="leplayer-next__head">Следующее</div>
-					<div class="leplayer-next__title"${this.options.title}</div>
+					<div class="leplayer-next__title">${this.options.title}</div>
 					<div class="leplayer-next__subtitle">${this.options.subtitle}</div>
 				</div>
+
 				<span class="_button-replace"></span>
+
 				<div class="leplayer-next__footer">
 					<div class="leplayer-next__cancel">Отмена</div>
 				</div>
 			</div>
 
-		`.trim()
+		`.trim();
+
 		this.progressButton = new RadialBar(this.player);
+
+		console.log(this.options);
 
 		this.element = $('<div />').html(template).contents();
 
 		this.element
 			.css({
 				'background-image' : `url(${this.options.image})`
-			})
+			});
+
+		this.element
 			.find('._button-replace')
-			.replace(this.progressButton.element);
+			.replaceWith(this.progressButton.element);
 
 		return this.element;
 	}

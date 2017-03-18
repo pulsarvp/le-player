@@ -18,10 +18,13 @@
     height: 100%;
     transition: all .1s cubic-bezier(0.4,0.0,1,1);
 	top: 0;
+	z-index: @z-index-base + 7;
+	color: white;
+	text-align: center;
 	&::after {
 		content: '';
 		position: absolute;
-		background: rgba(0,0,0,0.5);
+		background: rgba(0,0,0,0.6);
 		top: 0;
 		bottom: 0;
 		left: 0;
@@ -31,12 +34,41 @@
 
 	&__header
 	{
+		text-align: center;
+		padding-bottom: 7px;
+	}
+	&__title
+	{
+		font-size: 1.3em;
+		display: block;
+		padding: 10px 10px 2px;
+		text-align: center;
+		font-weight: 500;
+		overflow: hidden;
+		white-space: nowrap;
+		word-wrap: normal;
+		text-overflow: ellipsis;
+	}
+
+	&__subtitle
+	{
+		display: block;
+		line-height: 1.2em;
+		overflow: hidden;
+		padding: 0 10px 10px;
+		text-align: center;
+		color: #fff;
+		font-size: 130%;
+	}
+
+	&__header
+	{
 		width: 100%;
 		position: absolute;
 		margin-left: auto;
 		margin-right: auto;
 		bottom: 50%;
-		margin-bottom: 52px;
+		margin-bottom: 55px;
 	}
 
 	&__footer
@@ -46,7 +78,20 @@
 		margin-left: auto;
 		margin-right: auto;
 		top: 50%;
-		margin-top: 52px;
+		margin-top: 55px;
+	}
+
+	&__cancel
+	{
+		display: inline-block;
+		border: none;
+		background-color: transparent;
+		padding: 0.5em;
+		&:hover
+		{
+			background-color: rgba(255,255,255,0.25);
+			border-radius: 2px;
+		}
 	}
 }
 
@@ -62,6 +107,7 @@
 	height: auto;
 	z-index: auto;
 	display: flex;
+	position: absolute;
 }
 
 .radial-bar {
@@ -69,6 +115,10 @@
 	height: 110px;
 	background-color: #cccccc;
 	border-radius: 50%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -55px 0 0 -55px;
 }
 
 .radial-bar__mask {
