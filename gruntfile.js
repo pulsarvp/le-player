@@ -40,7 +40,7 @@ module.exports = function (grunt) {
 				},
 				expand : true,
 				cwd : 'source/less/',
-				src : '**/le-player.less',
+				src : '**/le-player*',
 				ext : '.css',
 				dest : 'dist/css/',
 				profile : true,
@@ -62,7 +62,7 @@ module.exports = function (grunt) {
 				},
 				expand : true,
 				cwd : 'source/less/',
-				src : '**/le-player.less',
+				src : '**/le-player*',
 				ext : '.min.css',
 				dest : 'dist/css/'
 			}

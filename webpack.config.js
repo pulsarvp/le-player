@@ -5,7 +5,8 @@ const path = require('path');
 module.exports = {
 	entry: {
 		'le-player' : './source/js/le-player.js',
-		'le-player-ga' : './source/js/plugins/le-player-ga.js'
+		'le-player-ga' : './source/js/plugins/le-player-ga.js',
+		'le-player-next' : './source/js/plugins/le-player-next.js',
 	},
 
 	output: {

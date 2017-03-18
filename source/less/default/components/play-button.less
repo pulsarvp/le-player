@@ -10,10 +10,8 @@
 	position: absolute;
 	height: 100%;
 	width: 100%;
-	font-size: 50px;
 	outline: 0;
 	text-align: center;
-	text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 	z-index: @z-index-base + 8;
 	&:hover
 	{
@@ -27,9 +25,12 @@
 
 	&__button
 	{
+		font-size: 50px;
+		text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 		padding: 25px;
 		background-color: @color-active;
 		border-radius: 50%;
+		cursor: pointer;
 	}
 
 	.leplayer-icon

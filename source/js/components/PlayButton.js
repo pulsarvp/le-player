@@ -26,7 +26,7 @@ class PlayButton extends Control {
 		.append(new Icon(this.player, { iconName : 'play' }).element);
 
 		this.element = createEl('div', {
-			className : this.buildCSSClass
+			className : this.buildCSSClass()
 		})
 		.append(inner);
 
@@ -46,7 +46,7 @@ class PlayButton extends Control {
 	 * @override
 	 */
 	buildCSSClass() {
-		return `leplayer-play-button`
+		return `leplayer-play-button ${this.options.className}`
 	}
 
 }

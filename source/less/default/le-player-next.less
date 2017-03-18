@@ -1,0 +1,125 @@
+@import "variables.less";
+
+.leplayer--ended
+{
+	.leplayer-next
+	{
+		display: block;
+	}
+}
+
+.leplayer-next {
+    position: absolute;
+    display: none;
+    vertical-align: top;
+    opacity: 1;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    transition: all .1s cubic-bezier(0.4,0.0,1,1);
+	top: 0;
+	&::after {
+		content: '';
+		position: absolute;
+		background: rgba(0,0,0,0.5);
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: -1;
+	}
+
+	&__header
+	{
+		width: 100%;
+		position: absolute;
+		margin-left: auto;
+		margin-right: auto;
+		bottom: 50%;
+		margin-bottom: 52px;
+	}
+
+	&__footer
+	{
+		width: 100%;
+		position: absolute;
+		margin-left: auto;
+		margin-right: auto;
+		top: 50%;
+		margin-top: 52px;
+	}
+}
+
+.leplayer-next__close {
+	background: none;
+	border: none;
+	text-shadow: none;
+}
+
+.leplayer-next__next {
+	background: none;
+	width: auto;
+	height: auto;
+	z-index: auto;
+	display: flex;
+}
+
+.radial-bar {
+	width: 110px;
+	height: 110px;
+	background-color: #cccccc;
+	border-radius: 50%;
+}
+
+.radial-bar__mask {
+	clip: rect(0px, 110px, 110px, 55px);
+	transition: transform 1s linear;
+	width: 110px;
+	height: 110px;
+	position: absolute;
+	border-radius: 50%;
+}
+
+.radial-bar__fill {
+	transition: transform 1s linear;
+	border-radius: 50%;
+	clip: rect(0px, 55px, 110px, 0px);
+	background-color: @color-primary;
+	width: 110px;
+	height: 110px;
+	position: absolute;
+}
+
+.radial-bar__button {
+	width: 100px;
+	height: 100px;
+	position: absolute;
+	margin-left: 5px;
+	margin-top: 5px;
+	border-radius: 50%;
+	font-size: 50px;
+	text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+	padding: 25px;
+	background-color: @color-active;
+	border-radius: 50%;
+	cursor: pointer;
+	color: @color-primary;
+	&:hover
+	{
+		opacity: fade(@color-active, 80%);
+	}
+	.leplayer-icon
+	{
+		position: relative;
+		left: 4px;
+	}
+}
+
+.radial-bar__percent {
+	text-align: center;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+	color: @color-primary;
+	font-size: 22px;
+}
