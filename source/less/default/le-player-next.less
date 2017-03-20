@@ -8,19 +8,28 @@
 	}
 }
 
+.leplayer--mini
+{
+	.leplayer-next
+	{
+		display: none;
+	}
+}
+
 .leplayer-next {
-    position: absolute;
-    display: none;
-    vertical-align: top;
-    opacity: 1;
-    overflow: hidden;
-    width: 100%;
-    height: 100%;
-    transition: all .1s cubic-bezier(0.4,0.0,1,1);
+	position: absolute;
+	display: none;
+	vertical-align: top;
+	opacity: 1;
+	overflow: hidden;
+	width: 100%;
+	height: 100%;
+	transition: all .1s cubic-bezier(0.4,0.0,1,1);
 	top: 0;
 	z-index: @z-index-base + 7;
 	color: white;
 	text-align: center;
+	background-size: cover;
 	&::after {
 		content: '';
 		position: absolute;
@@ -85,8 +94,10 @@
 	{
 		display: inline-block;
 		border: none;
+		box-shadow: none;
 		background-color: transparent;
 		padding: 0.5em;
+		margin-top: 2%;
 		&:hover
 		{
 			background-color: rgba(255,255,255,0.25);
