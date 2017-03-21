@@ -17,7 +17,7 @@ import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
 import { createEl, secondsToTime, noop } from './utils';
-import { IS_ANDROID, IS_IOS } from './utils/browser';
+import { IS_ANDROID_PHONE, IS_IPHONE } from './utils/browser';
 
 import MediaError from './MediaError';
 import Html5 from './entity/Html5.js';
@@ -99,11 +99,11 @@ const defaultOptions = {
 			['play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
 		],
 		ios : [
-			['play', 'rate', 'timeline']
+			['play', 'rate', 'timeline', 'source',]
 		],
 		android : [
-			['timeline', 'fullscreen'],
-			['play', 'rate']
+			['play', 'timeline', 'fullscreen'],
+			['rate', 'source']
 		]
 	},
 	controlsOptions : {
@@ -1061,6 +1061,10 @@ class Player extends Component {
 		this.addClass('leplayer--paused');
 		this.addClass('leplayer--virgin');
 
+		if(IS_IPHONE) {
+			this.addClass('leplayer--iphone')
+		}
+
 
 		if(options.sectionContainer) {
 			this.sectionsContainer = $(options.sectionContainer);
@@ -1209,10 +1213,10 @@ class Player extends Component {
 
 		for (const name of ['common', 'fullscreen']) {
 			if (!this.options.controls.hasOwnProperty(name)) return;
-			console.log(IS_IOS, IS_ANDROID);
-			if(IS_IOS) {
+
+			if(IS_IPHONE) {
 				controls = this.options.controls['ios'];
-			} else if (IS_ANDROID) {
+			} else if (IS_ANDROID_PHONE) {
 				controls = this.options.controls['android'];
 			} else {
 				controls = this.options.controls[name];

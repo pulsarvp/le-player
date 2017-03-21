@@ -562,6 +562,25 @@
 
 }
 
+@media screen and (max-width: 500px) {
+	.leplayer-controls {
+		.control.disabled {
+			display: none;
+		}
+	}
+}
+
+.leplayer--iphone {
+	.leplayer-controls {
+		.timeline-container {
+			width: 1%;
+		}
+		.timeline {
+			display: none;
+		}
+	}
+}
+
 
 .leplayer-control-collection
 {
@@ -884,6 +903,7 @@
 		display: none
 	}
 }
+
 
 
 @import "components/video.less";
