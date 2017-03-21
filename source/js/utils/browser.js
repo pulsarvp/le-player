@@ -5,9 +5,13 @@
 
 const USER_AGENT = window.navigator && window.navigator.userAgent || '';
 
+export const IS_MOBILE = (/Mobile/i).test(USER_AGENT);
+
 export const IS_CHROME = USER_AGENT.indexOf('Chrome') > -1;
 
 export const IS_ANDROID = (/Android/i).test(USER_AGENT);
+
+export const IS_ANDROID_PHONE = IS_ANDROID && IS_MOBILE;
 
 export const IS_IPAD = (/iPad/i).test(USER_AGENT);
 // The Facebook app's UIWebView identifies as both an iPhone and iPad, so
