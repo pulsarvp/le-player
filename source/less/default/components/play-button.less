@@ -10,11 +10,10 @@
 	position: absolute;
 	height: 100%;
 	width: 100%;
-	font-size: 50px;
 	outline: 0;
 	text-align: center;
-	text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 	z-index: @z-index-base + 8;
+	font-size: 50px;
 	&:hover
 	{
 		background: rgba(0, 0, 0, 0.2);
@@ -27,15 +26,17 @@
 
 	&__button
 	{
-		padding: 25px;
+		text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+		padding: 0.5em;
 		background-color: @color-active;
 		border-radius: 50%;
+		cursor: pointer;
 	}
 
 	.leplayer-icon
 	{
 		position: relative;
-		left: 4px;
+		left: 0.08em;
 	}
 }
 
@@ -44,6 +45,13 @@
 	.leplayer-play-button
 	{
 		display: flex;
+	}
+}
+
+@media screen and (max-width: 420px) {
+	.leplayer-play-button
+	{
+		font-size: 35px;
 	}
 }
 
@@ -61,7 +69,7 @@
 
 	.leplayer-play-button__button
 	{
-		padding: 30px;
+		padding: 0.6em;
 	}
 }
 
@@ -70,11 +78,6 @@
 	.leplayer-play-button
 	{
 		font-size: 30px;
-	}
-
-	.leplayer-play-button__button
-	{
-		padding: 20px;
 	}
 }
 
