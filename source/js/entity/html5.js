@@ -65,23 +65,34 @@ class Html5 extends Component {
 		return Cookie.get('rate') || this.player.options.rate.default
 	}
 
-
-	set rate (value) {
-		const player = this.player;
-		let max = player.options.rate.max;
-		let min = player.options.rate.min;
-
-		if(IS_SAFARI || IS_IOS || IS_ANDROID) {
+	get rateMax() {
+		let max = this.player.options.rate.max;
+		if(IS_IOS || IS_ANDROID) {
 			max = Html5.MOBILE_MAX_RATE;
+		}
+		if(IS_SAFARI) {
+			max = Html5.SAFARI_MAX_RATE;
+		}
+
+		return max;
+	}
+
+	get rateMin() {
+		let min = this.player.options.rate.min;
+
+		if(IS_IOS || IS_ANDROID) {
 			min = Html5.MOBILE_MIN_RATE;
 		}
 
 		if(IS_SAFARI) {
-			max = Html5.SAFARI_MAX_RATE;
 			min = Html5.SAFARI_MIN_RATE;
 		}
 
-		if (value <= max && value >= min) {
+		return min;
+	}
+
+	set rate (value) {
+		if (value <= this.rateMax && value >= this.rateMin) {
 			this.media.playbackRate = value;
 			Cookie.set('rate', value);
 		}
