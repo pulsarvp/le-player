@@ -132,6 +132,8 @@ class NextComponent extends Component {
 		this._hidden = false;
 		this.element.show();
 
+		if(!this.options.auto) return;
+
 		setTimeout(() => {
 			this.progressButton.timeout = 5000;
 			this.progressButton.radial = 100;
