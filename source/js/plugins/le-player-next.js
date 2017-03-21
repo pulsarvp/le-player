@@ -52,6 +52,12 @@ class RadialBar extends Component {
 class NextComponent extends Component {
 
 	constructor(player, options) {
+		options = $.extend({}, {
+			title : '',
+			subtitle : '',
+			delay : 5000
+		}, options);
+
 		super(player, options);
 		this._hidden = true;
 		this.url = this.options.url;
@@ -77,8 +83,8 @@ class NextComponent extends Component {
 			<div class="leplayer-next">
 				<div class="leplayer-next__header">
 					<div class="leplayer-next__head">Следующее</div>
-					<div class="leplayer-next__title">${this.options.title || ''}</div>
-					<div class="leplayer-next__subtitle">${this.options.subtitle || ''}</div>
+					<div class="leplayer-next__title">${this.options.title}</div>
+					<div class="leplayer-next__subtitle">${this.options.subtitle}</div>
 				</div>
 
 				<span class="_button-replace"></span>
@@ -135,12 +141,12 @@ class NextComponent extends Component {
 		if(!this.options.auto) return;
 
 		setTimeout(() => {
-			this.progressButton.timeout = 5000;
+			this.progressButton.timeout = this.options.delay;
 			this.progressButton.radial = 100;
 
 			this._timeoutId = setTimeout(() => {
 				this.next();
-			}, 5000)
+			}, this.options.delay)
 		})
 	}
 }
