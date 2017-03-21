@@ -17,6 +17,7 @@ import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
 import { createEl, secondsToTime, noop } from './utils';
+import { IS_IPHONE, IS_IPOD, IS_ANDROID_PHONE } from './utils/browser';
 
 import MediaError from './MediaError';
 import Html5 from './entity/Html5.js';
@@ -1442,6 +1443,10 @@ class Player extends Component {
 			this.view = 'fullscreen';
 		} else {
 			this.view = 'common';
+
+			if(IS_ANDROID_PHONE || IS_IPHONE || IS_IPOD) {
+				this.pause();
+			}
 		}
 	}
 
