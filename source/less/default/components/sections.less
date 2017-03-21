@@ -67,25 +67,25 @@
 {
 	color: @color-section-muted;
 	display: block;
-	float: left;
 	font-size: 0.92em;
 	font-weight: 400;
 	text-align: right;
-	width: 4.5em;
+	width: 3.5em;
+	flex: 0 0 3.5em;
 }
 
 .leplayer-section-info
 {
 	display: block;
-	width: 100%;
-	float: left;
 	padding-left: 10px;
 	padding-right: 7px;
+	width: calc(~"100% - 3.5em");
 }
 
 .leplayer-section-title
 {
 	font-weight: 500;
+	word-wrap: break-word;
 }
 
 
@@ -93,6 +93,7 @@
 {
 	display: none;
 	margin-top: 5px;
+	word-wrap: break-word;
 }
 
 
