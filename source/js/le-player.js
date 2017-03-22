@@ -1026,6 +1026,10 @@ class Player extends Component {
 			}
 		})
 
+		if(this.options.videoInfo) {
+			console.warn('options.videoInfo is deprecated, please use istead options.description');
+		}
+
 		this.infoElement = createEl('div', {
 			className : 'leplayer__info'
 		})
@@ -1035,7 +1039,7 @@ class Player extends Component {
 		}))
 		.append(createEl('div', {
 			className : 'leplayer__video-info',
-			html : this.options.videoInfo || ""
+			html : this.options.description || this.options.videoInfo || ""
 		}))
 		.append(createEl('div', {
 			className : 'leplayer__last',
