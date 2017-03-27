@@ -129,6 +129,7 @@ class Sections extends Component {
 		const topPosition = this.activeSection.position().top;
 
 		this.element
+			.find('.leplayer-sections__inner')
 			.animate({
 				scrollTop : this.element.scrollTop() + topPosition
 			}, 800)
