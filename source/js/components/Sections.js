@@ -117,7 +117,7 @@ class Sections extends Component {
 	setActiveByIndex(index) {
 		if (
 			this.activeSection.length === 0 ||
-			this.activeSection.attr('data-index') === index ||
+			parseInt(this.activeSection.attr('data-index')) === index ||
 			this.getSectionByIndex(index).length === 0
 		) {
 			return this
