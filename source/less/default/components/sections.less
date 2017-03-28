@@ -2,8 +2,7 @@
 {
 	font-size: @control-text-font-size + 1;
 	height: 100%;
-	overflow-x: hidden;
-	overflow-y: scroll;
+	overflow: hidden;
 	width: 260px;
 	z-index: @z-index-base + 6;
 	box-sizing: border-box;
@@ -21,8 +20,6 @@
 
 	&--hide-scroll
 	{
-		overflow: hidden;
-
 		.leplayer-sections__inner
 		{
 			position: absolute;
@@ -30,10 +27,15 @@
 			bottom: 0;
 			left: 0;
 			right: -15px;
-			overflow-y: scroll;
 			box-sizing: content-box;
 		}
 	}
+}
+
+.leplayer-sections__inner
+{
+	overflow-y: scroll;
+	height: 100%;
 }
 
 .leplayer-section
