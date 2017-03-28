@@ -34,7 +34,7 @@
 /******/ 	__webpack_require__.c = installedModules;
 
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
+/******/ 	__webpack_require__.p = "/dist/js/";
 
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(0);
@@ -85,7 +85,7 @@
 		});
 
 		player.on('sectionsclick', function (e, data) {
-			window.ga('send', 'event', 'Player Sections', 'Click', player.getView());
+			window.ga('send', 'event', 'Player Sections', 'Click', player.view);
 		});
 
 		var volumeChangeTimeout = null;
@@ -93,7 +93,7 @@
 		player.on('volumechange', function (e, data) {
 			clearTimeout(volumeChangeTimeout);
 
-			volumeChangeTimeout = setTimeout(function () {
+			volumeChangeTimeout = setTimeout(function (_) {
 				var value = data.volume;
 				window.ga('send', 'event', 'Player Volume Change', Number(value).toFixed(1));
 			}, options.volumeChangeDelay);
@@ -103,7 +103,7 @@
 		player.on('ratechange', function (e, data) {
 			clearTimeout(rateChangeTimeout);
 
-			rateChangeTimeout = setTimeout(function () {
+			rateChangeTimeout = setTimeout(function (_) {
 				var value = data.rate;
 				window.ga('send', 'event', 'Player Rate Change', value);
 			}, options.rateChangeDelay);

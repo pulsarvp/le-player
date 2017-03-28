@@ -34,7 +34,7 @@
 /******/ 	__webpack_require__.c = installedModules;
 
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
+/******/ 	__webpack_require__.p = "/dist/js/";
 
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(0);
@@ -50,9 +50,6 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	// Register common controls
-
-
 	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
@@ -61,19 +58,15 @@
 
 	var _Control2 = _interopRequireDefault(_Control);
 
-	var _Component = __webpack_require__(3);
+	var _Component2 = __webpack_require__(3);
 
-	var _Component2 = _interopRequireDefault(_Component);
+	var _Component3 = _interopRequireDefault(_Component2);
 
-	var _MiniPlayer = __webpack_require__(5);
-
-	var _MiniPlayer2 = _interopRequireDefault(_MiniPlayer);
-
-	var _PlayButton = __webpack_require__(8);
+	var _PlayButton = __webpack_require__(5);
 
 	var _PlayButton2 = _interopRequireDefault(_PlayButton);
 
-	var _SplashIcon = __webpack_require__(9);
+	var _SplashIcon = __webpack_require__(7);
 
 	var _SplashIcon2 = _interopRequireDefault(_SplashIcon);
 
@@ -81,39 +74,39 @@
 
 	var _Icon2 = _interopRequireDefault(_Icon);
 
-	var _Time = __webpack_require__(10);
+	var _Time = __webpack_require__(8);
 
 	var _Time2 = _interopRequireDefault(_Time);
 
-	var _ControlCollection = __webpack_require__(6);
+	var _ControlCollection = __webpack_require__(9);
 
 	var _ControlCollection2 = _interopRequireDefault(_ControlCollection);
 
-	var _Sections = __webpack_require__(11);
+	var _Sections = __webpack_require__(10);
 
 	var _Sections2 = _interopRequireDefault(_Sections);
 
-	var _ErrorDisplay = __webpack_require__(12);
+	var _ErrorDisplay = __webpack_require__(11);
 
 	var _ErrorDisplay2 = _interopRequireDefault(_ErrorDisplay);
 
-	var _Poster = __webpack_require__(13);
+	var _Poster = __webpack_require__(12);
 
 	var _Poster2 = _interopRequireDefault(_Poster);
 
-	var _FullscreenApi = __webpack_require__(14);
+	var _FullscreenApi = __webpack_require__(13);
 
 	var _FullscreenApi2 = _interopRequireDefault(_FullscreenApi);
 
-	var _cookie = __webpack_require__(15);
+	var _utils = __webpack_require__(6);
 
-	var _cookie2 = _interopRequireDefault(_cookie);
-
-	var _utils = __webpack_require__(7);
-
-	var _MediaError = __webpack_require__(16);
+	var _MediaError = __webpack_require__(14);
 
 	var _MediaError2 = _interopRequireDefault(_MediaError);
+
+	var _Html = __webpack_require__(15);
+
+	var _Html2 = _interopRequireDefault(_Html);
 
 	__webpack_require__(17);
 
@@ -145,6 +138,13 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	// Register common controls
+
+
 	_Control2.default.registerControl('divider', function () {
 		return {
 			element: (0, _jquery2.default)('<div/>').addClass('divider')
@@ -154,6 +154,7 @@
 	/**
 	 * Return array with excluded dist's items from source array
 	 *
+	 * @access private
 	 * @param {Array} source
 	 * @param {Array} dist
 	 * @return {Array}
@@ -178,13 +179,13 @@
 		muted: false,
 		preload: 'metadata',
 		poster: null,
-		svgPath: '../dist/svg/svg-defs.svg',
+		svgPath: '',
 		innactivityTimeout: 5000,
 		rate: {
 			step: 0.25,
 			min: 0.5,
 			max: 4.0,
-			'default': 1
+			default: 1
 		},
 		playback: {
 			step: {
@@ -197,6 +198,16 @@
 			common: [['play', 'volume', 'divider', 'timeline', 'divider', 'section', 'divider', 'fullscreen'], ['rate', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'keybinding info']],
 			fullscreen: [['play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'keybinding info', 'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen']],
 			mini: [['play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']]
+		},
+		controlsOptions: {
+
+			common: {
+				align: ['justify', 'left']
+			},
+
+			fullscreen: {
+				align: 'justify'
+			}
 		},
 		volume: {
 			default: 0.4,
@@ -255,7 +266,7 @@
 			fn: function fn(player) {
 				player.video.volume += player.options.volume.step;
 
-				player.splashIcon.show(player._calcVolumeIcon(player.video.volume));
+				player.splashIcon.show(player.calcVolumeIcon(player.video.volume));
 			}
 		}, {
 			key: 40,
@@ -264,7 +275,7 @@
 			fn: function fn(player) {
 				player.video.volume -= player.options.volume.step;
 
-				player.splashIcon.show(player._calcVolumeIcon(player.video.volume));
+				player.splashIcon.show(player.calcVolumeIcon(player.video.volume));
 			}
 		}, {
 			key: 70,
@@ -274,20 +285,15 @@
 				player.toggleFullscreen();
 			}
 		}],
-		miniplayer: {
-			width: '100%',
-			offsetShow: function offsetShow(player) {
-				// 80px - it's height of common controls container
-				var offset = player.element.offset().top + player.element.outerHeight() - player.getControls('common').element.height();
-
-				return offset;
-			}
+		plugins: {
+			miniplayer: {}
 		},
-		onPlayerInited: function onPlayerInited() {}
+		onPlayerInited: _utils.noop
 	};
 
 	/**
 	 * @class Player
+	 * @extends Component
 	 * @param {jQuery} element Element when player will init
 	 * @param {Object} [options]
 	 * @param {Boolean} [options.autoplay=false]
@@ -334,753 +340,1328 @@
 	 * @param {String|Object} [options.data] Url or JSON with data for player
 	 * @param {Array} [options.data.sections] Sections array
 	 */
-	var Player = function Player(element, options) {
-		var _this8 = this;
 
-		if (element.prop('tagName').toLowerCase() != 'video') {
-			console.warn('Incorrect element selected.');
-			return this;
+	var Player = function (_Component) {
+		_inherits(Player, _Component);
+
+		function Player(element, options) {
+			_classCallCheck(this, Player);
+
+			options.createElement = false;
+
+			var _this = _possibleConstructorReturn(this, (Player.__proto__ || Object.getPrototypeOf(Player)).call(this, null, options));
+
+			_this._element = element;
+
+			/**
+	   * DOM container to hold inner of player
+	   *
+	   * @memberof! Player#
+	   * @type {jQuery}
+	   */
+			_this.innerElement = (0, _utils.createEl)('div');
+
+			// Users options
+			_this._userOptions = options;
+			_this._initOptions();
+
+			if (_this.options.svgPath === '') {
+				Player._loadSVGSprite(Player.defaultSprite);
+			}
+
+			_this._view = 'common';
+
+			/**
+	   * DOM container to hold all player
+	   *
+	   * @memberof! Player#
+	   * @type {jQuery}
+	   */
+			_this.element = _this.createElement();
+
+			/**
+	   * Video html5 component
+	   *
+	   * @memberof! Player#
+	   * @type {Html5}
+	   */
+			_this.video = new _Html2.default(_this, { element: element });
+
+			// Create controls
+			// TODO: move this action to the createElement
+			_this.controls = {};
+			_this._initControls();
+
+			/**
+	   * @access private
+	   */
+			_this._dblclickTimeout = null;
+
+			_this._initSections().then(function (data) {
+				_this.sections = data.sectionsComponent;
+
+				/**
+	    * Sections init event
+	    *
+	    * @event Player#sectionsinit
+	    * @example
+	    * const player = new Player($('#video'), options);
+	    * player.on('sectionsinit', (e, data) => cosnole.log(data));
+	    *
+	    */
+				_this.trigger('sectionsinit', data);
+			});
+			_this._initPlugins();
+
+			_this.video.init().then(function () {
+				/**
+	    * Player init event
+	    *
+	    * @event Player#inited
+	    */
+				_this.trigger('inited');
+
+				if (_this.options.time) {
+					_this.currentTime = _this.options.time;
+				}
+
+				if (_this.video.src != null && _this.options.autoplay) {
+					_this.play();
+				}
+			});
+
+			_this._listenHotKeys();
+
+			_this._userActivity = false;
+			_this._listenUserActivity();
+
+			var mediaElement = _this.video.element;
+			mediaElement.one({
+				play: function play(e) {
+					/**
+	     * First play event
+	     *
+	     * @event Player#firstplay
+	     */
+					_this.trigger('firstplay');
+					_this.removeClass('leplayer--virgin');
+				}
+			});
+
+			_this._waitingTimeouts = [];
+
+			mediaElement.on({
+
+				loadstart: function loadstart(e) {
+					_this.removeClass('leplayer--ended');
+
+					_this.error = null;
+					/**
+	     * loadstart html5 media event
+	     *
+	     * @event Player#loadstart
+	     */
+					_this.trigger('loadstart');
+				},
+
+				durationchange: function durationchange(e) {
+					/**
+	     * durationchange html5 media event
+	     *
+	     * @event Player#durationchange
+	     */
+					_this.trigger('durationchange');
+				},
+
+				timeupdate: function timeupdate(e) {
+					if (_this.video.currentTime > 0) {
+						_this.removeClass('leplayer--virgin');
+					}
+
+					/**
+	     * timeupdate html5 media event
+	     *
+	     * @event Player#timeupdate
+	     */
+					_this.trigger('timeupdate', { time: _this.video.currentTime, duration: _this.video.duration });
+				},
+
+				seeking: function seeking(e) {
+					_this._startWaiting();
+					/**
+	     * seeking html5 media event
+	     *
+	     * @event Player#seeking
+	     */
+					_this.trigger('seeking');
+				},
+
+				seeked: function seeked(e) {
+					_this._stopWayting();
+					/**
+	     * seeked html5 media event
+	     *
+	     * @event Player#seeked
+	     */
+					_this.trigger('seeked');
+				},
+
+				progress: function progress() {
+					/**
+	     * progress html5 media event
+	     *
+	     * @event Player#progress
+	     */
+					_this.trigger('progress');
+				},
+
+				dblclick: function dblclick() {
+					/**
+	     * dblclick
+	     *
+	     * @event Player#dbclick
+	     */
+					_this.trigger('dblclick');
+				},
+
+				click: function click() {
+					/**
+	     * click
+	     *
+	     * @event Player#click
+	     */
+					_this.trigger('click');
+				},
+
+				volumechange: function volumechange(e) {
+					/**
+	     * volumechange html5 media event
+	     *
+	     * @event Player#volumechange
+	     */
+					_this.trigger('volumechange', { volume: _this.video.volume });
+				},
+
+				play: function play(e) {
+					_this.removeClass('leplayer--ended');
+					_this.removeClass('leplayer--paused');
+					_this.addClass('leplayer--playing');
+
+					/**
+	     * play html5 media event
+	     *
+	     * @event Player#play
+	     */
+					_this.trigger('play');
+				},
+
+				pause: function pause(e) {
+					_this.removeClass('leplayer--playing');
+					_this.addClass('leplayer--paused');
+
+					/**
+	     * pause html5 media event
+	     *
+	     * @event Player#pause
+	     */
+					_this.trigger('pause');
+				},
+
+				playing: function playing(e) {
+					_this._stopWayting();
+
+					/**
+	     * playing html5 media event
+	     *
+	     * @event Player#playing
+	     */
+					_this.trigger('playing');
+				},
+
+				ratechange: function ratechange(e) {
+
+					/**
+	     * rate html5 media event
+	     *
+	     * @event Player#rate
+	     */
+					_this.trigger('ratechange', { rate: _this.video.rate });
+				},
+
+				canplay: function canplay(e) {
+					/**
+	     * canplay html5 media event
+	     *
+	     * @event Player#canplay
+	     */
+					_this.trigger('canplay');
+				},
+
+				ended: function ended(e) {
+					_this.addClass('leplayer--ended');
+
+					if (_this.options.loop) {
+						_this.currentTime = 0;
+						_this.video.play();
+					} else if (!_this.video.paused) {
+						_this.video.pause();
+					}
+
+					/**
+	     * ended html5 media event
+	     *
+	     * @event Player#ended
+	     */
+					_this.trigger('ended');
+				},
+
+				canplaythrough: function canplaythrough(e) {
+					_this._stopWayting();
+					/**
+	     * canplaythrough html5 media event
+	     *
+	     * @event Player#canplaythrough
+	     */
+					_this.trigger('canplaythrough');
+				},
+
+				waiting: function waiting(e) {
+					_this._startWaiting();
+
+					_this.one('timeupdate', function () {
+						return _this._stopWayting();
+					});
+
+					/**
+	     * waiting html5 media event
+	     *
+	     * @event Player#waiting
+	     */
+					_this.trigger('waiting');
+				},
+
+				error: function error(e) {
+					_this.error = new _MediaError2.default(e.target.error.code);
+				}
+			});
+
+			_this.on('fullscreenchange', _this._onFullscreenChange.bind(_this));
+			_this.on('click', _this._onClick.bind(_this));
+			_this.on('dblclick', _this._onDbclick.bind(_this));
+			_this.on('inited', _this._onInited.bind(_this));
+			_this.on('play', _this._onPlay.bind(_this));
+			_this.on('pause', _this._onPause.bind(_this));
+
+			(0, _jquery2.default)(document).on(_FullscreenApi2.default.fullscreenchange, _this._onEntityFullscrenChange.bind(_this));
+
+			return _this;
 		}
 
-		var player = this;
-		var fsApi = _FullscreenApi2.default;
-
-		this._element = element;
-
-		// key -> contol collection name, valuy -> ControlCollection
-		this.controls = {};
-
-		// Entity component
-		this.video = null;
-
 		/**
-	  * DOM container to hold video and all other stuff.
-	  * @type object
-	  */
-
-		this.element = (0, _utils.createEl)('div');
-
-		this.innerElement = (0, _utils.createEl)('div');
-
-		var Video = function () {
-			function Video(player, ctx) {
-				_classCallCheck(this, Video);
-
-				this.player = player;
-				this._ctx = ctx;
-				this._video = ctx[0];
-
-				this.element = (0, _jquery2.default)(this._video);
-				this.subtitles = [];
-				this.bufferRanges = [];
-
-				if ((0, _jquery2.default)(this._video).attr('src') == null) {
-					this.source = this.player.options.src;
-				}
-			}
-
-			_createClass(Video, [{
-				key: 'init',
-				value: function init() {
-					var _this = this;
-
-					var dfd = _jquery2.default.Deferred();
-					this._initSubtitles();
-					this._initVideo().done(function () {
-						//this.fullscreen = new Fullscreen(this.player);
-						//this.fullscreen.init();
-						_this._initRate();
-						_this._initVolume();
-
-						// temporary solution for poster usage
-						// this.startBuffering();
-
-
-						dfd.resolve();
-					});
-					return dfd.promise();
-				}
-			}, {
-				key: 'startBuffering',
-				value: function startBuffering() {
-					var _this2 = this;
-
-					var volume = this.volume;
-					this.volume = 0;
-					return this.play().then(function () {
-						return _this2.pause();
-					}).then(function () {
-						_this2.currentTime = 0;
-						_this2.volume = volume;
-					});
-				}
-			}, {
-				key: 'supportsFullScreen',
-				value: function supportsFullScreen() {
-					if (typeof this._video.webkitEnterFullScreen === 'function') {
-						var userAgent = window.navigator && window.navigator.userAgent || '';
-
-						// Seems to be broken in Chromium/Chrome && Safari in Leopard
-						if (/Android/.test(userAgent) || !/Chrome|Mac OS X 10.5/.test(userAgent)) {
-							return true;
-						}
-					}
-					return false;
-				}
-			}, {
-				key: 'enterFullscreen',
-				value: function enterFullscreen() {
-					var _this3 = this;
-
-					var video = this._video;
-					if (video.paused && video.networkState <= video.HAVE_METADATA) {
-						// attempt to prime the video element for programmatic access
-						// this isn't necessary on the desktop but shouldn't hurt
-						this.play();
-
-						// playing and pausing synchronously during the transition to fullscreen
-						// can get iOS ~6.1 devices into a play/pause loop
-						setTimeout(function () {
-							_this3.pause();
-							video.webkitEnterFullScreen();
-						}, 0);
-					} else {
-						video.webkitEnterFullScreen();
-					}
-				}
-			}, {
-				key: 'exitFullscreen',
-				value: function exitFullscreen() {
-					this._video.webkitExitFullScreen();
-				}
-			}, {
-				key: 'togglePlay',
-				value: function togglePlay() {
-					if (!this._video.played || this._video.paused) {
-						this.play();
-					} else {
-						this.pause();
-					}
-				}
-			}, {
-				key: 'seek',
-				value: function seek(time) {
-					this._video.currentTime = time;
-				}
-			}, {
-				key: 'play',
-				value: function play() {
-					var dfd = _jquery2.default.Deferred();
-					var playPromise = this._video.play();
-
-					if (playPromise != null) {
-						playPromise.then(function () {
-							dfd.resolve();
-						});
-					} else {
-						dfd.resolve();
-					}
-					return dfd.promise();
-				}
-			}, {
-				key: 'pause',
-				value: function pause() {
-					var dfd = _jquery2.default.Deferred();
-					var pausePromise = this._video.pause();
-
-					if (pausePromise != null) {
-						pausePromise.then(function () {
-							dfd.resolve();
-						});
-					} else {
-						dfd.resolve();
-					}
-					return dfd.promise();
-				}
-			}, {
-				key: 'trigger',
-				value: function trigger(eventName) {
-					var _player$trigger;
-
-					for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-						args[_key - 1] = arguments[_key];
-					}
-
-					(_player$trigger = this.player.trigger).call.apply(_player$trigger, [(0, _jquery2.default)(this._video), 'leplayer_' + eventName].concat(args));
-					return this;
-				}
-			}, {
-				key: 'on',
-				value: function on(eventName) {
-					var _$$on;
-
-					for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-						args[_key2 - 1] = arguments[_key2];
-					}
-
-					(_$$on = (0, _jquery2.default)(this._video).on).call.apply(_$$on, [(0, _jquery2.default)(this._video), 'leplayer_' + eventName].concat(args));
-					return this;
-				}
-			}, {
-				key: '_initRate',
-				value: function _initRate() {
-					this.rate = this.defaultRate;
-				}
-			}, {
-				key: '_initVolume',
-				value: function _initVolume() {
-					this.volume = this.defaultVolume;
-				}
-			}, {
-				key: '_initSubtitles',
-				value: function _initSubtitles() {
-					var _self = this;
-					this._ctx.children('track[kind="subtitles"]').each(function () {
-						var language = (0, _jquery2.default)(this).attr('srclang');
-						var title = (0, _jquery2.default)(this).attr('label');
-						var src = (0, _jquery2.default)(this).attr('src');
-						if (title.length > 0 && src.length > 0) {
-							_self.subtitles.push({
-								title: title,
-								src: src,
-								language: language
-							});
-						}
-					});
-				}
-			}, {
-				key: '_initVideo',
-				value: function _initVideo() {
-					var _this4 = this;
-
-					var dfd = _jquery2.default.Deferred();
-					if (this._video.readyState > HTMLMediaElement.HAVE_NOTHING) {
-						dfd.resolve();
-						this._textTracksHack();
-					} else {
-						(0, _jquery2.default)(this._video).one('loadedmetadata', function (e) {
-							dfd.resolve();
-							_this4._textTracksHack();
-						});
-					}
-					dfd.notify();
-					return dfd.promise();
-				}
-			}, {
-				key: '_textTracksHack',
-				value: function _textTracksHack() {
-
-					// This is generally for Firefox only
-					// because it somehow resets track list
-					// for video element after DOM manipulation.
-
-					if (this._video.textTracks.length == 0 && this.subtitles.length > 0) {
-						this._ctx.children('track[kind="subtitles"]').remove();
-						for (var i in this.subtitles) {
-							if (this.subtitles.hasOwnProperty(i)) {
-								this._ctx.append((0, _jquery2.default)('<track/>').attr('label', this.subtitles[i].title).attr('src', this.subtitles[i].src).attr('srclang', this.subtitles[i].language).attr('id', this.subtitles[i].language).attr('kind', 'subtitles'));
-							}
-						}
-					}
-				}
-			}, {
-				key: 'currentTime',
-				get: function get() {
-					return this._video.currentTime;
-				},
-				set: function set(value) {
-					var time = void 0;
-					if (value > this.duration) {
-						time = this.duration;
-					} else if (value < 0) {
-						time = 0;
-					} else {
-						time = value;
-					}
-
-					this.player.trigger('timeupdateload', { time: time });
-
-					this._video.currentTime = time;
-				}
-			}, {
-				key: 'duration',
-				get: function get() {
-					return this._video.duration;
-				}
-			}, {
-				key: 'height',
-				get: function get() {
-					return this._video.clientHeight;
-				}
-			}, {
-				key: 'width',
-				get: function get() {
-					return this._video.clientWidth;
-				}
-			}, {
-				key: 'rate',
-				get: function get() {
-					return this._video.playbackRate;
-				},
-				set: function set(value) {
-					var player = this.player;
-					if (value <= player.options.rate.max && value >= player.options.rate.min) {
-						this._video.playbackRate = value;
-						_cookie2.default.set('rate', value);
-					}
-					/** TODO: Chanche controls.rate in event handler */
-					//controls.rate = this._video.playbackRate;
-				}
-			}, {
-				key: 'defaultRate',
-				get: function get() {
-					return _cookie2.default.get('rate') || player.options.rate.default;
-				}
-			}, {
-				key: 'source',
-				set: function set(src) {
-					if (src == null) return;
-					if (this.source && this.source.url === src.url) return;
-					var time = this.currentTime;
-					var rate = this.rate;
-					var stop = this.paused;
-
-					console.log(src.url);
-					(0, _jquery2.default)(this._video).attr('src', src.url);
-
-					this._video = this._ctx[0];
-
-					this._video.playbackRate = rate;
-
-					this._video.currentTime = time;
-
-					this._source = src;
-
-					if (stop) {
-						this.pause();
-					} else {
-						this.play();
-					}
-				},
-				get: function get() {
-					return this._source;
-				}
-			}, {
-				key: 'track',
-				set: function set(value) {
-					for (var i = 0; i < this._video.textTracks.length; i++) {
-						if (this._video.textTracks[i].language == value) this._video.textTracks[i].mode = 'showing';else this._video.textTracks[i].mode = 'hidden';
-					}
-				}
-			}, {
-				key: 'paused',
-				get: function get() {
-					return this._video.paused;
-				}
-			}, {
-				key: 'volume',
-				get: function get() {
-					return this._video.volume;
-				},
-				set: function set(value) {
-					var player = this.player;
-					if (value > 1) {
-						this._video.volume = 1;
-					} else if (value < player.options.volume.mutelimit) {
-						this._video.volume = 0;
-					} else {
-						this._video.volume = value;
-						_cookie2.default.set('volume', value);
-					}
-					this._video.mute = value < player.options.volume.mutelimit;
-				}
-			}, {
-				key: 'defaultVolume',
-				get: function get() {
-					return _cookie2.default.get('volume') || player.options.volume.default;
-				}
-			}, {
-				key: 'buffered',
-				get: function get() {
-					return this._video.buffered;
-				}
-
-				/**
-	    * @return {TimeRanges}
-	    */
-
-			}, {
-				key: 'seekable',
-				get: function get() {
-					return this._video.seekable;
-				}
-
-				/**
-	    * @return {TimeRanges}
-	    */
-
-			}, {
-				key: 'played',
-				get: function get() {
-					return this._video.played;
-				}
-			}, {
-				key: 'playedPercentage',
-				get: function get() {
-					var result = 0;
-					for (var i = 0; i < this.played.length; i++) {
-						result += this.played.end(i) - this.played.start(i);
-					}
-
-					return result / this.duration * 100;
-				}
-			}]);
-
-			return Video;
-		}();
-
-		this.initControls = function () {
-			//controls = new Controls(player);
-			var _arr = ['common', 'fullscreen'];
-			for (var _i = 0; _i < _arr.length; _i++) {
-				var name = _arr[_i];
-				if (!this.options.controls.hasOwnProperty(name)) return;
-				var controlCollection = new _ControlCollection2.default(this, { name: name });
-				this.element.append(controlCollection.element);
-			}
-			if (this.controls.common != null) {
-				this.controls.common.active = true;
-			}
-		};
-
-		/**
-	  * Init sections, get ajax or json with sections data and create Sections object and added them to the DOM
-	  *
-	  * @access private
-	  * @returns {jqPromise} jQuery promise
-	  */
-		this.initSections = function () {
-			var _this5 = this;
-
-			var dfd = _jquery2.default.Deferred();
-			if (this.options.data == null) {
-				dfd.reject(null);
-			} else {
-				this.getSectionData().done(function (sections) {
-					sections = [].concat(_toConsumableArray(sections));
-
-					var isSectionOutside = _this5.sectionsContainer && _this5.sectionsContainer.length > 0;
-
-					if (sections == null || sections.length == 0) {
-						dfd.reject(null);
-						return;
-					}
-
-					sections = _this5.completeSections(sections);
-
-					var sectionsComponent = new _Sections2.default(_this5, {
-
-						items: sections,
-						fullscreenOnly: isSectionOutside
-					});
-
-					_this5.innerElement.append(sectionsComponent.element);
-
-					if (isSectionOutside) {
-						var outsideSections = new _Sections2.default(player, {
-							items: sections
-						});
-						_this5.sectionsContainer.append(outsideSections.element);
-					}
-					dfd.resolve({ sectionsComponent: sectionsComponent, items: sections });
-				});
-			}
-
-			return dfd.promise();
-		};
-
-		this.initHotKeys = function () {
-			var _this6 = this;
-
-			var isKeyBinding = function isKeyBinding(e, binding) {
-				return (e.which === binding.key || e.key === binding.key) && !!binding.shiftKey == e.shiftKey && !!binding.ctrlKey == e.ctrlKey;
-			};
-
-			(0, _jquery2.default)(this.element).bind('keydown.leplayer.hotkey', function (e) {
-				var _isFocused = isFocused();
-				if (_isFocused) {
-
-					_this6.options.keyBinding.forEach(function (binding) {
-
-						if (isKeyBinding(e, binding)) {
-							e.preventDefault();
-							binding.fn(_this6);
-							return false;
-						}
-					});
-				}
-			});
-		};
-
-		/**
-	  * Get options from video's attribute ( height, width, poster, preload etc...)
-	  * Get source video from src attr or <source> element with data attr 'data-quality'
-	  * Also get sources for different quality from <source> element with data attr 'data-quality'
+	  * Starts playing the video
 	  *
 	  * @access public
-	  * @returns {Object} options
+	  * @example
+	  * const player = new Player($("#video"),options);
+	  * $('.some-button').on('click', () => player.play());
 	  */
-		this.optionsFromElement = function () {
-			// Copy video attrs to the opitons
-			var element = this._element;
-			var attrOptions = ['height', 'width', 'poster', 'autoplay', 'loop', 'muted', 'preload'].reduce(function (obj, item) {
-				var val = element.attr(item);
-				if (val != null) {
-					obj[item] = element.attr(item);
-				}
-				return obj;
-			}, {});
 
-			attrOptions.sources = [];
 
-			// Src it is main source, that will be load
-			if (element.attr('src')) {
-				attrOptions.src = {
-					url: element.attr('src'),
-					title: element.attr('data-quality') || element.attr('title') || 'default'
-				};
+		_createClass(Player, [{
+			key: 'play',
+			value: function play() {
+				return this.video.play();
 			}
 
-			// Copy sources from HTML5 source element with data-quality attr
-			// If data-quality attr does not exist - no
-			element.find('source').each(function (i, item) {
-				item = (0, _jquery2.default)(item);
-				if (!item.attr('data-quality')) {
+			/**
+	   * Pauses the currently playing video
+	   *
+	   * @access public
+	   */
+
+		}, {
+			key: 'pause',
+			value: function pause() {
+				return this.video.pause();
+			}
+
+			/**
+	   * Toggle the currently playing video
+	   *
+	   * @access public
+	   */
+
+		}, {
+			key: 'togglePlay',
+			value: function togglePlay() {
+				return this.video.togglePlay();
+			}
+
+			/**
+	   * Begin loading the src data
+	   *
+	   * @access public
+	   */
+
+		}, {
+			key: 'load',
+			value: function load() {
+				return this.video.load();
+			}
+
+			/**
+	   * On set view callback
+	   *
+	   * @access public
+	   * @param {String} view View name
+	   * @returns {Player} this
+	   * @example
+	   * const player = new Player($('#video'), options);
+	   * player.onSetView('mini', () => console.log('Miniplayer yeah!')
+	   *     .onSetView('fullscreen', () => console.log('Fullscreen boom!')
+	   *     .onSetView('common', () => console.log('Common view - lol');
+	   */
+
+		}, {
+			key: 'onSetView',
+			value: function onSetView(view) {
+				for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+					args[_key - 1] = arguments[_key];
+				}
+
+				this.on.apply(this, ['setview.' + view].concat(args));
+
+				return this;
+			}
+
+			/**
+	   * On del view callback
+	   *
+	   * @access public
+	   * @param {String} view View name
+	   * @returns {Player} this
+	   * @example
+	   * const player = new Player($('#video'), options);
+	   * player.onDelView('mini', () => console.log('Exit miniplayer')
+	   */
+
+		}, {
+			key: 'onDelView',
+			value: function onDelView(view) {
+				for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+					args[_key2 - 1] = arguments[_key2];
+				}
+
+				this.on.apply(this, ['delview.' + view].concat(args));
+
+				return this;
+			}
+
+			/**
+	   * Get some data for player
+	   *
+	   * @access public
+	   * @returns {jQuery.promise} Promise
+	   */
+
+		}, {
+			key: 'getData',
+			value: function getData() {
+				var dfd = new _jquery2.default.Deferred();
+
+				if (this._data !== undefined) {
+					dfd.resolve(this._data);
+					return dfd.promise();
+				}
+
+				if (typeof this.options.data === 'string') {
+					return _jquery2.default.ajax({
+						url: this.options.data,
+						method: 'GET',
+						dataType: 'json'
+					}).promise();
+				} else if (_typeof(this.options.data) === 'object') {
+					dfd.resolve(this.options.data);
+					return dfd.promise();
+				}
+			}
+		}, {
+			key: 'getSectionData',
+			value: function getSectionData() {
+				return this.getData().then(function (data) {
+					return data.sections;
+				});
+			}
+
+			/**
+	   * Request fullscreen
+	   *
+	   * @access public
+	   * @fires Player#fullscreenchange
+	   */
+
+		}, {
+			key: 'requestFullscreen',
+			value: function requestFullscreen() {
+				var fsApi = _FullscreenApi2.default;
+
+				if (fsApi.requestFullscreen) {
+					// Call HTML5 Video api requestFullscreen
+					this.element[0][fsApi.requestFullscreen]();
+
+					/**
+	     * fullscreenchange html5 media event
+	     *
+	     * @event Player#fullscreenchange
+	     */
+					this.trigger('fullscreenchange', true);
+				} else if (this.video.supportsFullScreen()) {
+					this.video.enterFullscreen();
+				}
+			}
+
+			/**
+	   * Exit fullscreen
+	   *
+	   * @access public
+	   * @fires Player#fullscreenchange
+	   */
+
+		}, {
+			key: 'exitFullscreen',
+			value: function exitFullscreen() {
+				var fsApi = _FullscreenApi2.default;
+
+				if (fsApi.exitFullscreen) {
+					document[fsApi.exitFullscreen]();
+				} else if (this.video.supportsFullScreen()) {
+					this.video.exitFullscreen();
+				}
+
+				this.trigger('fullscreenchange', false);
+			}
+
+			/**
+	   * Toggle fullscreen
+	   *
+	   * @access public
+	   * @fires Player#fullscreenchange
+	   */
+
+		}, {
+			key: 'toggleFullscreen',
+			value: function toggleFullscreen() {
+				if (this.view === 'fullscreen') {
+					this.exitFullscreen();
+				} else {
+					this.requestFullscreen();
+				}
+			}
+
+			/**
+	   * Get ControlCollection of Player by name (e.x 'common', 'fullscreen')
+	   *
+	   * @access public
+	   * @param {String} name - Name of ControlCollection
+	   * @returns {ControlCollection}
+	   */
+
+		}, {
+			key: 'getControls',
+			value: function getControls(name) {
+				return this.controls[name];
+			}
+
+			/**
+	   * Return the width of player.
+	   *
+	   * @access public
+	   * @returns {Number} Width in px
+	   */
+
+		}, {
+			key: 'getWidth',
+			value: function getWidth() {
+				return this.element.width();
+			}
+
+			/**
+	   * Complete the sections, by the additional field 'end' in each section
+	   *
+	   * @access private
+	   * @param {Object} sections - Sections
+	   * @returns {Object} New sections
+	   */
+
+		}, {
+			key: '_completeSections',
+			value: function _completeSections(sections) {
+				if (sections == null || sections.length === 0) {
 					return;
 				}
-				attrOptions.sources = attrOptions.sources.concat({
-					url: item.attr('src'),
-					title: item.attr('data-quality') || item.attr('title') || 'default'
+				var newSections = [].concat(sections);
+				for (var i = 0; i < newSections.length; i++) {
+					var endSection = void 0;
+					if (i < newSections.length - 1) {
+						endSection = newSections[i + 1].begin;
+					} else {
+						endSection = this.video.duration;
+					}
+					newSections[i].end = endSection;
+				}
+				return newSections;
+			}
+
+			/**
+	   * Get and set the current playback position in the audio/video (in seconds)
+	   * Getter and setter
+	   *
+	   * @access public
+	   * @memberof! Player#
+	   * @type {Nubmer}
+	   */
+
+		}, {
+			key: 'createElement',
+
+
+			/**
+	   * Remove unnecessary attributes, and set some attrs from options (loop, poster etc...). Create main DOM objects
+	   *
+	   * @override
+	   */
+			value: function createElement() {
+				var _this2 = this;
+
+				var options = this.options;
+				var element = this._element;
+
+				this.element = (0, _utils.createEl)('div');
+
+				[
+
+				// Remove controls because we dont not support native controls yet
+				'controls', 'poster',
+
+				// It is unnecessary attrs, this functionality solve CSS
+				'height', 'width'].forEach(function (item) {
+					element.removeAttr(item);
 				});
-			});
 
-			return attrOptions;
-		};
-
-		/**
-	  * Merge defaultOptions with attrOptions and user's options;
-	  *
-	  * And complement two objects: controls and excludeControls
-	  *
-	  * @access private
-	  */
-		this.initOptions = function () {
-			var _this7 = this;
-
-			var attrOptions = this.optionsFromElement();
-			// Merge default options + video attributts + user options
-			this.options = _jquery2.default.extend(true, {}, defaultOptions, attrOptions, options);
-
-			if (this.options.sources && !Array.isArray(this.options.sources)) {
-				this.options.sources = [this.options.sources];
-			}
-
-			if (this.options.src == null && this.options.sources.length > 0) {
-				this.options.src = this.options.sources[0];
-			}
-
-			if (this.options.src == null) {
-				this.setError(new _MediaError2.default('No sources found'));
-			}
-
-			// Merge correctly controls, without deep merge
-			this.options.controls = _jquery2.default.extend({}, defaultOptions.controls, options.controls);
-
-			// exclude controls option
-
-			var _loop = function _loop(name) {
-				if (!_this7.options.excludeControls.hasOwnProperty(name)) return {
-						v: void 0
-					};
-				var controlCollection = _this7.options.excludeControls[name];
-				controlCollection.forEach(function (row, index) {
-					if (_this7.options.controls[name] && _this7.options.controls[name][index]) {
-						_this7.options.controls[name][index] = excludeArray(_this7.options.controls[name][index], row);
+				// Set attrs from options
+				['preload', 'autoplay', 'loop', 'muted'].forEach(function (item) {
+					if (_this2.options[item]) {
+						element.attr(item, _this2.options[item]);
+						element.prop(item, _this2.options[item]);
 					}
 				});
-			};
 
-			for (var name in this.options.excludeControls) {
-				var _ret = _loop(name);
-
-				if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-			}
-		};
-
-		var isFocused = function isFocused() {
-			var focused = (0, _jquery2.default)(_this8.element).find(':focus');
-			return focused.length > 0 || (0, _jquery2.default)(_this8.element).is(':focus');
-		};
-
-		// Check if element is correctly selected.
-
-		this.initOptions();
-
-		/** TODO: Use promise to async run this */
-		this.createElement();
-
-		// Create video link
-		this.video = new Video(this, element);
-
-		// Create controls
-		// TODO: move this action to the createElement
-		this.initControls();
-
-		// Listen hotkeys
-		this.initHotKeys();
-
-		this.initSections().then(function (data) {
-			_this8.sections = data.sectionsComponent;
-			_this8.trigger('sectionsinit', data);
-		});
-
-		this.video.init().then(function () {
-			_this8.trigger('inited');
-			_this8._initPlugins();
-		});
-
-		this._listenUserActivity();
-
-		var mediaElement = this.video.element;
-
-		mediaElement.one({
-			'play': function play(e) {
-				_this8.trigger('firstplay');
-				_this8.removeClass('leplayer--virgin');
-			}
-		});
-
-		mediaElement.on({
-
-			'loadstart': function loadstart(e) {
-				_this8.removeClass('leplayer--ended');
-
-				_this8.setError(null);
-
-				_this8.trigger('loadstart');
-			},
-
-			'durationchange': function durationchange(e) {
-				_this8.trigger('durationchange');
-			},
-
-			'timeupdate': function timeupdate(e) {
-				if (_this8.video.currentTime > 0) {
-					_this8.removeClass('leplayer--virgin');
-				}
-
-				_this8.trigger('timeupdate', { time: _this8.video.currentTime, duration: _this8.video.duration });
-			},
-
-			'seeking': function seeking(e) {
-				_this8._startWaiting();
-				_this8.trigger('seeking');
-			},
-
-			'seeked': function seeked(e) {
-				_this8._stopWayting();
-				_this8.trigger('seeked');
-			},
-
-			'progress': function progress() {
-				_this8.trigger('progress');
-			},
-
-			'dblclick': function dblclick() {
-				_this8.trigger('dblclick');
-			},
-
-			'click': function click() {
-				_this8.trigger('click');
-			},
-
-			'volumechange': function volumechange(e) {
-				_this8.trigger('volumechange', { volume: _this8.video.volume });
-			},
-
-			'play': function play(e) {
-				_this8.removeClass('leplayer--ended');
-				_this8.removeClass('leplayer--paused');
-				_this8.addClass('leplayer--playing');
-
-				_this8.trigger('play');
-			},
-
-			'pause': function pause(e) {
-				_this8.removeClass('leplayer--playing');
-				_this8.addClass('leplayer--paused');
-				_this8.trigger('pause');
-				//overlay.show()
-			},
-
-			'playing': function playing(e) {
-				_this8._stopWayting();
-				_this8.trigger('playing');
-			},
-
-			'ratechange': function ratechange(e) {
-				_this8.trigger('ratechange', { rate: _this8.video.rate });
-			},
-
-			'canplay': function canplay(e) {
-				//loader.hide();
-				_this8.trigger('canplay');
-			},
-
-			'ended': function ended(e) {
-				_this8.addClass('leplayer--ended');
-
-				if (_this8.options.loop) {
-					_this8.currentTime(0);
-					_this8.video.play();
-				} else if (!_this8.video.paused) {
-					_this8.video.pause();
-				}
-
-				_this8.trigger('ended');
-			},
-
-			'canplaythrough': function canplaythrough(e) {
-				_this8._stopWayting();
-				_this8.trigger('canplaythrough');
-			},
-
-			'waiting': function waiting(e) {
-				_this8._startWaiting();
-
-				_this8.one('timeupdate', function () {
-					return _this8._stopWayting();
+				element.find('source[data-quality]').each(function (i, item) {
+					(0, _jquery2.default)(item).remove();
 				});
 
-				_this8.trigger('waiting');
-			},
+				this.element = this.element.addClass('leplayer').attr('tabindex', 0).css('width', options.width && '100%').css('max-width', options.width);
 
-			'error': function error(e) {
-				_this8.setError(new _MediaError2.default(e.target.error.code));
+				/**
+	    * Error display component.
+	    *
+	    * @type {ErrorDisplay}
+	    * @memberof! Player#
+	    */
+				this.errorDisplay = new _ErrorDisplay2.default(this);
+
+				/**
+	    * Play button component.
+	    *
+	    * @type {PlayButton}
+	    * @memberof! Player#
+	    */
+				this.playButton = new _PlayButton2.default(this);
+
+				// TODO: Вынести это в отдельнеый компонент
+				this.loader = (0, _jquery2.default)('<div />').addClass('leplayer-loader-container').append(new _Icon2.default(this, {
+					iconName: 'refresh',
+					className: 'leplayer-loader-container__icon'
+				}).element);
+
+				/**
+	    * Splash icon component.
+	    *
+	    * @type {SplashIcon}
+	    * @memberof! Player#
+	    */
+				this.splashIcon = new _SplashIcon2.default(this);
+
+				this.videoContainer = (0, _utils.createEl)('div', {
+					className: 'leplayer-video'
+				}).append(this.errorDisplay.element).append(this.playButton.element).append(this.loader).append(this.splashIcon.element);
+
+				if (options.poster) {
+					this.poster = new _Poster2.default(this);
+					this.videoContainer.append(this.poster.element);
+				}
+
+				var lastTimer = new _Time2.default(this, {
+					fn: function fn(player) {
+						var video = player.video;
+						return (0, _utils.secondsToTime)(video.duration - video.currentTime);
+					}
+				});
+
+				this.infoElement = (0, _utils.createEl)('div', {
+					className: 'leplayer__info'
+				}).append((0, _utils.createEl)('div', {
+					className: 'leplayer__title',
+					html: this.options.title || ""
+				})).append((0, _utils.createEl)('div', {
+					className: 'leplayer__video-info',
+					html: this.options.videoInfo || ""
+				})).append((0, _utils.createEl)('div', {
+					className: 'leplayer__last',
+					html: '\u0412\u0438\u0434\u0435\u043E \u0437\u0430\u043A\u043E\u043D\u0447\u0438\u0442\u0441\u044F \u0447\u0435\u0440\u0435\u0437 '
+				}).append(lastTimer.element));
+
+				this.innerElement = (0, _jquery2.default)('<div />').addClass('leplayer__inner').append(this.videoContainer).append(this.infoElement);
+
+				this.element = this.element.append(this.innerElement);
+
+				this.addClass('leplayer--paused');
+				this.addClass('leplayer--virgin');
+
+				if (options.sectionContainer) {
+					this.sectionsContainer = (0, _jquery2.default)(options.sectionContainer);
+				}
+
+				element.before(this.element);
+				this.videoContainer.append(element);
+
+				return this.element;
 			}
-		});
 
-		this.on('fullscreenchange', this._onFullscreenChange.bind(this));
-		this.on('click', this._onClick.bind(this));
-		this.on('dblclick', this._onDbclick.bind(this));
-		this.on('inited', this._onInited.bind(this));
-		this.on('play', this._onPlay.bind(this));
-		this.on('pause', this._onPause.bind(this));
+			/**
+	   * Get options from video's attribute ( height, width, poster, preload etc...)
+	   * Get source video from src attr or <source> element with data attr 'data-quality'
+	   * Also get sources for different quality from <source> element with data attr 'data-quality'
+	   *
+	   * @access private
+	   * @returns {Object} options
+	   */
 
-		(0, _jquery2.default)(document).on(fsApi.fullscreenchange, this._onEntityFullscrenChange.bind(this));
+		}, {
+			key: '_optionsFromElement',
+			value: function _optionsFromElement() {
+				// Copy video attrs to the opitons
+				var element = this._element;
+				var attrOptions = ['height', 'width', 'poster', 'autoplay', 'loop', 'muted', 'preload'].reduce(function (obj, item) {
+					var val = element.attr(item);
+					if (val != null) {
+						obj[item] = element.attr(item);
+					}
+					return obj;
+				}, {});
 
-		return this;
-	};
+				attrOptions.sources = [];
+
+				// Src it is main source, that will be load
+				if (element.attr('src')) {
+					attrOptions.src = {
+						url: element.attr('src'),
+						title: element.attr('data-quality') || element.attr('title') || 'default'
+					};
+				}
+
+				// Copy sources from HTML5 source element with data-quality attr
+				// If data-quality attr does not exist - no
+				element.find('source').each(function (i, item) {
+					item = (0, _jquery2.default)(item);
+					if (!item.attr('data-quality')) {
+						return;
+					}
+					attrOptions.sources = attrOptions.sources.concat({
+						url: item.attr('src'),
+						title: item.attr('data-quality') || item.attr('title') || 'default'
+					});
+				});
+
+				return attrOptions;
+			}
+
+			/**
+	   * Return a name of icon. If less then 0.1 return volume-off,
+	   * if less then 0.5 return volume down, else return volume-up
+	   *
+	   * @access private
+	   * @param {Number} value Volume value
+	   * @returns {String} Icon name
+	   */
+
+		}, {
+			key: 'calcVolumeIcon',
+			value: function calcVolumeIcon(value) {
+				var volume = value || this.video.volume;
+
+				if (volume < this.options.volume.mutelimit) {
+					return 'volume-off';
+				} else if (value < 0.5) {
+					return 'volume-down';
+				} else {
+					return 'volume-up';
+				}
+			}
+
+			/**
+	   * Merge defaultOptions, presetOptions with attrOptions and user's options;
+	   *
+	   * And complement two objects: controls and excludeControls
+	   *
+	   * @access private
+	   */
+
+		}, {
+			key: '_initOptions',
+			value: function _initOptions() {
+				var _this3 = this;
+
+				var attrOptions = this._optionsFromElement();
+				var presetOptions = {};
+
+				if (this._userOptions.preset && Player.getPreset(this._userOptions.preset)) {
+					presetOptions = Player.getPreset(this._userOptions.preset).options;
+				}
+
+				// Merge default options + preset options + video attributts+ user options
+				this.options = _jquery2.default.extend(true, {}, defaultOptions, presetOptions, attrOptions, this._userOptions);
+
+				if (this.options.sources && !Array.isArray(this.options.sources)) {
+					this.options.sources = [this.options.sources];
+				}
+
+				if (typeof this.options.src === 'string') {
+					this.options.src = { url: this.options.src };
+				}
+
+				if (this.options.src == null && this.options.sources.length > 0) {
+					this.options.src = this.options.sources[0];
+				}
+
+				// Merge correctly controls, without deep merge
+				this.options.controls = _jquery2.default.extend({}, defaultOptions.controls, presetOptions.controls, this._userOptions.controls);
+
+				// exclude controls option
+
+				var _loop = function _loop(name) {
+					if (!_this3.options.excludeControls.hasOwnProperty(name)) return {
+							v: void 0
+						};
+					var controlCollection = _this3.options.excludeControls[name];
+					controlCollection.forEach(function (row, index) {
+						if (_this3.options.controls[name] && _this3.options.controls[name][index]) {
+							_this3.options.controls[name][index] = excludeArray(_this3.options.controls[name][index], row);
+						}
+					});
+				};
+
+				for (var name in this.options.excludeControls) {
+					var _ret = _loop(name);
+
+					if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+				}
+
+				if (this.options.preset && Player.getPreset(this.options.preset)) {
+					Player.getPreset(this.options.preset).initOptions();
+				}
+			}
+
+			/**
+	   * Create and init all controls
+	   *
+	   * @access private
+	   */
+
+		}, {
+			key: '_initControls',
+			value: function _initControls() {
+				var _arr = ['common', 'fullscreen'];
+
+				for (var _i = 0; _i < _arr.length; _i++) {
+					var name = _arr[_i];
+					if (!this.options.controls.hasOwnProperty(name)) return;
+					var controlCollection = new _ControlCollection2.default(this, { name: name });
+					this.element.append(controlCollection.element);
+				}
+
+				if (this.controls.common != null) {
+					this.controls.common.active = true;
+				}
+			}
+		}, {
+			key: '_listenHotKeys',
+			value: function _listenHotKeys() {
+				var _this4 = this;
+
+				var isKeyBinding = function isKeyBinding(e, binding) {
+					return (e.which === binding.key || e.key === binding.key) && !!binding.shiftKey === e.shiftKey && !!binding.ctrlKey === e.ctrlKey;
+				};
+
+				this.element.on('keydown.leplayer.hotkey', function (e) {
+					var _isFocused = function _isFocused() {
+						return _this4.element.is(':focus');
+					};
+					if (_isFocused) {
+
+						_this4.options.keyBinding.forEach(function (binding) {
+
+							if (isKeyBinding(e, binding)) {
+								e.preventDefault();
+								binding.fn(_this4);
+								return false;
+							}
+						});
+					}
+				});
+			}
+
+			/**
+	   * Init sections, get ajax or json with sections data and create Sections object and added them to the DOM
+	   *
+	   * @access private
+	   * @returns {jqPromise} jQuery promise
+	   */
+
+		}, {
+			key: '_initSections',
+			value: function _initSections() {
+				var _this5 = this;
+
+				var dfd = _jquery2.default.Deferred();
+				if (this.options.data == null) {
+					dfd.reject(null);
+				} else {
+					this.getSectionData().done(function (sections) {
+						sections = [].concat(_toConsumableArray(sections));
+
+						var isSectionOutside = _this5.sectionsContainer && _this5.sectionsContainer.length > 0;
+
+						if (sections == null || sections.length === 0) {
+							dfd.reject(null);
+							return;
+						}
+
+						sections = _this5._completeSections(sections);
+
+						var sectionsComponent = new _Sections2.default(_this5, {
+							items: sections,
+							fullscreenOnly: isSectionOutside,
+							hideScroll: true
+						});
+
+						_this5.innerElement.append(sectionsComponent.element);
+
+						if (isSectionOutside) {
+							var outsideSections = new _Sections2.default(_this5, {
+								items: sections
+							});
+							_this5.sectionsContainer.append(outsideSections.element);
+						}
+						dfd.resolve({ sectionsComponent: sectionsComponent, items: sections });
+					});
+				}
+
+				return dfd.promise();
+			}
+
+			/**
+	   * Function, than init all plugins from player options.
+	   * If plugin doesn't exist throw an error
+	   *
+	   * @access private
+	   * @returns {Player} this
+	   */
+
+		}, {
+			key: '_initPlugins',
+			value: function _initPlugins() {
+				if (this.options.plugins) {
+					for (var name in this.options.plugins) {
+						if (!this.options.plugins.hasOwnProperty(name)) return;
+						var pluginOptions = this.options.plugins[name];
+						if (this[name]) {
+							if (pluginOptions) {
+								this[name](pluginOptions);
+							}
+						} else {
+							console.error('Plugin \'' + name + '\' doesn\'t exist');
+						}
+					}
+				}
+
+				return this;
+			}
+
+			/**
+	   * @access private
+	   */
+
+		}, {
+			key: '_listenUserActivity',
+			value: function _listenUserActivity() {
+				var _this6 = this;
+
+				var mouseInProgress = void 0;
+				var lastMoveX = void 0;
+				var lastMoveY = void 0;
+
+				var onMouseMove = function onMouseMove(e) {
+					if (e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
+						lastMoveX = e.screenX;
+						lastMoveY = e.screenY;
+						_this6._userActivity = true;
+					}
+				};
+
+				var onMouseDown = function onMouseDown(e) {
+					_this6._userActivity = true;
+
+					// While user is pressing mouse or touch, dispatch user activity
+					clearInterval(mouseInProgress);
+
+					mouseInProgress = setInterval(function () {
+						_this6._userActivity = true;
+					}, 250);
+				};
+
+				var onMouseUp = function onMouseUp(e) {
+					_this6._userActivity = true;
+					clearInterval(mouseInProgress);
+				};
+
+				this.element.on('mousemove', onMouseMove);
+
+				this.element.on('mousedown', onMouseDown);
+
+				this.element.on('mouseup', onMouseUp);
+
+				this.element.on('keydown', function (e) {
+					return _this6._userActivity = true;
+				});
+				this.element.on('keyup', function (e) {
+					return _this6._userActivity = true;
+				});
+
+				// See http://ejohn.org/blog/learning-from-twitter/
+				var inactivityTimeout = void 0;
+				var delay = this.options.innactivityTimeout;
+				setInterval(function () {
+					if (_this6._userActivity) {
+
+						// Reset user activuty tracker
+						_this6._userActivity = false;
+
+						_this6.userActive = true;
+
+						clearTimeout(inactivityTimeout);
+
+						if (delay > 0) {
+
+							inactivityTimeout = setTimeout(function () {
+								if (!_this6._userActivity) {
+									_this6.userActive = false;
+								}
+							}, delay);
+						}
+					}
+				}, 250);
+			}
+
+			/**
+	   * Stop showing spinner and clear delay of showing spinner
+	   *
+	   * @access private
+	   */
+
+		}, {
+			key: '_stopWayting',
+			value: function _stopWayting() {
+				this._waitingTimeouts.forEach(function (item) {
+					return clearTimeout(item);
+				});
+				this._waitingTimeouts = [];
+				this.removeClass('leplayer--waiting');
+			}
+
+			/**
+	   * Show spinner with delay in 300ms
+	   *
+	   * @access private
+	   */
+
+		}, {
+			key: '_startWaiting',
+			value: function _startWaiting() {
+				var _this7 = this;
+
+				this._waitingTimeouts.push(setTimeout(function () {
+					_this7.addClass('leplayer--waiting');
+				}, 300));
+			}
+
+			/**
+	   * On inited player event handler
+	   *
+	   * @access private
+	   * @param {PlayerEvent} e
+	   */
+
+		}, {
+			key: '_onInited',
+			value: function _onInited(e) {
+				this.addClass('leplayer--inited');
+
+				this.options.onPlayerInited.call(this, e);
+			}
+
+			/**
+	   * On click video event handler. Focus on video and togglePlay
+	   *
+	   * @access private
+	   * @param {PlayerEvent} e
+	   */
+
+		}, {
+			key: '_onClick',
+			value: function _onClick(e) {
+				var _this8 = this;
+
+				clearTimeout(this._dblclickTimeout);
+				this._dblclickTimeout = setTimeout(function () {
+					_this8.video.element.focus();
+					_this8.togglePlay();
+				}, 300);
+			}
+
+			/**
+	   * On dblclick on the video player event handler
+	   *
+	   * @access private
+	   * @param {PlayerEvent} e
+	   */
+
+		}, {
+			key: '_onDbclick',
+			value: function _onDbclick(e) {
+				clearTimeout(this._dblclickTimeout);
+				this.toggleFullscreen();
+			}
+
+			/**
+	   * On fullscreen change player event handler
+	   *
+	   * @access private
+	   * @param {PlayerEvent} e
+	   */
+
+		}, {
+			key: '_onFullscreenChange',
+			value: function _onFullscreenChange(e, isFs) {
+				if (isFs) {
+					this.view = 'fullscreen';
+				} else {
+					this.view = 'common';
+				}
+			}
+
+			/**
+	   * On play event handler
+	   *
+	   * @access private
+	   * @param {PlayerEvent} e
+	   */
+
+		}, {
+			key: '_onPlay',
+			value: function _onPlay() {
+				this.splashIcon.show('play');
+			}
+
+			/**
+	   * On pause player event handler
+	   * Show pause icon in the center of video
+	   *
+	   * @access private
+	   */
+
+		}, {
+			key: '_onPause',
+			value: function _onPause() {
+				this.splashIcon.show('pause');
+			}
+		}, {
+			key: '_onEntityFullscrenChange',
+			value: function _onEntityFullscrenChange() {
+				var fsApi = _FullscreenApi2.default;
+				var isFs = !!document[fsApi.fullscreenElement];
+				this.trigger('fullscreenchange', isFs);
+			}
+		}, {
+			key: 'currentTime',
+			get: function get() {
+				return this.video.currentTime;
+			},
+			set: function set(value) {
+				this.video.currentTime = value;
+			}
+
+			/**
+	   * Returns the length of the current audio/video (in seconds)
+	   * Getter
+	   *
+	   * @access public
+	   * @memberof! Player#
+	   * @type {Nubmer}
+	   */
+
+		}, {
+			key: 'duration',
+			get: function get() {
+				return this.video.duration;
+			}
+
+			/**
+	   * Returns whether the playback of the audio/video has ended or not
+	   * Getter
+	   *
+	   * @memberof! Player#
+	   * @type {Boolean}
+	   */
+
+		}, {
+			key: 'ended',
+			get: function get() {
+				return this.video.ended;
+			}
+
+			/**
+	   * Returns and set whether the playback of the audio/video has ended or not
+	   * Getter and setter
+	   *
+	   * @access public
+	   * @memberof! Player#
+	   * @type {MediaError|String}
+	   * @fires Player#error
+	   */
+
+		}, {
+			key: 'error',
+			get: function get() {
+				return this._error || null;
+			},
+			set: function set(value) {
+				if (value === null) {
+					this._error = null;
+					this.removeClass('leplayer--error');
+					if (this.errorDisplay) {
+						this.errorDisplay.element.hide();
+					}
+					return this;
+				}
+				this._error = new _MediaError2.default(value);
+
+				this.addClass('leplayer--error');
+
+				/**
+	    * error event
+	    *
+	    * @event Player#error
+	    * @property {MediaError} error
+	    * @example
+	    * const player = new Player($('#video'), options);
+	    * player.on('error', (e, data) => console.error(data.error));
+	    */
+				this.trigger('error', { error: this._error });
+
+				return this;
+			}
+
+			/**
+	   * Return the height of player. If you want get height only of video element, use this.video.height or whatever
+	   *
+	   * @access public
+	   * @type {Number}
+	   * @memberof! Player#
+	   */
+
+		}, {
+			key: 'height',
+			get: function get() {
+				return this.element.height();
+			}
+
+			/**
+	   * Return unnecessary video heigth
+	   * @access public
+	   * @type {Number}
+	   * @memberof! Player#
+	   */
+
+		}, {
+			key: 'videoHeight',
+			get: function get() {
+				return this.video.height;
+			}
+
+			/**
+	   * @access public
+	   * @type {Boolean}
+	   * @mebmerof! Player#
+	   */
+
+		}, {
+			key: 'userActive',
+			get: function get() {
+				return this._userActive || false;
+			},
+			set: function set(value) {
+				if (value !== this.getUserActive) {
+					this._userActive = value;
+					this.toggleClass('leplayer--user-active', value);
+					/**
+	     * User active event
+	     *
+	     * @event Player#useractive
+	     */
+					this.trigger('useractive');
+				}
+			}
+
+			/**
+	   * Set and get player view. View Can be 'common', 'fullscreen', 'mini'w
+	   *
+	   * @access public
+	   * @type {String}
+	   * @memberof! Player#
+	   */
+
+		}, {
+			key: 'view',
+			get: function get() {
+				return this._view;
+			},
+			set: function set(view) {
+				if (this.view != null) {
+					this.removeClass('leplayer--' + this.view);
+					this.trigger('delview.' + this.view);
+				}
+
+				this._view = view;
+				this.element.addClass('leplayer--' + view);
+				this.trigger('setview.' + view);
+
+				return this;
+			}
+		}]);
+
+		return Player;
+	}(_Component3.default);
 
 	/**
 	 * Static helper for creating a plugins for leplayer
@@ -1097,6 +1678,8 @@
 	 * })
 	 *
 	 */
+
+
 	Player.plugin = function (name, fn) {
 		Player.prototype[name] = fn;
 	};
@@ -1104,12 +1687,10 @@
 	/**
 	 * Get by name registered component
 	 *
-	 * @access public
-	 * @static
-	 * @param {String} name
-	 * @returns {Component}
+	 * @param {String} name - Name of component
+	 * @return {Component}
 	 */
-	Player.getComponent = _Component2.default.getComponent;
+	Player.getComponent = _Component3.default.getComponent;
 
 	/**
 	 * Register component
@@ -1122,7 +1703,7 @@
 	 * @example
 	 * Player.registerComponent('ErrorDisplay', ErrorDisplay);
 	 */
-	Player.registerComponent = _Component2.default.registerComponent;
+	Player.registerComponent = _Component3.default.registerComponent;
 
 	/**
 	 * Register control
@@ -1156,619 +1737,52 @@
 	 * @returns {String}
 	 */
 	Player.secondsToTime = _utils.secondsToTime;
-	/**
-	 * Remove unnecessary attributes, and set some attrs from options (loop, poster etc...). Create main DOM objects
-	 *
-	 * @access private
-	 */
-	Player.prototype.createElement = function () {
-		var _this9 = this;
-
-		var options = this.options;
-		var element = this._element;
-
-		[
-
-		// Remove controls because we dont not support native controls yet
-		'controls', 'poster',
-
-		// It is unnecessary attrs, this functionality solve CSS
-		'height', 'width'].forEach(function (item) {
-			element.removeAttr(item);
-		});
-
-		// Set attrs from options
-		['preload', 'autoplay', 'loop', 'muted'].forEach(function (item) {
-			if (_this9.options[item]) {
-				element.attr(item, _this9.options[item]);
-				element.prop(item, _this9.options[item]);
-			}
-		});
-
-		element.find('source[data-quality]').each(function (i, item) {
-			(0, _jquery2.default)(item).remove();
-		});
-
-		this.element = this.element.addClass('leplayer').attr('tabindex', 0).css('width', '100%').css('max-width', (options.width || this.video.width) + 'px');
-
-		this.errorDisplay = new _ErrorDisplay2.default(this);
-
-		this.playButton = new _PlayButton2.default(this);
-
-		// TODO: Вынести это в отдельнеый компонент
-		this.loader = (0, _jquery2.default)('<div />').addClass('leplayer-loader-container').append(new _Icon2.default(this, {
-			iconName: 'refresh',
-			className: 'leplayer-loader-container__icon'
-		}).element);
-
-		this.splashIcon = new _SplashIcon2.default(this);
-
-		this.videoContainer = (0, _utils.createEl)('div', {
-			className: 'leplayer-video'
-		}).append(this.errorDisplay.element).append(this.playButton.element).append(this.loader).append(this.splashIcon.element);
-
-		if (options.poster) {
-			this.poster = new _Poster2.default(this);
-			this.videoContainer.append(this.poster.element);
-		}
-
-		if (options.miniplayer) {
-			this.miniPlayer = new _MiniPlayer2.default(this);
-		}
-
-		var lastTimer = new _Time2.default(this, {
-			fn: function fn(player) {
-				var video = player.video;
-				return (0, _utils.secondsToTime)(video.duration - video.currentTime);
-			}
-		});
-
-		this.innerElement = (0, _jquery2.default)('<div />').addClass('leplayer__inner').append(this.videoContainer).append((0, _utils.createEl)('div', {
-			className: 'leplayer__info'
-		}).append((0, _utils.createEl)('div', {
-			className: 'leplayer__title',
-			html: this.options.title || ""
-		})).append((0, _utils.createEl)('div', {
-			className: 'leplayer__video-info',
-			html: this.options.videoInfo || ""
-		})).append((0, _utils.createEl)('div', {
-			className: 'leplayer__last',
-			html: '\u0412\u0438\u0434\u0435\u043E \u0437\u0430\u043A\u043E\u043D\u0447\u0438\u0442\u0441\u044F \u0447\u0435\u0440\u0435\u0437 '
-		}).append(lastTimer.element)).append(this.miniPlayer && this.miniPlayer.element));
-		//.append($('leplayer__video-info')
-		//.text(this.options.videoInfo || ""))
-
-		this.element = this.element.append(this.innerElement);
-
-		this.addClass('leplayer--paused');
-		this.addClass('leplayer--virgin');
-
-		if (options.sectionContainer) {
-			this.sectionsContainer = (0, _jquery2.default)(options.sectionContainer);
-		}
-
-		element.before(this.element);
-		this.videoContainer.append(element);
-		return this.element;
-	};
 
 	/**
-	 * @access private
-	 *
-	 * Function, than init all plugins from player options.
-	 * If plugin doesn't exist throw an error
-	 * @returns {Player} this
-	 *
-	 */
-	Player.prototype._initPlugins = function () {
-		if (this.options.plugins) {
-			for (var name in this.options.plugins) {
-				if (!this.options.plugins.hasOwnProperty(name)) return;
-				var pluginOptions = this.options.plugins[name];
-				if (this[name]) {
-					this[name](pluginOptions);
-				} else {
-					console.error('Plugin \'' + name + '\' doesn\'t exist');
-				}
-			}
-		}
-
-		return this;
-	};
-
-	/**
-	 * @access private
-	 */
-	Player.prototype._view = 'common';
-
-	/**
-	 * Emit a player event (the name of event would be a leplayer_smth)
+	 * Static helper for creating a plugins for leplayer
 	 *
 	 * @access public
-	 * @param {String} eventName
-	 * @param {Arguments} ...args jQuery.fn.on other arguments
-	 * @returns {Player} this
-	 */
-	Player.prototype.trigger = function (eventName) {
-		var _element$trigger;
-
-		var event = _jquery2.default.Event('leplayer_' + eventName, { player: this });
-
-		for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-			args[_key3 - 1] = arguments[_key3];
-		}
-
-		(_element$trigger = this.element.trigger).call.apply(_element$trigger, [this.element, event].concat(args));
-		return this;
-	};
-
-	/**
-	 * Listen a player event with leplayer_ suffix
+	 * @static
+	 * @param {String} name The name of plugin
+	 * @param {Function|Object} fn Plugin init function
 	 *
-	 * @access public
-	 * @param {String} eventName
-	 * @param {Arguments} ...args jQuery.fn.on other arguments
-	 * @returns {Player} this
+	 * @example
+	 * Player.preset('common', {
+	 *     width : '100%',
+	 *     plugins : {
+	 *         miniplayer : true
+	 *     }
+	 * });
 	 */
-	Player.prototype.on = function (eventName) {
-		var _element$on;
-
-		for (var _len4 = arguments.length, args = Array(_len4 > 1 ? _len4 - 1 : 0), _key4 = 1; _key4 < _len4; _key4++) {
-			args[_key4 - 1] = arguments[_key4];
-		}
-
-		(_element$on = this.element.on).call.apply(_element$on, [this.element, 'leplayer_' + eventName].concat(args));
-		return this;
-	};
-
-	Player.prototype.one = function (eventName) {
-		var _element$one;
-
-		for (var _len5 = arguments.length, args = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
-			args[_key5 - 1] = arguments[_key5];
-		}
-
-		(_element$one = this.element.one).call.apply(_element$one, [this.element, 'leplayer_' + eventName].concat(args));
-	};
-
-	/**
-	 * Add the CSS class for general leplayer DOM element
-	 *
-	 * @access public
-	 * @param {String} className Name of class (not a selector, it's mean, that string sould be without point at the start)
-	 * @returns {Player} this
-	 */
-	Player.prototype.addClass = function (className) {
-		this.element.addClass(className);
-		return this;
-	};
-
-	/**
-	 * Remove the CSS class from general leplayer DOM element
-	 *
-	 * @access public
-	 * @param {String} className Name of class
-	 * @returns {Player} this
-	 */
-	Player.prototype.removeClass = function (className) {
-		this.element.removeClass(className);
-		return this;
-	};
-
-	/**
-	 * Toggle the CSS class from general leplayer DOM element
-	 *
-	 * @access public
-	 * @param {String} className
-	 * @param {Boolean} flag
-	 * @returns {Player} this
-	 */
-	Player.prototype.toggleClass = function (className, flag) {
-		this.element.toggleClass(className, flag);
-		return this;
-	};
-
-	Player.prototype.hasClass = function (className) {
-		return this.element.hasClass(className);
-	};
-
-	/**
-	 * Set player view
-	 *
-	 * @access public
-	 * @param {String} view Can be 'common', 'fullscreen', 'mini'
-	 * @returns {Player} this
-	 */
-	Player.prototype.setView = function (view) {
-		this.element.removeClass('leplayer--' + this._view).addClass('leplayer--' + view);
-		this._view = view;
-		return this;
-	};
-
-	/**
-	 * Return the view of player
-	 *
-	 * @access public
-	 * @returns {String}
-	 */
-	Player.prototype.getView = function () {
-		return this._view;
-	};
-
-	/**
-	 * Show player error if param value not null. Also trigger player event 'error'
-	 *
-	 * @param {String|MediaError} value
-	 * @returns {Player} this
-	 */
-	Player.prototype.setError = function (value) {
-		if (value === null) {
-			this._error = null;
-			this.removeClass('leplayer--error');
-			if (this.errorDisplay) {
-				this.errorDisplay.element.hide();
-			}
-			return this;
-		}
-		this._error = new _MediaError2.default(value);
-
-		this.addClass('leplayer--error');
-		this.trigger('error', { error: this._error });
-
-		return this;
-	};
-
-	/**
-	 * @access public
-	 * @params {Boolean} value
-	 */
-	Player.prototype.setUserActive = function (value) {
-		if (value !== this.getUserActive) {
-			this._userActive = value;
-			this.toggleClass('leplayer--user-active', value);
-			this.trigger('useractive');
+	Player.preset = function (name, obj) {
+		if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
+			Player._presets[name] = _jquery2.default.extend({}, {
+				options: {},
+				initOptions: _utils.noop
+			}, obj);
+		} else if (typeof obj === 'function') {
+			Player._presets[name] = obj();
 		}
 	};
 
-	Player.prototype.getUserActive = function () {
-		return this._userActive || false;
-	};
-
-	Player.prototype.play = function () {
-		return this.video.play();
-	};
-
-	Player.prototype.pause = function () {
-		return this.video.pause();
-	};
-
-	Player.prototype.togglePlay = function () {
-		return this.video.togglePlay();
-	};
-
-	// TODO: Сделать плеер классов и реализовать эти методы через get и set
-	Player.prototype.getError = function () {
-		return this._error || null;
-	};
-
-	/**
-	 * Get some data for player
-	 *
-	 * @access public
-	 * @returns {jQuery.promise} Promise
-	 */
-	Player.prototype.getData = function () {
-		var dfd = new _jquery2.default.Deferred();
-
-		if (this._data !== undefined) {
-			dfd.resolve(this._data);
-			return dfd.promise();
-		}
-
-		if (typeof this.options.data === 'string') {
-			return _jquery2.default.ajax({
-				url: this.options.data,
-				method: 'GET',
-				dataType: 'json'
-			}).promise();
-		} else if (_typeof(this.options.data) === 'object') {
-			dfd.resolve(this.options.data);
-			return dfd.promise();
-		}
-	};
-
-	Player.prototype.getSectionData = function () {
-		return this.getData().then(function (data) {
-			return data.sections;
-		});
-	};
-
-	Player.prototype.requestFullscreen = function () {
-		var fsApi = _FullscreenApi2.default;
-
-		if (fsApi.requestFullscreen) {
-			// Call HTML5 Video api requestFullscreen
-			this.element[0][fsApi.requestFullscreen]();
-
-			this.trigger('fullscreenchange', true);
-		} else if (this.video.supportsFullScreen()) {
-			this.video.enterFullscreen();
-		}
-	};
-
-	Player.prototype.exitFullscreen = function () {
-		var fsApi = _FullscreenApi2.default;
-
-		if (fsApi.exitFullscreen) {
-			document[fsApi.exitFullscreen]();
-		} else if (this.video.supportsFullScreen()) {
-			this.video.exitFullscreen();
-		}
-
-		this.trigger('fullscreenchange', false);
-	};
-
-	Player.prototype.toggleFullscreen = function () {
-		if (this.getView() === 'fullscreen') {
-			this.exitFullscreen();
+	Player.getPreset = function (name) {
+		if (Player._presets[name]) {
+			return Player._presets[name];
 		} else {
-			this.requestFullscreen();
+			console.error('preset ' + name + ' doesn\'t exist');
+			return null;
 		}
 	};
 
-	/**
-	 * Get ControlCollection of Player by name (e.x 'common', 'fullscreen')
-	 *
-	 * @access public
-	 * @param {String} name Name of ControlCollection
-	 * @returns {ControlCollection}
-	 */
-	Player.prototype.getControls = function (name) {
-		return this.controls[name];
+	Player._presets = {};
+
+	Player._loadSVGSprite = function (svg) {
+		var hiddenElement = (0, _jquery2.default)('<div/>').hide();
+		(0, _jquery2.default)('body').prepend(hiddenElement.append(svg));
+		return hiddenElement;
 	};
 
-	/**
-	 * Return the height of player. If you want get height only of video element, use this.video.height or whatever
-	 *
-	 * @access public
-	 * @returns {Number} Height in px
-	 */
-	Player.prototype.getHeight = function () {
-		return this.element.height();
-	};
-
-	/**
-	 * Return the width of player.
-	 *
-	 * @access public
-	 * @returns {Number} Width in px
-	 */
-	Player.prototype.getWidth = function () {
-		return this.element.width();
-	};
-
-	Player.prototype.completeSections = function (sections) {
-		if (sections == null || sections.length == 0) {
-			return;
-		}
-		var newSections = [].concat(sections);
-		for (var i = 0; i < newSections.length; i++) {
-			var endSection = void 0;
-			if (i < newSections.length - 1) {
-				endSection = newSections[i + 1].begin;
-			} else {
-				endSection = this.video.duration;
-			}
-			newSections[i].end = endSection;
-		}
-		return newSections;
-	};
-
-	Player.prototype._userActivity = false;
-
-	/**
-	 * @access private
-	 */
-	Player.prototype._listenUserActivity = function () {
-		var _this10 = this;
-
-		var mouseInProgress = void 0;
-		var lastMoveX = void 0;
-		var lastMoveY = void 0;
-
-		var onMouseMove = function onMouseMove(e) {
-			if (e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
-				lastMoveX = e.screenX;
-				lastMoveY = e.screenY;
-				_this10._userActivity = true;
-			}
-		};
-
-		var onMouseDown = function onMouseDown(e) {
-			_this10._userActivity = true;
-
-			// While user is pressing mouse or touch, dispatch user activity
-			clearInterval(mouseInProgress);
-
-			mouseInProgress = setInterval(function () {
-				_this10._userActivity = true;
-			}, 250);
-		};
-
-		var onMouseUp = function onMouseUp(e) {
-			_this10._userActivity = true;
-			clearInterval(mouseInProgress);
-		};
-
-		this.element.on('mousemove', onMouseMove);
-
-		this.element.on('mousedown', onMouseDown);
-
-		this.element.on('mouseup', onMouseUp);
-
-		this.element.on('keydown', function (e) {
-			return _this10._userActivity = true;
-		});
-		this.element.on('keyup', function (e) {
-			return _this10._userActivity = true;
-		});
-
-		// See http://ejohn.org/blog/learning-from-twitter/
-		var inactivityTimeout = void 0;
-		var delay = this.options.innactivityTimeout;
-		setInterval(function () {
-			if (_this10._userActivity) {
-
-				// Reset user activuty tracker
-				_this10._userActivity = false;
-
-				_this10.setUserActive(true);
-
-				clearTimeout(inactivityTimeout);
-
-				if (delay > 0) {
-
-					inactivityTimeout = setTimeout(function () {
-						if (!_this10._userActivity) {
-							_this10.setUserActive(false);
-						}
-					}, delay);
-				}
-			}
-		}, 250);
-	};
-
-	Player.prototype._waitingTimeouts = [];
-
-	/**
-	 * Stop showing spinner and clear delay of showing spinner
-	 *
-	 * @access private
-	 */
-	Player.prototype._stopWayting = function () {
-		this._waitingTimeouts.forEach(function (item) {
-			return clearTimeout(item);
-		});
-		this._waitingTimeouts = [];
-		this.removeClass('leplayer--waiting');
-	};
-
-	/**
-	 * Show spinner with delay in 300ms
-	 *
-	 * @access private
-	 */
-	Player.prototype._startWaiting = function () {
-		var _this11 = this;
-
-		this._waitingTimeouts.push(setTimeout(function () {
-			_this11.addClass('leplayer--waiting');
-		}, 300));
-	};
-
-	/**
-	 * On inited player event handler
-	 *
-	 * @access private
-	 * @param {PlayerEvent} e
-	 */
-	Player.prototype._onInited = function (e) {
-		this.addClass('leplayer--inited');
-
-		this.options.onPlayerInited.call(this, e);
-	};
-
-	/**
-	 * @access private
-	 */
-	Player.prototype._dblclickTimeout = null;
-
-	/**
-	 * On click video event handler. Focus on video and togglePlay
-	 *
-	 * @access private
-	 * @param {PlayerEvent} e
-	 */
-	Player.prototype._onClick = function (e) {
-		var _this12 = this;
-
-		clearTimeout(this._dblclickTimeout);
-		this._dblclickTimeout = setTimeout(function () {
-			_this12.video.element.focus();
-			_this12.togglePlay();
-		}, 300);
-	};
-
-	/**
-	 * On dblclick on the video player event handler
-	 *
-	 * @access private
-	 * @param {PlayerEvent} e
-	 */
-	Player.prototype._onDbclick = function (e) {
-		clearTimeout(this._dblclickTimeout);
-		this.toggleFullscreen();
-	};
-
-	/**
-	 * On fullscreen change player event handler
-	 *
-	 * @access public
-	 * @param {PlayerEvent} e
-	 */
-	Player.prototype._onFullscreenChange = function (e, isFs) {
-		if (isFs) {
-			this.setView('fullscreen');
-		} else {
-			this.setView('common');
-		}
-	};
-
-	/**
-	 * On play event handler
-	 *
-	 * @access private
-	 * @param {PlayerEvent} e
-	 */
-	Player.prototype._onPlay = function () {
-		this.splashIcon.show('play');
-	};
-
-	/**
-	 * On pause player event handler
-	 * Show pause icon in the center of video
-	 *
-	 * @access private
-	 */
-	Player.prototype._onPause = function () {
-		this.splashIcon.show('pause');
-	};
-
-	Player.prototype._onEntityFullscrenChange = function () {
-		var fsApi = _FullscreenApi2.default;
-		var isFs = !!document[fsApi.fullscreenElement];
-		this.trigger('fullscreenchange', isFs);
-	};
-
-	/**
-	 * Return a name of icon. If less then 0.1 return volume-off,
-	 * if less then 0.5 return volume down, else return volume-up
-	 *
-	 * @access private
-	 * @param {Number} value Volume value
-	 * @returns {String} Icon name
-	 */
-	Player.prototype._calcVolumeIcon = function (value) {
-		var volume = value || this.video.volume;
-
-		if (volume < this.options.volume.mutelimit) {
-			return 'volume-off';
-		} else if (value < 0.5) {
-			return 'volume-down';
-		} else {
-			return 'volume-up';
-		}
-	};
+	Player.defaultSprite = __webpack_require__(35);
 
 	window.$.fn.lePlayer = function (options) {
 		return this.each(function () {
@@ -1779,6 +1793,108 @@
 	window.$.lePlayer = Player;
 
 	window.lePlayer = Player;
+
+	/**
+	 * Mini Player plugin
+	 *
+	 * @plugin
+	 */
+	Player.plugin('miniplayer', function (pluginOptions) {
+		var _this9 = this;
+
+		var player = this;
+
+		// Мержим с this.options.miniplayer, чтобы не сломать обратную совместимось, так как раньше
+		// миниплеер не был плагином плеера.
+		var options = _jquery2.default.extend({}, {
+			width: '100%',
+			offsetShow: function offsetShow(player) {
+				var offset = player.element.offset().top + player.element.outerHeight() - player.getControls('common').element.height();
+
+				return offset;
+			}
+		}, this.options.miniplayer, pluginOptions);
+
+		var controls = new _ControlCollection2.default(this, {
+			name: 'mini',
+			controls: options.controls,
+			controlOptions: {
+				control: {
+					disable: false
+				}
+			}
+		});
+
+		// Вставляем в infoElement под title и description
+		this.infoElement.append(controls.element);
+
+		/**
+	  * Return offset on oY , when miniplayer should showing or hiding
+	  *
+	  * @returns {Number}
+	  */
+		var offsetShow = function offsetShow() {
+			if (_jquery2.default.isFunction(options.offsetShow)) {
+				return options.offsetShow(player);
+			}
+
+			return options.offsetShow;
+		};
+
+		var getWidth = function getWidth() {
+			return options.width || _this9.element.width();
+		};
+
+		this._updateMiniPlayer = function () {
+			var scrollTop = (0, _jquery2.default)(window).scrollTop();
+
+			if (scrollTop > offsetShow()) {
+				_this9.showMiniPlayer();
+			} else {
+				_this9.hideMiniPlayer();
+			}
+		};
+
+		this.showMiniPlayer = function (force) {
+			if (!force && _this9.view === 'mini') {
+				return;
+			}
+
+			// Added empty space
+			_this9.element.css('padding-top', _this9.videoContainer.height());
+
+			_this9.view = 'mini';
+		};
+
+		this.hideMiniPlayer = function (force) {
+			if (!force && _this9.view !== 'mini') {
+				return;
+			}
+			_this9.view = 'common';
+		};
+
+		(0, _jquery2.default)(window).on('scroll', this._updateMiniPlayer.bind(this));
+		(0, _jquery2.default)(window).on('resize', this._updateMiniPlayer.bind(this));
+		this.on('inited', this._updateMiniPlayer.bind(this));
+
+		this.onSetView('mini', function () {
+			_this9.innerElement.css('max-width', getWidth());
+			_this9.innerElement.css('height', _this9.video.height);
+		});
+
+		this.onDelView('mini', function () {
+			_this9.innerElement.css('max-width', '');
+			_this9.innerElement.css('height', '');
+
+			_this9.element.css('padding-top', '');
+		});
+
+		this._updateMiniPlayer();
+	});
+
+	Player.preset('vps', __webpack_require__(36).preset);
+	Player.preset('sms', __webpack_require__(37).preset);
+	Player.preset('compressed', __webpack_require__(38).preset);
 
 /***/ },
 /* 1 */
@@ -1852,8 +1968,8 @@
 			});
 
 			_this.element.on({
-				'click': _this._onClick.bind(_this),
-				'leplayer_control_click': _this.onClick.bind(_this)
+				click: _this._onClick.bind(_this),
+				leplayer_control_click: _this.onClick.bind(_this)
 			});
 
 			_this.player.on('inited', _this.onPlayerInited.bind(_this));
@@ -1911,7 +2027,7 @@
 			key: 'onClick',
 			value: function onClick(e) {
 				e.preventDefault();
-				if (typeof this.options.onClick == 'function') {
+				if (typeof this.options.onClick === 'function') {
 					this.options.onClick.call(this, arguments);
 				}
 			}
@@ -2010,19 +2126,30 @@
 		function Component(player, options) {
 			_classCallCheck(this, Component);
 
-			/** TODO(adinvadim): Add options.component, for clone component instance */
-			options = this.options = _jquery2.default.extend({}, this.options, options);
-			this.player = player;
+			options = this.options = _jquery2.default.extend({}, {
+				createElement: true
+			}, this.options, options);
 
-			if (options.element) {
-				this.element = options.element;
+			if (!player) {
+				this.player = player = this;
 			} else {
-				this.createElement();
+				this.player = player;
 			}
-			if (this.element.length != 1) {
-				console.error('Component.prototype.element.length must equal 1, not ' + this.element.length + '\n', this.element);
+
+			if (options.createElement) {
+
+				if (options.element) {
+					this.element = options.element;
+				} else {
+					this.createElement();
+				}
+
+				if (this.element.length !== 1) {
+					console.error('Component.prototype.element.length must equal 1, not ' + this.element.length + '\n', this.element);
+				}
+
+				this.element[0].__node = this;
 			}
-			this.element[0].__node = this;
 		}
 
 		/**
@@ -2045,6 +2172,134 @@
 			key: 'buildCSSClass',
 			value: function buildCSSClass() {
 				return '';
+			}
+
+			/**
+	   * Set the focus to this component
+	   */
+
+		}, {
+			key: 'focus',
+			value: function focus() {
+				this.element.focus();
+			}
+
+			/**
+	   * Remove the focus from this component
+	   */
+
+		}, {
+			key: 'blur',
+			value: function blur() {
+				this.element.blur();
+			}
+
+			/**
+	   * Emit a player event (the name of event would be a leplayer_smth)
+	   *
+	   * @access public
+	   * @param {String} eventName
+	   * @param {Arguments} ...args jQuery.fn.on other arguments
+	   * @returns {Player} this
+	   */
+
+		}, {
+			key: 'trigger',
+			value: function trigger(eventName) {
+				var _element$trigger;
+
+				var event = _jquery2.default.Event('leplayer_' + eventName, { player: this });
+
+				for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+					args[_key - 1] = arguments[_key];
+				}
+
+				(_element$trigger = this.element.trigger).call.apply(_element$trigger, [this.element, event].concat(args));
+				return this;
+			}
+
+			/**
+	   * Listen a player event with leplayer_ suffix
+	   *
+	   * @access public
+	   * @param {String} eventName
+	   * @param {Arguments} ...args jQuery.fn.on other arguments
+	   * @returns {Player} this
+	   */
+
+		}, {
+			key: 'on',
+			value: function on(eventName) {
+				var _element$on;
+
+				for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
+					args[_key2 - 1] = arguments[_key2];
+				}
+
+				(_element$on = this.element.on).call.apply(_element$on, [this.element, 'leplayer_' + eventName].concat(args));
+				return this;
+			}
+		}, {
+			key: 'one',
+			value: function one(eventName) {
+				var _element$one;
+
+				for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+					args[_key3 - 1] = arguments[_key3];
+				}
+
+				(_element$one = this.element.one).call.apply(_element$one, [this.element, 'leplayer_' + eventName].concat(args));
+			}
+
+			/**
+	   * Add the CSS class for general leplayer DOM element
+	   *
+	   * @access public
+	   * @param {String} className Name of class (not a selector, it's mean, that string sould be without point at the start)
+	   * @returns {Player} this
+	   */
+
+		}, {
+			key: 'addClass',
+			value: function addClass(className) {
+				this.element.addClass(className);
+				return this;
+			}
+
+			/**
+	   * Remove the CSS class from general leplayer DOM element
+	   *
+	   * @access public
+	   * @param {String} className Name of class
+	   * @returns {Player} this
+	   */
+
+		}, {
+			key: 'removeClass',
+			value: function removeClass(className) {
+				this.element.removeClass(className);
+				return this;
+			}
+
+			/**
+	   * Toggle the CSS class from general leplayer DOM element
+	   *
+	   * @access public
+	   * @param {String} className
+	   * @param {Boolean} flag
+	   * @returns {Player} this
+	   */
+
+		}, {
+			key: 'toggleClass',
+			value: function toggleClass(className, flag) {
+				this.element.toggleClass(className, flag);
+				return this;
+			}
+		}, {
+			key: 'hasClass',
+			value: function hasClass(className) {
+				return this.element.hasClass(className);
 			}
 		}], [{
 			key: 'registerComponent',
@@ -2200,464 +2455,6 @@
 
 	'use strict';
 	/**
-	 * @file MiniPlayer.js
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _Component2 = __webpack_require__(3);
-
-	var _Component3 = _interopRequireDefault(_Component2);
-
-	var _ControlCollection = __webpack_require__(6);
-
-	var _ControlCollection2 = _interopRequireDefault(_ControlCollection);
-
-	var _utils = __webpack_require__(7);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	// TODO: Сделать это в качестве плагина для плеера
-
-	/**
-	 * @class MiniPlayer
-	 * @param {Player} player Main player
-	 * @param {Object} [options]
-	 * @extends Control
-	 */
-	var MiniPlayer = function (_Component) {
-		_inherits(MiniPlayer, _Component);
-
-		function MiniPlayer(player, options) {
-			_classCallCheck(this, MiniPlayer);
-
-			// Merge options
-			options = _jquery2.default.extend({}, {
-				visible: false
-			}, player.options.miniplayer, options);
-
-			var _this = _possibleConstructorReturn(this, (MiniPlayer.__proto__ || Object.getPrototypeOf(MiniPlayer)).call(this, player, options));
-
-			if (options.visible) {
-				_this.show();
-			}
-
-			(0, _jquery2.default)(window).on('scroll', _this.update.bind(_this));
-			(0, _jquery2.default)(window).on('resize', _this.update.bind(_this));
-			_this.player.on('fullscreenchange', _this._onFullscreenChange.bind(_this));
-			_this.player.on('inited', _this._onPlayerInited.bind(_this));
-			return _this;
-		}
-
-		_createClass(MiniPlayer, [{
-			key: 'update',
-			value: function update() {
-				var scrollTop = (0, _jquery2.default)(window).scrollTop();
-
-				if (scrollTop > this.offsetShow) {
-					this.show();
-				} else {
-					this.hide();
-				}
-			}
-		}, {
-			key: 'show',
-
-
-			/**
-	   * Show mini player
-	   * @param {Boolean} force
-	   *
-	   * @public
-	   */
-			value: function show(force) {
-				if (!force && this.player.getView() === 'mini') {
-					return;
-				}
-
-				// Added empty space
-				this.player.element.css('padding-top', this.player.videoContainer.height());
-
-				this.player.setView('mini');
-				this.player.innerElement.css('max-width', this.width);
-				this.player.innerElement.css('height', this.player.video.height);
-			}
-
-			/**
-	   * Hide mini player
-	   * @param {Boolean} force
-	   *
-	   * @public
-	   */
-
-		}, {
-			key: 'hide',
-			value: function hide(force) {
-				if (!force && this.player.getView() !== 'mini') {
-					return;
-				}
-				this.player.setView('common');
-
-				this.player.innerElement.css('max-width', '');
-				this.player.innerElement.css('height', '');
-
-				this.player.element.css('padding-top', '');
-			}
-
-			/**
-	   * @override
-	   */
-
-		}, {
-			key: 'createElement',
-			value: function createElement() {
-				var controls = new _ControlCollection2.default(this.player, { name: 'mini' });
-				return this.element = (0, _utils.createEl)('div', {
-					className: 'leplayer-miniplayer'
-				}).append(controls.element);
-			}
-		}, {
-			key: '_onFullscreenChange',
-			value: function _onFullscreenChange(e, data) {
-				if (data == true) {
-					this.hide();
-				}
-			}
-		}, {
-			key: '_onPlayerInited',
-			value: function _onPlayerInited(e) {
-				var scrollTop = (0, _jquery2.default)(window).scrollTop();
-
-				if (scrollTop > this.offsetShow) {
-					this.show(true);
-				} else {
-					this.hide();
-				}
-			}
-		}, {
-			key: 'offsetShow',
-			get: function get() {
-				if (_jquery2.default.isFunction(this.options.offsetShow)) {
-					return this.options.offsetShow(this.player);
-				}
-
-				return this.options.offsetShow;
-			}
-		}, {
-			key: 'height',
-			get: function get() {
-				return this.player.element.height();
-			}
-		}, {
-			key: 'width',
-			get: function get() {
-				return this.options.width || this.player.element.width();
-			}
-		}]);
-
-		return MiniPlayer;
-	}(_Component3.default);
-
-	exports.default = MiniPlayer;
-
-/***/ },
-/* 6 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	/**
-	 * @file ControlCollection.js
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _Component2 = __webpack_require__(3);
-
-	var _Component3 = _interopRequireDefault(_Component2);
-
-	var _Control = __webpack_require__(2);
-
-	var _Control2 = _interopRequireDefault(_Control);
-
-	var _utils = __webpack_require__(7);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * @param {Player} player Main player
-	 * @param {Object} [options] Options of component
-	 * @param {jQuery} [options.controls] Array of rows of control's name
-	 * @param {Object} [options.controlOptions] Control options
-	 * @property {Array} Array of rows of control's name
-	 * @pr
-	 *
-	 */
-	var ControlCollection = function (_Component) {
-		_inherits(ControlCollection, _Component);
-
-		function ControlCollection(player, options) {
-			_classCallCheck(this, ControlCollection);
-
-			options = _jquery2.default.extend({}, {
-				controls: player.options.controls[options.name] || [],
-				controlOptions: {}
-			}, options);
-
-			var _this = _possibleConstructorReturn(this, (ControlCollection.__proto__ || Object.getPrototypeOf(ControlCollection)).call(this, player, options));
-
-			_this.active = options.active || false;
-			_this.name = options.name;
-
-			_this.player.controls[_this.name] = _this;
-			return _this;
-		}
-
-		_createClass(ControlCollection, [{
-			key: '_getControlOptions',
-			value: function _getControlOptions(name) {
-				var controlOptions = this.options.controlOptions;
-
-				var result = controlOptions.control || {};
-
-				if (controlOptions[name]) {
-					result = _jquery2.default.extend(true, {}, result, controlOptions[name]);
-				}
-
-				return result;
-			}
-		}, {
-			key: 'addControl',
-			value: function addControl(indexRow, name, options) {
-				var control = _Control2.default.create(this.player, name, _extends({
-					collection: this.options.name
-				}, options));
-
-				if (control == null) {
-					return;
-				}
-
-				while (indexRow > this._rows.length) {
-					this.addRow();
-				}
-
-				var elemRow = this._rows[indexRow];
-				elemRow.append(control.element);
-
-				if (this.controls == null) {
-					this.controls = [];
-				}
-				if (this.controls[indexRow] == null) {
-					this.controls[indexRow] = {};
-				}
-
-				this.controls[indexRow][name] = control;
-			}
-		}, {
-			key: 'getControl',
-			value: function getControl(first, second) {
-				if (second == null) {
-					var name = first;
-					for (var i = 0; i < this.controls.length; i++) {
-						if (this.controls[i][name] != undefined) {
-							return this.controls[i][name];
-						}
-					}
-				} else {
-					var _name = first;
-					var indexRow = second;
-					return this.controls[indexRow][_name];
-				}
-
-				return null;
-			}
-		}, {
-			key: 'addRow',
-			value: function addRow() {
-				var elemRow = (0, _utils.createEl)('div', {
-					className: 'leplayer-controls controls-' + this.options.name
-				});
-
-				if (this._rows == null) {
-					this._rows = [];
-				}
-				this._rows.push(elemRow);
-				this.element.append(elemRow);
-
-				return elemRow;
-			}
-		}, {
-			key: 'getRow',
-			value: function getRow(indexRow) {
-				return this._rows[indexRow || 0];
-			}
-
-			/**
-	   * @override
-	   */
-
-		}, {
-			key: 'createElement',
-			value: function createElement() {
-				var _this2 = this;
-
-				var _options = this.options,
-				    name = _options.name,
-				    controls = _options.controls;
-
-
-				this.element = (0, _utils.createEl)('div', {
-					className: 'leplayer-control-collection leplayer-control-collection--' + name
-				});
-
-				controls.forEach(function (row, indexRow) {
-					var elemRow = _this2.addRow();
-					var hasTimeline = false;
-					row.forEach(function (controlName) {
-						if (controlName == 'timeline') {
-							hasTimeline = true;
-						}
-
-						_this2.addControl(indexRow, controlName, _this2._getControlOptions(name));
-					});
-
-					if (!hasTimeline) {
-						elemRow.css('width', '1px');
-					}
-					elemRow.find('.divider + .divider').remove();
-				});
-				return this.element;
-			}
-		}, {
-			key: 'hide',
-			value: function hide() {
-				this.element.hide();
-				this.element.find('.leplayer-controls').hide();
-			}
-		}, {
-			key: 'show',
-			value: function show() {
-				this.element.show();
-				this.element.find('.leplayer-controls').show();
-			}
-		}]);
-
-		return ControlCollection;
-	}(_Component3.default);
-
-	_Component3.default.registerComponent('ControlCollection', ControlCollection);
-	exports.default = ControlCollection;
-
-/***/ },
-/* 7 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	/**
-	 * @file time.js
-	 *
-	 * @module time
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-	exports.secondsToTime = secondsToTime;
-	exports.percentify = percentify;
-	exports.createEl = createEl;
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	/**
-	 * Convert seconds to format string 'hh?:mm:ss'
-	 *
-	 * @access public
-	 * @param {Number} seconds Seconds
-	 * @param {Boolean} showHours convert to format 'hh:mm:ss'
-	 * @returns {String}
-	 */
-	function secondsToTime(seconds, showHours) {
-		var h = Math.floor(seconds / 3600);
-		var m = Math.floor(seconds % 3600 / 60);
-		var s = Math.floor(seconds % 3600 % 60);
-		var out = '';
-		if (m < 10) {
-			m = '0' + m;
-		}
-		if (s < 10) {
-			s = '0' + s;
-		}
-		out = m + ':' + s;
-
-		if (h > 0 || showHours) {
-			out = h + ':' + out;
-		}
-		return out;
-	}
-
-	/**
-	 * Return length / end
-	 *
-	 * @access public
-	 * @param {Number} length
-	 * @param {Nubmer} end
-	 */
-	function percentify(length, end) {
-		// or zero beacase NaN
-		var percent = length / end || 0;
-		return percent >= 1 ? 1 : percent;
-	}
-
-	function createEl() {
-		var tag = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'div';
-		var props = arguments[1];
-
-		if (props && props.className) {
-			props["class"] = props.className;
-			delete props.className;
-		}
-		return (0, _jquery2.default)('<' + tag + '/>', props);
-	}
-
-/***/ },
-/* 8 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-	/**
 	 * @file PlayButton.js
 	 */
 
@@ -2681,7 +2478,7 @@
 
 	var _Icon2 = _interopRequireDefault(_Icon);
 
-	var _utils = __webpack_require__(7);
+	var _utils = __webpack_require__(6);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2750,7 +2547,110 @@
 	exports.default = PlayButton;
 
 /***/ },
-/* 9 */
+/* 6 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
+	 * @file time.js
+	 *
+	 * @module time
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.getScrollBarWidth = undefined;
+	exports.secondsToTime = secondsToTime;
+	exports.percentify = percentify;
+	exports.createEl = createEl;
+	exports.noop = noop;
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	/**
+	 * Convert seconds to format string 'hh?:mm:ss'
+	 *
+	 * @access public
+	 * @param {Number} seconds Seconds
+	 * @param {Boolean} showHours convert to format 'hh:mm:ss'
+	 * @returns {String}
+	 */
+	function secondsToTime(seconds, showHours) {
+		var h = Math.floor(seconds / 3600);
+		var m = Math.floor(seconds % 3600 / 60);
+		var s = Math.floor(seconds % 3600 % 60);
+		var out = '';
+		if (m < 10) {
+			m = '0' + m;
+		}
+		if (s < 10) {
+			s = '0' + s;
+		}
+		out = m + ':' + s;
+
+		if (h > 0 || showHours) {
+			out = h + ':' + out;
+		}
+		return out;
+	}
+
+	/**
+	 * Return length / end
+	 *
+	 * @access public
+	 * @param {Number} length
+	 * @param {Nubmer} end
+	 */
+	function percentify(length, end) {
+		// or zero beacase NaN
+		var percent = length / end || 0;
+		return percent >= 1 ? 1 : percent;
+	}
+
+	function createEl() {
+		var tag = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'div';
+		var props = arguments[1];
+
+		if (props && props.className) {
+			props["class"] = props.className;
+			delete props.className;
+		}
+		return (0, _jquery2.default)('<' + tag + '/>', props);
+	}
+
+	function noop() {}
+
+	var getScrollBarWidth = exports.getScrollBarWidth = function () {
+		var result = void 0;
+
+		return function () {
+
+			if (result != null) {
+				return result;
+			}
+
+			var outer = (0, _jquery2.default)('<div />').css({
+				visibility: 'hidden',
+				width: 100,
+				overflow: 'scroll'
+			}).appendTo('body');
+
+			var widthWithScroll = (0, _jquery2.default)('<div />').css({
+				width: '100%'
+			}).appendTo(outer).outerWidth();
+
+			outer.remove();
+			return result = 100 - widthWithScroll;
+		};
+	}();
+
+/***/ },
+/* 7 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2829,7 +2729,7 @@
 	exports.default = SplashIcon;
 
 /***/ },
-/* 10 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2851,7 +2751,7 @@
 
 	var _Component3 = _interopRequireDefault(_Component2);
 
-	var _utils = __webpack_require__(7);
+	var _utils = __webpack_require__(6);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -2910,7 +2810,234 @@
 	exports.default = Time;
 
 /***/ },
-/* 11 */
+/* 9 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	/**
+	 * @file ControlCollection.js
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _Component2 = __webpack_require__(3);
+
+	var _Component3 = _interopRequireDefault(_Component2);
+
+	var _Control = __webpack_require__(2);
+
+	var _Control2 = _interopRequireDefault(_Control);
+
+	var _utils = __webpack_require__(6);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * @param {Player} player Main player
+	 * @param {Object} [options] Options of component
+	 * @param {jQuery} [options.controls] Array of rows of control's name
+	 * @param {Object} [options.controlsOptions] Control options
+	 * @property {Array} Array of rows of control's name
+	 * @pr
+	 *
+	 */
+	var ControlCollection = function (_Component) {
+		_inherits(ControlCollection, _Component);
+
+		function ControlCollection(player, options) {
+			_classCallCheck(this, ControlCollection);
+
+			var name = options.name;
+
+			var playerOptions = {
+				controls: player.options.controls[name]
+			};
+
+			if (player.options.controlsOptions[name]) {
+				playerOptions['align'] = player.options.controlsOptions[name].align;
+				playerOptions['controlsOptions'] = player.options.controlsOptions[name].controls;
+			}
+
+			options = _jquery2.default.extend({}, {
+				controls: [],
+				controlsOptions: {},
+				align: 'left'
+			}, playerOptions, options);
+
+			var _this = _possibleConstructorReturn(this, (ControlCollection.__proto__ || Object.getPrototypeOf(ControlCollection)).call(this, player, options));
+
+			_this.active = options.active || false;
+			_this.name = options.name;
+
+			_this.player.controls[_this.name] = _this;
+			return _this;
+		}
+
+		_createClass(ControlCollection, [{
+			key: '_getControlOptions',
+			value: function _getControlOptions(name) {
+				var controlsOptions = this.options.controlsOptions;
+
+				var result = controlsOptions.control || {};
+
+				if (controlsOptions[name]) {
+					result = _jquery2.default.extend(true, {}, result, controlsOptions[name]);
+				}
+
+				return result;
+			}
+		}, {
+			key: 'addControl',
+			value: function addControl(indexRow, name, options) {
+				var control = _Control2.default.create(this.player, name, _extends({
+					collection: this.options.name
+				}, options));
+
+				if (control == null) {
+					return;
+				}
+
+				while (indexRow > this._rows.length) {
+					this.addRow();
+				}
+
+				var elemRow = this._rows[indexRow];
+				elemRow.append(control.element);
+
+				if (this.controls == null) {
+					this.controls = [];
+				}
+				if (this.controls[indexRow] == null) {
+					this.controls[indexRow] = {};
+				}
+
+				this.controls[indexRow][name] = control;
+			}
+		}, {
+			key: 'getControl',
+			value: function getControl(first, second) {
+				if (second == null) {
+					var name = first;
+					for (var i = 0; i < this.controls.length; i++) {
+						if (this.controls[i][name] != null) {
+							return this.controls[i][name];
+						}
+					}
+				} else {
+					var _name = first;
+					var indexRow = second;
+					return this.controls[indexRow][_name];
+				}
+
+				return null;
+			}
+		}, {
+			key: 'addRow',
+			value: function addRow() {
+				var elemRow = (0, _utils.createEl)('div', {
+					className: 'leplayer-controls controls-' + this.options.name
+				});
+
+				if (this._rows == null) {
+					this._rows = [];
+				}
+				this._rows.push(elemRow);
+				this.element.append(elemRow);
+
+				return elemRow;
+			}
+		}, {
+			key: 'getRow',
+			value: function getRow(indexRow) {
+				return this._rows[indexRow || 0];
+			}
+
+			/**
+	   * @override
+	   */
+
+		}, {
+			key: 'createElement',
+			value: function createElement() {
+				var _this2 = this;
+
+				var _options = this.options,
+				    name = _options.name,
+				    controls = _options.controls,
+				    align = _options.align;
+
+				var globalAlign = null;
+
+				this.element = (0, _utils.createEl)('div', {
+					className: 'leplayer-control-collection leplayer-control-collection--' + name
+				});
+
+				if (typeof align === 'string') {
+					globalAlign = align;
+				}
+
+				controls.forEach(function (row, indexRow) {
+					var elemRow = _this2.addRow();
+					var rowAlign = globalAlign;
+
+					if (Array.isArray(align) && align[indexRow]) {
+						rowAlign = align[indexRow];
+					}
+
+					row.forEach(function (controlName) {
+
+						if (controlName === 'timeline' && rowAlign !== 'justify') {
+							console.warn('Conrols should have justify align, if there is the timeline in it');
+						}
+
+						_this2.addControl(indexRow, controlName, _this2._getControlOptions(name));
+					});
+
+					elemRow.addClass('leplayer-controls--' + rowAlign);
+
+					elemRow.find('.divider + .divider').remove();
+				});
+
+				return this.element;
+			}
+		}, {
+			key: 'hide',
+			value: function hide() {
+				this.element.hide();
+				this.element.find('.leplayer-controls').hide();
+			}
+		}, {
+			key: 'show',
+			value: function show() {
+				this.element.show();
+				this.element.find('.leplayer-controls').show();
+			}
+		}]);
+
+		return ControlCollection;
+	}(_Component3.default);
+
+	_Component3.default.registerComponent('ControlCollection', ControlCollection);
+	exports.default = ControlCollection;
+
+/***/ },
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -2932,7 +3059,7 @@
 
 	var _Component3 = _interopRequireDefault(_Component2);
 
-	var _utils = __webpack_require__(7);
+	var _utils = __webpack_require__(6);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3014,11 +3141,27 @@
 		}, {
 			key: 'createElement',
 			value: function createElement() {
+				var _options = this.options,
+				    fullscreenOnly = _options.fullscreenOnly,
+				    hideScroll = _options.hideScroll;
+
+
 				this.element = (0, _jquery2.default)('<div />').addClass('leplayer-sections');
-				if (this.options.fullscreenOnly) {
+				this._innerElement = (0, _jquery2.default)('<div />').addClass('leplayer-sections__inner');
+
+				if (fullscreenOnly) {
 					this.element.addClass('leplayer-sections--fsonly');
 				}
-				this.element.append(this._createSections(this.options.items));
+
+				if (hideScroll) {
+					this.element.addClass('leplayer-sections--hide-scroll');
+					this._innerElement.css({
+						right: -1 * (0, _utils.getScrollBarWidth)()
+					});
+				}
+
+				this.element.append(this._innerElement.append(this._createSections(this.options.items)));
+
 				return this.element;
 			}
 
@@ -3048,7 +3191,7 @@
 		}, {
 			key: 'setActiveByIndex',
 			value: function setActiveByIndex(index) {
-				if (this.activeSection.length == 0 || this.activeSection.attr('data-index') == index || this.getSectionByIndex(index).length == 0) {
+				if (this.activeSection.length === 0 || this.activeSection.attr('data-index') === index || this.getSectionByIndex(index).length === 0) {
 					return this;
 				}
 
@@ -3074,7 +3217,7 @@
 		}, {
 			key: 'onTimeUpdate',
 			value: function onTimeUpdate(e, data) {
-				if (this.activeSection.length == 0) {
+				if (this.activeSection.length === 0) {
 					return;
 				}
 
@@ -3082,7 +3225,7 @@
 
 				// Update span with end section time
 				// TODO: Вынести это в отдельный компонент ShowTime или типо того
-				if (this.player.getView() === 'mini') {
+				if (this.player.view === 'mini') {
 					var endSectionTime = this.activeSection.attr('data-end');
 					this.activeSection.next().find('.time').text((0, _utils.secondsToTime)(endSectionTime - currentTime));
 				}
@@ -3152,7 +3295,7 @@
 	exports.default = Sections;
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3237,7 +3380,7 @@
 	exports.default = ErrorDisplay;
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3308,7 +3451,7 @@
 	exports.default = Poster;
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -3364,71 +3507,7 @@
 	exports.default = FullscreenApi;
 
 /***/ },
-/* 15 */
-/***/ function(module, exports) {
-
-	'use strict';
-	/**
-	 * @file cookie-control.js
-	 *
-	 * @clas Cookie
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var Cookie = function () {
-		function Cookie() {
-			_classCallCheck(this, Cookie);
-		}
-
-		_createClass(Cookie, null, [{
-			key: 'get',
-
-			/**
-	   * @public
-	   *
-	   * @param {String} name Name of cookie
-	   * @param {String} [dflt] Return default value if this field is empty
-	   *
-	   */
-			value: function get(name, dflt) {
-				var cookies = document.cookie.split(';');
-				for (var i in cookies) {
-					var d = cookies[i].trim().split('=');
-					if (d[0] == 'leplayer_' + name) return d[1];
-				}
-				return dflt;
-			}
-
-			/**
-	   * @public
-	   *
-	   * @param {String} name Key
-	   * @param {String} value Value
-	   */
-
-		}, {
-			key: 'set',
-			value: function set(name, value) {
-				var d = new Date();
-				d.setDate(d.year + 1);
-				document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
-			}
-		}]);
-
-		return Cookie;
-	}();
-
-	exports.default = Cookie;
-
-/***/ },
-/* 16 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3499,6 +3578,476 @@
 	exports.default = MediaError;
 
 /***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _cookie = __webpack_require__(16);
+
+	var _cookie2 = _interopRequireDefault(_cookie);
+
+	var _Component2 = __webpack_require__(3);
+
+	var _Component3 = _interopRequireDefault(_Component2);
+
+	var _MediaError = __webpack_require__(14);
+
+	var _MediaError2 = _interopRequireDefault(_MediaError);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Html5 = function (_Component) {
+		_inherits(Html5, _Component);
+
+		function Html5(player, options) {
+			_classCallCheck(this, Html5);
+
+			var _this = _possibleConstructorReturn(this, (Html5.__proto__ || Object.getPrototypeOf(Html5)).call(this, player, options));
+
+			_this.player = player;
+			_this.media = _this.element[0];
+
+			_this.subtitles = [];
+			_this.bufferRanges = [];
+
+			if (_this.player.options.src == null) {
+				_this.player.error = new _MediaError2.default('Видеофайл не найден.');
+			}
+
+			_this.src = _this.player.options.src;
+			return _this;
+		}
+
+		/* TODO */
+
+
+		_createClass(Html5, [{
+			key: 'createElement',
+			value: function createElement() {
+				return this.element = (0, _jquery2.default)(this.options.ctx);
+			}
+		}, {
+			key: 'init',
+			value: function init() {
+				var _this2 = this;
+
+				var dfd = _jquery2.default.Deferred();
+				this._initSubtitles();
+				this._initVideo().done(function () {
+					_this2._initRate();
+					_this2._initVolume();
+					dfd.resolve();
+				});
+				return dfd.promise();
+			}
+		}, {
+			key: 'startBuffering',
+			value: function startBuffering() {
+				var _this3 = this;
+
+				var volume = this.volume;
+				this.volume = 0;
+				return this.play().then(function () {
+					return _this3.pause();
+				}).then(function () {
+					_this3.currentTime = 0;
+					_this3.volume = volume;
+				});
+			}
+		}, {
+			key: 'supportsFullScreen',
+			value: function supportsFullScreen() {
+				if (typeof this.media.webkitEnterFullScreen === 'function') {
+					var userAgent = window.navigator && window.navigator.userAgent || '';
+
+					// Seems to be broken in Chromium/Chrome && Safari in Leopard
+					if (/Android/.test(userAgent) || !/Chrome|Mac OS X 10.5/.test(userAgent)) {
+						return true;
+					}
+				}
+				return false;
+			}
+		}, {
+			key: 'enterFullscreen',
+			value: function enterFullscreen() {
+				var _this4 = this;
+
+				var video = this.media;
+				if (video.paused && video.networkState <= video.HAVE_METADATA) {
+					// attempt to prime the video element for programmatic access
+					// this isn't necessary on the desktop but shouldn't hurt
+					this.play();
+
+					// playing and pausing synchronously during the transition to fullscreen
+					// can get iOS ~6.1 devices into a play/pause loop
+					setTimeout(function () {
+						_this4.pause();
+						video.webkitEnterFullScreen();
+					}, 0);
+				} else {
+					video.webkitEnterFullScreen();
+				}
+			}
+		}, {
+			key: 'exitFullscreen',
+			value: function exitFullscreen() {
+				this.media.webkitExitFullScreen();
+			}
+		}, {
+			key: 'togglePlay',
+			value: function togglePlay() {
+				if (!this.media.played || this.media.paused) {
+					this.play();
+				} else {
+					this.pause();
+				}
+			}
+		}, {
+			key: 'seek',
+			value: function seek(time) {
+				this.media.currentTime = time;
+			}
+		}, {
+			key: 'play',
+			value: function play() {
+				var dfd = _jquery2.default.Deferred();
+				var playPromise = this.media.play();
+
+				if (playPromise != null) {
+					playPromise.then(function () {
+						dfd.resolve();
+					});
+				} else {
+					dfd.resolve();
+				}
+				return dfd.promise();
+			}
+		}, {
+			key: 'pause',
+			value: function pause() {
+				var dfd = _jquery2.default.Deferred();
+				var pausePromise = this.media.pause();
+
+				if (pausePromise != null) {
+					pausePromise.then(function () {
+						dfd.resolve();
+					});
+				} else {
+					dfd.resolve();
+				}
+				return dfd.promise();
+			}
+		}, {
+			key: 'load',
+			value: function load() {
+				return this.media.load();
+			}
+		}, {
+			key: '_initRate',
+			value: function _initRate() {
+				this.rate = this.defaultRate;
+			}
+		}, {
+			key: '_initVolume',
+			value: function _initVolume() {
+				this.volume = this.defaultVolume;
+			}
+		}, {
+			key: '_initSubtitles',
+			value: function _initSubtitles() {
+				var _self = this;
+				this.element.children('track[kind="subtitles"]').each(function () {
+					var language = (0, _jquery2.default)(this).attr('srclang');
+					var title = (0, _jquery2.default)(this).attr('label');
+					var src = (0, _jquery2.default)(this).attr('src');
+					if (title.length > 0 && src.length > 0) {
+						_self.subtitles.push({
+							title: title,
+							src: src,
+							language: language
+						});
+					}
+				});
+			}
+		}, {
+			key: '_initVideo',
+			value: function _initVideo() {
+				var _this5 = this;
+
+				var dfd = _jquery2.default.Deferred();
+				if (this.media.readyState > HTMLMediaElement.HAVE_NOTHING) {
+					dfd.resolve();
+					this._textTracksHack();
+				} else {
+					(0, _jquery2.default)(this.media).one('loadedmetadata', function (e) {
+						dfd.resolve();
+						_this5._textTracksHack();
+					});
+				}
+				dfd.notify();
+				return dfd.promise();
+			}
+		}, {
+			key: '_textTracksHack',
+			value: function _textTracksHack() {
+
+				// This is generally for Firefox only
+				// because it somehow resets track list
+				// for video element after DOM manipulation.
+
+				if (this.media.textTracks.length === 0 && this.subtitles.length > 0) {
+					this.element.children('track[kind="subtitles"]').remove();
+					for (var i in this.subtitles) {
+						if (this.subtitles.hasOwnProperty(i)) {
+							this.element.append((0, _jquery2.default)('<track/>').attr('label', this.subtitles[i].title).attr('src', this.subtitles[i].src).attr('srclang', this.subtitles[i].language).attr('id', this.subtitles[i].language).attr('kind', 'subtitles'));
+						}
+					}
+				}
+			}
+		}, {
+			key: 'currentTime',
+			get: function get() {
+				return this.media.currentTime;
+			},
+			set: function set(value) {
+				var time = void 0;
+				if (value > this.duration) {
+					time = this.duration;
+				} else if (value < 0) {
+					time = 0;
+				} else {
+					time = value;
+				}
+
+				this.player.trigger('timeupdateload', { time: time });
+
+				this.media.currentTime = time;
+			}
+		}, {
+			key: 'duration',
+			get: function get() {
+				return this.media.duration;
+			}
+		}, {
+			key: 'height',
+			get: function get() {
+				return this.media.clientHeight;
+			}
+		}, {
+			key: 'width',
+			get: function get() {
+				return this.media.clientWidth;
+			}
+		}, {
+			key: 'rate',
+			get: function get() {
+				return this.media.playbackRate;
+			},
+			set: function set(value) {
+				var player = this.player;
+				if (value <= player.options.rate.max && value >= player.options.rate.min) {
+					this.media.playbackRate = value;
+					_cookie2.default.set('rate', value);
+				}
+				/** TODO: Chanche controls.rate in event handler */
+				//controls.rate = this.media.playbackRate;
+			}
+		}, {
+			key: 'defaultRate',
+			get: function get() {
+				return _cookie2.default.get('rate') || this.player.options.rate.default;
+			}
+		}, {
+			key: 'src',
+			set: function set(src) {
+				if (src == null) return;
+				if (this.src && this.src.url === src.url) return;
+
+				var time = this.currentTime;
+				var rate = this.rate;
+				var stop = this.paused;
+
+				this.media.src = src.url;
+
+				this.playbackRate = rate;
+
+				this.currentTime = time;
+
+				this._source = src;
+
+				if (stop) {
+					this.pause();
+				} else {
+					this.play();
+				}
+			},
+			get: function get() {
+				return this._source;
+			}
+		}, {
+			key: 'track',
+			set: function set(value) {
+				for (var i = 0; i < this.media.textTracks.length; i++) {
+					if (this.media.textTracks[i].language === value) this.media.textTracks[i].mode = 'showing';else this.media.textTracks[i].mode = 'hidden';
+				}
+			}
+		}, {
+			key: 'paused',
+			get: function get() {
+				return this.media.paused;
+			}
+		}, {
+			key: 'volume',
+			get: function get() {
+				return this.media.volume;
+			},
+			set: function set(value) {
+				var player = this.player;
+				if (value > 1) {
+					this.media.volume = 1;
+				} else if (value < player.options.volume.mutelimit) {
+					this.media.volume = 0;
+				} else {
+					this.media.volume = value;
+					_cookie2.default.set('volume', value);
+				}
+				this.media.mute = value < player.options.volume.mutelimit;
+			}
+		}, {
+			key: 'defaultVolume',
+			get: function get() {
+				return _cookie2.default.get('volume') || this.player.options.volume.default;
+			}
+		}, {
+			key: 'buffered',
+			get: function get() {
+				return this.media.buffered;
+			}
+
+			/**
+	   * @return {TimeRanges}
+	   */
+
+		}, {
+			key: 'seekable',
+			get: function get() {
+				return this.media.seekable;
+			}
+
+			/**
+	   * @return {TimeRanges}
+	   */
+
+		}, {
+			key: 'played',
+			get: function get() {
+				return this.media.played;
+			}
+		}, {
+			key: 'playedPercentage',
+			get: function get() {
+				var result = 0;
+				for (var i = 0; i < this.played.length; i++) {
+					result += this.played.end(i) - this.played.start(i);
+				}
+
+				return result / this.duration * 100;
+			}
+		}, {
+			key: 'currentSrc',
+			get: function get() {
+				return this.media.currentSrc;
+			}
+		}]);
+
+		return Html5;
+	}(_Component3.default);
+
+	_Component3.default.registerComponent('Html5', Html5);
+	exports.default = Html5;
+
+/***/ },
+/* 16 */
+/***/ function(module, exports) {
+
+	'use strict';
+	/**
+	 * @file cookie-control.js
+	 *
+	 * @clas Cookie
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Cookie = function () {
+		function Cookie() {
+			_classCallCheck(this, Cookie);
+		}
+
+		_createClass(Cookie, null, [{
+			key: 'get',
+
+			/**
+	   * @public
+	   *
+	   * @param {String} name Name of cookie
+	   * @param {String} [dflt] Return default value if this field is empty
+	   *
+	   */
+			value: function get(name, dflt) {
+				var cookies = document.cookie.split(';');
+				for (var i in cookies) {
+					var d = cookies[i].trim().split('=');
+					if (d[0] === 'leplayer_' + name) return d[1];
+				}
+				return dflt;
+			}
+
+			/**
+	   * @public
+	   *
+	   * @param {String} name Key
+	   * @param {String} value Value
+	   */
+
+		}, {
+			key: 'set',
+			value: function set(name, value) {
+				var d = new Date();
+				d.setDate(d.year + 1);
+				document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
+			}
+		}]);
+
+		return Cookie;
+	}();
+
+	exports.default = Cookie;
+
+/***/ },
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
@@ -3555,13 +4104,11 @@
 
 			var _this = _possibleConstructorReturn(this, (PlayControl.__proto__ || Object.getPrototypeOf(PlayControl)).call(this, player, options));
 
-			_this.player.on('play', function (e) {
-				_this.play();
-			});
+			_this.player.on('play', _this.showPause.bind(_this));
+			_this.player.on('pause', _this.showPlay.bind(_this));
+			_this.player.on('ended', _this.showReplay.bind(_this));
 
-			_this.player.on('pause', function (e) {
-				_this.pause();
-			});
+			_this.player.on('seeking play', _this.removeReplay.bind(_this));
 			return _this;
 		}
 
@@ -3571,8 +4118,8 @@
 
 
 		_createClass(PlayControl, [{
-			key: 'pause',
-			value: function pause() {
+			key: 'showPlay',
+			value: function showPlay() {
 				this.icon.iconName = 'play';
 				this.element.attr('title', this.options.title);
 			}
@@ -3582,10 +4129,33 @@
 	   */
 
 		}, {
-			key: 'play',
-			value: function play() {
+			key: 'showPause',
+			value: function showPause() {
 				this.icon.iconName = 'pause';
 				this.element.attr('title', 'Поставить на паузу');
+			}
+		}, {
+			key: 'showReplay',
+			value: function showReplay() {
+				if (this.player.duration !== Infinity) {
+					this._replay = true;
+					this.icon.iconName = 'refresh';
+					this.element.attr('title', 'Запустить заново');
+				}
+			}
+		}, {
+			key: 'removeReplay',
+			value: function removeReplay() {
+				if (!this._replay) {
+					return;
+				}
+				this._replay = false;
+
+				if (this.player.video.paused) {
+					this.showPlay();
+				} else {
+					this.showPause();
+				}
 			}
 
 			/**
@@ -3700,12 +4270,12 @@
 				this.icon.element.attr('title', 'Отключить звук');
 
 				this.marker.on('mousedown', function (e) {
-					if (e.which != 1) return;
+					if (e.which !== 1) return;
 					drag = true;
 				});
 
 				(0, _jquery2.default)(document).on({
-					'mousemove': function mousemove(e) {
+					mousemove: function mousemove(e) {
 						if (!drag) return;
 						var p = _this2.getPosition(e.pageY);
 						if (p >= 0 && p <= 1) {
@@ -3713,7 +4283,7 @@
 						}
 					},
 
-					'mouseup': function mouseup(e) {
+					mouseup: function mouseup(e) {
 						drag = false;
 					}
 				});
@@ -3725,7 +4295,7 @@
 				var video = this.player.video;
 
 
-				if (video.volume == 0) {
+				if (video.volume === 0) {
 					video.volume = video.defaultVolume;
 				} else {
 					video.volume = 0;
@@ -3750,7 +4320,7 @@
 		}, {
 			key: 'value',
 			set: function set(value) {
-				this.icon.iconName = this.player._calcVolumeIcon(value);
+				this.icon.iconName = this.player.calcVolumeIcon(value);
 
 				var p = Math.round(value * 100).toString() + '%';
 				this.active.css('height', p);
@@ -3901,7 +4471,7 @@
 
 	var _Marker2 = _interopRequireDefault(_Marker);
 
-	var _utils = __webpack_require__(7);
+	var _utils = __webpack_require__(6);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -4010,7 +4580,7 @@
 				this.bufferedRanges = new _BufferedRanges2.default(this.player).element;
 
 				this.line = (0, _jquery2.default)('<div />').addClass('timeline').append(this.marker.element).append(this.markerShadow.element).append(this.playedRanges).append(this.bufferedRanges).on({
-					'mousemove': function mousemove(e) {
+					mousemove: function mousemove(e) {
 						if (_this2.marker.drag) return;
 
 						var p = _this2.getPosition(e.pageX);
@@ -4022,16 +4592,16 @@
 						}
 					},
 
-					'mouseleave': function mouseleave(e) {
+					mouseleave: function mouseleave(e) {
 						if (_this2.drag) return;
 						_this2.markerShadow.element.hide();
 					},
 
-					'mousedown': function mousedown(e) {},
+					mousedown: function mousedown(e) {},
 
-					'click': this._onLineClick.bind(this),
+					click: this._onLineClick.bind(this),
 
-					'touchmove': function touchmove(e) {}
+					touchmove: function touchmove(e) {}
 				});
 
 				this.element.addClass('timeline-container').append((0, _jquery2.default)('<div />').addClass('timeline-subcontainer').append(this.currentTime.element).append(this.line).append(this.totalTime.element));
@@ -4069,7 +4639,7 @@
 		}, {
 			key: 'updateSectionRanges',
 			value: function updateSectionRanges(items) {
-				if (this.sections == null || this.sections.length == 0) {
+				if (this.sections == null || this.sections.length === 0) {
 					this.sections = this.createSectionRanges(items);
 					this.line.append(this.sections);
 				} else {
@@ -4168,8 +4738,8 @@
 					video.loaded.forEach(function (item) {
 						var domItem = (0, _jquery2.default)('<div />').addClass('time-buffered');
 						domItem.css({
-							'left': item[START] * 100 + '%',
-							'width': (item[END] - item[START]) * 100 + '%'
+							left: item[START] * 100 + '%',
+							width: (item[END] - item[START]) * 100 + '%'
 						});
 						result = result.add(domItem);
 					});
@@ -4318,7 +4888,7 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _utils = __webpack_require__(7);
+	var _utils = __webpack_require__(6);
 
 	var _Component2 = __webpack_require__(3);
 
@@ -4436,12 +5006,12 @@
 
 			(0, _jquery2.default)(document).on({
 
-				'mousemove': function mousemove(e) {
+				mousemove: function mousemove(e) {
 					if (!_this.drag) return;
 					_this.element.trigger('leplayer_mousemove', { x: e.pageX });
 				},
 
-				'mouseup': function mouseup(e) {
+				mouseup: function mouseup(e) {
 					if (!_this.drag) return;
 					_this.drag = false;
 					_this.markerTime.hide();
@@ -4562,7 +5132,7 @@
 				_get(SectionControl.prototype.__proto__ || Object.getPrototypeOf(SectionControl.prototype), 'onChecked', this).call(this, e);
 				this.player.trigger('sectionstoggle', {
 					checked: data.checked,
-					view: this.player.getView()
+					view: this.player.view
 				});
 			}
 		}, {
@@ -4815,7 +5385,7 @@
 
 	var _ControlText2 = _interopRequireDefault(_ControlText);
 
-	var _cookie = __webpack_require__(15);
+	var _cookie = __webpack_require__(16);
 
 	var _cookie2 = _interopRequireDefault(_cookie);
 
@@ -5134,7 +5704,7 @@
 				_get(SourceControl.prototype.__proto__ || Object.getPrototypeOf(SourceControl.prototype), 'onClick', this).call(this, e);
 				var defaultItem = this.getByIndex(0);
 
-				this.player.video.source = {
+				this.player.video.src = {
 					url: defaultItem.data('url'),
 					title: defaultItem.data('title')
 				};
@@ -5145,7 +5715,7 @@
 			value: function onItemClick(e) {
 				_get(SourceControl.prototype.__proto__ || Object.getPrototypeOf(SourceControl.prototype), 'onItemClick', this).call(this, e);
 				var item = (0, _jquery2.default)(e.target);
-				this.player.video.source = {
+				this.player.video.src = {
 					url: item.data('url'),
 					title: item.data('title')
 				};
@@ -5574,7 +6144,7 @@
 		}, {
 			key: 'onLoadStart',
 			value: function onLoadStart(e, data) {
-				this.link = this.player.video.source.url;
+				this.link = this.player.video.src.url;
 			}
 		}, {
 			key: 'link',
@@ -5584,7 +6154,7 @@
 				var fileName = parser.pathname.split('/');
 				fileName = fileName[fileName.length - 1];
 				this.element.attr({
-					'href': value,
+					href: value,
 					download: fileName
 				});
 			}
@@ -5675,7 +6245,7 @@
 					var keyString = '';
 
 					hotkey.info.forEach(function (key, index) {
-						if (index != 0) {
+						if (index !== 0) {
 							keyString += ' + ';
 						}
 						keyString += '<kbd class="leplayer-key">' + key + '</kbd>';
@@ -5727,7 +6297,7 @@
 
 	var _ControlText2 = _interopRequireDefault(_ControlText);
 
-	var _utils = __webpack_require__(7);
+	var _utils = __webpack_require__(6);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -5765,6 +6335,10 @@
 
 				_this._currentTimeControl.text = (0, _utils.secondsToTime)(time);
 			});
+
+			_this.player.on('durationchange', function (e) {
+				_this._totalTimeControl.text = (0, _utils.secondsToTime)(_this.player.video.duration);
+			});
 			return _this;
 		}
 
@@ -5776,8 +6350,22 @@
 		_createClass(TimeInfoControl, [{
 			key: 'createElement',
 			value: function createElement() {
+				var duration = this.player.video.duration;
+				var currentTime = this.player.video.currentTime;
 				this._currentTimeControl = new _ControlText2.default(this.player, { className: 'control-time__current' });
 				this._totalTimeControl = new _ControlText2.default(this.player, { className: 'control-time__total' });
+
+				if (isNaN(duration) || duration == null) {
+					this._totalTimeControl.text = '';
+				} else {
+					this._totalTimeControl.text = (0, _utils.secondsToTime)(duration);
+				}
+
+				if (currentTime == null) {
+					this._currentTimeControl.text = (0, _utils.secondsToTime)(0);
+				} else {
+					this._currentTimeControl.text = (0, _utils.secondsToTime)(currentTime);
+				}
 
 				this.element = (0, _jquery2.default)('<div/>').addClass('control-time');
 				this.element.append(this._currentTimeControl.element).append(this._totalTimeControl.element);
@@ -5801,9 +6389,6 @@
 			value: function _onClick(e) {
 				e.preventDefault();
 			}
-		}, {
-			key: 'currentTime',
-			set: function set(value) {}
 		}]);
 
 		return TimeInfoControl;
@@ -5812,6 +6397,69 @@
 	_Component2.default.registerComponent('TimeInfoControl', TimeInfoControl);
 	_Control3.default.registerControl('timeinfo', TimeInfoControl);
 	exports.default = TimeInfoControl;
+
+/***/ },
+/* 35 */
+/***/ function(module, exports) {
+
+	module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\"><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-arrows-alt\"><title>arrows-alt</title><path d=\"M1411 541l-355 355 355 355 144-144q29-31 70-14 39 17 39 59v448q0 26-19 45t-45 19h-448q-42 0-59-40-17-39 14-69l144-144-355-355-355 355 144 144q31 30 14 69-17 40-59 40h-448q-26 0-45-19t-19-45v-448q0-42 40-59 39-17 69 14l144 144 355-355-355-355-144 144q-19 19-45 19-12 0-24-5-40-17-40-59v-448q0-26 19-45t45-19h448q42 0 59 40 17 39-14 69l-144 144 355 355 355-355-144-144q-31-30-14-69 17-40 59-40h448q26 0 45 19t19 45v448q0 42-39 59-13 5-25 5-26 0-45-19z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-backward\"><title>backward</title><path d=\"M1683 141q19-19 32-13t13 32v1472q0 26-13 32t-32-13l-710-710q-8-9-13-19v710q0 26-13 32t-32-13l-710-710q-19-19-19-45t19-45l710-710q19-19 32-13t13 32v710q5-11 13-19z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-bullseye\"><title>bullseye</title><path d=\"M1152 896q0 106-75 181t-181 75-181-75-75-181 75-181 181-75 181 75 75 181zm128 0q0-159-112.5-271.5t-271.5-112.5-271.5 112.5-112.5 271.5 112.5 271.5 271.5 112.5 271.5-112.5 112.5-271.5zm128 0q0 212-150 362t-362 150-362-150-150-362 150-362 362-150 362 150 150 362zm128 0q0-130-51-248.5t-136.5-204-204-136.5-248.5-51-248.5 51-204 136.5-136.5 204-51 248.5 51 248.5 136.5 204 204 136.5 248.5 51 248.5-51 204-136.5 136.5-204 51-248.5zm128 0q0 209-103 385.5t-279.5 279.5-385.5 103-385.5-103-279.5-279.5-103-385.5 103-385.5 279.5-279.5 385.5-103 385.5 103 279.5 279.5 103 385.5z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 400 380\" id=\"leplayer-icon-cat\"><title>cat</title> <path d=\"M 151.34904,307.20455 L 264.34904,307.20455 C 264.34904,291.14096 263.2021,287.95455 236.59904,287.95455 C 240.84904,275.20455 258.12424,244.35808 267.72404,244.35808 C 276.21707,244.35808 286.34904,244.82592 286.34904,264.20455 C 286.34904,286.20455 323.37171,321.67547 332.34904,307.20455 C 345.72769,285.63897 309.34904,292.21514 309.34904,240.20455 C 309.34904,169.05135 350.87417,179.18071 350.87417,139.20455 C 350.87417,119.20455 345.34904,116.50374 345.34904,102.20455 C 345.34904,83.30695 361.99717,84.403577 358.75805,68.734879 C 356.52061,57.911656 354.76962,49.23199 353.46516,36.143889 C 352.53959,26.857305 352.24452,16.959398 342.59855,17.357382 C 331.26505,17.824992 326.96549,37.77419 309.34904,39.204549 C 291.76851,40.631991 276.77834,24.238028 269.97404,26.579549 C 263.22709,28.901334 265.34904,47.204549 269.34904,60.204549 C 275.63588,80.636771 289.34904,107.20455 264.34904,111.20455 C 239.34904,115.20455 196.34904,119.20455 165.34904,160.20455 C 134.34904,201.20455 135.49342,249.3212 123.34904,264.20455 C 82.590696,314.15529 40.823919,293.64625 40.823919,335.20455 C 40.823919,353.81019 72.349045,367.20455 77.349045,361.20455 C 82.349045,355.20455 34.863764,337.32587 87.995492,316.20455 C 133.38711,298.16014 137.43914,294.47663 151.34904,307.20455 z \" style=\"fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\"/> </symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-commenting-o\"><title>commenting-o</title><path d=\"M640 896q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm384 0q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm384 0q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-512-512q-204 0-381.5 69.5t-282 187.5-104.5 255q0 112 71.5 213.5t201.5 175.5l87 50-27 96q-24 91-70 172 152-63 275-171l43-38 57 6q69 8 130 8 204 0 381.5-69.5t282-187.5 104.5-255-104.5-255-282-187.5-381.5-69.5zm896 512q0 174-120 321.5t-326 233-450 85.5q-70 0-145-8-198 175-460 242-49 14-114 22h-5q-15 0-27-10.5t-16-27.5v-1q-3-4-.5-12t2-10 4.5-9.5l6-9 7-8.5 8-9q7-8 31-34.5t34.5-38 31-39.5 32.5-51 27-59 26-76q-157-89-247.5-220t-90.5-281q0-130 71-248.5t191-204.5 286-136.5 348-50.5 348 50.5 286 136.5 191 204.5 71 248.5z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-download\"><title>download</title><path d=\"M1344 1344q0-26-19-45t-45-19-45 19-19 45 19 45 45 19 45-19 19-45zm256 0q0-26-19-45t-45-19-45 19-19 45 19 45 45 19 45-19 19-45zm128-224v320q0 40-28 68t-68 28h-1472q-40 0-68-28t-28-68v-320q0-40 28-68t68-28h465l135 136q58 56 136 56t136-56l136-136h464q40 0 68 28t28 68zm-325-569q17 41-14 70l-448 448q-18 19-45 19t-45-19l-448-448q-31-29-14-70 17-39 59-39h256v-448q0-26 19-45t45-19h256q26 0 45 19t19 45v448h256q42 0 59 39z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-edit\"><title>edit</title><path d=\"M888 1184l116-116-152-152-116 116v56h96v96h56zm440-720q-16-16-33 1l-350 350q-17 17-1 33t33-1l350-350q17-17 1-33zm80 594v190q0 119-84.5 203.5t-203.5 84.5h-832q-119 0-203.5-84.5t-84.5-203.5v-832q0-119 84.5-203.5t203.5-84.5h832q63 0 117 25 15 7 18 23 3 17-9 29l-49 49q-14 14-32 8-23-6-45-6h-832q-66 0-113 47t-47 113v832q0 66 47 113t113 47h832q66 0 113-47t47-113v-126q0-13 9-22l64-64q15-15 35-7t20 29zm-96-738l288 288-672 672h-288v-288zm444 132l-92 92-288-288 92-92q28-28 68-28t68 28l152 152q28 28 28 68t-28 68z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-forward\"><title>forward</title><path d=\"M109 1651q-19 19-32 13t-13-32v-1472q0-26 13-32t32 13l710 710q8 8 13 19v-710q0-26 13-32t32 13l710 710q19 19 19 45t-19 45l-710 710q-19 19-32 13t-13-32v-710q-5 10-13 19z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-info\"><title>info</title><path d=\"M1216 1344v128q0 26-19 45t-45 19h-512q-26 0-45-19t-19-45v-128q0-26 19-45t45-19h64v-384h-64q-26 0-45-19t-19-45v-128q0-26 19-45t45-19h384q26 0 45 19t19 45v576h64q26 0 45 19t19 45zm-128-1152v192q0 26-19 45t-45 19h-256q-26 0-45-19t-19-45v-192q0-26 19-45t45-19h256q26 0 45 19t19 45z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-list-ul\"><title>list-ul</title><path d=\"M384 1408q0 80-56 136t-136 56-136-56-56-136 56-136 136-56 136 56 56 136zm0-512q0 80-56 136t-136 56-136-56-56-136 56-136 136-56 136 56 56 136zm1408 416v192q0 13-9.5 22.5t-22.5 9.5h-1216q-13 0-22.5-9.5t-9.5-22.5v-192q0-13 9.5-22.5t22.5-9.5h1216q13 0 22.5 9.5t9.5 22.5zm-1408-928q0 80-56 136t-136 56-136-56-56-136 56-136 136-56 136 56 56 136zm1408 416v192q0 13-9.5 22.5t-22.5 9.5h-1216q-13 0-22.5-9.5t-9.5-22.5v-192q0-13 9.5-22.5t22.5-9.5h1216q13 0 22.5 9.5t9.5 22.5zm0-512v192q0 13-9.5 22.5t-22.5 9.5h-1216q-13 0-22.5-9.5t-9.5-22.5v-192q0-13 9.5-22.5t22.5-9.5h1216q13 0 22.5 9.5t9.5 22.5z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-magic\"><title>magic</title><path d=\"M1254 581l293-293-107-107-293 293zm447-293q0 27-18 45l-1286 1286q-18 18-45 18t-45-18l-198-198q-18-18-18-45t18-45l1286-1286q18-18 45-18t45 18l198 198q18 18 18 45zm-1351-190l98 30-98 30-30 98-30-98-98-30 98-30 30-98zm350 162l196 60-196 60-60 196-60-196-196-60 196-60 60-196zm930 478l98 30-98 30-30 98-30-98-98-30 98-30 30-98zm-640-640l98 30-98 30-30 98-30-98-98-30 98-30 30-98z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-pause\"><title>pause</title><path d=\"M1664 192v1408q0 26-19 45t-45 19h-512q-26 0-45-19t-19-45v-1408q0-26 19-45t45-19h512q26 0 45 19t19 45zm-896 0v1408q0 26-19 45t-45 19h-512q-26 0-45-19t-19-45v-1408q0-26 19-45t45-19h512q26 0 45 19t19 45z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-plane\"><title>plane</title><path d=\"M1568 160q44 52 12 148t-108 172l-161 161 160 696q5 19-12 33l-128 96q-7 6-19 6-4 0-7-1-15-3-21-16l-279-508-259 259 53 194q5 17-8 31l-96 96q-9 9-23 9h-2q-15-2-24-13l-189-252-252-189q-11-7-13-23-1-13 9-25l96-97q9-9 23-9 6 0 8 1l194 53 259-259-508-279q-14-8-17-24-2-16 9-27l128-128q14-13 30-8l665 159 160-160q76-76 172-108t148 12z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-play\"><title>play</title><path d=\"M1576 927l-1328 738q-23 13-39.5 3t-16.5-36v-1472q0-26 16.5-36t39.5 3l1328 738q23 13 23 31t-23 31z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-plus\"><title>plus</title><path d=\"M1600 736v192q0 40-28 68t-68 28h-416v416q0 40-28 68t-68 28h-192q-40 0-68-28t-28-68v-416h-416q-40 0-68-28t-28-68v-192q0-40 28-68t68-28h416v-416q0-40 28-68t68-28h192q40 0 68 28t28 68v416h416q40 0 68 28t28 68z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-redo\"><title>redo</title><path d=\"M1664 256v448q0 26-19 45t-45 19h-448q-42 0-59-40-17-39 14-69l138-138q-148-137-349-137-104 0-198.5 40.5t-163.5 109.5-109.5 163.5-40.5 198.5 40.5 198.5 109.5 163.5 163.5 109.5 198.5 40.5q119 0 225-52t179-147q7-10 23-12 14 0 25 9l137 138q9 8 9.5 20.5t-7.5 22.5q-109 132-264 204.5t-327 72.5q-156 0-298-61t-245-164-164-245-61-298 61-298 164-245 245-164 298-61q147 0 284.5 55.5t244.5 156.5l130-129q29-31 70-14 39 17 39 59z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-refresh\"><title>refresh</title><path d=\"M1639 1056q0 5-1 7-64 268-268 434.5t-478 166.5q-146 0-282.5-55t-243.5-157l-129 129q-19 19-45 19t-45-19-19-45v-448q0-26 19-45t45-19h448q26 0 45 19t19 45-19 45l-137 137q71 66 161 102t187 36q134 0 250-65t186-179q11-17 53-117 8-23 30-23h192q13 0 22.5 9.5t9.5 22.5zm25-800v448q0 26-19 45t-45 19h-448q-26 0-45-19t-19-45 19-45l138-138q-148-137-349-137-134 0-250 65t-186 179q-11 17-53 117-8 23-30 23h-199q-13 0-22.5-9.5t-9.5-22.5v-7q65-268 270-434.5t480-166.5q146 0 284 55.5t245 156.5l130-129q19-19 45-19t45 19 19 45z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-trash\"><title>trash</title><path d=\"M704 1376v-704q0-14-9-23t-23-9h-64q-14 0-23 9t-9 23v704q0 14 9 23t23 9h64q14 0 23-9t9-23zm256 0v-704q0-14-9-23t-23-9h-64q-14 0-23 9t-9 23v704q0 14 9 23t23 9h64q14 0 23-9t9-23zm256 0v-704q0-14-9-23t-23-9h-64q-14 0-23 9t-9 23v704q0 14 9 23t23 9h64q14 0 23-9t9-23zm-544-992h448l-48-117q-7-9-17-11h-317q-10 2-17 11zm928 32v64q0 14-9 23t-23 9h-96v948q0 83-47 143.5t-113 60.5h-832q-66 0-113-58.5t-47-141.5v-952h-96q-14 0-23-9t-9-23v-64q0-14 9-23t23-9h309l70-167q15-37 54-63t79-26h320q40 0 79 26t54 63l70 167h309q14 0 23 9t9 23z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-undo\"><title>undo</title><path d=\"M1664 896q0 156-61 298t-164 245-245 164-298 61q-172 0-327-72.5t-264-204.5q-7-10-6.5-22.5t8.5-20.5l137-138q10-9 25-9 16 2 23 12 73 95 179 147t225 52q104 0 198.5-40.5t163.5-109.5 109.5-163.5 40.5-198.5-40.5-198.5-109.5-163.5-163.5-109.5-198.5-40.5q-98 0-188 35.5t-160 101.5l137 138q31 30 14 69-17 40-59 40h-448q-26 0-45-19t-19-45v-448q0-42 40-59 39-17 69 14l130 129q107-101 244.5-156.5t284.5-55.5q156 0 298 61t245 164 164 245 61 298z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-volume-down\"><title>volume-down</title><path d=\"M1088 352v1088q0 26-19 45t-45 19-45-19l-333-333h-262q-26 0-45-19t-19-45v-384q0-26 19-45t45-19h262l333-333q19-19 45-19t45 19 19 45zm384 544q0 76-42.5 141.5t-112.5 93.5q-10 5-25 5-26 0-45-18.5t-19-45.5q0-21 12-35.5t29-25 34-23 29-35.5 12-57-12-57-29-35.5-34-23-29-25-12-35.5q0-27 19-45.5t45-18.5q15 0 25 5 70 27 112.5 93t42.5 142z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-volume-off\"><title>volume-off</title><path d=\"M1280 352v1088q0 26-19 45t-45 19-45-19l-333-333h-262q-26 0-45-19t-19-45v-384q0-26 19-45t45-19h262l333-333q19-19 45-19t45 19 19 45z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-volume-up\"><title>volume-up</title><path d=\"M832 352v1088q0 26-19 45t-45 19-45-19l-333-333h-262q-26 0-45-19t-19-45v-384q0-26 19-45t45-19h262l333-333q19-19 45-19t45 19 19 45zm384 544q0 76-42.5 141.5t-112.5 93.5q-10 5-25 5-26 0-45-18.5t-19-45.5q0-21 12-35.5t29-25 34-23 29-35.5 12-57-12-57-29-35.5-34-23-29-25-12-35.5q0-27 19-45.5t45-18.5q15 0 25 5 70 27 112.5 93t42.5 142zm256 0q0 153-85 282.5t-225 188.5q-13 5-25 5-27 0-46-19t-19-45q0-39 39-59 56-29 76-44 74-54 115.5-135.5t41.5-173.5-41.5-173.5-115.5-135.5q-20-15-76-44-39-20-39-59 0-26 19-45t45-19q13 0 26 5 140 59 225 188.5t85 282.5zm256 0q0 230-127 422.5t-338 283.5q-13 5-26 5-26 0-45-19t-19-45q0-36 39-59 7-4 22.5-10.5t22.5-10.5q46-25 82-51 123-91 192-227t69-289-69-289-192-227q-36-26-82-51-7-4-22.5-10.5t-22.5-10.5q-39-23-39-59 0-26 19-45t45-19q13 0 26 5 211 91 338 283.5t127 422.5z\"/></symbol></svg>"
+
+/***/ },
+/* 36 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var preset = exports.preset = {
+		options: {
+			width: '100%',
+			controls: {
+				common: [['play', 'volume', 'divider', 'timeline', 'divider', 'fullscreen'], ['rate', 'divider', 'backward', 'divider', 'source', 'divider', 'download']],
+				fullscreen: [['play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'backward', 'divider', 'source', 'divider', 'download', 'divider', 'fullscreen']]
+			}
+		}
+	};
+
+/***/ },
+/* 37 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var preset = exports.preset = {
+		options: {
+			width: '100%',
+			controls: {
+				common: [['play', 'volume', 'timeline', 'rate', 'source', 'divider', 'download', 'fullscreen'], []],
+				fullscreen: [['play', 'volume', 'timeline', 'rate', 'source', 'divider', 'download', 'fullscreen']]
+			}
+		}
+	};
+
+/***/ },
+/* 38 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var preset = exports.preset = {
+		options: {
+			width: '100%',
+			controls: {
+				common: [['play', 'volume', 'timeline', 'rate', 'source', 'divider', 'fullscreen'], []],
+				fullscreen: [['play', 'volume', 'timeline', 'rate', 'source', 'divider', 'fullscreen']]
+			}
+		}
+	};
 
 /***/ }
 /******/ ]);
