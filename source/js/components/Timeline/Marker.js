@@ -14,12 +14,12 @@ class Marker extends Component {
 
 		$(document).on({
 
-			'mousemove' : (e) => {
+			mousemove : (e) => {
 				if (!this.drag) return;
 				this.element.trigger('leplayer_mousemove', { x : e.pageX });
 			},
 
-			'mouseup' : (e) => {
+			mouseup : (e) => {
 				if (!this.drag) return;
 				this.drag = false;
 				this.markerTime.hide();

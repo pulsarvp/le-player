@@ -27,7 +27,7 @@ export function secondsToTime (seconds, showHours) {
 	}
 	out = `${m}:${s}`;
 
-	if(h > 0 || showHours ) {
+	if(h > 0 || showHours) {
 		out = `${h}:` + out
 	}
 	return out;
@@ -43,7 +43,7 @@ export function secondsToTime (seconds, showHours) {
  */
 export function percentify (length, end) {
 	// or zero beacase NaN
-	const percent = (length / end ) || 0;
+	const percent = (length / end) || 0;
 	return (percent >= 1) ? 1 : percent;
 }
 
@@ -55,3 +55,31 @@ export function createEl(tag='div', props) {
 	}
 	return $(`<${tag}/>`, props);
 }
+
+
+export function noop() {}
+
+export const getScrollBarWidth = (function() {
+	let result;
+
+	return function() {
+
+		if(result != null) {
+			return result;
+		}
+
+		const outer = $('<div />').css({
+			visibility : 'hidden',
+			width : 100,
+			overflow : 'scroll'
+		}).appendTo('body');
+
+		const widthWithScroll = $('<div />').css({
+			width : '100%'
+		}).appendTo(outer).outerWidth();
+
+		outer.remove();
+		return result = 100 - widthWithScroll;
+	}
+
+}());

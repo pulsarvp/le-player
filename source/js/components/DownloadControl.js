@@ -41,7 +41,7 @@ class DownloadControl extends Control {
 				title : this.options.title,
 			})
 			.addClass(this.buildCSSClass())
-			.append(new Icon(this.player, { iconName : 'download' } ).element);
+			.append(new Icon(this.player, { iconName : 'download' }).element);
 	}
 
 	/**
@@ -63,14 +63,14 @@ class DownloadControl extends Control {
 		let fileName = parser.pathname.split('/');
 		fileName = fileName[fileName.length - 1];
 		this.element.attr({
-			'href' : value,
+			href : value,
 			download : fileName
 		});
 	}
 
 
 	onLoadStart(e, data) {
-		this.link = this.player.video.source.url
+		this.link = this.player.video.src.url
 	}
 
 }

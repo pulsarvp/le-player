@@ -6,8 +6,7 @@
 import $ from 'jquery';
 import Component from './Component';
 
-import { secondsToTime } from '../utils';
-
+import { secondsToTime, getScrollBarWidth } from '../utils';
 /**
  * @class Sections
  * @param {Player} player Main player
@@ -68,11 +67,28 @@ class Sections extends Component {
 	 * @override
 	 */
 	createElement() {
+		const { fullscreenOnly, hideScroll } = this.options;
+
+
 		this.element = $('<div />').addClass('leplayer-sections');
-		if(this.options.fullscreenOnly) {
+		this._innerElement = $('<div />').addClass('leplayer-sections__inner');
+
+		if(fullscreenOnly) {
 			this.element.addClass('leplayer-sections--fsonly');
 		}
-		this.element.append(this._createSections(this.options.items));
+
+		if(hideScroll) {
+			this.element.addClass('leplayer-sections--hide-scroll');
+			this._innerElement.css({
+				right : -1 * getScrollBarWidth()
+			})
+		}
+
+		this.element.append(
+			this._innerElement.append(this._createSections(this.options.items))
+		)
+
+
 		return this.element;
 	}
 
@@ -80,7 +96,7 @@ class Sections extends Component {
 	 * @override
 	 */
 	updateSectionDuration() {
-		if(this.items != null && this.items.length > 0 ) {
+		if(this.items != null && this.items.length > 0) {
 			const length = this.items.length
 			this.items[length - 1].end = this.player.video.duration;
 
@@ -99,9 +115,9 @@ class Sections extends Component {
 
 	setActiveByIndex(index) {
 		if (
-			this.activeSection.length == 0 ||
-			this.activeSection.attr('data-index') == index ||
-			this.getSectionByIndex(index).length == 0
+			this.activeSection.length === 0 ||
+			this.activeSection.attr('data-index') === index ||
+			this.getSectionByIndex(index).length === 0
 		) {
 			return this
 		}
@@ -128,7 +144,7 @@ class Sections extends Component {
 
 
 	onTimeUpdate(e, data) {
-		if (this.activeSection.length == 0) {
+		if (this.activeSection.length === 0) {
 			return
 		}
 
@@ -136,7 +152,7 @@ class Sections extends Component {
 
 		// Update span with end section time
 		// TODO: Вынести это в отдельный компонент ShowTime или типо того
-		if(this.player.getView() === 'mini' ) {
+		if(this.player.view === 'mini') {
 			const endSectionTime = this.activeSection.attr('data-end');
 			this.activeSection
 				.next()

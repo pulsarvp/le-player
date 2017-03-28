@@ -29,7 +29,11 @@ class TimeInfoControl extends Control {
 		this.player.on('timeupdate', (e, data) => {
 			const { time } = data;
 			this._currentTimeControl.text = secondsToTime(time);
-		})
+		});
+
+		this.player.on('durationchange', (e) => {
+			this._totalTimeControl.text = secondsToTime(this.player.video.duration);
+		});
 	}
 
 
@@ -37,8 +41,22 @@ class TimeInfoControl extends Control {
 	 * @override
 	 */
 	createElement() {
+		const duration = this.player.video.duration;
+		const currentTime = this.player.video.currentTime;
 		this._currentTimeControl = new ControlText(this.player, { className : 'control-time__current'});
 		this._totalTimeControl = new ControlText(this.player, { className : 'control-time__total'});
+
+		if(isNaN(duration) || duration == null) {
+			this._totalTimeControl.text = '';
+		} else {
+			this._totalTimeControl.text = secondsToTime(duration);
+		}
+
+		if(currentTime == null) {
+			this._currentTimeControl.text = secondsToTime(0);
+		} else {
+			this._currentTimeControl.text = secondsToTime(currentTime);
+		}
 
 		this.element = $('<div/>').addClass('control-time');
 		this.element
@@ -56,10 +74,6 @@ class TimeInfoControl extends Control {
 		let video = this.player.video;
 		this._currentTimeControl.text = secondsToTime(video.currentTime);
 		this._totalTimeControl.text = secondsToTime(video.duration);
-	}
-
-	set currentTime(value) {
-
 	}
 
 	_onClick(e) {

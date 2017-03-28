@@ -40,7 +40,7 @@ class KeyBindingInfoControl extends ControlDropdown {
 			let keyString = '';
 
 			hotkey.info.forEach((key, index) => {
-				if (index != 0) {
+				if (index !== 0) {
 					keyString += ` + `
 				}
 				keyString += `<kbd class="leplayer-key">${key}</kbd>`
