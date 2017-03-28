@@ -24,6 +24,7 @@ class Sections extends Component {
 
 		super(player, options)
 
+		this.scrollElement = this._innerElement;
 		this.activeSection = this.getSectionByIndex(0);
 
 		this.items = items;
@@ -128,10 +129,9 @@ class Sections extends Component {
 
 		const topPosition = this.activeSection.position().top;
 
-		this.element
-			.find('.leplayer-sections__inner')
+		this.scrollElement
 			.animate({
-				scrollTop : this.element.scrollTop() + topPosition
+				scrollTop : this.scrollElement.scrollTop() + topPosition
 			}, 800)
 
 		this.player.trigger('sectionschange', { section : this.items[index]});
