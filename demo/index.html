@@ -5,6 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>LePlayer Demo Page</title>
 		<link id="linkPlayerTheme" rel="stylesheet" href="../dist/css/default/le-player.css">
+		<link id="linkPlayerTheme" rel="stylesheet" href="../dist/css/default/le-player-next.css">
 		<link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
 		<style>
 			body
@@ -110,6 +111,12 @@
 	},
 	plugins : {
 		'ga' : {},
+		'next' : {
+			url : './',
+			title : 'Next video',
+			subtitle : 'Subtitle',
+			poster : './poster.jpg'
+		},
 		'miniplayer' : {
 			width : '1140px'
 		}
@@ -148,6 +155,7 @@
 		<script src="index.js" charset="utf-8"></script>
 		<script src="../dist/js/le-player.js"></script>
 		<script src="../dist/js/le-player-ga.js"></script>
+		<script src="../dist/js/le-player-next.js"></script>
 		<script>
 			$(document).ready(function () {
 				if (window.location.protocol != 'http:') {

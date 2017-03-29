@@ -138,6 +138,10 @@ class Html5 extends Component {
 		return this.media.played;
 	}
 
+	get ended() {
+		return this.media.ended;
+	}
+
 	get playedPercentage() {
 		let result = 0;
 		for (let i = 0; i < this.played.length; i++) {
