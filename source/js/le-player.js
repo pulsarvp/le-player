@@ -1669,10 +1669,16 @@ Player.plugin('miniplayer', function(pluginOptions) {
 	this._updateMiniPlayer = (e, force) => {
 		const scrollTop = $(window).scrollTop();
 
+		// Because in force update, for normally count height and padding
+		// miniplayer before the show must first be hidden
+		if(force) {
+			this.hideMiniPlayer(force);
+		}
+
 		if(scrollTop > offsetShow()) {
 			this.showMiniPlayer(force);
 		} else {
-			this.hideMiniPlayer(force);
+			this.hideMiniPlayer();
 		}
 	}
 
