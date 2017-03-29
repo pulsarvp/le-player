@@ -29,7 +29,7 @@
 	z-index: @z-index-base + 7;
 	color: white;
 	text-align: center;
-	background-size: cover;
+	background-size:cover;
 	&::after {
 		content: '';
 		position: absolute;
@@ -59,7 +59,7 @@
 		text-overflow: ellipsis;
 	}
 
-	&__subtitle
+	&__description
 	{
 		display: block;
 		line-height: 1.2em;
@@ -92,7 +92,8 @@
 
 	&__cancel
 	{
-		display: inline-block;
+		cursor: pointer;
+		display: none;
 		border: none;
 		box-shadow: none;
 		background-color: transparent;
@@ -104,6 +105,51 @@
 			border-radius: 2px;
 		}
 	}
+}
+
+.leplayer-next--auto
+{
+	.leplayer-next__cancel
+	{
+		display: inline-block;
+	}
+
+
+	.radial-bar {
+		width: 2.2em;
+		height: 2.2em;
+		margin: -1.1em 0 0 -1.1em;
+	}
+
+	.radial-bar__button {
+		width: 2em;
+		height: 2em;
+		position: absolute;
+		margin-left: 0.1em;
+		margin-top: 0.1em;
+		border-radius: 50%;
+		text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+		cursor: pointer;
+		color: @color-primary;
+		&:hover
+		{
+			opacity: fade(@color-active, 80%);
+		}
+	}
+	.radial-bar__svg-spinner {
+		display: block;
+	}
+}
+.radial-bar {
+	display: block;
+	width: 2em;
+	height: 2em;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -1em 0 0 -1em;
+	background-color: #cccccc;
+	border-radius: 50%;
 }
 
 .leplayer-next__close {
@@ -121,66 +167,9 @@
 	position: absolute;
 }
 
-.radial-bar {
-	width: 110px;
-	height: 110px;
-	background-color: #cccccc;
-	border-radius: 50%;
+.radial-bar__svg-spinner {
 	position: absolute;
-	top: 50%;
-	left: 50%;
-	margin: -55px 0 0 -55px;
-}
-
-.radial-bar__mask {
-	clip: rect(0px, 110px, 110px, 55px);
-	transition: transform 1s linear;
-	width: 110px;
-	height: 110px;
-	position: absolute;
-	border-radius: 50%;
-}
-
-.radial-bar__fill {
-	transition: transform 1s linear;
-	border-radius: 50%;
-	clip: rect(0px, 55px, 110px, 0px);
-	background-color: @color-primary;
-	width: 110px;
-	height: 110px;
-	position: absolute;
-}
-
-.radial-bar__button {
-	width: 100px;
-	height: 100px;
-	position: absolute;
-	margin-left: 5px;
-	margin-top: 5px;
-	border-radius: 50%;
-	font-size: 50px;
-	text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-	padding: 25px;
-	background-color: @color-active;
-	border-radius: 50%;
-	cursor: pointer;
+	left: 0;
 	color: @color-primary;
-	&:hover
-	{
-		opacity: fade(@color-active, 80%);
-	}
-	.leplayer-icon
-	{
-		position: relative;
-		left: 4px;
-	}
-}
-
-.radial-bar__percent {
-	text-align: center;
-	position: relative;
-	top: 50%;
-	transform: translateY(-50%);
-	color: @color-primary;
-	font-size: 22px;
+	display: none;
 }
