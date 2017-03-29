@@ -1666,13 +1666,13 @@ Player.plugin('miniplayer', function(pluginOptions) {
 	}
 
 
-	this._updateMiniPlayer = () => {
+	this._updateMiniPlayer = (e, force) => {
 		const scrollTop = $(window).scrollTop();
 
 		if(scrollTop > offsetShow()) {
-			this.showMiniPlayer();
+			this.showMiniPlayer(force);
 		} else {
-			this.hideMiniPlayer();
+			this.hideMiniPlayer(force);
 		}
 	}
 
@@ -1696,7 +1696,7 @@ Player.plugin('miniplayer', function(pluginOptions) {
 
 	$(window).on('scroll', this._updateMiniPlayer.bind(this));
 	$(window).on('resize', this._updateMiniPlayer.bind(this));
-	this.on('inited', this._updateMiniPlayer.bind(this));
+	this.on('inited', (e) => this._updateMiniPlayer(e, true));
 
 	this.onSetView('mini', () => {
 		this.innerElement.css('max-width', getWidth());
