@@ -1666,11 +1666,17 @@ Player.plugin('miniplayer', function(pluginOptions) {
 	}
 
 
-	this._updateMiniPlayer = () => {
+	this._updateMiniPlayer = (e, force) => {
 		const scrollTop = $(window).scrollTop();
 
+		// Because in force update, for normally count height and padding
+		// miniplayer before the show must first be hidden
+		if(force) {
+			this.hideMiniPlayer(force);
+		}
+
 		if(scrollTop > offsetShow()) {
-			this.showMiniPlayer();
+			this.showMiniPlayer(force);
 		} else {
 			this.hideMiniPlayer();
 		}
@@ -1696,7 +1702,7 @@ Player.plugin('miniplayer', function(pluginOptions) {
 
 	$(window).on('scroll', this._updateMiniPlayer.bind(this));
 	$(window).on('resize', this._updateMiniPlayer.bind(this));
-	this.on('inited', this._updateMiniPlayer.bind(this));
+	this.on('inited', (e) => this._updateMiniPlayer(e, true));
 
 	this.onSetView('mini', () => {
 		this.innerElement.css('max-width', getWidth());
