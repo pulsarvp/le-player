@@ -68,7 +68,7 @@ class NextComponent extends Component {
 		options = $.extend({}, {
 			title : '',
 			description : '',
-			timeout : 5000,
+			timeout : 10000,
 		}, options);
 
 		super(player, options);
