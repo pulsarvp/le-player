@@ -24,6 +24,7 @@ class Sections extends Component {
 
 		super(player, options)
 
+		this.scrollElement = this._innerElement;
 		this.activeSection = this.getSectionByIndex(0);
 
 		this.items = items;
@@ -116,7 +117,7 @@ class Sections extends Component {
 	setActiveByIndex(index) {
 		if (
 			this.activeSection.length === 0 ||
-			this.activeSection.attr('data-index') === index ||
+			parseInt(this.activeSection.attr('data-index')) === index ||
 			this.getSectionByIndex(index).length === 0
 		) {
 			return this
@@ -128,9 +129,9 @@ class Sections extends Component {
 
 		const topPosition = this.activeSection.position().top;
 
-		this.element
+		this.scrollElement
 			.animate({
-				scrollTop : this.element.scrollTop() + topPosition
+				scrollTop : this.scrollElement.scrollTop() + topPosition
 			}, 800)
 
 		this.player.trigger('sectionschange', { section : this.items[index]});

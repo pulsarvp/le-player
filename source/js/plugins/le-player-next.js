@@ -140,7 +140,7 @@ class NextComponent extends Component {
 	}
 
 	next() {
-		if(this.url) {
+		if(this.url != null) {
 			window.location = this.options.url;
 		}
 	}
