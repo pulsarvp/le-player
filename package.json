@@ -1,6 +1,6 @@
 {
   "name": "le-player",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "The best HTML5 video player made for Lectoriy.",
   "main": "dist/js/le-player.min.js",
   "directories": {
