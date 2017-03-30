@@ -782,8 +782,7 @@
 .leplayer-sections {
   font-size: 11px;
   height: 100%;
-  overflow-x: hidden;
-  overflow-y: scroll;
+  overflow: hidden;
   width: 260px;
   z-index: 16;
   box-sizing: border-box;
@@ -795,17 +794,17 @@
 .leplayer-sections--fsonly {
   display: none;
 }
-.leplayer-sections--hide-scroll {
-  overflow: hidden;
-}
 .leplayer-sections--hide-scroll .leplayer-sections__inner {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   right: -15px;
-  overflow-y: scroll;
   box-sizing: content-box;
+}
+.leplayer-sections__inner {
+  overflow-y: scroll;
+  height: 100%;
 }
 .leplayer-section {
   display: -ms-flexbox;
@@ -831,25 +830,27 @@
 .leplayer-section-time {
   color: #a0a0a0;
   display: block;
-  float: left;
   font-size: 0.92em;
   font-weight: 400;
+  padding-top: 2px;
   text-align: right;
-  width: 4.5em;
+  width: 3.5em;
+  -ms-flex: 0 0 3.5em;
+      flex: 0 0 3.5em;
 }
 .leplayer-section-info {
   display: block;
-  width: 100%;
-  float: left;
   padding-left: 10px;
   padding-right: 7px;
+  width: calc(100% - 3.5em);
 }
 .leplayer-section-title {
   font-weight: 500;
+  word-wrap: break-word;
 }
 .leplayer-section-description {
   display: none;
-  margin-top: 5px;
+  word-wrap: break-word;
 }
 .leplayer-section-next-info {
   display: none;

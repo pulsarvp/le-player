@@ -3094,6 +3094,7 @@
 
 			var _this = _possibleConstructorReturn(this, (Sections.__proto__ || Object.getPrototypeOf(Sections)).call(this, player, options));
 
+			_this.scrollElement = _this._innerElement;
 			_this.activeSection = _this.getSectionByIndex(0);
 
 			_this.items = items;
@@ -3191,7 +3192,7 @@
 		}, {
 			key: 'setActiveByIndex',
 			value: function setActiveByIndex(index) {
-				if (this.activeSection.length === 0 || this.activeSection.attr('data-index') === index || this.getSectionByIndex(index).length === 0) {
+				if (this.activeSection.length === 0 || parseInt(this.activeSection.attr('data-index')) === index || this.getSectionByIndex(index).length === 0) {
 					return this;
 				}
 
@@ -3201,8 +3202,8 @@
 
 				var topPosition = this.activeSection.position().top;
 
-				this.element.animate({
-					scrollTop: this.element.scrollTop() + topPosition
+				this.scrollElement.animate({
+					scrollTop: this.scrollElement.scrollTop() + topPosition
 				}, 800);
 
 				this.player.trigger('sectionschange', { section: this.items[index] });
