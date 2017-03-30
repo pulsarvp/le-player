@@ -69,6 +69,7 @@ class NextComponent extends Component {
 			title : '',
 			description : '',
 			timeout : 10000,
+			auto : false
 		}, options);
 
 		super(player, options);
