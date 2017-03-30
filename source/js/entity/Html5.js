@@ -2,6 +2,8 @@ import $ from 'jquery';
 import Cookie from '../utils/cookie';
 import Component from '../components/Component';
 import MediaError from '../MediaError';
+import { IS_SAFARI, IS_IOS, IS_ANDROID } from '../utils/browser';
+
 
 class Html5 extends Component {
 	constructor (player, options) {
@@ -63,15 +65,37 @@ class Html5 extends Component {
 		return Cookie.get('rate') || this.player.options.rate.default
 	}
 
+	get rateMax() {
+		let max = this.player.options.rate.max;
+		if(IS_IOS || IS_ANDROID) {
+			max = Html5.MOBILE_MAX_RATE;
+		}
+		if(IS_SAFARI) {
+			max = Html5.SAFARI_MAX_RATE;
+		}
+
+		return max;
+	}
+
+	get rateMin() {
+		let min = this.player.options.rate.min;
+
+		if(IS_IOS || IS_ANDROID) {
+			min = Html5.MOBILE_MIN_RATE;
+		}
+
+		if(IS_SAFARI) {
+			min = Html5.SAFARI_MIN_RATE;
+		}
+
+		return min;
+	}
 
 	set rate (value) {
-		const player = this.player;
-		if (value <= player.options.rate.max && value >= player.options.rate.min) {
+		if (value <= this.rateMax && value >= this.rateMin) {
 			this.media.playbackRate = value;
 			Cookie.set('rate', value);
 		}
-		/** TODO: Chanche controls.rate in event handler */
-		//controls.rate = this.media.playbackRate;
 	}
 
 
@@ -334,6 +358,22 @@ class Html5 extends Component {
 	}
 
 }
+
+
+/**
+ * Min rate for android and ios
+ */
+Html5.MOBILE_MIN_RATE = 0.5;
+
+/**
+ * Max rate for android and ios
+ */
+Html5.MOBILE_MAX_RATE = 2
+
+
+Html5.SAFARI_MIN_RATE = 0.5;
+
+Html5.SAFARI_MAX_RATE = 2;
 
 Component.registerComponent('Html5', Html5);
 export default Html5;
