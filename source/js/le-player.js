@@ -65,6 +65,7 @@ function excludeArray(source, dist) {
 }
 
 const defaultOptions = {
+	entity : 'Html5',
 	autoplay : false,
 	height : 'auto',
 	loop : false,
@@ -294,7 +295,10 @@ class Player extends Component {
 		 * @memberof! Player#
 		 * @type {Html5}
 		 */
-		this.video = new Html5(this, { element });
+		this.loadEntity(this.options.entity, { element });
+		this.video = this.entity;
+		// this.loadEntity(this.options.entity, this._getEntityOptions());
+		// this.video = this.entity;
 
 		// Create controls
 		// TODO: move this action to the createElement
@@ -565,8 +569,18 @@ class Player extends Component {
 
 	}
 
+	get entity() {
+		return this._entity;
+	}
+
+	loadEntity(name, options) {
+		const Entity = Player.getComponent(name);
+		this._entity = new Entity(this);
+	}
+
 	/**
 	 * Starts playing the video
+	 *
 	 *
 	 * @access public
 	 * @example
@@ -1075,6 +1089,10 @@ class Player extends Component {
 	_optionsFromElement() {
 		// Copy video attrs to the opitons
 		const  element = this._element;
+		if (element == null || element.length === 0) {
+			return {}
+		}
+
 		let attrOptions = [
 			'height',
 			'width',
@@ -1085,7 +1103,7 @@ class Player extends Component {
 			'preload',
 		]
 		.reduce((obj, item) => {
-			const val = element.attr(item)
+			const val = element.attr(item);
 			if(val != null) {
 				obj[item] = element.attr(item);
 			}
@@ -1176,6 +1194,8 @@ class Player extends Component {
 		this.options.controls = $.extend({}, defaultOptions.controls, presetOptions.controls, this._userOptions.controls);
 
 		// exclude controls option
+		// TODO(adinvadim):
+		// Set depreceted flag for this option;
 		for (const name in this.options.excludeControls) {
 			if (!this.options.excludeControls.hasOwnProperty(name)) return;
 			const controlCollection = this.options.excludeControls[name];

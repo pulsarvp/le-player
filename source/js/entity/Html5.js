@@ -1,20 +1,16 @@
 import $ from 'jquery';
 import Cookie from '../utils/cookie';
 import Component from '../components/Component';
-import MediaError from '../MediaError';
+import Entity from './Entity';
 
-class Html5 extends Component {
+
+class Html5 extends Entity {
 	constructor (player, options) {
 		super(player, options)
-		this.player = player;
 		this.media = this.element[0];
 
 		this.subtitles = [];
 		this.bufferRanges = [];
-
-		if (this.player.options.src == null) {
-			this.player.error = new MediaError('Видеофайл не найден.');
-		}
 
 		this.src = this.player.options.src;
 	}
@@ -58,11 +54,6 @@ class Html5 extends Component {
 	get rate () {
 		return this.media.playbackRate;
 	}
-
-	get defaultRate() {
-		return Cookie.get('rate') || this.player.options.rate.default
-	}
-
 
 	set rate (value) {
 		const player = this.player;
@@ -181,19 +172,6 @@ class Html5 extends Component {
 		return dfd.promise();
 	}
 
-	startBuffering() {
-		const volume = this.volume;
-		this.volume = 0
-		return this.play()
-			.then(() => {
-				return this.pause();
-			})
-			.then(() => {
-				this.currentTime = 0;
-				this.volume = volume;
-			})
-	}
-
 	supportsFullScreen() {
 		if (typeof this.media.webkitEnterFullScreen === 'function') {
 			const userAgent = window.navigator && window.navigator.userAgent || '';
@@ -234,10 +212,6 @@ class Html5 extends Component {
 		} else {
 			this.pause();
 		}
-	}
-
-	seek (time) {
-		this.media.currentTime = time;
 	}
 
 	play () {

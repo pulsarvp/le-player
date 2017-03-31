@@ -22,7 +22,7 @@ class Component {
 			createElement : true
 		}, this.options, options);
 
-		if(!player) {
+		if(!player && this.play != null) {
 			this.player = player = this;
 		} else {
 			this.player = player;
@@ -85,7 +85,7 @@ class Component {
 	 * @returns {Player} this
 	 */
 	trigger(eventName, ...args) {
-		const event = $.Event(`leplayer_${eventName}`, { player : this })
+		const event = $.Event(`leplayer_${eventName}`, { player : this.player })
 		this.element.trigger.call(this.element, event, ...args);
 		return this;
 	}
