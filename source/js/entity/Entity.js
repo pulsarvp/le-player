@@ -13,6 +13,7 @@ class Entity extends Component {
 		}
 
 	}
+
 	get currentTime() {
 		return
 	}

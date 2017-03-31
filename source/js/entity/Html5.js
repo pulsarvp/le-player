@@ -6,7 +6,7 @@ import Entity from './Entity';
 
 class Html5 extends Entity {
 	constructor (player, options) {
-		super(player, options)
+		super(player, options);
 		this.media = this.element[0];
 
 		this.subtitles = [];
@@ -17,7 +17,39 @@ class Html5 extends Entity {
 
 	/* TODO */
 	createElement() {
-		return this.element = $(this.options.ctx);
+		this.element = this.options.ctx;
+		[
+
+			// Remove controls because we dont not support native controls yet
+			'controls',
+			'poster',
+
+			// It is unnecessary attrs, this functionality solve CSS
+			'height',
+			'width'
+
+		].forEach(item => {
+			this.element.removeAttr(item);
+		});
+
+		// Set attrs from options
+		[
+			'preload',
+			'autoplay',
+			'loop',
+			'muted'
+		].forEach(item => {
+			if(this.options[item]) {
+				this.element.attr(item, this.options[item]);
+				this.element.prop(item, this.options[item]);
+			}
+		})
+
+		this.element.find('source[data-quality]').each((i, item) => {
+			$(item).remove();
+		});
+
+		return this.element;
 	}
 
 	get currentTime () {

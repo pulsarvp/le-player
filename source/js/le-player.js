@@ -19,7 +19,6 @@ import FullscreenApi from './FullscreenApi';
 import { createEl, secondsToTime, noop } from './utils';
 
 import MediaError from './MediaError';
-import Html5 from './entity/Html5.js';
 
 // Register common controls
 import './components/PlayControl';
@@ -289,16 +288,14 @@ class Player extends Component {
 		 */
 		this.element = this.createElement();
 
+		this.loadEntity(this.options.entity, { ctx : element });
 		/**
 		 * Video html5 component
 		 *
 		 * @memberof! Player#
-		 * @type {Html5}
+		 * @type {Entity}
 		 */
-		this.loadEntity(this.options.entity, { element });
 		this.video = this.entity;
-		// this.loadEntity(this.options.entity, this._getEntityOptions());
-		// this.video = this.entity;
 
 		// Create controls
 		// TODO: move this action to the createElement
@@ -575,7 +572,7 @@ class Player extends Component {
 
 	loadEntity(name, options) {
 		const Entity = Player.getComponent(name);
-		this._entity = new Entity(this);
+		this._entity = new Entity(this, options);
 	}
 
 	/**
@@ -946,37 +943,6 @@ class Player extends Component {
 		const element = this._element;
 
 		this.element = createEl('div');
-
-		[
-
-			// Remove controls because we dont not support native controls yet
-			'controls',
-			'poster',
-
-			// It is unnecessary attrs, this functionality solve CSS
-			'height',
-			'width'
-
-		].forEach(item => {
-			element.removeAttr(item);
-		});
-
-		// Set attrs from options
-		[
-			'preload',
-			'autoplay',
-			'loop',
-			'muted'
-		].forEach(item => {
-			if(this.options[item]) {
-				element.attr(item, this.options[item]);
-				element.prop(item, this.options[item]);
-			}
-		})
-
-		element.find('source[data-quality]').each((i, item) => {
-			$(item).remove();
-		});
 
 
 		this.element = this.element
