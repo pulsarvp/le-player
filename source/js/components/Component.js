@@ -85,8 +85,8 @@ class Component {
 	 * @returns {Player} this
 	 */
 	trigger(eventName, ...args) {
-		const event = $.Event(`leplayer_${eventName}`, { player : this.player })
-		this.element.trigger.call(this.element, event, ...args);
+		const event = $.Event(`leplayer_${eventName}`, { player : this.player });
+		this.element.triggerHandler(event, ...args);
 		return this;
 	}
 
@@ -100,13 +100,13 @@ class Component {
 	 * @returns {Player} this
 	 */
 	on(eventName, ...args) {
-		this.element.on.call(this.element, `leplayer_${eventName}`, ...args);
+		this.element.on(`leplayer_${eventName}`, ...args);
 		return this;
 	}
 
 
 	one(eventName, ...args) {
-		this.element.one.call(this.element, `leplayer_${eventName}`, ...args);
+		this.element.one(`leplayer_${eventName}`, ...args);
 	}
 
 

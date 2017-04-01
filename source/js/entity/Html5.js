@@ -13,6 +13,91 @@ class Html5 extends Entity {
 		this.bufferRanges = [];
 
 		this.src = this.player.options.src;
+
+		this.element.on('loadstart', this.onLoadStart.bind(this));
+		this.element.on('timeupdate', this.onTimeUpdate.bind(this));
+		this.element.on('durationchange', this.onDurationChange.bind(this));
+		this.element.on('progress', this.onProgress.bind(this));
+		this.element.on('seeking', this.onSeeking.bind(this));
+		this.element.on('seeked', this.onSeeked.bind(this));
+		this.element.on('volumechange', this.onVolumeChange.bind(this));
+		this.element.on('click', this.onClick.bind(this));
+		this.element.on('dblclick', this.onDblclick.bind(this));
+		this.element.on('play', this.onPlay.bind(this));
+		this.element.on('pause', this.onPause.bind(this));
+		this.element.on('ratechange', this.onRateChange.bind(this));
+		this.element.on('ended', this.onEnded.bind(this));
+		this.element.on('canplaythrough', this.onCanplayThrough.bind(this));
+		this.element.on('waiting', this.onWaiting.bind(this));
+		this.element.on('error', this.onError.bind(this));
+	}
+
+	onLoadStart(e) {
+		this.trigger('loadstart');
+	}
+
+	onTimeUpdate(e) {
+		this.trigger('timeupdate');
+	}
+
+	onDurationChange(e) {
+		this.trigger('durationchange');
+	}
+
+	onProgress(e) {
+		this.trigger('progress');
+	}
+
+	onSeeking(e) {
+		this.trigger('seeking');
+	}
+
+	onSeeked(e) {
+		this.trigger('seeked');
+	}
+
+	onVolumeChange(e) {
+		this.trigger('volumechange');
+	}
+
+	onClick() {
+		this.trigger('click');
+	}
+
+	onDblclick() {
+		this.trigger('dblclick');
+	}
+
+	onPlay() {
+		this.trigger('play');
+	}
+
+	onPause() {
+		this.trigger('pause');
+	}
+
+	onPlaying() {
+		this.trigger('playing');
+	}
+
+	onRateChange() {
+		this.trigger('ratechange');
+	}
+
+	onEnded() {
+		this.trigger('ended');
+	}
+
+	onCanplayThrough() {
+		this.trigger('canplaythrough');
+	}
+
+	onWaiting() {
+		this.trigger('waiting');
+	}
+
+	onError(e) {
+		this.trigger('error', { code : e.target.error.code });
 	}
 
 	/* TODO */

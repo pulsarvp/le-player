@@ -34,6 +34,9 @@ import './components/DownloadControl';
 import './components/KeybindingInfoControl';
 import './components/TimeInfoControl';
 
+import './entity/Html5';
+
+
 Control.registerControl('divider', function() {
 	return {
 		element : $('<div/>').addClass('divider')
@@ -345,214 +348,206 @@ class Player extends Component {
 		this._userActivity = false;
 		this._listenUserActivity();
 
-		const mediaElement = this.video.element;
-		mediaElement.one({
-			play : (e) => {
-				/**
-				 * First play event
-				 *
-				 * @event Player#firstplay
-				 */
-				this.trigger('firstplay');
-				this.removeClass('leplayer--virgin');
-			}
-		});
-
 		this._waitingTimeouts = [];
 
-		mediaElement.on({
+		/* Retrigger {@link Entity} Events */
+		[
+			/**
+			 * durationchange player event
+			 *
+			 * @event Player#durationchange
+			 */
+			'durationchange',
 
-			loadstart : (e) => {
-				this.removeClass('leplayer--ended');
+			/**
+			 * progress html5 media event
+			 *
+			 * @event Player#progress
+			 */
+			'progress',
 
-				this.error = null;
-				/**
-				 * loadstart html5 media event
-				 *
-				 * @event Player#loadstart
-				 */
-				this.trigger('loadstart');
-			},
+			/**
+			 * dblclick
+			 *
+			 * @event Player#dbclick
+			 */
+			'dblclick',
 
-			durationchange : (e) => {
-				/**
-				 * durationchange html5 media event
-				 *
-				 * @event Player#durationchange
-				 */
-				this.trigger('durationchange');
-			},
+			/**
+			 * dblclick
+			 *
+			 * @event Player#dbclick
+			 */
+			'click',
 
-			timeupdate : (e) => {
-				if (this.video.currentTime > 0) {
-					this.removeClass('leplayer--virgin');
-				}
 
-				/**
-				 * timeupdate html5 media event
-				 *
-				 * @event Player#timeupdate
-				 */
-				this.trigger('timeupdate', { time : this.video.currentTime, duration : this.video.duration });
+			/**
+			 * canplay html5 media event
+			 *
+			 * @event Player#canplay
+			 */
+			'canplay'
 
-			},
 
-			seeking : (e) => {
-				this._startWaiting();
-				/**
-				 * seeking html5 media event
-				 *
-				 * @event Player#seeking
-				 */
-				this.trigger('seeking');
+		].forEach(eventName => {
+			this.video.on(eventName, () => {
+				this.trigger(eventName);
+			})
+		});
 
-			},
+		this.video.one('play', () => {
+            /**
+             * First play event
+             *
+             * @event Player#firstplay
+             */
+			this.trigger('firstplay');
+			this.removeClass('leplayer--virgin');
+		});
 
-			seeked : (e) => {
-				this._stopWayting();
-				/**
-				 * seeked html5 media event
-				 *
-				 * @event Player#seeked
-				 */
-				this.trigger('seeked');
-			},
-
-			progress : () => {
-				/**
-				 * progress html5 media event
-				 *
-				 * @event Player#progress
-				 */
-				this.trigger('progress');
-			},
-
-			dblclick : () => {
-				/**
-				 * dblclick
-				 *
-				 * @event Player#dbclick
-				 */
-				this.trigger('dblclick');
-			},
-
-			click : () => {
-				/**
-				 * click
-				 *
-				 * @event Player#click
-				 */
-				this.trigger('click')
-			},
-
-			volumechange : (e) => {
-				/**
-				 * volumechange html5 media event
-				 *
-				 * @event Player#volumechange
-				 */
-				this.trigger('volumechange', { volume : this.video.volume });
-			},
-
-			play : (e) => {
-				this.removeClass('leplayer--ended');
-				this.removeClass('leplayer--paused');
-				this.addClass('leplayer--playing');
-
-				/**
-				 * play html5 media event
-				 *
-				 * @event Player#play
-				 */
-				this.trigger('play');
-			},
-
-			pause : (e) => {
-				this.removeClass('leplayer--playing');
-				this.addClass('leplayer--paused');
-
-				/**
-				 * pause html5 media event
-				 *
-				 * @event Player#pause
-				 */
-				this.trigger('pause');
-			},
-
-			playing : (e) => {
-				this._stopWayting();
-
-				/**
-				 * playing html5 media event
-				 *
-				 * @event Player#playing
-				 */
-				this.trigger('playing');
-			},
-
-			ratechange : (e) => {
-
-				/**
-				 * rate html5 media event
-				 *
-				 * @event Player#rate
-				 */
-				this.trigger('ratechange', { rate : this.video.rate });
-			},
-
-			canplay : (e) => {
-				/**
-				 * canplay html5 media event
-				 *
-				 * @event Player#canplay
-				 */
-				this.trigger('canplay');
-			},
-
-			ended : (e) => {
-				this.addClass('leplayer--ended')
-
-				if(this.options.loop) {
-					this.currentTime = 0;
-					this.video.play();
-				} else if (!this.video.paused) {
-					this.video.pause();
-				}
-
-				/**
-				 * ended html5 media event
-				 *
-				 * @event Player#ended
-				 */
-				this.trigger('ended');
-			},
-
-			canplaythrough : (e) => {
-				this._stopWayting();
-				/**
-				 * canplaythrough html5 media event
-				 *
-				 * @event Player#canplaythrough
-				 */
-				this.trigger('canplaythrough');
-			},
-
-			waiting : (e) => {
-				this._startWaiting()
-
-				this.one('timeupdate', () => this._stopWayting());
-
-				/**
-				 * waiting html5 media event
-				 *
-				 * @event Player#waiting
-				 */
-				this.trigger('waiting');
-			},
-
-			error : (e) => {
-				this.error = new MediaError(e.target.error.code);
+		this.video.on('timeupdate', () => {
+			if (this.video.currentTime > 0) {
+				this.removeClass('leplayer--virgin');
 			}
+
+			/**
+			 * timeupdate html5 media event
+			 *
+			 * @event Player#timeupdate
+			 */
+			this.trigger('timeupdate', { time : this.video.currentTime, duration : this.video.duration });
+
+		})
+
+		this.video.on('loadstart', () => {
+			this.removeClass('leplayer--ended');
+
+			this.error = null;
+			/**
+			 * loadstart player event
+			 *
+			 * @event Player#loadstart
+			 */
+			this.trigger('loadstart');
+		});
+
+		this.video.on('seeking', () => {
+			this._startWaiting();
+			/**
+			 * seeking html5 media event
+			 *
+			 * @event Player#seeking
+			 */
+			this.trigger('seeking');
+		});
+
+		this.video.on('seeked', () => {
+			this._stopWayting();
+			/**
+			 * seeked html5 media event
+			 *
+			 * @event Player#seeked
+			 */
+			this.trigger('seeked');
+		});
+
+		this.video.on('volumechange', () => {
+			/**
+			 * volumechange html5 media event
+			 *
+			 * @event Player#volumechange
+			 */
+			this.trigger('volumechange', { volume : this.video.volume });
+		});
+
+		this.video.on('play', () => {
+			this.removeClass('leplayer--ended');
+			this.removeClass('leplayer--paused');
+			this.addClass('leplayer--playing');
+
+			/**
+			 * play html5 media event
+			 *
+			 * @event Player#play
+			 */
+			this.trigger('play');
+		});
+
+		this.video.on('pause', () => {
+			this.removeClass('leplayer--playing');
+			this.addClass('leplayer--paused');
+
+			/**
+			 * pause html5 media event
+			 *
+			 * @event Player#pause
+			 */
+			this.trigger('pause');
+		});
+
+		this.video.on('playing', () => {
+			this._stopWayting();
+
+			/**
+			 * playing html5 media event
+			 *
+			 * @event Player#playing
+			 */
+			this.trigger('playing');
+		});
+
+		this.video.on('ratechange', () => {
+			/**
+			 * rate html5 media event
+			 *
+			 * @event Player#rate
+			 */
+			this.trigger('ratechange', { rate : this.video.rate });
+		});
+
+		this.video.on('ended', () => {
+			this.addClass('leplayer--ended');
+
+			if(this.options.loop) {
+				this.currentTime = 0;
+				this.video.play();
+			} else if (!this.video.paused) {
+				this.video.pause();
+			}
+
+			/**
+			 * ended html5 media event
+			 *
+			 * @event Player#ended
+			 */
+			this.trigger('ended');
+		});
+
+		this.video.on('canplaythrough', () => {
+			this._stopWayting();
+			/**
+			 * canplaythrough html5 media event
+			 *
+			 * @event Player#canplaythrough
+			 */
+			this.trigger('canplaythrough');
+		});
+
+		this.video.on('waiting', () => {
+			this._startWaiting();
+
+			this.video.one('timeupdate', () => this._stopWayting());
+
+			/**
+			 * waiting html5 media event
+			 *
+			 * @event Player#waiting
+			 */
+			this.trigger('waiting');
+		});
+
+		this.video.on('error', (e, data) => {
+			this.error = new MediaError(data.code);
 		});
 
 		this.on('fullscreenchange', this._onFullscreenChange.bind(this));
@@ -563,7 +558,6 @@ class Player extends Component {
 		this.on('pause', this._onPause.bind(this));
 
 		$(document).on(FullscreenApi.fullscreenchange, this._onEntityFullscrenChange.bind(this));
-
 	}
 
 	get entity() {
