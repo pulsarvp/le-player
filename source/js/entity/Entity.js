@@ -7,6 +7,7 @@ import Cookie from '../utils/cookie';
 class Entity extends Component {
 	constructor(player, options) {
 		super(player, options);
+		this.subtitles = [];
 
 		if (this.player.options.src == null) {
 			this.player.error = new MediaError('Видеофайл не найден.');
@@ -75,6 +76,14 @@ class Entity extends Component {
 	}
 
 	load() {
+	}
+
+	togglePlay () {
+		if (this.paused) {
+			this.play();
+		} else {
+			this.pause();
+		}
 	}
 
 }

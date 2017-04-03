@@ -35,6 +35,7 @@ import './components/KeybindingInfoControl';
 import './components/TimeInfoControl';
 
 import './entity/Html5';
+import './entity/Youtube';
 
 
 Control.registerControl('divider', function() {
