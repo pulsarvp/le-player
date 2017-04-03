@@ -445,8 +445,6 @@ class Player extends Component {
 		});
 
 		this.video.on('posterchange', (e, data) => {
-			console.log(data, 'from listner');
-
 			const url = data.url;
 			this.poster.url = url;
 			this.trigger('posterchange');

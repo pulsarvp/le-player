@@ -62,7 +62,7 @@ class Entity extends Component {
 	}
 
 	get height() {
-		return this.element.height()
+		return this.element.innerHeight()
 	}
 
 	get width() {
