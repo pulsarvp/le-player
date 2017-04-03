@@ -11,17 +11,18 @@ const apiLoaded = loadScript('https://www.youtube.com/iframe_api');
 class Youtube extends Entity {
 	constructor(player, options) {
 		super(player, options);
-		this._paused = true;
+		this.src = this.player.options.src;
 
-		this.ytPlayer = {
-			getDuration : () => {
-				return 0;
-			},
-			getCurrentTime : () => 0
-		}
+		this._paused = true;
 
 		this.element.on('click', this.onClick.bind(this));
 		this.element.on('dblclick', this.onDblclick.bind(this));
+	}
+
+	set src(src) {
+		if(src == null) return;
+		if(this.src && this.src.url === src.url) return;
+		this.videoId = Youtube.parseUrl(src.url);
 	}
 
 	onClick(event) {
@@ -33,7 +34,7 @@ class Youtube extends Entity {
 	}
 
 	get currentTime() {
-		return this.ytPlayer.getCurrentTime();
+		return this.ytPlayer? this.ytPlayer.getCurrentTime() : 0;
 	}
 
 	set currentTime(value) {
@@ -46,6 +47,7 @@ class Youtube extends Entity {
 
 	get paused() {
 		return this._paused;
+
 	}
 	set paused(value) {
 		this._paused = value;
@@ -120,7 +122,7 @@ class Youtube extends Entity {
 		YT.ready(() => {
 			this.options.ctx.replaceWith(this.element);
 			this.ytPlayer = new YT.Player(this.youtubeElement[0], {
-				videoId : globalOptions.youtubeVideoId,
+				videoId : this.videoId,
 				width : globalOptions.width || '100%',
 				playerVars : ytOptions,
 				events : {
@@ -146,6 +148,7 @@ class Youtube extends Entity {
 		this._state = state;
 		switch(state) {
 			case -1:
+				console.log("UHHHU");
 				this.trigger('loadstart');
 				this.trigger('loadedmetadata');
 				this.trigger('durationchange');
@@ -176,6 +179,16 @@ class Youtube extends Entity {
 				break;
 		}
 
+	}
+
+	static parseUrl(url) {
+		let result = null;
+        const regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regex);
+        if(match && match[2].length === 11) {
+        	result = match[2];
+		}
+		return result;
 	}
 }
 
