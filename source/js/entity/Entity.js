@@ -3,16 +3,50 @@
  */
 import Component from '../components/Component';
 import Cookie from '../utils/cookie';
+import MediaError from '../MediaError';
 
 class Entity extends Component {
 	constructor(player, options) {
 		super(player, options);
 		this.subtitles = [];
+		this._triggerStack = [];
+		this._stopListen = false;
 
 		if (this.player.options.src == null) {
 			this.player.error = new MediaError('Видеофайл не найден.');
 		}
 
+	}
+
+	/**
+	 * @override
+	 */
+	trigger(...args) {
+		if(!this._stopListen) {
+			this._triggerStack.push(args);
+		}
+		super.trigger(...args);
+	}
+
+	init() {
+		this._stopListen = true;
+		this._triggerStack.forEach(args => {
+			this.trigger(...args);
+		});
+	}
+
+	createElement() {
+		return this.element = $('<div />');
+	}
+
+	set poster(url) {
+		this._poster = url;
+		this.trigger('posterchange', { url });
+	}
+
+
+	get poster() {
+		return this._poster;
 	}
 
 	get currentTime() {

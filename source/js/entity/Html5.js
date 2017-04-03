@@ -14,6 +14,10 @@ class Html5 extends Entity {
 
 		this.src = this.player.options.src;
 
+		if(this.player.options.poster != null) {
+			this.poster = this.player.options.poster;
+		}
+
 		this.element.on('loadstart', this.onLoadStart.bind(this));
 		this.element.on('timeupdate', this.onTimeUpdate.bind(this));
 		this.element.on('durationchange', this.onDurationChange.bind(this));
@@ -128,7 +132,8 @@ class Html5 extends Entity {
 				this.element.attr(item, this.options[item]);
 				this.element.prop(item, this.options[item]);
 			}
-		})
+		});
+
 
 		this.element.find('source[data-quality]').each((i, item) => {
 			$(item).remove();
@@ -278,6 +283,7 @@ class Html5 extends Entity {
 	}
 
 	init () {
+		super.init();
 		let dfd = $.Deferred();
 		this._initSubtitles();
 		this._initVideo()

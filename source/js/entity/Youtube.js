@@ -11,9 +11,9 @@ const apiLoaded = loadScript('https://www.youtube.com/iframe_api');
 class Youtube extends Entity {
 	constructor(player, options) {
 		super(player, options);
-		this.src = this.player.options.src;
-
 		this._paused = true;
+
+		this.src = this.player.options.src;
 
 		this.element.on('click', this.onClick.bind(this));
 		this.element.on('dblclick', this.onDblclick.bind(this));
@@ -23,6 +23,8 @@ class Youtube extends Entity {
 		if(src == null) return;
 		if(this.src && this.src.url === src.url) return;
 		this.videoId = Youtube.parseUrl(src.url);
+
+		this.poster = 'https://img.youtube.com/vi/' + this.videoId + '/0.jpg';
 	}
 
 	onClick(event) {
@@ -87,6 +89,7 @@ class Youtube extends Entity {
 
 
 	init() {
+		super.init();
 		return apiLoaded
 			.then(() => this.initYTPlayer())
 	}
@@ -98,6 +101,7 @@ class Youtube extends Entity {
 			.addClass('leplayer__youtube');
 		this.blocker = $('<div />')
 			.addClass('leplayer__youtube-blocker');
+
 
 		return this.element
 			.append(this.blocker)
@@ -148,11 +152,11 @@ class Youtube extends Entity {
 		this._state = state;
 		switch(state) {
 			case -1:
-				console.log("UHHHU");
 				this.trigger('loadstart');
 				this.trigger('loadedmetadata');
 				this.trigger('durationchange');
 				this.trigger('ratechange');
+				this.trigger('posterchange');
 				break;
 
 			case YT.PlayerState.ENDED:

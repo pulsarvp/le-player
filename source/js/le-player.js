@@ -327,23 +327,6 @@ class Player extends Component {
 		});
 		this._initPlugins();
 
-		this.video.init().then(() => {
-			/**
-			 * Player init event
-			 *
-			 * @event Player#inited
-			 */
-			this.trigger('inited');
-
-			if(this.options.time) {
-				this.currentTime = this.options.time;
-			}
-
-			if(this.video.src != null && this.options.autoplay) {
-				this.play();
-			}
-		});
-
 		this._listenHotKeys();
 
 		this._userActivity = false;
@@ -461,7 +444,15 @@ class Player extends Component {
 			this.trigger('volumechange', { volume : this.video.volume });
 		});
 
-		this.video.on('play', () => {
+		this.video.on('posterchange', (e, data) => {
+			console.log(data, 'from listner');
+
+			const url = data.url;
+			this.poster.url = url;
+			this.trigger('posterchange');
+		});
+
+		this.video.on('play', (e) => {
 			this.removeClass('leplayer--ended');
 			this.removeClass('leplayer--paused');
 			this.addClass('leplayer--playing');
@@ -550,6 +541,24 @@ class Player extends Component {
 		this.video.on('error', (e, data) => {
 			this.error = new MediaError(data.code);
 		});
+
+		this.video.init().then(() => {
+			/**
+			 * Player init event
+			 *
+			 * @event Player#inited
+			 */
+			this.trigger('inited');
+
+			if(this.options.time) {
+				this.currentTime = this.options.time;
+			}
+
+			if(this.video.src != null && this.options.autoplay) {
+				this.play();
+			}
+		});
+
 
 		this.on('fullscreenchange', this._onFullscreenChange.bind(this));
 		this.on('click', this._onClick.bind(this));
@@ -988,15 +997,13 @@ class Player extends Component {
 		.append(this.loader)
 		.append(this.splashIcon.element)
 
-		if(options.poster) {
-			this.poster = new Poster(this);
-			this.videoContainer.append(this.poster.element);
-		}
+        this.poster = new Poster(this);
+        this.videoContainer.append(this.poster.element);
 
 
 		const lastTimer = new Time(this, {
 			fn : (player) => {
-				const video = player.video
+				const video = player.video;
 				return secondsToTime(video.duration - video.currentTime);
 			}
 		})
