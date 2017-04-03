@@ -125,15 +125,19 @@ class Youtube extends Entity {
 				playerVars : ytOptions,
 				events : {
 					onReady : () => dfd.resolve(),
-					onStateChange : this.onPlayerStateChange.bind(this)
-
+					onStateChange : this.onYTPStateChange.bind(this),
+					onPlaybackRateChange : this.onYTPRateChange.bind(this)
 				}
 			})
 		})
 		return dfd.promise();
 	}
 
-	onPlayerStateChange(e) {
+	onYTPRateChange(e) {
+		this.trigger('ratechange');
+	}
+
+	onYTPStateChange(e) {
 		const state = e.data;
 		if(state === this._state) {
 			return;
