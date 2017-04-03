@@ -71,7 +71,9 @@ class Youtube extends Entity {
 	set volume(value) {
 		this.ytPlayer.setVolume(value * 100);
 
-		this.trigger('volumechange');
+		setTimeout(() => {
+			this.trigger('volumechange');
+		}, 50)
 
 	}
 
@@ -156,7 +158,7 @@ class Youtube extends Entity {
 				this.trigger('loadedmetadata');
 				this.trigger('durationchange');
 				this.trigger('ratechange');
-				this.trigger('posterchange');
+				this.trigger('volumechange');
 				break;
 
 			case YT.PlayerState.ENDED:
