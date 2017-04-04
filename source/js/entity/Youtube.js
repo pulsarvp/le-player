@@ -60,8 +60,21 @@ class Youtube extends Entity {
 	}
 
 	set rate(value) {
+		super.rate = value;
 		this.ytPlayer.setPlaybackRate(value);
 		this.trigger('ratechange');
+	}
+
+	increaseRate() {
+		const index = this.availableRates.indexOf(this.rate);
+		if(index + 1 >= this.availableRates.length) return;
+		return this.rate = this.availableRates[index + 1];
+	}
+
+	decreaseRate() {
+		const index = this.availableRates.indexOf(this.rate);
+		if(index - 1 < 0) return;
+		return this.rate = this.availableRates[index - 1];
 	}
 
 	get volume() {
@@ -111,7 +124,7 @@ class Youtube extends Entity {
 	}
 
 	initYTPlayer() {
-		const dfd = $.Deferred();
+		this._initPromise = $.Deferred();
 		const globalOptions = this.player.options;
 		let ytOptions = {
 			controls : 0,
@@ -127,18 +140,30 @@ class Youtube extends Entity {
 
 		YT.ready(() => {
 			this.options.ctx.replaceWith(this.element);
+
 			this.ytPlayer = new YT.Player(this.youtubeElement[0], {
 				videoId : this.videoId,
 				width : globalOptions.width || '100%',
 				playerVars : ytOptions,
 				events : {
-					onReady : () => dfd.resolve(),
+					onReady : this.onYTPReady.bind(this),
 					onStateChange : this.onYTPStateChange.bind(this),
 					onPlaybackRateChange : this.onYTPRateChange.bind(this)
 				}
 			})
 		})
-		return dfd.promise();
+		return this._initPromise.promise();
+	}
+
+	setAvailablePlaybackRates() {
+		this.availableRates = this.ytPlayer.getAvailablePlaybackRates();
+		this.rateMin = this.availableRates[0];
+		this.rateMax = this.availableRates[this.availableRates.length - 1];
+	}
+
+	onYTPReady(e) {
+		this._initPromise.resolve();
+		this.setAvailablePlaybackRates();
 	}
 
 	onYTPRateChange(e) {

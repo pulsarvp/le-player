@@ -69,12 +69,36 @@ class Entity extends Component {
 		return this.element.width()
 	}
 
-	get rate() {
+	set rateMax(value) {
+		this._rateMax = value;
+	}
+
+	set rateMin(value) {
+		this._rateMin = value;
+	}
+
+	get rateMax() {
+		return this._rateMax || this.player.options.rate.max;
 
 	}
 
-	set rate(value) {
+	get rateMin() {
+		return this._rateMin || this.player.options.rate.min;
+	}
 
+	get rate() {
+	}
+
+	set rate(value) {
+		if(value > this.rateMax || value < this.rateMin) return;
+	}
+
+	increaseRate() {
+		this.rate += this.player.options.rate.step;
+	}
+
+	decreaseRate() {
+		this.rate -= this.player.options.rate.step;
 	}
 
 	get paused() {
