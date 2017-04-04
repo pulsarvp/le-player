@@ -25,10 +25,10 @@ class RateControl extends Control {
 		}, options);
 		super(player, options);
 
-		this.player.on('ratechange', this.update.bind(this));
+		this.player.on('ratechange', () => {
+			this.update();
+		});
 	}
-
-
 
 	/**
 	 * @override
