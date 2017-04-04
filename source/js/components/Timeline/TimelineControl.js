@@ -59,8 +59,8 @@ class TimelineControl extends Control {
 	}
 
 	_onTimeUpdate(e, data) {
-		const { time } = data;
 		const duration = this.player.video.duration;
+		const time = this.player.currentTime;
 		this.hardMove(time / duration);
 	}
 

@@ -149,7 +149,7 @@ class Sections extends Component {
 			return
 		}
 
-		const currentTime = data.time;
+		const currentTime = this.player.currentTime;
 
 		// Update span with end section time
 		// TODO: Вынести это в отдельный компонент ShowTime или типо того

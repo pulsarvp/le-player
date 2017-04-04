@@ -40,11 +40,24 @@ class Youtube extends Entity {
 	}
 
 	set currentTime(value) {
-		this.ytPlayer.seekTo(value);
+		if(this.lastState === YT.PlayerState.PAUSED) {
+			this.timeBeforeSeek = this.currentTime;
+		}
+
+		if (!this.isSeeking) {
+			this.wasPausedBeforeSeek = this.paused;
+		}
+
+		this.isSeeking = true;
+		this.ytPlayer.seekTo(value, true);
+		this.trigger('timeupdate');
+		this.trigger('seeking');
+
+		this.emitTimeupdate();
 	}
 
 	get duration() {
-		return this.ytPlayer ? this.ytPlayer.getDuration() : NaN;
+		return this.ytPlayer && this.ytPlayer.getDuration ? this.ytPlayer.getDuration() : NaN;
 	}
 
 	get paused() {
@@ -96,6 +109,7 @@ class Youtube extends Entity {
 
 	play() {
 		this.ytPlayer.playVideo();
+		this.trigger('play');
 	}
 
 	pause() {
@@ -155,6 +169,7 @@ class Youtube extends Entity {
 		return this._initPromise.promise();
 	}
 
+
 	setAvailablePlaybackRates() {
 		this.availableRates = this.ytPlayer.getAvailablePlaybackRates();
 		this.rateMin = this.availableRates[0];
@@ -172,52 +187,84 @@ class Youtube extends Entity {
 
 	onYTPStateChange(e) {
 		const state = e.data;
-		if(state === this._state) {
+		if(state === this.lastState) {
 			return;
 		}
 
-		this._state = state;
+		this.lastState = state;
 		switch(state) {
-			case -1:
-				this.trigger('loadstart');
-				this.trigger('loadedmetadata');
-				this.trigger('durationchange');
-				this.trigger('ratechange');
-				this.trigger('volumechange');
-				break;
+		case -1:
+			this.trigger('loadstart');
+			this.trigger('loadedmetadata');
+			this.trigger('durationchange');
+			this.trigger('ratechange');
+			this.trigger('volumechange');
+			break;
 
-			case YT.PlayerState.ENDED:
-				this.trigger('ended');
-				break;
+		case YT.PlayerState.ENDED:
+			this.trigger('ended');
+			break;
 
-			case YT.PlayerState.PLAYING:
-				this.trigger('timeupdate');
-				this.trigger('durationchange');
-				this.trigger('playing');
-				this.trigger('play');
-				this.paused = false;
-				break;
+		case YT.PlayerState.PLAYING:
+			this.paused = false;
+			this.trigger('timeupdate');
+			this.trigger('durationchange');
+			this.trigger('playing');
 
-			case YT.PlayerState.PAUSED:
-				this.trigger('canplay');
+			if(this.isSeeking) {
+				this.onSeeked();
+			}
+
+			this.emitTimeupdate();
+			break;
+
+		case YT.PlayerState.PAUSED:
+			this.trigger('canplay');
+
+			if(this.isSeeking) {
+				this.onSeeked();
+			} else {
 				this.trigger('pause');
 				this.paused = true;
-				break;
+			}
+			break;
 
-			case YT.PlayerState.BUFFERING:
-				this.trigger('timeupdate');
-				this.trigger('waiting');
-				break;
+		case YT.PlayerState.BUFFERING:
+			this.player.trigger('timeupdate');
+			this.player.trigger('waiting');
+			break;
 		}
 
 	}
 
+	onSeeked() {
+		clearInterval(this.seekingInterval);
+		this.isSeeking = false;
+
+		if (this.wasPausedBeforeSeek) {
+			this.pause();
+		}
+
+		this.trigger('seeked');
+	}
+
+	emitTimeupdate() {
+		clearInterval(this.seekingInterval);
+
+		this.seekingInterval = setInterval(() => {
+			if(this.lastState === YT.PlayerState.PAUSED) {
+				clearInterval(this.seekingInterval);
+			} else if(this.currentTime !== this.timeBeforeSeek) {
+				this.trigger('timeupdate');
+			}
+		}, 250)
+	}
 	static parseUrl(url) {
 		let result = null;
-        const regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-        const match = url.match(regex);
-        if(match && match[2].length === 11) {
-        	result = match[2];
+		const regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+		const match = url.match(regex);
+		if(match && match[2].length === 11) {
+			result = match[2];
 		}
 		return result;
 	}

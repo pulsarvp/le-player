@@ -38,6 +38,8 @@ class BufferedRanges extends Component {
 	update() {
 		const buffered = this.player.video.buffered;
 		const duration = this.player.video.duration;
+		if(buffered == null) return;
+
 		let end = 0;
 		if (buffered.length > 0) {
 			end = buffered.end(buffered.length - 1);
