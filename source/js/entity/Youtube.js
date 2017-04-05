@@ -24,7 +24,11 @@ class Youtube extends Entity {
 		if(this.src && this.src.url === src.url) return;
 		this.videoId = Youtube.parseUrl(src.url);
 
-		this.poster = 'https://img.youtube.com/vi/' + this.videoId + '/0.jpg';
+		if(this.player.options.poster) {
+			this.poster = this.player.options.poster
+		} else {
+			this.poster = 'https://img.youtube.com/vi/' + this.videoId + '/0.jpg';
+		}
 	}
 
 	onClick(event) {
