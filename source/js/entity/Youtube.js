@@ -66,12 +66,12 @@ class Youtube extends Entity {
 	}
 
 	get paused() {
-		return this._paused;
+		return (this.ytPlayer) ?
+			(this.lastState !== YT.PlayerState.PLAYING && this.lastState !== YT.PlayerState.BUFFERING)
+			: true;
 
 	}
-	set paused(value) {
-		this._paused = value;
-	}
+
 
 	get rate() {
 		return this.ytPlayer.getPlaybackRate();
@@ -231,7 +231,6 @@ class Youtube extends Entity {
 			break;
 
 		case YT.PlayerState.PLAYING:
-			this.paused = false;
 			this.trigger('timeupdate');
 			this.trigger('durationchange');
 			this.trigger('playing');
@@ -250,7 +249,6 @@ class Youtube extends Entity {
 				this.onSeeked();
 			} else {
 				this.trigger('pause');
-				this.paused = true;
 			}
 			break;
 
