@@ -128,9 +128,9 @@ class Html5 extends Entity {
 			'loop',
 			'muted'
 		].forEach(item => {
-			if(this.options[item]) {
-				this.element.attr(item, this.options[item]);
-				this.element.prop(item, this.options[item]);
+			if(this.player.options[item]) {
+				this.element.attr(item, this.player.options[item]);
+				this.element.prop(item, this.player.options[item]);
 			}
 		});
 
@@ -175,6 +175,14 @@ class Html5 extends Entity {
 
 	get rate () {
 		return this.media.playbackRate;
+	}
+
+	set muted(value) {
+		this.media.muted = value;
+	}
+
+	get muted() {
+		return this.media.muted
 	}
 
 	set rate (value) {

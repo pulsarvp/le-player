@@ -61,6 +61,14 @@ class Entity extends Component {
 		return
 	}
 
+	set muted(value) {
+
+	}
+
+	get muted() {
+
+	}
+
 	get height() {
 		return this.element.innerHeight()
 	}

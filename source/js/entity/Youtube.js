@@ -83,6 +83,26 @@ class Youtube extends Entity {
 		this.trigger('ratechange');
 	}
 
+	set muted(value) {
+		if(value) {
+			this.ytPlayer.mute();
+		} else {
+			this.ytPlayer.unMute();
+		}
+
+		setTimeout(() => {
+			this.trigger('volumechange');
+		}, 50);
+	}
+
+	get muted() {
+		return this.ytPlayer.isMuted();
+	}
+
+	get defaultVolume() {
+		return this.volume || this.player.options.volume.default;
+	}
+
 	increaseRate() {
 		const index = this.availableRates.indexOf(this.rate);
 		if(index + 1 >= this.availableRates.length) return;
