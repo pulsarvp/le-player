@@ -15,6 +15,7 @@ class Youtube extends Entity {
 
 		this.src = this.player.options.src;
 
+		this.player.addClass('leplayer--youtube');
 		this.element.on('click', this.onClick.bind(this));
 		this.element.on('dblclick', this.onDblclick.bind(this));
 	}
