@@ -18,6 +18,10 @@ class Html5 extends Entity {
 			this.poster = this.player.options.poster;
 		}
 
+		if(this.player.options.sources && this.player.options.sources.length > 0) {
+			this._quality = this.player.options.sources[0].title;
+		}
+
 		this.element.on('loadstart', this.onLoadStart.bind(this));
 		this.element.on('timeupdate', this.onTimeUpdate.bind(this));
 		this.element.on('durationchange', this.onDurationChange.bind(this));
@@ -195,28 +199,47 @@ class Html5 extends Entity {
 		//controls.rate = this.media.playbackRate;
 	}
 
+	getAvailableQualityLevels() {
+		return this.player.options.sources.map(item => ({
+			name : item.title,
+			...item
+		}));
+	}
 
-	set src (src) {
-		if(src == null) return;
-		if(this.src && this.src.url === src.url) return;
-
+	set playbackQuality(name) {
+		super.playbackQuality = name;
 		const time = this.currentTime;
 		const rate = this.rate;
 		const stop = this.paused;
 
-		this.media.src = src.url;
+		const src = this.getAvailableQualityLevels().find(item => item.name === name);
+		this._quality = name;
 
+		this.src = src;
 		this.playbackRate = rate;
-
 		this.currentTime = time;
-
-		this._source = src;
 
 		if (stop) {
 			this.pause();
 		} else {
 			this.play();
 		}
+
+		this.trigger('qualitychange', this._quality);
+
+	}
+
+	get playbackQuality() {
+		return this._quality;
+	}
+
+	set src (src) {
+		if(src == null) return;
+		if(this.src && this.src.url === src.url) return;
+
+		this.media.src = src.url;
+
+		this._source = src;
 	}
 
 	get src () {

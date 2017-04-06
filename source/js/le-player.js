@@ -37,6 +37,8 @@ import './components/TimeInfoControl';
 import './entity/Html5';
 import './entity/Youtube';
 
+import 'array.prototype.find';
+
 
 Control.registerControl('divider', function() {
 	return {
@@ -370,7 +372,14 @@ class Player extends Component {
 			 *
 			 * @event Player#canplay
 			 */
-			'canplay'
+			'canplay',
+
+			/**
+			 * qualitychange html5
+			 *
+			 * @event Player#qualitychange
+			 */
+			'qualitychange'
 
 
 		].forEach(eventName => {
@@ -1112,7 +1121,10 @@ class Player extends Component {
 	 * @returns {String} Icon name
 	 */
 	calcVolumeIcon(value) {
-		const volume = value || this.video.volume;
+		if(value == null) {
+			value = this.video.volume;
+		}
+		const volume = value;
 
 		if (volume < this.options.volume.mutelimit) {
 			return 'volume-off';

@@ -115,6 +115,21 @@ class Youtube extends Entity {
 		return this.rate = this.availableRates[index - 1];
 	}
 
+	getAvailableQualityLevels() {
+		return this.ytPlayer.getAvailableQualityLevels().map(item => ({
+			title : Youtube.QUALITY_NAMES[item] || item,
+			name : item
+		}));
+	}
+
+	set playbackQuality(name) {
+		this.ytPlayer.setPlaybackQuality(name);
+	}
+
+	get playbackQuality() {
+		return this.ytPlayer.getPlaybackQuality();
+	}
+
 	get volume() {
 		return this.ytPlayer ? this.ytPlayer.getVolume() / 100.0 : 1;
 	}
@@ -187,7 +202,8 @@ class Youtube extends Entity {
 				events : {
 					onReady : this.onYTPReady.bind(this),
 					onStateChange : this.onYTPStateChange.bind(this),
-					onPlaybackRateChange : this.onYTPRateChange.bind(this)
+					onPlaybackRateChange : this.onYTPRateChange.bind(this),
+					onPlaybackQualityChange : this.onYTPPlaybackQualityChange.bind(this)
 				}
 			})
 		})
@@ -208,6 +224,11 @@ class Youtube extends Entity {
 
 	onYTPRateChange(e) {
 		this.trigger('ratechange');
+	}
+
+	onYTPPlaybackQualityChange(e) {
+		const data = e.data;
+		this.trigger('qualitychange', data);
 	}
 
 	onYTPStateChange(e) {
@@ -291,6 +312,17 @@ class Youtube extends Entity {
 		}
 		return result;
 	}
+}
+
+Youtube.QUALITY_NAMES = {
+	tiny : '140p',
+	small : '240p',
+	medium : '360p',
+	large : '480p',
+	hd720 : '720p',
+	hd1080 : '1080p',
+	highres : 'HD',
+	auto : 'Авто'
 }
 
 Component.registerComponent('Youtube', Youtube);

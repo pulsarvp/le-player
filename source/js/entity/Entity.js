@@ -109,6 +109,17 @@ class Entity extends Component {
 		this.rate -= this.player.options.rate.step;
 	}
 
+	set playbackQuality(name) {
+		const levels = this.getAvailableQualityLevels();
+		if(!levels.some(obj => name in obj)) {
+			return;
+		}
+	}
+
+	get playbackQuality() {
+
+	}
+
 	get paused() {
 
 	}
