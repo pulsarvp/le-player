@@ -1206,10 +1206,7 @@ class Player extends Component {
 					(!!binding.ctrlKey === e.ctrlKey)
 		}
 
-		$(document).on('keydown.leplayer.hotkey', (e) => {
-			if(!this.element.is(':focus')) {
-				return;
-			}
+		this.element.on('keydown.leplayer.hotkey', (e) => {
             this.options.keyBinding.forEach(binding => {
 
                 if(isKeyBinding(e, binding)) {
