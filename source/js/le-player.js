@@ -1112,7 +1112,10 @@ class Player extends Component {
 	 * @returns {String} Icon name
 	 */
 	calcVolumeIcon(value) {
-		const volume = value || this.video.volume;
+		if(value == null) {
+			value = this.video.volume;
+		}
+		const volume = value;
 
 		if (volume < this.options.volume.mutelimit) {
 			return 'volume-off';
@@ -1204,19 +1207,15 @@ class Player extends Component {
 		}
 
 		this.element.on('keydown.leplayer.hotkey', (e) => {
-			const _isFocused = () => this.element.is(':focus');
-			if (_isFocused) {
+            this.options.keyBinding.forEach(binding => {
 
-				this.options.keyBinding.forEach(binding => {
+                if(isKeyBinding(e, binding)) {
+                    e.preventDefault();
+                    binding.fn(this);
+                    return false;
+                }
 
-					if(isKeyBinding(e, binding)) {
-						e.preventDefault();
-						binding.fn(this);
-						return false;
-					}
-
-				})
-			}
+            })
 		})
 	}
 

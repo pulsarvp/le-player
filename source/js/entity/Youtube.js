@@ -150,7 +150,8 @@ class Youtube extends Entity {
 
 	createElement() {
 		this.element = $('<div />')
-			.addClass('leplayer__youtube-wrapper');
+			.addClass('leplayer__youtube-wrapper')
+			.attr('tabindex', '0');
 		this.youtubeElement = $('<div />')
 			.addClass('leplayer__youtube');
 		this.blocker = $('<div />')
