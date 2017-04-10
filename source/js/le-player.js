@@ -1216,19 +1216,15 @@ class Player extends Component {
 		}
 
 		this.element.on('keydown.leplayer.hotkey', (e) => {
-			const _isFocused = () => this.element.is(':focus');
-			if (_isFocused) {
+            this.options.keyBinding.forEach(binding => {
 
-				this.options.keyBinding.forEach(binding => {
+                if(isKeyBinding(e, binding)) {
+                    e.preventDefault();
+                    binding.fn(this);
+                    return false;
+                }
 
-					if(isKeyBinding(e, binding)) {
-						e.preventDefault();
-						binding.fn(this);
-						return false;
-					}
-
-				})
-			}
+            })
 		})
 	}
 
@@ -1438,6 +1434,7 @@ class Player extends Component {
 	_onFullscreenChange(e, isFs) {
 		if(isFs) {
 			this.view = 'fullscreen';
+			this.focus();
 		} else {
 			this.view = 'common';
 		}
