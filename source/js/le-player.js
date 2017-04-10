@@ -1425,6 +1425,7 @@ class Player extends Component {
 	_onFullscreenChange(e, isFs) {
 		if(isFs) {
 			this.view = 'fullscreen';
+			this.focus();
 		} else {
 			this.view = 'common';
 		}
