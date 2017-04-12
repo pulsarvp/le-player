@@ -36,6 +36,12 @@ class SourceControl extends ControlContainer {
 		const video = this.player.video;
 
 		video.playbackQuality = item.data('name');
+
+		// Hide dropdownContent after click
+		this.dropdownContent.hide();
+		this.dropdownContent.css({
+			'display' : ''
+		})
 	}
 
 	onPlayerInited(e, data) {
