@@ -23,7 +23,10 @@ class Youtube extends Entity {
 	set src(src) {
 		if(src == null) return;
 		if(this.src && this.src.url === src.url) return;
-		this.videoId = Youtube.parseUrl(src.url);
+
+		const url = src.url || src.id;
+
+		this.videoId = Youtube.parseUrl(url);
 
 		if(this.player.options.poster) {
 			this.poster = this.player.options.poster
@@ -167,15 +170,17 @@ class Youtube extends Entity {
 		this._initPromise = $.Deferred();
 		const globalOptions = this.player.options;
 		let ytOptions = {
+			autoplay : globalOptions.autoplay ? 1 : 0,
+			loop : globalOptions.loop ? 1 : 0,
+			iv_load_policy: 3,
 			controls : 0,
 			modestbranding : 1,
 			rel : 0,
 			showinfo : 0,
-			loop : globalOptions.loop ? 1 : 0,
-			autoplay : globalOptions.autoplay ? 1 : 0,
+			cc_load_policy: 1,
 			disablekb : 0,
 			fs : 0,
-			time : 0
+			start : globalOptions.time
 		};
 
 		YT.ready(() => {
@@ -285,13 +290,29 @@ class Youtube extends Entity {
 	}
 	static parseUrl(url) {
 		let result = null;
-		const regex = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+		const regex = Youtube.URL_REGEX;
 		const match = url.match(regex);
-		if(match && match[2].length === 11) {
+		if(url.length === 11 ) {
+			result = url;
+		} else if(match && match[2].length === 11) {
 			result = match[2];
 		}
+		console.log(result);
 		return result;
 	}
+}
+
+Youtube.URL_REGEX = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+
+Youtube.QUALITY_NAMES = {
+	tiny : '140p',
+	small : '240p',
+	medium : '360p',
+	large : '480p',
+	hd720 : '720p',
+	hd1080 : '1080p',
+	highres : 'HD',
+	auto : 'Авто'
 }
 
 Component.registerComponent('Youtube', Youtube);
