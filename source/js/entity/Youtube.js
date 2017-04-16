@@ -123,7 +123,23 @@ class Youtube extends Entity {
 	}
 
 	set playbackQuality(name) {
+		super.playbackQuality = name;
+		const paused = this.paused;
+		const time = this.currentTime;
+		const status = this.ytPlayer.getPlayerState();
+
+		if( status !== YT.PlayerState.UNSTARTED && status !== YT.PlayerState.CUED ) {
+			this.ytPlayer.pauseVideo();
+		}
+
 		this.ytPlayer.setPlaybackQuality(name);
+		this.ytPlayer.seekTo(time);
+
+		if( status !== YT.PlayerState.UNSTARTED ) {
+			this.ytPlayer.pauseVideo();
+		} else {
+			this.ytPlayer.playVideo();
+		}
 	}
 
 	get playbackQuality() {
@@ -154,6 +170,7 @@ class Youtube extends Entity {
 
 	pause() {
 		this.ytPlayer.pauseVideo();
+		this.trigger('pause');
 	}
 
 
@@ -240,7 +257,7 @@ class Youtube extends Entity {
 
 		this.lastState = state;
 		switch(state) {
-		case -1:
+		case YT.PlayerState.UNSTARTED:
 			this.trigger('loadstart');
 			this.trigger('loadedmetadata');
 			this.trigger('durationchange');
@@ -269,8 +286,6 @@ class Youtube extends Entity {
 
 			if(this.isSeeking) {
 				this.onSeeked();
-			} else {
-				this.trigger('pause');
 			}
 			break;
 

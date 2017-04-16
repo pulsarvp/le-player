@@ -34,14 +34,10 @@ class SourceControl extends ControlContainer {
 		e.preventDefault();
 		const item = $(e.target);
 		const video = this.player.video;
-
 		video.playbackQuality = item.data('name');
 
-		// Hide dropdownContent after click
 		this.dropdownContent.hide();
-		this.dropdownContent.css({
-			'display' : ''
-		})
+
 	}
 
 	onPlayerInited(e, data) {

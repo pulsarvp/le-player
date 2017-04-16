@@ -19,6 +19,10 @@ class ControlDropdown extends Control {
 
 	constructor(player, options={}) {
 		super(player, options);
+		this.element.hover(
+			() => !this.disable && this.dropdownContent.show(),
+			() => this.dropdownContent.hide()
+		);
 	}
 
 

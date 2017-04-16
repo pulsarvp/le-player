@@ -1,6 +1,3 @@
-/**
- * Created by adinvadim on 31/03/2017.
- */
 import Component from '../components/Component';
 import Cookie from '../utils/cookie';
 import MediaError from '../MediaError';
