@@ -135,9 +135,7 @@ class Youtube extends Entity {
 		this.ytPlayer.setPlaybackQuality(name);
 		this.ytPlayer.seekTo(time);
 
-		if( status !== YT.PlayerState.UNSTARTED ) {
-			this.ytPlayer.pauseVideo();
-		} else {
+		if( status !== YT.PlayerState.PAUSED ) {
 			this.ytPlayer.playVideo();
 		}
 	}
