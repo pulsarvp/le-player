@@ -132,8 +132,8 @@ class Youtube extends Entity {
 			this.ytPlayer.pauseVideo();
 		}
 
-		this.ytPlayer.loadVideoById(this.videoId, this.currentTime, name);
-		// this.ytPlayer.seekTo(time);
+		this.ytPlayer.setPlaybackQuality(name);
+		this.ytPlayer.seekTo(time);
 
 		if( status !== YT.PlayerState.PAUSED ) {
 			this.ytPlayer.playVideo();
@@ -258,7 +258,7 @@ class Youtube extends Entity {
 		case YT.PlayerState.UNSTARTED:
 			this.trigger('loadstart');
 			this.trigger('loadedmetadata');
-			// this.trigger('durationchange');
+			this.trigger('durationchange');
 			this.trigger('ratechange');
 			this.trigger('volumechange');
 			break;
