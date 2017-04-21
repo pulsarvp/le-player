@@ -2,10 +2,12 @@ import $ from 'jquery';
 import Entity from './Entity';
 import Component from '../components/Component';
 
+
 function loadScript(url) {
 	return $.getScript(url);
 }
 
+/* global YT */
 const apiLoaded = loadScript('https://www.youtube.com/iframe_api');
 
 class Youtube extends Entity {
@@ -131,11 +133,10 @@ class Youtube extends Entity {
 
 	set playbackQuality(name) {
 		super.playbackQuality = name;
-		const paused = this.paused;
 		const time = this.currentTime;
 		const status = this.ytPlayer.getPlayerState();
 
-		if( status !== YT.PlayerState.UNSTARTED && status !== YT.PlayerState.CUED ) {
+		if(status !== YT.PlayerState.UNSTARTED && status !== YT.PlayerState.CUED) {
 			this.ytPlayer.pauseVideo();
 		}
 
@@ -143,7 +144,7 @@ class Youtube extends Entity {
 		this.ytPlayer.setPlaybackQuality(name);
 		this.ytPlayer.seekTo(time);
 
-		if( status !== YT.PlayerState.PAUSED ) {
+		if(status !== YT.PlayerState.PAUSED) {
 			this.ytPlayer.playVideo();
 		}
 

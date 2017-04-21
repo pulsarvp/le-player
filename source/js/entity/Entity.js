@@ -1,6 +1,7 @@
 import Component from '../components/Component';
 import Cookie from '../utils/cookie';
 import MediaError from '../MediaError';
+import $ from 'jquery';
 
 class Entity extends Component {
 	constructor(player, options) {
