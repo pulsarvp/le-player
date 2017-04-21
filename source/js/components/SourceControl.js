@@ -49,7 +49,7 @@ class SourceControl extends ControlContainer {
 		const qualityLevels = video.getAvailableQualityLevels();
 		const currentQuality = video.playbackQuality;
 
-		if(qualityLevels.length === 0 || currentQuality == null) {
+		if(qualityLevels.length === 0) {
 			this.disable = true;
 			return;
 		}

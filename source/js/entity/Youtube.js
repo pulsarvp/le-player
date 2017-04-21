@@ -143,6 +143,7 @@ class Youtube extends Entity {
 			this.ytPlayer.pauseVideo();
 		}
 
+		this._nextPlaybackQuality = name;
 		this.ytPlayer.setPlaybackQuality(name);
 		this.ytPlayer.seekTo(time);
 
@@ -291,6 +292,8 @@ class Youtube extends Entity {
 			this.trigger('durationchange');
 			this.trigger('playing');
 
+			this.ytPlayer.setPlaybackQuality(this._nextPlaybackQuality);
+
 			if(this.isSeeking) {
 				this.onSeeked();
 			}
@@ -309,7 +312,8 @@ class Youtube extends Entity {
 		case YT.PlayerState.BUFFERING:
 			this.player.trigger('timeupdate');
 			this.player.trigger('waiting');
-			this.ytPlayer.setPlaybackQuality(this._playbackQuality);
+
+			this.ytPlayer.setPlaybackQuality(this._nextPlaybackQuality);
 			break;
 		}
 

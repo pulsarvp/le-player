@@ -116,12 +116,14 @@ Player.plugin('ga', function(pluginOptions) {
 			return
 		}
 
-		window.ga(
-			'send',
-			'event',
-			'Player Change Quality',
-			player.video.playbackQuality.title
-		)
+		if(player.video.playbackQuality != null) {
+			window.ga(
+				'send',
+				'event',
+				'Player Change Quality',
+				player.video.playbackQuality.title
+			)
+		}
 	})
 
 })
