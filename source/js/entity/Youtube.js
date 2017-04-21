@@ -2,10 +2,12 @@ import $ from 'jquery';
 import Entity from './Entity';
 import Component from '../components/Component';
 
+
 function loadScript(url) {
 	return $.getScript(url);
 }
 
+/* global YT */
 const apiLoaded = loadScript('https://www.youtube.com/iframe_api');
 
 class Youtube extends Entity {
@@ -118,6 +120,43 @@ class Youtube extends Entity {
 		return this.rate = this.availableRates[index - 1];
 	}
 
+	getAvailableQualityLevels() {
+		const arr = this.ytPlayer.getAvailableQualityLevels();
+		const index = arr.indexOf('auto');
+
+		if(index > -1) {
+			arr.splice(index, 1);
+		}
+
+		return arr.map(item => ({
+			title : Youtube.QUALITY_NAMES[item] || item,
+			name : item
+		}));
+	}
+
+	set playbackQuality(name) {
+		super.playbackQuality = name;
+		const time = this.currentTime;
+		const status = this.ytPlayer.getPlayerState();
+
+		if(status !== YT.PlayerState.UNSTARTED && status !== YT.PlayerState.CUED) {
+			this.ytPlayer.pauseVideo();
+		}
+
+		this._playbackQuality = name;
+		this.ytPlayer.setPlaybackQuality(name);
+		this.ytPlayer.seekTo(time);
+
+		if(status !== YT.PlayerState.PAUSED) {
+			this.ytPlayer.playVideo();
+		}
+
+	}
+
+	get playbackQuality() {
+		return this.ytPlayer.getPlaybackQuality();
+	}
+
 	get volume() {
 		return this.ytPlayer ? this.ytPlayer.getVolume() / 100.0 : 1;
 	}
@@ -142,6 +181,7 @@ class Youtube extends Entity {
 
 	pause() {
 		this.ytPlayer.pauseVideo();
+		this.trigger('pause');
 	}
 
 
@@ -193,7 +233,8 @@ class Youtube extends Entity {
 				events : {
 					onReady : this.onYTPReady.bind(this),
 					onStateChange : this.onYTPStateChange.bind(this),
-					onPlaybackRateChange : this.onYTPRateChange.bind(this)
+					onPlaybackRateChange : this.onYTPRateChange.bind(this),
+					onPlaybackQualityChange : this.onYTPPlaybackQualityChange.bind(this)
 				}
 			})
 		})
@@ -216,6 +257,11 @@ class Youtube extends Entity {
 		this.trigger('ratechange');
 	}
 
+	onYTPPlaybackQualityChange(e) {
+		const data = e.data;
+		this.trigger('qualitychange', data);
+	}
+
 	onYTPStateChange(e) {
 		const state = e.data;
 		if(state === this.lastState) {
@@ -224,7 +270,7 @@ class Youtube extends Entity {
 
 		this.lastState = state;
 		switch(state) {
-		case -1:
+		case YT.PlayerState.UNSTARTED:
 			this.trigger('loadstart');
 			this.trigger('loadedmetadata');
 			this.trigger('durationchange');
@@ -253,14 +299,13 @@ class Youtube extends Entity {
 
 			if(this.isSeeking) {
 				this.onSeeked();
-			} else {
-				this.trigger('pause');
 			}
 			break;
 
 		case YT.PlayerState.BUFFERING:
 			this.player.trigger('timeupdate');
 			this.player.trigger('waiting');
+			this.ytPlayer.setPlaybackQuality(this._playbackQuality);
 			break;
 		}
 

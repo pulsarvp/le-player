@@ -1,9 +1,7 @@
-/**
- * Created by adinvadim on 31/03/2017.
- */
 import Component from '../components/Component';
 import Cookie from '../utils/cookie';
 import MediaError from '../MediaError';
+import $ from 'jquery';
 
 class Entity extends Component {
 	constructor(player, options) {
@@ -107,6 +105,17 @@ class Entity extends Component {
 
 	decreaseRate() {
 		this.rate -= this.player.options.rate.step;
+	}
+
+	set playbackQuality(name) {
+		const levels = this.getAvailableQualityLevels();
+		if(!levels.some(obj => name in obj)) {
+			return;
+		}
+	}
+
+	get playbackQuality() {
+
 	}
 
 	get paused() {

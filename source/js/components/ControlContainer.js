@@ -99,6 +99,7 @@ class ControlContainer extends ControlDropdown {
 			.data(data)
 			.on('click', this.onItemClick.bind(this))
 			.append(content);
+
 		this.list.push(item);
 
 		this.dropdownContent.append(item);

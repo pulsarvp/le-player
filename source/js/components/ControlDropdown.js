@@ -19,6 +19,8 @@ class ControlDropdown extends Control {
 
 	constructor(player, options={}) {
 		super(player, options);
+		this.element.on('mouseenter', () => !this.disable && this.dropdownContent.show());
+		this.element.on('mouseleave', () => this.dropdownContent.hide());
 	}
 
 

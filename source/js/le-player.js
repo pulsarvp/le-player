@@ -37,6 +37,8 @@ import './components/TimeInfoControl';
 import './entity/Html5';
 import './entity/Youtube';
 
+import 'array.prototype.find';
+
 
 Control.registerControl('divider', function() {
 	return {
@@ -370,7 +372,14 @@ class Player extends Component {
 			 *
 			 * @event Player#canplay
 			 */
-			'canplay'
+			'canplay',
+
+			/**
+			 * qualitychange html5
+			 *
+			 * @event Player#qualitychange
+			 */
+			'qualitychange'
 
 
 		].forEach(eventName => {
@@ -995,8 +1004,8 @@ class Player extends Component {
 		.append(this.loader)
 		.append(this.splashIcon.element)
 
-        this.poster = new Poster(this);
-        this.videoContainer.append(this.poster.element);
+		this.poster = new Poster(this);
+		this.videoContainer.append(this.poster.element);
 
 
 		const lastTimer = new Time(this, {
@@ -1207,15 +1216,15 @@ class Player extends Component {
 		}
 
 		this.element.on('keydown.leplayer.hotkey', (e) => {
-            this.options.keyBinding.forEach(binding => {
+			this.options.keyBinding.forEach(binding => {
 
-                if(isKeyBinding(e, binding)) {
-                    e.preventDefault();
-                    binding.fn(this);
-                    return false;
-                }
+				if(isKeyBinding(e, binding)) {
+					e.preventDefault();
+					binding.fn(this);
+					return false;
+				}
 
-            })
+			})
 		})
 	}
 
