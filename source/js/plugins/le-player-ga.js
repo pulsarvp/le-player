@@ -107,4 +107,21 @@ Player.plugin('ga', function(pluginOptions) {
 		})
 	});
 
+
+	// First qualitychange fired on player init, and we don't need track this to GA
+	let loadQuality = false;
+	player.on('qualitychange', function(e) {
+		if(!loadQuality) {
+			loadQuality = true;
+			return
+		}
+
+		window.ga(
+			'send',
+			'event',
+			'Player Change Quality',
+			player.video.playbackQuality.title
+		)
+	})
+
 })
