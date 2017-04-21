@@ -116,7 +116,14 @@ class Youtube extends Entity {
 	}
 
 	getAvailableQualityLevels() {
-		return this.ytPlayer.getAvailableQualityLevels().map(item => ({
+		const arr = this.ytPlayer.getAvailableQualityLevels();
+		const index = arr.indexOf('auto');
+
+		if(index > -1) {
+			arr.splice(index, 1);
+		}
+
+		return arr.map(item => ({
 			title : Youtube.QUALITY_NAMES[item] || item,
 			name : item
 		}));
@@ -132,12 +139,14 @@ class Youtube extends Entity {
 			this.ytPlayer.pauseVideo();
 		}
 
+		this._playbackQuality = name;
 		this.ytPlayer.setPlaybackQuality(name);
 		this.ytPlayer.seekTo(time);
 
 		if( status !== YT.PlayerState.PAUSED ) {
 			this.ytPlayer.playVideo();
 		}
+
 	}
 
 	get playbackQuality() {
@@ -290,6 +299,7 @@ class Youtube extends Entity {
 		case YT.PlayerState.BUFFERING:
 			this.player.trigger('timeupdate');
 			this.player.trigger('waiting');
+			this.ytPlayer.setPlaybackQuality(this._playbackQuality);
 			break;
 		}
 
