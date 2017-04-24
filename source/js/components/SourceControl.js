@@ -59,7 +59,7 @@ class SourceControl extends ControlContainer {
 
 		qualityLevels.forEach(item => {
 			const elem = this.addItem(item.title, item);
-			if(currentQuality === item.name) {
+			if(currentQuality.name === item.name) {
 				this.active = elem;
 			}
 		});

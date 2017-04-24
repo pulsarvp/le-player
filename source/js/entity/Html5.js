@@ -18,8 +18,8 @@ class Html5 extends Entity {
 			this.poster = this.player.options.poster;
 		}
 
-		if(this.player.options.sources && this.player.options.sources.length > 0) {
-			this._quality = this.player.options.sources[0].title;
+		if(this.getAvailableQualityLevels().length > 0) {
+			this._playbackQuality = this.getAvailableQualityLevels()[0];
 		}
 
 		this.element.on('loadstart', this.onLoadStart.bind(this));
@@ -212,10 +212,9 @@ class Html5 extends Entity {
 		const rate = this.rate;
 		const stop = this.paused;
 
-		const src = this.getAvailableQualityLevels().find(item => item.name === name);
-		this._quality = name;
+		this._playbackQuality = this.getAvailableQualityLevels().find(item => item.name === name);
 
-		this.src = src;
+		this.src = this._playbackQuality;
 		this.playbackRate = rate;
 		this.currentTime = time;
 
@@ -225,12 +224,12 @@ class Html5 extends Entity {
 			this.play();
 		}
 
-		this.trigger('qualitychange', this._quality);
+		this.trigger('qualitychange', this._playbackQuality);
 
 	}
 
 	get playbackQuality() {
-		return this._quality;
+		return this._playbackQuality;
 	}
 
 	set src (src) {
