@@ -1,5 +1,6 @@
 'use strict';
 
+const webpack = require('webpack');
 const path = require('path');
 
 module.exports = {
@@ -13,6 +14,12 @@ module.exports = {
 		filename: '[name].js',
 		publicPath: "/dist/js/"
 	},
+
+    plugins : [
+        new webpack.DefinePlugin({
+            VERSION: JSON.stringify(require("./package.json").version)
+        })
+    ],
 
 	module: {
 		preLoaders : [

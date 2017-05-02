@@ -18,6 +18,16 @@
 				height: 300px;
 			}
 
+			#version
+			{
+				min-width: 40px;
+				display: inline-block;
+			}
+
+			#sections {
+				height: 400px;
+			}
+
 			.bigDivider
 			{
 				padding-top: 1000px;
@@ -32,51 +42,62 @@
 			Note that for subtitles to work you need to run this page under
 			<em>http</em> protocol.
 		</div>
-		<a href="https://github.com/miptliot/le-player">
+		<a href="https://github.com/miptliot/le-player" class="hidden-md hidden-xs hidden-sm">
 			<img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
 		</a>
 		<div class="container">
 
 			<div class="header clearfix">
-				<nav>
-					<ul class="nav nav-pills float-xs-right">
-						<li role="presentation" class="nav-item active">
-							<a class="nav-link active" href="#">Демо</a>
-						</li>
-						<li role="presentation" class="nav-item">
-							<a class="nav-link active" href="../docs/out/index.html">Readme</a>
-						</li>
-						<li role="presentation" class="nav-item">
-							<a class="nav-link active" href="../docs/out/Player.html">Документация</a>
-						</li>
-						<li role="presentation" class="dropdown" id="changeTheme">
-							<a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-								Выбрать тему
-								<span class="caret"></span>
-							</a>
-							<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-								<li><a href="#default" class="link-set-theme" data-name="default">Лекторий
-									<span class="label label-default">Default</span></a></li>
-								<li><a href="#vps" class="link-set-theme" data-name="vps">video.mipt</a></li>
-								<li><a href="#ussr" class="link-set-theme" data-name="ussr">СССР</a></li>
-								<li><a href="#vps-gray" class="link-set-theme" data-name="vps-gray">Новый video.mipt</a>
-								</li>
-								<li><a href="#opus-green" class="link-set-theme" data-name="opus-green">ОТУС green</a>
-								</li>
-								<li>
-									<a href="#opus-orange" class="link-set-theme" data-name="opus-orange">ОТУС orange</a>
-								</li>
-								<li><a href="#compressed" class="link-set-theme" data-name="compressed">Compressed
-									<span class="label label-success">New</span></a></li>
-								<li><a href="#sms" class="link-set-theme" data-name="sms">SMS
-									<span class="label label-success">New</span></a></li>
-							</ul>
-						</li>
-					</ul>
+				<nav class="navbar navbar-default">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+							<span class="sr-only">Toggle navigation</span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<a class="navbar-brand" href="#">lePlayer <span id="version"></span></a>
+					</div>
+					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                        <ul class="nav navbar-nav float-xs-right">
+                            <li role="presentation" class="nav-item active">
+                                <a class="nav-link active" href="./">Демо</a>
+                            </li>
+                            <li role="presentation" class="nav-item">
+                                <a class="nav-link active" href="../docs/out/index.html">Readme</a>
+                            </li>
+                            <li role="presentation" class="nav-item">
+                                <a class="nav-link active" href="../docs/out/Player.html">Документация</a>
+                            </li>
+                            <li role="presentation" class="dropdown" id="changeTheme">
+                                <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                                    Выбрать тему
+                                    <span class="caret"></span>
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                                    <li><a href="#default" class="link-set-theme" data-name="default">Лекторий
+                                        <span class="label label-default">Default</span></a></li>
+                                    <li><a href="#vps" class="link-set-theme" data-name="vps">video.mipt</a></li>
+                                    <li><a href="#ussr" class="link-set-theme" data-name="ussr">СССР</a></li>
+                                    <li><a href="#vps-gray" class="link-set-theme" data-name="vps-gray">Новый video.mipt</a>
+                                    </li>
+                                    <li><a href="#opus-green" class="link-set-theme" data-name="opus-green">ОТУС green</a>
+                                    </li>
+                                    <li>
+                                        <a href="#opus-orange" class="link-set-theme" data-name="opus-orange">ОТУС orange</a>
+                                    </li>
+                                    <li><a href="#compressed" class="link-set-theme" data-name="compressed">Compressed
+                                        <span class="label label-success">New</span></a></li>
+                                    <li><a href="#sms" class="link-set-theme" data-name="sms">SMS
+                                        <span class="label label-success">New</span></a></li>
+                                </ul>
+                            </li>
+                        </ul>
+					</div>
 				</nav>
 			</div>
 
-			<h2>Multiple videos with miniplayer</h2>
+
 			<div class="row">
 				<div class="col-sm-12 col-md-7">
 					<video id="video">
@@ -91,23 +112,54 @@
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-sm-7">
+				<div class="col-md-7 col-sm-12">
 					<h3>options =</h3>
 					<div id="editor">new Object({
 	//preset : 'compressed',
-	title : 'Multiple videos with mini player',
+	title : 'Title',
 	description : '<a hre="#">Link ... </a>',
-	width: '100%',
-	data : './data.json',
 	sectionContainer: "#sections",
 	poster : './poster.jpg',
 	preload : 'metadata',
-	controlsOptions : {
-		common : {
-			align : ['justify', 'right'],
-			//inOneRow : true
-		}
-	},
+    data : {
+        sections : [
+            {
+                "title" : "Секция с пустым описание",
+                "description": "",
+                "begin" : 0
+            },
+            {
+                "title" : "Секцисоченьдлиннымсловомкотороенаверняканевлезит",
+                "description": "Момент сил, действующий на рамку в однородном магнитном поле. Магнитный момент рамки. Сила, действующая на рамку в неоднородном магнитном поле.",
+                "begin" : 203
+            },
+            {
+                "title": "Cекция с длинным словом в описании",
+                "description": "Граничные условия для магнитногооченьдлинноеслововотвотиононевлезит поля на границе раздела двух сред (с доказательством из теорем Гаусса и о циркуляции для магнитного поля в веществе).",
+                "begin": 760
+            },
+            {
+                "title": "Демонстрации. Рамка в магнитном поле",
+                "description": "Рамка в магнитном поле катушки. Влияние сердечника на величину магнитного поля соленоида.",
+                "begin": 1060
+            },
+            {
+                "title": "Описание в 100 слов",
+                "description": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores eligendi eos repellendus veritatis! Accusamus aperiam, asperiores aspernatur culpa doloribus eum excepturi in inventore ipsa iste iusto molestias mollitia nam necessitatibus odit perspiciatis qui quos ratione recusandae rerum sapiente similique soluta tempora voluptate voluptatem voluptatibus voluptatum. Commodi dolore dolorum ducimus eaque eum eveniet explicabo hic impedit incidunt ipsam iure iusto labore magnam minima molestias, mollitia nam natus neque nobis nostrum nulla odit officiis praesentium quae quaerat quia quos rerum sit vel voluptates. Dicta dolores ex mollitia qui suscipit ullam. Asperiores dolore eaque eius ex excepturi fugiat non ratione repudiandae totam veritatis",
+                "begin": 1370
+            },
+            {
+                "title": "Пустое описание",
+                "description": "",
+                "begin": 2000
+            },
+            {
+                "title": "Магнитное поле в намагничивающихся средах",
+                "description": "Магнитное поле в намагничивающихся средах. Молекулярные токи и токи проводимости. Усреднение магнитного поля по физически малому объему.",
+                "begin": 3200
+            }
+        ]
+    },
 	plugins : {
 		'ga' : {},
 		'miniplayer' : {
@@ -117,9 +169,10 @@
 });
 					</div>
 				</div>
-				<div class="col-sm-12" style="margin-top: 30px">
-					<button class="btn btn-success" id="editor-go">Save and Go</button>
-					<button class="btn" id="editor-save">Save</button>
+				<div class="col-md-7 col-sm-12 clearfix" style="margin-top: 30px">
+					<button class="btn btn-success" id="editor-go">Save and Reload</button>
+					<button class="btn btn-default" id="editor-save">Save</button>
+					<a href="./" class="btn btn-danger pull-right">Clear</a>
 				</div>
 			</div>
 
@@ -153,6 +206,7 @@
 				if (window.location.protocol != 'http:') {
 					$('.warning-subtitle').show();
 				}
+				$('#version').text(lePlayer.version);
 			});
 		</script>
 	</body>
