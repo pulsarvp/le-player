@@ -12,6 +12,7 @@
 {
 	.leplayer-next
 	{
+		z-index: @z-index-miniplayer + 2;
 		@media (max-width: 750px) {
 			display: none;
 		}
@@ -21,21 +22,17 @@
 		}
 
 		&__box {
-			width: 260px;
-			right: 0;
+			width: 170px;
+			right: auto;
 			top: 0;
+			left: 0;
 			bottom: 0;
-			flex: 0 0 260px;
+			flex: 0 0 170px;
 			margin-left: auto;
 			position: absolute;
 			background: @color-background;
 			transform: none;
 			height: auto;
-			background: auto 95px;
-		}
-
-		&__play {
-			margin-top: -20px;
 		}
 
 		&__cancel {
@@ -53,11 +50,17 @@
 			display: none;
 		}
 
+		&--auto {
+			.leplayer-next__play {
+				margin-top: -20px;
+			}
+		}
 
 	}
 }
 
 .leplayer--fullscreen
+
 {
 
 	.leplayer-next
@@ -68,6 +71,7 @@
           .leplayer-next__box {
 
                   max-width: 600px;
+
                   height: 200px;
           }
 
