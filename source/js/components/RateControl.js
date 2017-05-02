@@ -103,9 +103,10 @@ class RateControl extends Control {
 		}
 		this.upControl.disable = false;
 		this.downControl.disable = false;
-		if (video.rate <= options.rate.min) {
+
+		if (video.rate <= video.rateMin) {
 			this.downControl.disable = true;
-		} else if (video.rate >= options.rate.max) {
+		} else if (video.rate >= video.rateMax) {
 			this.upControl.disable = true;
 		}
 		this.show();

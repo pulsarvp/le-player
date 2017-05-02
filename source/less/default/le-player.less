@@ -219,17 +219,7 @@
 			background: @color-control-hovered;
 			color: @color-text-hovered;
 		}
-		&.disabled
-		{
-			cursor: not-allowed;
-			color: @color-disabled;
-			pointer-events: none;
-			&:hover
-			{
-				background: @color-background;
-				color: @color-disabled;
-			}
-		}
+
 
 		&.play
 		{
@@ -237,10 +227,25 @@
 			color: @color-active;
 			padding: 0 (@control-play-width - @control-font-size) / 2;
 			width: 1%;
+			&.disabled:hover
+			{
+				background: @color-background-play;
+			}
 			&:hover
 			{
 				background: @color-background-play-hovered;
 				color: @color-background;
+			}
+		}
+
+		&.disabled
+		{
+			cursor: not-allowed;
+			color: @color-disabled;
+			&:hover
+			{
+				background: @color-background;
+				color: @color-disabled;
 			}
 		}
 	}
@@ -748,6 +753,10 @@
 	{
 		display: block;
 		right: 20px;
+
+		@media screen and (max-width: 750px) {
+			display: none;
+		}
 
 	}
 

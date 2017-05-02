@@ -17,7 +17,7 @@ import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
 import { createEl, secondsToTime, noop } from './utils';
-import { IS_ANDROID_PHONE, IS_IPHONE } from './utils/browser';
+import { IS_IPHONE, IS_IPOD, IS_ANDROID_PHONE } from './utils/browser';
 
 import MediaError from './MediaError';
 import Html5 from './entity/Html5.js';
@@ -1034,6 +1034,10 @@ class Player extends Component {
 			}
 		})
 
+		if(this.options.videoInfo) {
+			console.warn('options.videoInfo is deprecated, please use istead options.description');
+		}
+
 		this.infoElement = createEl('div', {
 			className : 'leplayer__info'
 		})
@@ -1043,7 +1047,7 @@ class Player extends Component {
 		}))
 		.append(createEl('div', {
 			className : 'leplayer__video-info',
-			html : this.options.videoInfo || ""
+			html : this.options.description || this.options.videoInfo || ""
 		}))
 		.append(createEl('div', {
 			className : 'leplayer__last',
@@ -1469,6 +1473,10 @@ class Player extends Component {
 			this.view = 'fullscreen';
 		} else {
 			this.view = 'common';
+
+			if(IS_ANDROID_PHONE || IS_IPHONE || IS_IPOD) {
+				this.pause();
+			}
 		}
 	}
 
@@ -1689,11 +1697,17 @@ Player.plugin('miniplayer', function(pluginOptions) {
 	}
 
 
-	this._updateMiniPlayer = () => {
+	this._updateMiniPlayer = (e, force) => {
 		const scrollTop = $(window).scrollTop();
 
+		// Because in force update, for normally count height and padding
+		// miniplayer before the show must first be hidden
+		if(force) {
+			this.hideMiniPlayer(force);
+		}
+
 		if(scrollTop > offsetShow()) {
-			this.showMiniPlayer();
+			this.showMiniPlayer(force);
 		} else {
 			this.hideMiniPlayer();
 		}
@@ -1719,7 +1733,7 @@ Player.plugin('miniplayer', function(pluginOptions) {
 
 	$(window).on('scroll', this._updateMiniPlayer.bind(this));
 	$(window).on('resize', this._updateMiniPlayer.bind(this));
-	this.on('inited', this._updateMiniPlayer.bind(this));
+	this.on('inited', (e) => this._updateMiniPlayer(e, true));
 
 	this.onSetView('mini', () => {
 		this.innerElement.css('max-width', getWidth());
