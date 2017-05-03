@@ -65,7 +65,7 @@ function excludeArray(source, dist) {
 	return result;
 }
 
-const defaultOptions = {
+const defaultOptions = window.options = {
 	autoplay : false,
 	height : 'auto',
 	loop : false,
@@ -98,23 +98,34 @@ const defaultOptions = {
 		mini : [
 			['play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
 		],
-		ios : [
-			['play', 'rate', 'timeline', 'source',]
-		],
-		android : [
+		'common:android' : [
 			['play', 'timeline'],
-			['rate', 'source', 'fullscreen']
-		]
+			['rate', 'source', 'section', 'fullscreen']
+		],
+		'fullscreen:mobile' : [
+			['play', 'timeline', 'fullscreen'],
+			['rate', 'source', 'section']
+		],
+		'common:ios' : [
+			['play', 'rate', 'timeline', 'source', 'section']
+		],
 	},
 	controlsOptions : {
 
 		common : {
-			align : ['justify', 'left']
+			align : ['justify', 'left'],
+			// mobile : true
 		},
-
 		fullscreen : {
 			align : 'justify'
 		},
+		'common:android' : {
+			align : ['justify', 'right']
+		},
+
+		'fullscreen:mobile' : {
+			align : ['justify', 'right']
+		}
 	},
 	volume : {
 		default : 0.4,
@@ -1230,19 +1241,7 @@ class Player extends Component {
 
 		for (const name of ['common', 'fullscreen']) {
 			if (!this.options.controls.hasOwnProperty(name)) return;
-
-			if(IS_IPHONE) {
-				controls = this.options.controls['ios'];
-			} else if (IS_ANDROID_PHONE) {
-				controls = this.options.controls['android'];
-			} else {
-				controls = this.options.controls[name];
-			}
-
-			const controlCollection = new ControlCollection(this, {
-				name,
-				controls
-			});
+			const controlCollection = new ControlCollection(this, { name });
 
 			this.element.append(controlCollection.element);
 		}

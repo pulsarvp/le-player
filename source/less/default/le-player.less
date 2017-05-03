@@ -924,7 +924,21 @@
 	.controls-fullscreen {
 		position: absolute;
 		z-index: 1007;
+		&:nth-child(1) {
+			bottom: 0;
+			margin-bottom: 0;
+		}
+		&:nth-child(2) {
+			top: 20px;
+			left: 20px;
+
+			.control-dropdown__content {
+				bottom : auto;
+				top: @control-height;
+			}
+		}
 	}
+
 }
 
 
