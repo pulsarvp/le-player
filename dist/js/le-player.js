@@ -104,25 +104,23 @@
 
 	var _MediaError2 = _interopRequireDefault(_MediaError);
 
-	var _Html = __webpack_require__(15);
+	__webpack_require__(15);
 
-	var _Html2 = _interopRequireDefault(_Html);
-
-	__webpack_require__(17);
+	__webpack_require__(16);
 
 	__webpack_require__(18);
 
-	__webpack_require__(20);
+	__webpack_require__(22);
 
 	__webpack_require__(24);
 
-	__webpack_require__(26);
+	__webpack_require__(25);
 
 	__webpack_require__(27);
 
 	__webpack_require__(28);
 
-	__webpack_require__(29);
+	__webpack_require__(30);
 
 	__webpack_require__(31);
 
@@ -131,6 +129,10 @@
 	__webpack_require__(33);
 
 	__webpack_require__(34);
+
+	__webpack_require__(36);
+
+	__webpack_require__(37);
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -173,6 +175,7 @@
 	}
 
 	var defaultOptions = {
+		entity: 'Html5',
 		autoplay: false,
 		height: 'auto',
 		loop: false,
@@ -379,13 +382,14 @@
 	   */
 			_this.element = _this.createElement();
 
+			_this.loadEntity(_this.options.entity, { ctx: element });
 			/**
 	   * Video html5 component
 	   *
 	   * @memberof! Player#
-	   * @type {Html5}
+	   * @type {Entity}
 	   */
-			_this.video = new _Html2.default(_this, { element: element });
+			_this.video = _this.entity;
 
 			// Create controls
 			// TODO: move this action to the createElement
@@ -413,6 +417,223 @@
 			});
 			_this._initPlugins();
 
+			_this._listenHotKeys();
+
+			_this._userActivity = false;
+			_this._listenUserActivity();
+
+			_this._waitingTimeouts = [];
+
+			/* Retrigger {@link Entity} Events */
+			[
+			/**
+	   * durationchange player event
+	   *
+	   * @event Player#durationchange
+	   */
+			'durationchange',
+
+			/**
+	   * progress html5 media event
+	   *
+	   * @event Player#progress
+	   */
+			'progress',
+
+			/**
+	   * dblclick
+	   *
+	   * @event Player#dbclick
+	   */
+			'dblclick',
+
+			/**
+	   * dblclick
+	   *
+	   * @event Player#dbclick
+	   */
+			'click',
+
+			/**
+	   * canplay html5 media event
+	   *
+	   * @event Player#canplay
+	   */
+			'canplay',
+
+			/**
+	   * qualitychange html5
+	   *
+	   * @event Player#qualitychange
+	   */
+			'qualitychange'].forEach(function (eventName) {
+				_this.video.on(eventName, function () {
+					_this.trigger(eventName);
+				});
+			});
+
+			_this.video.one('play', function () {
+				/**
+	    * First play event
+	    *
+	    * @event Player#firstplay
+	    */
+				_this.trigger('firstplay');
+				_this.removeClass('leplayer--virgin');
+			});
+
+			_this.video.on('timeupdate', function () {
+				if (_this.video.currentTime > 0) {
+					_this.removeClass('leplayer--virgin');
+				}
+
+				/**
+	    * timeupdate html5 media event
+	    *
+	    * @event Player#timeupdate
+	    */
+				_this.trigger('timeupdate', { time: _this.video.currentTime, duration: _this.video.duration });
+			});
+
+			_this.video.on('loadstart', function () {
+				_this.removeClass('leplayer--ended');
+
+				_this.error = null;
+				/**
+	    * loadstart player event
+	    *
+	    * @event Player#loadstart
+	    */
+				_this.trigger('loadstart');
+			});
+
+			_this.video.on('seeking', function () {
+				_this._startWaiting();
+				/**
+	    * seeking html5 media event
+	    *
+	    * @event Player#seeking
+	    */
+				_this.trigger('seeking');
+			});
+
+			_this.video.on('seeked', function () {
+				_this._stopWayting();
+				/**
+	    * seeked html5 media event
+	    *
+	    * @event Player#seeked
+	    */
+				_this.trigger('seeked');
+			});
+
+			_this.video.on('volumechange', function () {
+				/**
+	    * volumechange html5 media event
+	    *
+	    * @event Player#volumechange
+	    */
+				_this.trigger('volumechange', { volume: _this.video.volume });
+			});
+
+			_this.video.on('posterchange', function (e, data) {
+				var url = data.url;
+				_this.poster.url = url;
+				_this.trigger('posterchange');
+			});
+
+			_this.video.on('play', function (e) {
+				_this.removeClass('leplayer--ended');
+				_this.removeClass('leplayer--paused');
+				_this.addClass('leplayer--playing');
+
+				/**
+	    * play html5 media event
+	    *
+	    * @event Player#play
+	    */
+				_this.trigger('play');
+			});
+
+			_this.video.on('pause', function () {
+				_this.removeClass('leplayer--playing');
+				_this.addClass('leplayer--paused');
+
+				/**
+	    * pause html5 media event
+	    *
+	    * @event Player#pause
+	    */
+				_this.trigger('pause');
+			});
+
+			_this.video.on('playing', function () {
+				_this._stopWayting();
+
+				/**
+	    * playing html5 media event
+	    *
+	    * @event Player#playing
+	    */
+				_this.trigger('playing');
+			});
+
+			_this.video.on('ratechange', function () {
+				/**
+	    * rate html5 media event
+	    *
+	    * @event Player#rate
+	    */
+				_this.trigger('ratechange', { rate: _this.video.rate });
+			});
+
+			_this.video.on('ended', function () {
+				_this.addClass('leplayer--ended');
+
+				if (_this.options.loop) {
+					_this.currentTime = 0;
+					_this.video.play();
+				} else if (!_this.video.paused) {
+					_this.video.pause();
+				}
+
+				/**
+	    * ended html5 media event
+	    *
+	    * @event Player#ended
+	    */
+				_this.trigger('ended');
+			});
+
+			_this.video.on('canplaythrough', function () {
+				_this._stopWayting();
+				/**
+	    * canplaythrough html5 media event
+	    *
+	    * @event Player#canplaythrough
+	    */
+				_this.trigger('canplaythrough');
+			});
+
+			_this.video.on('waiting', function () {
+				_this._startWaiting();
+
+				_this.video.one('timeupdate', function () {
+					return _this._stopWayting();
+				});
+
+				/**
+	    * waiting html5 media event
+	    *
+	    * @event Player#waiting
+	    */
+				_this.trigger('waiting');
+			});
+
+			_this.video.on('error', function (e, data) {
+				_this.error = new _MediaError2.default(data.code);
+			});
+
 			_this.video.init().then(function () {
 				/**
 	    * Player init event
@@ -430,221 +651,6 @@
 				}
 			});
 
-			_this._listenHotKeys();
-
-			_this._userActivity = false;
-			_this._listenUserActivity();
-
-			var mediaElement = _this.video.element;
-			mediaElement.one({
-				play: function play(e) {
-					/**
-	     * First play event
-	     *
-	     * @event Player#firstplay
-	     */
-					_this.trigger('firstplay');
-					_this.removeClass('leplayer--virgin');
-				}
-			});
-
-			_this._waitingTimeouts = [];
-
-			mediaElement.on({
-
-				loadstart: function loadstart(e) {
-					_this.removeClass('leplayer--ended');
-
-					_this.error = null;
-					/**
-	     * loadstart html5 media event
-	     *
-	     * @event Player#loadstart
-	     */
-					_this.trigger('loadstart');
-				},
-
-				durationchange: function durationchange(e) {
-					/**
-	     * durationchange html5 media event
-	     *
-	     * @event Player#durationchange
-	     */
-					_this.trigger('durationchange');
-				},
-
-				timeupdate: function timeupdate(e) {
-					if (_this.video.currentTime > 0) {
-						_this.removeClass('leplayer--virgin');
-					}
-
-					/**
-	     * timeupdate html5 media event
-	     *
-	     * @event Player#timeupdate
-	     */
-					_this.trigger('timeupdate', { time: _this.video.currentTime, duration: _this.video.duration });
-				},
-
-				seeking: function seeking(e) {
-					_this._startWaiting();
-					/**
-	     * seeking html5 media event
-	     *
-	     * @event Player#seeking
-	     */
-					_this.trigger('seeking');
-				},
-
-				seeked: function seeked(e) {
-					_this._stopWayting();
-					/**
-	     * seeked html5 media event
-	     *
-	     * @event Player#seeked
-	     */
-					_this.trigger('seeked');
-				},
-
-				progress: function progress() {
-					/**
-	     * progress html5 media event
-	     *
-	     * @event Player#progress
-	     */
-					_this.trigger('progress');
-				},
-
-				dblclick: function dblclick() {
-					/**
-	     * dblclick
-	     *
-	     * @event Player#dbclick
-	     */
-					_this.trigger('dblclick');
-				},
-
-				click: function click() {
-					/**
-	     * click
-	     *
-	     * @event Player#click
-	     */
-					_this.trigger('click');
-				},
-
-				volumechange: function volumechange(e) {
-					/**
-	     * volumechange html5 media event
-	     *
-	     * @event Player#volumechange
-	     */
-					_this.trigger('volumechange', { volume: _this.video.volume });
-				},
-
-				play: function play(e) {
-					_this.removeClass('leplayer--ended');
-					_this.removeClass('leplayer--paused');
-					_this.addClass('leplayer--playing');
-
-					/**
-	     * play html5 media event
-	     *
-	     * @event Player#play
-	     */
-					_this.trigger('play');
-				},
-
-				pause: function pause(e) {
-					_this.removeClass('leplayer--playing');
-					_this.addClass('leplayer--paused');
-
-					/**
-	     * pause html5 media event
-	     *
-	     * @event Player#pause
-	     */
-					_this.trigger('pause');
-				},
-
-				playing: function playing(e) {
-					_this._stopWayting();
-
-					/**
-	     * playing html5 media event
-	     *
-	     * @event Player#playing
-	     */
-					_this.trigger('playing');
-				},
-
-				ratechange: function ratechange(e) {
-
-					/**
-	     * rate html5 media event
-	     *
-	     * @event Player#rate
-	     */
-					_this.trigger('ratechange', { rate: _this.video.rate });
-				},
-
-				canplay: function canplay(e) {
-					/**
-	     * canplay html5 media event
-	     *
-	     * @event Player#canplay
-	     */
-					_this.trigger('canplay');
-				},
-
-				ended: function ended(e) {
-					_this.addClass('leplayer--ended');
-
-					if (_this.options.loop) {
-						_this.currentTime = 0;
-						_this.video.play();
-					} else if (!_this.video.paused) {
-						_this.video.pause();
-					}
-
-					/**
-	     * ended html5 media event
-	     *
-	     * @event Player#ended
-	     */
-					_this.trigger('ended');
-				},
-
-				canplaythrough: function canplaythrough(e) {
-					_this._stopWayting();
-					/**
-	     * canplaythrough html5 media event
-	     *
-	     * @event Player#canplaythrough
-	     */
-					_this.trigger('canplaythrough');
-				},
-
-				waiting: function waiting(e) {
-					_this._startWaiting();
-
-					_this.one('timeupdate', function () {
-						return _this._stopWayting();
-					});
-
-					/**
-	     * waiting html5 media event
-	     *
-	     * @event Player#waiting
-	     */
-					_this.trigger('waiting');
-				},
-
-				error: function error(e) {
-					_this.error = new _MediaError2.default(e.target.error.code);
-				}
-			});
-
 			_this.on('fullscreenchange', _this._onFullscreenChange.bind(_this));
 			_this.on('click', _this._onClick.bind(_this));
 			_this.on('dblclick', _this._onDbclick.bind(_this));
@@ -653,21 +659,27 @@
 			_this.on('pause', _this._onPause.bind(_this));
 
 			(0, _jquery2.default)(document).on(_FullscreenApi2.default.fullscreenchange, _this._onEntityFullscrenChange.bind(_this));
-
 			return _this;
 		}
 
-		/**
-	  * Starts playing the video
-	  *
-	  * @access public
-	  * @example
-	  * const player = new Player($("#video"),options);
-	  * $('.some-button').on('click', () => player.play());
-	  */
-
-
 		_createClass(Player, [{
+			key: 'loadEntity',
+			value: function loadEntity(name, options) {
+				var Entity = Player.getComponent(name);
+				this._entity = new Entity(this, options);
+			}
+
+			/**
+	   * Starts playing the video
+	   *
+	   *
+	   * @access public
+	   * @example
+	   * const player = new Player($("#video"),options);
+	   * $('.some-button').on('click', () => player.play());
+	   */
+
+		}, {
 			key: 'play',
 			value: function play() {
 				return this.video.play();
@@ -931,34 +943,10 @@
 	   * @override
 	   */
 			value: function createElement() {
-				var _this2 = this;
-
 				var options = this.options;
 				var element = this._element;
 
 				this.element = (0, _utils.createEl)('div');
-
-				[
-
-				// Remove controls because we dont not support native controls yet
-				'controls', 'poster',
-
-				// It is unnecessary attrs, this functionality solve CSS
-				'height', 'width'].forEach(function (item) {
-					element.removeAttr(item);
-				});
-
-				// Set attrs from options
-				['preload', 'autoplay', 'loop', 'muted'].forEach(function (item) {
-					if (_this2.options[item]) {
-						element.attr(item, _this2.options[item]);
-						element.prop(item, _this2.options[item]);
-					}
-				});
-
-				element.find('source[data-quality]').each(function (i, item) {
-					(0, _jquery2.default)(item).remove();
-				});
 
 				this.element = this.element.addClass('leplayer').attr('tabindex', 0).css('width', options.width && '100%').css('max-width', options.width);
 
@@ -996,10 +984,8 @@
 					className: 'leplayer-video'
 				}).append(this.errorDisplay.element).append(this.playButton.element).append(this.loader).append(this.splashIcon.element);
 
-				if (options.poster) {
-					this.poster = new _Poster2.default(this);
-					this.videoContainer.append(this.poster.element);
-				}
+				this.poster = new _Poster2.default(this);
+				this.videoContainer.append(this.poster.element);
 
 				var lastTimer = new _Time2.default(this, {
 					fn: function fn(player) {
@@ -1052,6 +1038,10 @@
 			value: function _optionsFromElement() {
 				// Copy video attrs to the opitons
 				var element = this._element;
+				if (element == null || element.length === 0) {
+					return {};
+				}
+
 				var attrOptions = ['height', 'width', 'poster', 'autoplay', 'loop', 'muted', 'preload'].reduce(function (obj, item) {
 					var val = element.attr(item);
 					if (val != null) {
@@ -1098,7 +1088,10 @@
 		}, {
 			key: 'calcVolumeIcon',
 			value: function calcVolumeIcon(value) {
-				var volume = value || this.video.volume;
+				if (value == null) {
+					value = this.video.volume;
+				}
+				var volume = value;
 
 				if (volume < this.options.volume.mutelimit) {
 					return 'volume-off';
@@ -1120,7 +1113,7 @@
 		}, {
 			key: '_initOptions',
 			value: function _initOptions() {
-				var _this3 = this;
+				var _this2 = this;
 
 				var attrOptions = this._optionsFromElement();
 				var presetOptions = {};
@@ -1148,15 +1141,17 @@
 				this.options.controls = _jquery2.default.extend({}, defaultOptions.controls, presetOptions.controls, this._userOptions.controls);
 
 				// exclude controls option
+				// TODO(adinvadim):
+				// Set depreceted flag for this option;
 
 				var _loop = function _loop(name) {
-					if (!_this3.options.excludeControls.hasOwnProperty(name)) return {
+					if (!_this2.options.excludeControls.hasOwnProperty(name)) return {
 							v: void 0
 						};
-					var controlCollection = _this3.options.excludeControls[name];
+					var controlCollection = _this2.options.excludeControls[name];
 					controlCollection.forEach(function (row, index) {
-						if (_this3.options.controls[name] && _this3.options.controls[name][index]) {
-							_this3.options.controls[name][index] = excludeArray(_this3.options.controls[name][index], row);
+						if (_this2.options.controls[name] && _this2.options.controls[name][index]) {
+							_this2.options.controls[name][index] = excludeArray(_this2.options.controls[name][index], row);
 						}
 					});
 				};
@@ -1197,27 +1192,21 @@
 		}, {
 			key: '_listenHotKeys',
 			value: function _listenHotKeys() {
-				var _this4 = this;
+				var _this3 = this;
 
 				var isKeyBinding = function isKeyBinding(e, binding) {
 					return (e.which === binding.key || e.key === binding.key) && !!binding.shiftKey === e.shiftKey && !!binding.ctrlKey === e.ctrlKey;
 				};
 
 				this.element.on('keydown.leplayer.hotkey', function (e) {
-					var _isFocused = function _isFocused() {
-						return _this4.element.is(':focus');
-					};
-					if (_isFocused) {
+					_this3.options.keyBinding.forEach(function (binding) {
 
-						_this4.options.keyBinding.forEach(function (binding) {
-
-							if (isKeyBinding(e, binding)) {
-								e.preventDefault();
-								binding.fn(_this4);
-								return false;
-							}
-						});
-					}
+						if (isKeyBinding(e, binding)) {
+							e.preventDefault();
+							binding.fn(_this3);
+							return false;
+						}
+					});
 				});
 			}
 
@@ -1231,7 +1220,7 @@
 		}, {
 			key: '_initSections',
 			value: function _initSections() {
-				var _this5 = this;
+				var _this4 = this;
 
 				var dfd = _jquery2.default.Deferred();
 				if (this.options.data == null) {
@@ -1240,28 +1229,28 @@
 					this.getSectionData().done(function (sections) {
 						sections = [].concat(_toConsumableArray(sections));
 
-						var isSectionOutside = _this5.sectionsContainer && _this5.sectionsContainer.length > 0;
+						var isSectionOutside = _this4.sectionsContainer && _this4.sectionsContainer.length > 0;
 
 						if (sections == null || sections.length === 0) {
 							dfd.reject(null);
 							return;
 						}
 
-						sections = _this5._completeSections(sections);
+						sections = _this4._completeSections(sections);
 
-						var sectionsComponent = new _Sections2.default(_this5, {
+						var sectionsComponent = new _Sections2.default(_this4, {
 							items: sections,
 							fullscreenOnly: isSectionOutside,
 							hideScroll: true
 						});
 
-						_this5.innerElement.append(sectionsComponent.element);
+						_this4.innerElement.append(sectionsComponent.element);
 
 						if (isSectionOutside) {
-							var outsideSections = new _Sections2.default(_this5, {
+							var outsideSections = new _Sections2.default(_this4, {
 								items: sections
 							});
-							_this5.sectionsContainer.append(outsideSections.element);
+							_this4.sectionsContainer.append(outsideSections.element);
 						}
 						dfd.resolve({ sectionsComponent: sectionsComponent, items: sections });
 					});
@@ -1305,7 +1294,7 @@
 		}, {
 			key: '_listenUserActivity',
 			value: function _listenUserActivity() {
-				var _this6 = this;
+				var _this5 = this;
 
 				var mouseInProgress = void 0;
 				var lastMoveX = void 0;
@@ -1315,23 +1304,23 @@
 					if (e.screenX !== lastMoveX || e.screenY !== lastMoveY) {
 						lastMoveX = e.screenX;
 						lastMoveY = e.screenY;
-						_this6._userActivity = true;
+						_this5._userActivity = true;
 					}
 				};
 
 				var onMouseDown = function onMouseDown(e) {
-					_this6._userActivity = true;
+					_this5._userActivity = true;
 
 					// While user is pressing mouse or touch, dispatch user activity
 					clearInterval(mouseInProgress);
 
 					mouseInProgress = setInterval(function () {
-						_this6._userActivity = true;
+						_this5._userActivity = true;
 					}, 250);
 				};
 
 				var onMouseUp = function onMouseUp(e) {
-					_this6._userActivity = true;
+					_this5._userActivity = true;
 					clearInterval(mouseInProgress);
 				};
 
@@ -1342,30 +1331,30 @@
 				this.element.on('mouseup', onMouseUp);
 
 				this.element.on('keydown', function (e) {
-					return _this6._userActivity = true;
+					return _this5._userActivity = true;
 				});
 				this.element.on('keyup', function (e) {
-					return _this6._userActivity = true;
+					return _this5._userActivity = true;
 				});
 
 				// See http://ejohn.org/blog/learning-from-twitter/
 				var inactivityTimeout = void 0;
 				var delay = this.options.innactivityTimeout;
 				setInterval(function () {
-					if (_this6._userActivity) {
+					if (_this5._userActivity) {
 
 						// Reset user activuty tracker
-						_this6._userActivity = false;
+						_this5._userActivity = false;
 
-						_this6.userActive = true;
+						_this5.userActive = true;
 
 						clearTimeout(inactivityTimeout);
 
 						if (delay > 0) {
 
 							inactivityTimeout = setTimeout(function () {
-								if (!_this6._userActivity) {
-									_this6.userActive = false;
+								if (!_this5._userActivity) {
+									_this5.userActive = false;
 								}
 							}, delay);
 						}
@@ -1398,10 +1387,10 @@
 		}, {
 			key: '_startWaiting',
 			value: function _startWaiting() {
-				var _this7 = this;
+				var _this6 = this;
 
 				this._waitingTimeouts.push(setTimeout(function () {
-					_this7.addClass('leplayer--waiting');
+					_this6.addClass('leplayer--waiting');
 				}, 300));
 			}
 
@@ -1430,12 +1419,12 @@
 		}, {
 			key: '_onClick',
 			value: function _onClick(e) {
-				var _this8 = this;
+				var _this7 = this;
 
 				clearTimeout(this._dblclickTimeout);
 				this._dblclickTimeout = setTimeout(function () {
-					_this8.video.element.focus();
-					_this8.togglePlay();
+					_this7.video.element.focus();
+					_this7.togglePlay();
 				}, 300);
 			}
 
@@ -1465,6 +1454,7 @@
 			value: function _onFullscreenChange(e, isFs) {
 				if (isFs) {
 					this.view = 'fullscreen';
+					this.focus();
 				} else {
 					this.view = 'common';
 				}
@@ -1501,6 +1491,11 @@
 				var fsApi = _FullscreenApi2.default;
 				var isFs = !!document[fsApi.fullscreenElement];
 				this.trigger('fullscreenchange', isFs);
+			}
+		}, {
+			key: 'entity',
+			get: function get() {
+				return this._entity;
 			}
 		}, {
 			key: 'currentTime',
@@ -1782,7 +1777,7 @@
 		return hiddenElement;
 	};
 
-	Player.defaultSprite = __webpack_require__(35);
+	Player.defaultSprite = __webpack_require__(63);
 
 	window.$.fn.lePlayer = function (options) {
 		return this.each(function () {
@@ -1800,7 +1795,7 @@
 	 * @plugin
 	 */
 	Player.plugin('miniplayer', function (pluginOptions) {
-		var _this9 = this;
+		var _this8 = this;
 
 		var player = this;
 
@@ -1842,35 +1837,35 @@
 		};
 
 		var getWidth = function getWidth() {
-			return options.width || _this9.element.width();
+			return options.width || _this8.element.width();
 		};
 
 		this._updateMiniPlayer = function () {
 			var scrollTop = (0, _jquery2.default)(window).scrollTop();
 
 			if (scrollTop > offsetShow()) {
-				_this9.showMiniPlayer();
+				_this8.showMiniPlayer();
 			} else {
-				_this9.hideMiniPlayer();
+				_this8.hideMiniPlayer();
 			}
 		};
 
 		this.showMiniPlayer = function (force) {
-			if (!force && _this9.view === 'mini') {
+			if (!force && _this8.view === 'mini') {
 				return;
 			}
 
 			// Added empty space
-			_this9.element.css('padding-top', _this9.videoContainer.height());
+			_this8.element.css('padding-top', _this8.videoContainer.height());
 
-			_this9.view = 'mini';
+			_this8.view = 'mini';
 		};
 
 		this.hideMiniPlayer = function (force) {
-			if (!force && _this9.view !== 'mini') {
+			if (!force && _this8.view !== 'mini') {
 				return;
 			}
-			_this9.view = 'common';
+			_this8.view = 'common';
 		};
 
 		(0, _jquery2.default)(window).on('scroll', this._updateMiniPlayer.bind(this));
@@ -1878,23 +1873,24 @@
 		this.on('inited', this._updateMiniPlayer.bind(this));
 
 		this.onSetView('mini', function () {
-			_this9.innerElement.css('max-width', getWidth());
-			_this9.innerElement.css('height', _this9.video.height);
+			_this8.innerElement.css('max-width', getWidth());
+			_this8.innerElement.css('height', _this8.video.height);
 		});
 
 		this.onDelView('mini', function () {
-			_this9.innerElement.css('max-width', '');
-			_this9.innerElement.css('height', '');
+			_this8.innerElement.css('max-width', '');
+			_this8.innerElement.css('height', '');
 
-			_this9.element.css('padding-top', '');
+			_this8.element.css('padding-top', '');
 		});
 
 		this._updateMiniPlayer();
 	});
 
-	Player.preset('vps', __webpack_require__(36).preset);
-	Player.preset('sms', __webpack_require__(37).preset);
-	Player.preset('compressed', __webpack_require__(38).preset);
+	Player.preset('vps', __webpack_require__(64).preset);
+	Player.preset('sms', __webpack_require__(65).preset);
+	Player.preset('compressed', __webpack_require__(66).preset);
+	Player.preset('youtube', __webpack_require__(67).preset);
 
 /***/ },
 /* 1 */
@@ -2130,7 +2126,7 @@
 				createElement: true
 			}, this.options, options);
 
-			if (!player) {
+			if (!player && this.play != null) {
 				this.player = player = this;
 			} else {
 				this.player = player;
@@ -2206,15 +2202,15 @@
 		}, {
 			key: 'trigger',
 			value: function trigger(eventName) {
-				var _element$trigger;
+				var _element;
 
-				var event = _jquery2.default.Event('leplayer_' + eventName, { player: this });
+				var event = _jquery2.default.Event('leplayer_' + eventName, { player: this.player });
 
 				for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
 					args[_key - 1] = arguments[_key];
 				}
 
-				(_element$trigger = this.element.trigger).call.apply(_element$trigger, [this.element, event].concat(args));
+				(_element = this.element).triggerHandler.apply(_element, [event].concat(args));
 				return this;
 			}
 
@@ -2230,25 +2226,25 @@
 		}, {
 			key: 'on',
 			value: function on(eventName) {
-				var _element$on;
+				var _element2;
 
 				for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
 					args[_key2 - 1] = arguments[_key2];
 				}
 
-				(_element$on = this.element.on).call.apply(_element$on, [this.element, 'leplayer_' + eventName].concat(args));
+				(_element2 = this.element).on.apply(_element2, ['leplayer_' + eventName].concat(args));
 				return this;
 			}
 		}, {
 			key: 'one',
 			value: function one(eventName) {
-				var _element$one;
+				var _element3;
 
 				for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
 					args[_key3 - 1] = arguments[_key3];
 				}
 
-				(_element$one = this.element.one).call.apply(_element$one, [this.element, 'leplayer_' + eventName].concat(args));
+				(_element3 = this.element).one.apply(_element3, ['leplayer_' + eventName].concat(args));
 			}
 
 			/**
@@ -3009,7 +3005,7 @@
 						_this2.addControl(indexRow, controlName, _this2._getControlOptions(name));
 					});
 
-					elemRow.addClass('leplayer-controls--' + rowAlign);
+					elemRow.addClass('leplayer-controls--' + rowAlign).attr('tabindex', 0);
 
 					elemRow.find('.divider + .divider').remove();
 				});
@@ -3112,6 +3108,10 @@
 
 			_this.player.on('durationchange', _this.updateSectionDuration.bind(_this));
 
+			_this.player.on('focus', function () {
+				return _this.player.focus();
+			});
+
 			return _ret = _this, _possibleConstructorReturn(_this, _ret);
 		}
 
@@ -3147,7 +3147,8 @@
 				    hideScroll = _options.hideScroll;
 
 
-				this.element = (0, _jquery2.default)('<div />').addClass('leplayer-sections');
+				this.element = (0, _jquery2.default)('<div />').addClass('leplayer-sections').attr('tabindex', '0');
+
 				this._innerElement = (0, _jquery2.default)('<div />').addClass('leplayer-sections__inner');
 
 				if (fullscreenOnly) {
@@ -3222,7 +3223,7 @@
 					return;
 				}
 
-				var currentTime = data.time;
+				var currentTime = this.player.currentTime;
 
 				// Update span with end section time
 				// TODO: Вынести это в отдельный компонент ShowTime или типо того
@@ -3414,7 +3415,7 @@
 	/**
 	 * @param {Player} player Main player
 	 * @param {Object} [options]
-	 * @param {String} [options.imgUrl] path to poster image
+	 * @param {String} [options.url] path to poster image
 	 * @class Poster
 	 * @extends Component
 	 */
@@ -3427,21 +3428,38 @@
 			_classCallCheck(this, Poster);
 
 			options = _jquery2.default.extend({}, {
-				imgUrl: player.options.poster
+				url: options.url
 			}, options);
 
-			return _possibleConstructorReturn(this, (Poster.__proto__ || Object.getPrototypeOf(Poster)).call(this, player, options));
+			var _this = _possibleConstructorReturn(this, (Poster.__proto__ || Object.getPrototypeOf(Poster)).call(this, player, options));
+
+			_this.url = _this.options.url;
+			return _this;
 		}
-
-		/**
-	  * @override
-	  */
-
 
 		_createClass(Poster, [{
 			key: 'createElement',
+
+
+			/**
+	   * @override
+	   */
 			value: function createElement() {
-				this.element = (0, _jquery2.default)('<div />').css('background-image', 'url("' + this.options.imgUrl + '")').addClass('leplayer-poster');
+				this.element = (0, _jquery2.default)('<div />').addClass('leplayer-poster');
+
+				return this.element;
+			}
+		}, {
+			key: 'url',
+			set: function set(value) {
+				if (value == null) {
+					return;
+				}
+				this._url = value;
+				this.element.css('background-image', 'url("' + value + '")');
+			},
+			get: function get() {
+				return this._url;
 			}
 		}]);
 
@@ -3583,476 +3601,6 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _jquery = __webpack_require__(1);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _cookie = __webpack_require__(16);
-
-	var _cookie2 = _interopRequireDefault(_cookie);
-
-	var _Component2 = __webpack_require__(3);
-
-	var _Component3 = _interopRequireDefault(_Component2);
-
-	var _MediaError = __webpack_require__(14);
-
-	var _MediaError2 = _interopRequireDefault(_MediaError);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	var Html5 = function (_Component) {
-		_inherits(Html5, _Component);
-
-		function Html5(player, options) {
-			_classCallCheck(this, Html5);
-
-			var _this = _possibleConstructorReturn(this, (Html5.__proto__ || Object.getPrototypeOf(Html5)).call(this, player, options));
-
-			_this.player = player;
-			_this.media = _this.element[0];
-
-			_this.subtitles = [];
-			_this.bufferRanges = [];
-
-			if (_this.player.options.src == null) {
-				_this.player.error = new _MediaError2.default('Видеофайл не найден.');
-			}
-
-			_this.src = _this.player.options.src;
-			return _this;
-		}
-
-		/* TODO */
-
-
-		_createClass(Html5, [{
-			key: 'createElement',
-			value: function createElement() {
-				return this.element = (0, _jquery2.default)(this.options.ctx);
-			}
-		}, {
-			key: 'init',
-			value: function init() {
-				var _this2 = this;
-
-				var dfd = _jquery2.default.Deferred();
-				this._initSubtitles();
-				this._initVideo().done(function () {
-					_this2._initRate();
-					_this2._initVolume();
-					dfd.resolve();
-				});
-				return dfd.promise();
-			}
-		}, {
-			key: 'startBuffering',
-			value: function startBuffering() {
-				var _this3 = this;
-
-				var volume = this.volume;
-				this.volume = 0;
-				return this.play().then(function () {
-					return _this3.pause();
-				}).then(function () {
-					_this3.currentTime = 0;
-					_this3.volume = volume;
-				});
-			}
-		}, {
-			key: 'supportsFullScreen',
-			value: function supportsFullScreen() {
-				if (typeof this.media.webkitEnterFullScreen === 'function') {
-					var userAgent = window.navigator && window.navigator.userAgent || '';
-
-					// Seems to be broken in Chromium/Chrome && Safari in Leopard
-					if (/Android/.test(userAgent) || !/Chrome|Mac OS X 10.5/.test(userAgent)) {
-						return true;
-					}
-				}
-				return false;
-			}
-		}, {
-			key: 'enterFullscreen',
-			value: function enterFullscreen() {
-				var _this4 = this;
-
-				var video = this.media;
-				if (video.paused && video.networkState <= video.HAVE_METADATA) {
-					// attempt to prime the video element for programmatic access
-					// this isn't necessary on the desktop but shouldn't hurt
-					this.play();
-
-					// playing and pausing synchronously during the transition to fullscreen
-					// can get iOS ~6.1 devices into a play/pause loop
-					setTimeout(function () {
-						_this4.pause();
-						video.webkitEnterFullScreen();
-					}, 0);
-				} else {
-					video.webkitEnterFullScreen();
-				}
-			}
-		}, {
-			key: 'exitFullscreen',
-			value: function exitFullscreen() {
-				this.media.webkitExitFullScreen();
-			}
-		}, {
-			key: 'togglePlay',
-			value: function togglePlay() {
-				if (!this.media.played || this.media.paused) {
-					this.play();
-				} else {
-					this.pause();
-				}
-			}
-		}, {
-			key: 'seek',
-			value: function seek(time) {
-				this.media.currentTime = time;
-			}
-		}, {
-			key: 'play',
-			value: function play() {
-				var dfd = _jquery2.default.Deferred();
-				var playPromise = this.media.play();
-
-				if (playPromise != null) {
-					playPromise.then(function () {
-						dfd.resolve();
-					});
-				} else {
-					dfd.resolve();
-				}
-				return dfd.promise();
-			}
-		}, {
-			key: 'pause',
-			value: function pause() {
-				var dfd = _jquery2.default.Deferred();
-				var pausePromise = this.media.pause();
-
-				if (pausePromise != null) {
-					pausePromise.then(function () {
-						dfd.resolve();
-					});
-				} else {
-					dfd.resolve();
-				}
-				return dfd.promise();
-			}
-		}, {
-			key: 'load',
-			value: function load() {
-				return this.media.load();
-			}
-		}, {
-			key: '_initRate',
-			value: function _initRate() {
-				this.rate = this.defaultRate;
-			}
-		}, {
-			key: '_initVolume',
-			value: function _initVolume() {
-				this.volume = this.defaultVolume;
-			}
-		}, {
-			key: '_initSubtitles',
-			value: function _initSubtitles() {
-				var _self = this;
-				this.element.children('track[kind="subtitles"]').each(function () {
-					var language = (0, _jquery2.default)(this).attr('srclang');
-					var title = (0, _jquery2.default)(this).attr('label');
-					var src = (0, _jquery2.default)(this).attr('src');
-					if (title.length > 0 && src.length > 0) {
-						_self.subtitles.push({
-							title: title,
-							src: src,
-							language: language
-						});
-					}
-				});
-			}
-		}, {
-			key: '_initVideo',
-			value: function _initVideo() {
-				var _this5 = this;
-
-				var dfd = _jquery2.default.Deferred();
-				if (this.media.readyState > HTMLMediaElement.HAVE_NOTHING) {
-					dfd.resolve();
-					this._textTracksHack();
-				} else {
-					(0, _jquery2.default)(this.media).one('loadedmetadata', function (e) {
-						dfd.resolve();
-						_this5._textTracksHack();
-					});
-				}
-				dfd.notify();
-				return dfd.promise();
-			}
-		}, {
-			key: '_textTracksHack',
-			value: function _textTracksHack() {
-
-				// This is generally for Firefox only
-				// because it somehow resets track list
-				// for video element after DOM manipulation.
-
-				if (this.media.textTracks.length === 0 && this.subtitles.length > 0) {
-					this.element.children('track[kind="subtitles"]').remove();
-					for (var i in this.subtitles) {
-						if (this.subtitles.hasOwnProperty(i)) {
-							this.element.append((0, _jquery2.default)('<track/>').attr('label', this.subtitles[i].title).attr('src', this.subtitles[i].src).attr('srclang', this.subtitles[i].language).attr('id', this.subtitles[i].language).attr('kind', 'subtitles'));
-						}
-					}
-				}
-			}
-		}, {
-			key: 'currentTime',
-			get: function get() {
-				return this.media.currentTime;
-			},
-			set: function set(value) {
-				var time = void 0;
-				if (value > this.duration) {
-					time = this.duration;
-				} else if (value < 0) {
-					time = 0;
-				} else {
-					time = value;
-				}
-
-				this.player.trigger('timeupdateload', { time: time });
-
-				this.media.currentTime = time;
-			}
-		}, {
-			key: 'duration',
-			get: function get() {
-				return this.media.duration;
-			}
-		}, {
-			key: 'height',
-			get: function get() {
-				return this.media.clientHeight;
-			}
-		}, {
-			key: 'width',
-			get: function get() {
-				return this.media.clientWidth;
-			}
-		}, {
-			key: 'rate',
-			get: function get() {
-				return this.media.playbackRate;
-			},
-			set: function set(value) {
-				var player = this.player;
-				if (value <= player.options.rate.max && value >= player.options.rate.min) {
-					this.media.playbackRate = value;
-					_cookie2.default.set('rate', value);
-				}
-				/** TODO: Chanche controls.rate in event handler */
-				//controls.rate = this.media.playbackRate;
-			}
-		}, {
-			key: 'defaultRate',
-			get: function get() {
-				return _cookie2.default.get('rate') || this.player.options.rate.default;
-			}
-		}, {
-			key: 'src',
-			set: function set(src) {
-				if (src == null) return;
-				if (this.src && this.src.url === src.url) return;
-
-				var time = this.currentTime;
-				var rate = this.rate;
-				var stop = this.paused;
-
-				this.media.src = src.url;
-
-				this.playbackRate = rate;
-
-				this.currentTime = time;
-
-				this._source = src;
-
-				if (stop) {
-					this.pause();
-				} else {
-					this.play();
-				}
-			},
-			get: function get() {
-				return this._source;
-			}
-		}, {
-			key: 'track',
-			set: function set(value) {
-				for (var i = 0; i < this.media.textTracks.length; i++) {
-					if (this.media.textTracks[i].language === value) this.media.textTracks[i].mode = 'showing';else this.media.textTracks[i].mode = 'hidden';
-				}
-			}
-		}, {
-			key: 'paused',
-			get: function get() {
-				return this.media.paused;
-			}
-		}, {
-			key: 'volume',
-			get: function get() {
-				return this.media.volume;
-			},
-			set: function set(value) {
-				var player = this.player;
-				if (value > 1) {
-					this.media.volume = 1;
-				} else if (value < player.options.volume.mutelimit) {
-					this.media.volume = 0;
-				} else {
-					this.media.volume = value;
-					_cookie2.default.set('volume', value);
-				}
-				this.media.mute = value < player.options.volume.mutelimit;
-			}
-		}, {
-			key: 'defaultVolume',
-			get: function get() {
-				return _cookie2.default.get('volume') || this.player.options.volume.default;
-			}
-		}, {
-			key: 'buffered',
-			get: function get() {
-				return this.media.buffered;
-			}
-
-			/**
-	   * @return {TimeRanges}
-	   */
-
-		}, {
-			key: 'seekable',
-			get: function get() {
-				return this.media.seekable;
-			}
-
-			/**
-	   * @return {TimeRanges}
-	   */
-
-		}, {
-			key: 'played',
-			get: function get() {
-				return this.media.played;
-			}
-		}, {
-			key: 'playedPercentage',
-			get: function get() {
-				var result = 0;
-				for (var i = 0; i < this.played.length; i++) {
-					result += this.played.end(i) - this.played.start(i);
-				}
-
-				return result / this.duration * 100;
-			}
-		}, {
-			key: 'currentSrc',
-			get: function get() {
-				return this.media.currentSrc;
-			}
-		}]);
-
-		return Html5;
-	}(_Component3.default);
-
-	_Component3.default.registerComponent('Html5', Html5);
-	exports.default = Html5;
-
-/***/ },
-/* 16 */
-/***/ function(module, exports) {
-
-	'use strict';
-	/**
-	 * @file cookie-control.js
-	 *
-	 * @clas Cookie
-	 */
-
-	Object.defineProperty(exports, "__esModule", {
-		value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var Cookie = function () {
-		function Cookie() {
-			_classCallCheck(this, Cookie);
-		}
-
-		_createClass(Cookie, null, [{
-			key: 'get',
-
-			/**
-	   * @public
-	   *
-	   * @param {String} name Name of cookie
-	   * @param {String} [dflt] Return default value if this field is empty
-	   *
-	   */
-			value: function get(name, dflt) {
-				var cookies = document.cookie.split(';');
-				for (var i in cookies) {
-					var d = cookies[i].trim().split('=');
-					if (d[0] === 'leplayer_' + name) return d[1];
-				}
-				return dflt;
-			}
-
-			/**
-	   * @public
-	   *
-	   * @param {String} name Key
-	   * @param {String} value Value
-	   */
-
-		}, {
-			key: 'set',
-			value: function set(name, value) {
-				var d = new Date();
-				d.setDate(d.year + 1);
-				document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
-			}
-		}]);
-
-		return Cookie;
-	}();
-
-	exports.default = Cookie;
-
-/***/ },
-/* 17 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
 	/**
 	 * @file PlayControl.js
 	 */
@@ -4179,7 +3727,7 @@
 	exports.default = PlayControl;
 
 /***/ },
-/* 18 */
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4207,7 +3755,7 @@
 
 	var _Control2 = _interopRequireDefault(_Control);
 
-	var _ControlDropdown2 = __webpack_require__(19);
+	var _ControlDropdown2 = __webpack_require__(17);
 
 	var _ControlDropdown3 = _interopRequireDefault(_ControlDropdown2);
 
@@ -4241,7 +3789,8 @@
 			var _this = _possibleConstructorReturn(this, (VolumeControl.__proto__ || Object.getPrototypeOf(VolumeControl)).call(this, player, options));
 
 			_this.player.on('volumechange', function (e, data) {
-				_this.value = data.volume;
+				var video = _this.player.video;
+				_this.value = video.muted ? 0 : video.volume;
 			});
 			return _this;
 		}
@@ -4253,6 +3802,7 @@
 
 				_get(VolumeControl.prototype.__proto__ || Object.getPrototypeOf(VolumeControl.prototype), 'createElement', this).call(this);
 				var drag = false;
+				var video = this.player.video;
 
 				this.marker = (0, _jquery2.default)('<div/>').addClass('volume-marker');
 
@@ -4262,7 +3812,10 @@
 					if (drag) return;
 					var p = _this2.getPosition(e.pageY);
 					if (p >= 0 && p <= 1) {
-						_this2.player.video.volume = 1 - p;
+						if (video.muted) {
+							video.muted = false;
+						}
+						video.volume = 1 - p;
 					}
 				});
 
@@ -4280,7 +3833,10 @@
 						if (!drag) return;
 						var p = _this2.getPosition(e.pageY);
 						if (p >= 0 && p <= 1) {
-							_this2.player.video.volume = 1 - p;
+							if (video.muted) {
+								video.muted = false;
+							}
+							video.volume = 1 - p;
 						}
 					},
 
@@ -4296,11 +3852,7 @@
 				var video = this.player.video;
 
 
-				if (video.volume === 0) {
-					video.volume = video.defaultVolume;
-				} else {
-					video.volume = 0;
-				}
+				video.muted = !video.muted;
 			}
 		}, {
 			key: 'getPosition',
@@ -4337,7 +3889,7 @@
 	exports.default = VolumeControl;
 
 /***/ },
-/* 19 */
+/* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4388,7 +3940,15 @@
 
 			_classCallCheck(this, ControlDropdown);
 
-			return _possibleConstructorReturn(this, (ControlDropdown.__proto__ || Object.getPrototypeOf(ControlDropdown)).call(this, player, options));
+			var _this = _possibleConstructorReturn(this, (ControlDropdown.__proto__ || Object.getPrototypeOf(ControlDropdown)).call(this, player, options));
+
+			_this.element.on('mouseenter', function () {
+				return !_this.disable && _this.dropdownContent.show();
+			});
+			_this.element.on('mouseleave', function () {
+				return _this.dropdownContent.hide();
+			});
+			return _this;
 		}
 
 		/**
@@ -4432,7 +3992,7 @@
 	exports.default = ControlDropdown;
 
 /***/ },
-/* 20 */
+/* 18 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4460,15 +4020,15 @@
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
-	var _ControlText = __webpack_require__(21);
+	var _ControlText = __webpack_require__(19);
 
 	var _ControlText2 = _interopRequireDefault(_ControlText);
 
-	var _BufferedRanges = __webpack_require__(22);
+	var _BufferedRanges = __webpack_require__(20);
 
 	var _BufferedRanges2 = _interopRequireDefault(_BufferedRanges);
 
-	var _Marker = __webpack_require__(23);
+	var _Marker = __webpack_require__(21);
 
 	var _Marker2 = _interopRequireDefault(_Marker);
 
@@ -4532,15 +4092,14 @@
 				var video = this.player.video;
 				if (p > 0 && p < 1) {
 					this.marker.markerTime.show().html((0, _utils.secondsToTime)(video.duration * p));
-					video.seek(video.duration * p);
+					video.currentTime = video.duration * p;
 				}
 			}
 		}, {
 			key: '_onTimeUpdate',
 			value: function _onTimeUpdate(e, data) {
-				var time = data.time;
-
 				var duration = this.player.video.duration;
+				var time = this.player.currentTime;
 				this.hardMove(time / duration);
 			}
 
@@ -4774,7 +4333,7 @@
 	exports.default = TimelineControl;
 
 /***/ },
-/* 21 */
+/* 19 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4875,7 +4434,7 @@
 	exports.default = ControlText;
 
 /***/ },
-/* 22 */
+/* 20 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -4943,6 +4502,8 @@
 			value: function update() {
 				var buffered = this.player.video.buffered;
 				var duration = this.player.video.duration;
+				if (buffered == null) return;
+
 				var end = 0;
 				if (buffered.length > 0) {
 					end = buffered.end(buffered.length - 1);
@@ -4963,7 +4524,7 @@
 	exports.default = BufferedRanges;
 
 /***/ },
-/* 23 */
+/* 21 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5058,7 +4619,7 @@
 	exports.default = Marker;
 
 /***/ },
-/* 24 */
+/* 22 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5086,7 +4647,7 @@
 
 	var _Control2 = _interopRequireDefault(_Control);
 
-	var _ControlCheckbox2 = __webpack_require__(25);
+	var _ControlCheckbox2 = __webpack_require__(23);
 
 	var _ControlCheckbox3 = _interopRequireDefault(_ControlCheckbox2);
 
@@ -5152,7 +4713,7 @@
 	exports.default = SectionControl;
 
 /***/ },
-/* 25 */
+/* 23 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5275,7 +4836,7 @@
 	exports.default = ControlCheckbox;
 
 /***/ },
-/* 26 */
+/* 24 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5354,7 +4915,7 @@
 	exports.default = FullscreenControl;
 
 /***/ },
-/* 27 */
+/* 25 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5382,11 +4943,11 @@
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
-	var _ControlText = __webpack_require__(21);
+	var _ControlText = __webpack_require__(19);
 
 	var _ControlText2 = _interopRequireDefault(_ControlText);
 
-	var _cookie = __webpack_require__(16);
+	var _cookie = __webpack_require__(26);
 
 	var _cookie2 = _interopRequireDefault(_cookie);
 
@@ -5421,8 +4982,8 @@
 
 			var _this = _possibleConstructorReturn(this, (RateControl.__proto__ || Object.getPrototypeOf(RateControl)).call(this, player, options));
 
-			_this.player.on('ratechange', function (e, data) {
-				_this.value = data.rate;
+			_this.player.on('ratechange', function () {
+				_this.update();
 			});
 			return _this;
 		}
@@ -5445,7 +5006,7 @@
 					collection: this.options.collection,
 					title: 'Уменьшить скорость проигрывания',
 					onClick: function onClick(e) {
-						video.rate -= this.player.options.rate.step;
+						video.decreaseRate();
 					}
 				});
 
@@ -5456,7 +5017,7 @@
 					collection: this.options.collection,
 					title: 'Увеличить скорость проигрывания',
 					onClick: function onClick(e) {
-						video.rate += this.player.options.rate.step;
+						video.increaseRate();
 					}
 				});
 
@@ -5487,7 +5048,7 @@
 		}, {
 			key: 'onPlayerInited',
 			value: function onPlayerInited() {
-				this.value = this.player.video.defaultRate;
+				this.update();
 			}
 
 			/**
@@ -5500,35 +5061,33 @@
 				e.preventDefault();
 			}
 		}, {
+			key: 'update',
+			value: function update(value) {
+				var video = this.player.video;
+
+				value = value || video.rate;
+				value = parseFloat(value).toFixed(2).toString().replace(/,/g, '.');
+				this.currentRate.text = '×' + value;
+
+				if (this.disable) return;
+
+				if (video.rate <= video.rateMin) {
+					this.downControl.disable = true;
+				} else {
+					this.downControl.disable = false;
+				}
+
+				if (video.rate >= video.rateMax) {
+					this.upControl.disable = true;
+				} else {
+					this.upControl.disable = false;
+				}
+			}
+		}, {
 			key: 'init',
 			value: function init() {
 				var rate = _cookie2.default.get('rate', this.player.options.rate.default);
 				this.show(rate);
-			}
-		}, {
-			key: 'show',
-			value: function show(value) {
-				var video = this.player.video;
-				value = value || video.rate;
-				value = parseFloat(value).toFixed(2).toString().replace(/,/g, '.');
-				this.currentRate.text = '×' + value;
-			}
-		}, {
-			key: 'value',
-			set: function set(value) {
-				var video = this.player.video;
-				var options = this.player.options;
-				if (this.disable) {
-					return false;
-				}
-				this.upControl.disable = false;
-				this.downControl.disable = false;
-				if (video.rate <= options.rate.min) {
-					this.downControl.disable = true;
-				} else if (video.rate >= options.rate.max) {
-					this.upControl.disable = true;
-				}
-				this.show();
 			}
 		}, {
 			key: 'disable',
@@ -5547,7 +5106,71 @@
 	exports.default = RateControl;
 
 /***/ },
-/* 28 */
+/* 26 */
+/***/ function(module, exports) {
+
+	'use strict';
+	/**
+	 * @file cookie-control.js
+	 *
+	 * @clas Cookie
+	 */
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var Cookie = function () {
+		function Cookie() {
+			_classCallCheck(this, Cookie);
+		}
+
+		_createClass(Cookie, null, [{
+			key: 'get',
+
+			/**
+	   * @public
+	   *
+	   * @param {String} name Name of cookie
+	   * @param {String} [dflt] Return default value if this field is empty
+	   *
+	   */
+			value: function get(name, dflt) {
+				var cookies = document.cookie.split(';');
+				for (var i in cookies) {
+					var d = cookies[i].trim().split('=');
+					if (d[0] === 'leplayer_' + name) return d[1];
+				}
+				return dflt;
+			}
+
+			/**
+	   * @public
+	   *
+	   * @param {String} name Key
+	   * @param {String} value Value
+	   */
+
+		}, {
+			key: 'set',
+			value: function set(name, value) {
+				var d = new Date();
+				d.setDate(d.year + 1);
+				document.cookie = 'leplayer_' + name + '=' + value + ';expires=' + d.toString();
+			}
+		}]);
+
+		return Cookie;
+	}();
+
+	exports.default = Cookie;
+
+/***/ },
+/* 27 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5630,7 +5253,7 @@
 	exports.default = BackwardControl;
 
 /***/ },
-/* 29 */
+/* 28 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5644,8 +5267,6 @@
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
 	var _jquery = __webpack_require__(1);
 
 	var _jquery2 = _interopRequireDefault(_jquery);
@@ -5658,7 +5279,7 @@
 
 	var _Control2 = _interopRequireDefault(_Control);
 
-	var _ControlContainer2 = __webpack_require__(30);
+	var _ControlContainer2 = __webpack_require__(29);
 
 	var _ControlContainer3 = _interopRequireDefault(_ControlContainer2);
 
@@ -5691,52 +5312,53 @@
 				className: 'source-control',
 				disable: true
 			}, options);
-			return _possibleConstructorReturn(this, (SourceControl.__proto__ || Object.getPrototypeOf(SourceControl)).call(this, player, options));
+
+			var _this = _possibleConstructorReturn(this, (SourceControl.__proto__ || Object.getPrototypeOf(SourceControl)).call(this, player, options));
+
+			_this.player.on('playing', _this.update.bind(_this));
+			_this.player.on('qualitychange', _this.update.bind(_this));
+			return _this;
 		}
 
-		/**
-	  * @override
-	  */
-
-
 		_createClass(SourceControl, [{
-			key: 'onClick',
-			value: function onClick(e) {
-				_get(SourceControl.prototype.__proto__ || Object.getPrototypeOf(SourceControl.prototype), 'onClick', this).call(this, e);
-				var defaultItem = this.getByIndex(0);
-
-				this.player.video.src = {
-					url: defaultItem.data('url'),
-					title: defaultItem.data('title')
-				};
-				this.active = defaultItem;
-			}
-		}, {
 			key: 'onItemClick',
 			value: function onItemClick(e) {
-				_get(SourceControl.prototype.__proto__ || Object.getPrototypeOf(SourceControl.prototype), 'onItemClick', this).call(this, e);
+				e.preventDefault();
 				var item = (0, _jquery2.default)(e.target);
-				this.player.video.src = {
-					url: item.data('url'),
-					title: item.data('title')
-				};
+				var video = this.player.video;
+				video.playbackQuality = item.data('name');
+
+				this.dropdownContent.hide();
 			}
 		}, {
 			key: 'onPlayerInited',
 			value: function onPlayerInited(e, data) {
+				this.update();
+			}
+		}, {
+			key: 'update',
+			value: function update() {
 				var _this2 = this;
 
-				var sources = this.player.options.sources;
-				if (sources.length > 1) {
-					sources.forEach(function (item) {
-						_this2.addItem(item.title, {
-							url: item.url,
-							title: item.title
-						});
-					});
-					this.setActiveByIndex(0);
-					this.disable = false;
+				var video = this.player.video;
+				var qualityLevels = video.getAvailableQualityLevels();
+				var currentQuality = video.playbackQuality;
+
+				if (qualityLevels.length === 0) {
+					this.disable = true;
+					return;
 				}
+
+				this.list = [];
+				this.dropdownContent.empty();
+
+				qualityLevels.forEach(function (item) {
+					var elem = _this2.addItem(item.title, item);
+					if (currentQuality.name === item.name) {
+						_this2.active = elem;
+					}
+				});
+				this.disable = false;
 			}
 		}]);
 
@@ -5748,7 +5370,7 @@
 	exports.default = SourceControl;
 
 /***/ },
-/* 30 */
+/* 29 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5776,7 +5398,7 @@
 
 	var _Control2 = _interopRequireDefault(_Control);
 
-	var _ControlDropdown2 = __webpack_require__(19);
+	var _ControlDropdown2 = __webpack_require__(17);
 
 	var _ControlDropdown3 = _interopRequireDefault(_ControlDropdown2);
 
@@ -5861,6 +5483,7 @@
 	   */
 			value: function addItem(content, data) {
 				var item = (0, _jquery2.default)('<div />').addClass('control-container__item').data(data).on('click', this.onItemClick.bind(this)).append(content);
+
 				this.list.push(item);
 
 				this.dropdownContent.append(item);
@@ -5932,7 +5555,7 @@
 	exports.default = ControlContainer;
 
 /***/ },
-/* 31 */
+/* 30 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -5962,7 +5585,7 @@
 
 	var _Control2 = _interopRequireDefault(_Control);
 
-	var _ControlContainer2 = __webpack_require__(30);
+	var _ControlContainer2 = __webpack_require__(29);
 
 	var _ControlContainer3 = _interopRequireDefault(_ControlContainer2);
 
@@ -6019,6 +5642,11 @@
 			key: 'onPlayerInited',
 			value: function onPlayerInited(e, data) {
 				var video = this.player.video;
+
+				if (video.subtitles == null) {
+					return false;
+				}
+
 				if (video.subtitles.length > 0) {
 					for (var i in video.subtitles) {
 						if (!video.subtitles.hasOwnProperty(i)) continue;
@@ -6041,7 +5669,7 @@
 	exports.default = SubtitleControl;
 
 /***/ },
-/* 32 */
+/* 31 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6169,7 +5797,7 @@
 	exports.default = DownloadControl;
 
 /***/ },
-/* 33 */
+/* 32 */
 /***/ function(module, exports, __webpack_require__) {
 
 	
@@ -6200,7 +5828,7 @@
 
 	var _Control2 = _interopRequireDefault(_Control);
 
-	var _ControlDropdown2 = __webpack_require__(19);
+	var _ControlDropdown2 = __webpack_require__(17);
 
 	var _ControlDropdown3 = _interopRequireDefault(_ControlDropdown2);
 
@@ -6268,7 +5896,7 @@
 	exports.default = KeyBindingInfoControl;
 
 /***/ },
-/* 34 */
+/* 33 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -6294,7 +5922,7 @@
 
 	var _Control3 = _interopRequireDefault(_Control2);
 
-	var _ControlText = __webpack_require__(21);
+	var _ControlText = __webpack_require__(19);
 
 	var _ControlText2 = _interopRequireDefault(_ControlText);
 
@@ -6332,8 +5960,7 @@
 			var _this = _possibleConstructorReturn(this, (TimeInfoControl.__proto__ || Object.getPrototypeOf(TimeInfoControl)).call(this, player, options));
 
 			_this.player.on('timeupdate', function (e, data) {
-				var time = data.time;
-
+				var time = _this.player.currentTime;
 				_this._currentTimeControl.text = (0, _utils.secondsToTime)(time);
 			});
 
@@ -6400,13 +6027,2419 @@
 	exports.default = TimeInfoControl;
 
 /***/ },
+/* 34 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+	var _set = function set(object, property, value, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent !== null) { set(parent, property, value, receiver); } } else if ("value" in desc && desc.writable) { desc.value = value; } else { var setter = desc.set; if (setter !== undefined) { setter.call(receiver, value); } } return value; };
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _cookie = __webpack_require__(26);
+
+	var _cookie2 = _interopRequireDefault(_cookie);
+
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	var _Entity2 = __webpack_require__(35);
+
+	var _Entity3 = _interopRequireDefault(_Entity2);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Html5 = function (_Entity) {
+		_inherits(Html5, _Entity);
+
+		function Html5(player, options) {
+			_classCallCheck(this, Html5);
+
+			var _this = _possibleConstructorReturn(this, (Html5.__proto__ || Object.getPrototypeOf(Html5)).call(this, player, options));
+
+			_this.media = _this.element[0];
+
+			_this.subtitles = [];
+			_this.bufferRanges = [];
+
+			_this.src = _this.player.options.src;
+
+			if (_this.player.options.poster != null) {
+				_this.poster = _this.player.options.poster;
+			}
+
+			if (_this.getAvailableQualityLevels().length > 0) {
+				_this._playbackQuality = _this.getAvailableQualityLevels()[0];
+			}
+
+			_this.element.on('loadstart', _this.onLoadStart.bind(_this));
+			_this.element.on('timeupdate', _this.onTimeUpdate.bind(_this));
+			_this.element.on('durationchange', _this.onDurationChange.bind(_this));
+			_this.element.on('progress', _this.onProgress.bind(_this));
+			_this.element.on('seeking', _this.onSeeking.bind(_this));
+			_this.element.on('seeked', _this.onSeeked.bind(_this));
+			_this.element.on('volumechange', _this.onVolumeChange.bind(_this));
+			_this.element.on('click', _this.onClick.bind(_this));
+			_this.element.on('dblclick', _this.onDblclick.bind(_this));
+			_this.element.on('play', _this.onPlay.bind(_this));
+			_this.element.on('pause', _this.onPause.bind(_this));
+			_this.element.on('ratechange', _this.onRateChange.bind(_this));
+			_this.element.on('ended', _this.onEnded.bind(_this));
+			_this.element.on('canplaythrough', _this.onCanplayThrough.bind(_this));
+			_this.element.on('waiting', _this.onWaiting.bind(_this));
+			_this.element.on('error', _this.onError.bind(_this));
+			return _this;
+		}
+
+		_createClass(Html5, [{
+			key: 'onLoadStart',
+			value: function onLoadStart(e) {
+				this.trigger('loadstart');
+			}
+		}, {
+			key: 'onTimeUpdate',
+			value: function onTimeUpdate(e) {
+				this.trigger('timeupdate');
+			}
+		}, {
+			key: 'onDurationChange',
+			value: function onDurationChange(e) {
+				this.trigger('durationchange');
+			}
+		}, {
+			key: 'onProgress',
+			value: function onProgress(e) {
+				this.trigger('progress');
+			}
+		}, {
+			key: 'onSeeking',
+			value: function onSeeking(e) {
+				this.trigger('seeking');
+			}
+		}, {
+			key: 'onSeeked',
+			value: function onSeeked(e) {
+				this.trigger('seeked');
+			}
+		}, {
+			key: 'onVolumeChange',
+			value: function onVolumeChange(e) {
+				this.trigger('volumechange');
+			}
+		}, {
+			key: 'onClick',
+			value: function onClick() {
+				this.trigger('click');
+			}
+		}, {
+			key: 'onDblclick',
+			value: function onDblclick() {
+				this.trigger('dblclick');
+			}
+		}, {
+			key: 'onPlay',
+			value: function onPlay() {
+				this.trigger('play');
+			}
+		}, {
+			key: 'onPause',
+			value: function onPause() {
+				this.trigger('pause');
+			}
+		}, {
+			key: 'onPlaying',
+			value: function onPlaying() {
+				this.trigger('playing');
+			}
+		}, {
+			key: 'onRateChange',
+			value: function onRateChange() {
+				this.trigger('ratechange');
+			}
+		}, {
+			key: 'onEnded',
+			value: function onEnded() {
+				this.trigger('ended');
+			}
+		}, {
+			key: 'onCanplayThrough',
+			value: function onCanplayThrough() {
+				this.trigger('canplaythrough');
+			}
+		}, {
+			key: 'onWaiting',
+			value: function onWaiting() {
+				this.trigger('waiting');
+			}
+		}, {
+			key: 'onError',
+			value: function onError(e) {
+				this.trigger('error', { code: e.target.error.code });
+			}
+
+			/* TODO */
+
+		}, {
+			key: 'createElement',
+			value: function createElement() {
+				var _this2 = this;
+
+				this.element = this.options.ctx;
+				[
+
+				// Remove controls because we dont not support native controls yet
+				'controls', 'poster',
+
+				// It is unnecessary attrs, this functionality solve CSS
+				'height', 'width'].forEach(function (item) {
+					_this2.element.removeAttr(item);
+				});
+
+				// Set attrs from options
+				['preload', 'autoplay', 'loop', 'muted'].forEach(function (item) {
+					if (_this2.player.options[item]) {
+						_this2.element.attr(item, _this2.player.options[item]);
+						_this2.element.prop(item, _this2.player.options[item]);
+					}
+				});
+
+				this.element.find('source[data-quality]').each(function (i, item) {
+					(0, _jquery2.default)(item).remove();
+				});
+
+				return this.element;
+			}
+		}, {
+			key: 'getAvailableQualityLevels',
+			value: function getAvailableQualityLevels() {
+				return this.player.options.sources.map(function (item) {
+					return _extends({
+						name: item.title
+					}, item);
+				});
+			}
+		}, {
+			key: 'init',
+			value: function init() {
+				var _this3 = this;
+
+				_get(Html5.prototype.__proto__ || Object.getPrototypeOf(Html5.prototype), 'init', this).call(this);
+				var dfd = _jquery2.default.Deferred();
+				this._initSubtitles();
+				this._initVideo().done(function () {
+					_this3._initRate();
+					_this3._initVolume();
+					dfd.resolve();
+				});
+				return dfd.promise();
+			}
+		}, {
+			key: 'supportsFullScreen',
+			value: function supportsFullScreen() {
+				if (typeof this.media.webkitEnterFullScreen === 'function') {
+					var userAgent = window.navigator && window.navigator.userAgent || '';
+
+					// Seems to be broken in Chromium/Chrome && Safari in Leopard
+					if (/Android/.test(userAgent) || !/Chrome|Mac OS X 10.5/.test(userAgent)) {
+						return true;
+					}
+				}
+				return false;
+			}
+		}, {
+			key: 'enterFullscreen',
+			value: function enterFullscreen() {
+				var _this4 = this;
+
+				var video = this.media;
+				if (video.paused && video.networkState <= video.HAVE_METADATA) {
+					// attempt to prime the video element for programmatic access
+					// this isn't necessary on the desktop but shouldn't hurt
+					this.play();
+
+					// playing and pausing synchronously during the transition to fullscreen
+					// can get iOS ~6.1 devices into a play/pause loop
+					setTimeout(function () {
+						_this4.pause();
+						video.webkitEnterFullScreen();
+					}, 0);
+				} else {
+					video.webkitEnterFullScreen();
+				}
+			}
+		}, {
+			key: 'exitFullscreen',
+			value: function exitFullscreen() {
+				this.media.webkitExitFullScreen();
+			}
+		}, {
+			key: 'togglePlay',
+			value: function togglePlay() {
+				if (!this.media.played || this.media.paused) {
+					this.play();
+				} else {
+					this.pause();
+				}
+			}
+		}, {
+			key: 'play',
+			value: function play() {
+				var dfd = _jquery2.default.Deferred();
+				var playPromise = this.media.play();
+
+				if (playPromise != null) {
+					playPromise.then(function () {
+						dfd.resolve();
+					});
+				} else {
+					dfd.resolve();
+				}
+				return dfd.promise();
+			}
+		}, {
+			key: 'pause',
+			value: function pause() {
+				var dfd = _jquery2.default.Deferred();
+				var pausePromise = this.media.pause();
+
+				if (pausePromise != null) {
+					pausePromise.then(function () {
+						dfd.resolve();
+					});
+				} else {
+					dfd.resolve();
+				}
+				return dfd.promise();
+			}
+		}, {
+			key: 'load',
+			value: function load() {
+				return this.media.load();
+			}
+		}, {
+			key: '_initRate',
+			value: function _initRate() {
+				this.rate = this.defaultRate;
+			}
+		}, {
+			key: '_initVolume',
+			value: function _initVolume() {
+				this.volume = this.defaultVolume;
+			}
+		}, {
+			key: '_initSubtitles',
+			value: function _initSubtitles() {
+				var _self = this;
+				this.element.children('track[kind="subtitles"]').each(function () {
+					var language = (0, _jquery2.default)(this).attr('srclang');
+					var title = (0, _jquery2.default)(this).attr('label');
+					var src = (0, _jquery2.default)(this).attr('src');
+					if (title.length > 0 && src.length > 0) {
+						_self.subtitles.push({
+							title: title,
+							src: src,
+							language: language
+						});
+					}
+				});
+			}
+		}, {
+			key: '_initVideo',
+			value: function _initVideo() {
+				var _this5 = this;
+
+				var dfd = _jquery2.default.Deferred();
+				if (this.media.readyState > HTMLMediaElement.HAVE_NOTHING) {
+					dfd.resolve();
+					this._textTracksHack();
+				} else {
+					(0, _jquery2.default)(this.media).one('loadedmetadata', function (e) {
+						dfd.resolve();
+						_this5._textTracksHack();
+					});
+				}
+				dfd.notify();
+				return dfd.promise();
+			}
+		}, {
+			key: '_textTracksHack',
+			value: function _textTracksHack() {
+
+				// This is generally for Firefox only
+				// because it somehow resets track list
+				// for video element after DOM manipulation.
+
+				if (this.media.textTracks.length === 0 && this.subtitles.length > 0) {
+					this.element.children('track[kind="subtitles"]').remove();
+					for (var i in this.subtitles) {
+						if (this.subtitles.hasOwnProperty(i)) {
+							this.element.append((0, _jquery2.default)('<track/>').attr('label', this.subtitles[i].title).attr('src', this.subtitles[i].src).attr('srclang', this.subtitles[i].language).attr('id', this.subtitles[i].language).attr('kind', 'subtitles'));
+						}
+					}
+				}
+			}
+		}, {
+			key: 'currentTime',
+			get: function get() {
+				return this.media.currentTime;
+			},
+			set: function set(value) {
+				var time = void 0;
+				if (value > this.duration) {
+					time = this.duration;
+				} else if (value < 0) {
+					time = 0;
+				} else {
+					time = value;
+				}
+
+				this.player.trigger('timeupdateload', { time: time });
+
+				this.media.currentTime = time;
+			}
+		}, {
+			key: 'duration',
+			get: function get() {
+				return this.media.duration;
+			}
+		}, {
+			key: 'height',
+			get: function get() {
+				return this.media.clientHeight;
+			}
+		}, {
+			key: 'width',
+			get: function get() {
+				return this.media.clientWidth;
+			}
+		}, {
+			key: 'rate',
+			get: function get() {
+				return this.media.playbackRate;
+			},
+			set: function set(value) {
+				var player = this.player;
+				if (value <= player.options.rate.max && value >= player.options.rate.min) {
+					this.media.playbackRate = value;
+					_cookie2.default.set('rate', value);
+				}
+				/** TODO: Chanche controls.rate in event handler */
+				//controls.rate = this.media.playbackRate;
+			}
+		}, {
+			key: 'muted',
+			set: function set(value) {
+				this.media.muted = value;
+			},
+			get: function get() {
+				return this.media.muted;
+			}
+		}, {
+			key: 'playbackQuality',
+			set: function set(name) {
+				_set(Html5.prototype.__proto__ || Object.getPrototypeOf(Html5.prototype), 'playbackQuality', name, this);
+				var time = this.currentTime;
+				var rate = this.rate;
+				var stop = this.paused;
+
+				this._playbackQuality = this.getAvailableQualityLevels().find(function (item) {
+					return item.name === name;
+				});
+
+				this.src = this._playbackQuality;
+				this.playbackRate = rate;
+				this.currentTime = time;
+
+				if (stop) {
+					this.pause();
+				} else {
+					this.play();
+				}
+
+				this.trigger('qualitychange', this._playbackQuality);
+			},
+			get: function get() {
+				return this._playbackQuality;
+			}
+		}, {
+			key: 'src',
+			set: function set(src) {
+				if (src == null) return;
+				if (this.src && this.src.url === src.url) return;
+
+				this.media.src = src.url;
+
+				this._source = src;
+			},
+			get: function get() {
+				return this._source;
+			}
+		}, {
+			key: 'track',
+			set: function set(value) {
+				for (var i = 0; i < this.media.textTracks.length; i++) {
+					if (this.media.textTracks[i].language === value) this.media.textTracks[i].mode = 'showing';else this.media.textTracks[i].mode = 'hidden';
+				}
+			}
+		}, {
+			key: 'paused',
+			get: function get() {
+				return this.media.paused;
+			}
+		}, {
+			key: 'volume',
+			get: function get() {
+				return this.media.volume;
+			},
+			set: function set(value) {
+				var player = this.player;
+				if (value > 1) {
+					this.media.volume = 1;
+				} else if (value < player.options.volume.mutelimit) {
+					this.media.volume = 0;
+				} else {
+					this.media.volume = value;
+					_cookie2.default.set('volume', value);
+				}
+				this.media.mute = value < player.options.volume.mutelimit;
+			}
+		}, {
+			key: 'defaultVolume',
+			get: function get() {
+				return _cookie2.default.get('volume') || this.player.options.volume.default;
+			}
+		}, {
+			key: 'buffered',
+			get: function get() {
+				return this.media.buffered;
+			}
+
+			/**
+	   * @return {TimeRanges}
+	   */
+
+		}, {
+			key: 'seekable',
+			get: function get() {
+				return this.media.seekable;
+			}
+
+			/**
+	   * @return {TimeRanges}
+	   */
+
+		}, {
+			key: 'played',
+			get: function get() {
+				return this.media.played;
+			}
+		}, {
+			key: 'playedPercentage',
+			get: function get() {
+				var result = 0;
+				for (var i = 0; i < this.played.length; i++) {
+					result += this.played.end(i) - this.played.start(i);
+				}
+
+				return result / this.duration * 100;
+			}
+		}, {
+			key: 'currentSrc',
+			get: function get() {
+				return this.media.currentSrc;
+			}
+		}]);
+
+		return Html5;
+	}(_Entity3.default);
+
+	_Component2.default.registerComponent('Html5', Html5);
+	exports.default = Html5;
+
+/***/ },
 /* 35 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+	var _Component2 = __webpack_require__(3);
+
+	var _Component3 = _interopRequireDefault(_Component2);
+
+	var _cookie = __webpack_require__(26);
+
+	var _cookie2 = _interopRequireDefault(_cookie);
+
+	var _MediaError = __webpack_require__(14);
+
+	var _MediaError2 = _interopRequireDefault(_MediaError);
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	var Entity = function (_Component) {
+		_inherits(Entity, _Component);
+
+		function Entity(player, options) {
+			_classCallCheck(this, Entity);
+
+			var _this = _possibleConstructorReturn(this, (Entity.__proto__ || Object.getPrototypeOf(Entity)).call(this, player, options));
+
+			_this.subtitles = [];
+			_this._triggerStack = [];
+			_this._stopListen = false;
+
+			if (_this.player.options.src == null) {
+				_this.player.error = new _MediaError2.default('Видеофайл не найден.');
+			}
+
+			return _this;
+		}
+
+		/**
+	  * @override
+	  */
+
+
+		_createClass(Entity, [{
+			key: 'trigger',
+			value: function trigger() {
+				var _get2;
+
+				for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
+					args[_key] = arguments[_key];
+				}
+
+				if (!this._stopListen) {
+					this._triggerStack.push(args);
+				}
+				(_get2 = _get(Entity.prototype.__proto__ || Object.getPrototypeOf(Entity.prototype), 'trigger', this)).call.apply(_get2, [this].concat(args));
+			}
+		}, {
+			key: 'init',
+			value: function init() {
+				var _this2 = this;
+
+				this._stopListen = true;
+				this._triggerStack.forEach(function (args) {
+					_this2.trigger.apply(_this2, _toConsumableArray(args));
+				});
+			}
+		}, {
+			key: 'createElement',
+			value: function createElement() {
+				return this.element = (0, _jquery2.default)('<div />');
+			}
+		}, {
+			key: 'increaseRate',
+			value: function increaseRate() {
+				this.rate += this.player.options.rate.step;
+			}
+		}, {
+			key: 'decreaseRate',
+			value: function decreaseRate() {
+				this.rate -= this.player.options.rate.step;
+			}
+		}, {
+			key: 'supportsFullScreen',
+			value: function supportsFullScreen() {}
+		}, {
+			key: 'play',
+			value: function play() {}
+		}, {
+			key: 'pause',
+			value: function pause() {}
+		}, {
+			key: 'load',
+			value: function load() {}
+		}, {
+			key: 'togglePlay',
+			value: function togglePlay() {
+				if (this.paused) {
+					this.play();
+				} else {
+					this.pause();
+				}
+			}
+		}, {
+			key: 'poster',
+			set: function set(url) {
+				this._poster = url;
+				this.trigger('posterchange', { url: url });
+			},
+			get: function get() {
+				return this._poster;
+			}
+		}, {
+			key: 'currentTime',
+			get: function get() {
+				return;
+			},
+			set: function set(value) {}
+		}, {
+			key: 'duration',
+			get: function get() {
+				return;
+			}
+		}, {
+			key: 'muted',
+			set: function set(value) {},
+			get: function get() {}
+		}, {
+			key: 'height',
+			get: function get() {
+				return this.element.innerHeight();
+			}
+		}, {
+			key: 'width',
+			get: function get() {
+				return this.element.width();
+			}
+		}, {
+			key: 'rateMax',
+			set: function set(value) {
+				this._rateMax = value;
+			},
+			get: function get() {
+				return this._rateMax || this.player.options.rate.max;
+			}
+		}, {
+			key: 'rateMin',
+			set: function set(value) {
+				this._rateMin = value;
+			},
+			get: function get() {
+				return this._rateMin || this.player.options.rate.min;
+			}
+		}, {
+			key: 'rate',
+			get: function get() {},
+			set: function set(value) {
+				if (value > this.rateMax || value < this.rateMin) return;
+			}
+		}, {
+			key: 'playbackQuality',
+			set: function set(name) {
+				var levels = this.getAvailableQualityLevels();
+				if (!levels.some(function (obj) {
+					return name in obj;
+				})) {
+					return;
+				}
+			},
+			get: function get() {}
+		}, {
+			key: 'paused',
+			get: function get() {}
+		}, {
+			key: 'played',
+			get: function get() {}
+		}, {
+			key: 'defaultRate',
+			get: function get() {
+				return _cookie2.default.get('rate') || this.player.options.rate.default;
+			}
+		}, {
+			key: 'src',
+			set: function set(value) {},
+			get: function get() {}
+		}]);
+
+		return Entity;
+	}(_Component3.default);
+
+	_Component3.default.registerComponent('Entity', Entity);
+	exports.default = Entity;
+
+/***/ },
+/* 36 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+	var _set = function set(object, property, value, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent !== null) { set(parent, property, value, receiver); } } else if ("value" in desc && desc.writable) { desc.value = value; } else { var setter = desc.set; if (setter !== undefined) { setter.call(receiver, value); } } return value; };
+
+	var _jquery = __webpack_require__(1);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _Entity2 = __webpack_require__(35);
+
+	var _Entity3 = _interopRequireDefault(_Entity2);
+
+	var _Component = __webpack_require__(3);
+
+	var _Component2 = _interopRequireDefault(_Component);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	function loadScript(url) {
+		return _jquery2.default.getScript(url);
+	}
+
+	/* global YT */
+	var apiLoaded = loadScript('https://www.youtube.com/iframe_api');
+
+	var Youtube = function (_Entity) {
+		_inherits(Youtube, _Entity);
+
+		function Youtube(player, options) {
+			_classCallCheck(this, Youtube);
+
+			var _this = _possibleConstructorReturn(this, (Youtube.__proto__ || Object.getPrototypeOf(Youtube)).call(this, player, options));
+
+			_this._paused = true;
+
+			_this.src = _this.player.options.src;
+
+			_this.player.addClass('leplayer--youtube');
+			_this.element.on('click', _this.onClick.bind(_this));
+			_this.element.on('dblclick', _this.onDblclick.bind(_this));
+			return _this;
+		}
+
+		_createClass(Youtube, [{
+			key: 'onClick',
+			value: function onClick(event) {
+				this.trigger('click');
+			}
+		}, {
+			key: 'onDblclick',
+			value: function onDblclick() {
+				this.trigger('dblclick');
+			}
+		}, {
+			key: 'increaseRate',
+			value: function increaseRate() {
+				var index = this.availableRates.indexOf(this.rate);
+				if (index + 1 >= this.availableRates.length) return;
+				return this.rate = this.availableRates[index + 1];
+			}
+		}, {
+			key: 'decreaseRate',
+			value: function decreaseRate() {
+				var index = this.availableRates.indexOf(this.rate);
+				if (index - 1 < 0) return;
+				return this.rate = this.availableRates[index - 1];
+			}
+		}, {
+			key: 'getAvailableQualityLevels',
+			value: function getAvailableQualityLevels() {
+				var arr = this.ytPlayer.getAvailableQualityLevels();
+				var index = arr.indexOf('auto');
+
+				if (index > -1) {
+					arr.splice(index, 1);
+				}
+
+				return arr.map(function (item) {
+					return {
+						title: Youtube.QUALITY_NAMES[item] || item,
+						name: item
+					};
+				});
+			}
+		}, {
+			key: 'supportsFullScreen',
+			value: function supportsFullScreen() {
+				return true;
+			}
+		}, {
+			key: 'play',
+			value: function play() {
+				this.ytPlayer.playVideo();
+				this.trigger('play');
+			}
+		}, {
+			key: 'pause',
+			value: function pause() {
+				this.ytPlayer.pauseVideo();
+				this.trigger('pause');
+			}
+		}, {
+			key: 'init',
+			value: function init() {
+				var _this2 = this;
+
+				_get(Youtube.prototype.__proto__ || Object.getPrototypeOf(Youtube.prototype), 'init', this).call(this);
+				return apiLoaded.then(function () {
+					return _this2.initYTPlayer();
+				});
+			}
+		}, {
+			key: 'createElement',
+			value: function createElement() {
+				this.element = (0, _jquery2.default)('<div />').addClass('leplayer__youtube-wrapper').attr('tabindex', '0');
+				this.youtubeElement = (0, _jquery2.default)('<div />').addClass('leplayer__youtube');
+				this.blocker = (0, _jquery2.default)('<div />').addClass('leplayer__youtube-blocker');
+
+				return this.element.append(this.blocker).append(this.youtubeElement);
+			}
+		}, {
+			key: 'initYTPlayer',
+			value: function initYTPlayer() {
+				var _this3 = this;
+
+				this._initPromise = _jquery2.default.Deferred();
+				var globalOptions = this.player.options;
+				var ytOptions = {
+					autoplay: globalOptions.autoplay ? 1 : 0,
+					loop: globalOptions.loop ? 1 : 0,
+					iv_load_policy: 3,
+					controls: 0,
+					modestbranding: 1,
+					rel: 0,
+					showinfo: 0,
+					cc_load_policy: 1,
+					disablekb: 0,
+					fs: 0,
+					start: globalOptions.time
+				};
+
+				YT.ready(function () {
+					_this3.options.ctx.replaceWith(_this3.element);
+
+					_this3.ytPlayer = new YT.Player(_this3.youtubeElement[0], {
+						videoId: _this3.videoId,
+						width: globalOptions.width || '100%',
+						playerVars: ytOptions,
+						events: {
+							onReady: _this3.onYTPReady.bind(_this3),
+							onStateChange: _this3.onYTPStateChange.bind(_this3),
+							onPlaybackRateChange: _this3.onYTPRateChange.bind(_this3),
+							onPlaybackQualityChange: _this3.onYTPPlaybackQualityChange.bind(_this3)
+						}
+					});
+				});
+				return this._initPromise.promise();
+			}
+		}, {
+			key: 'setAvailablePlaybackRates',
+			value: function setAvailablePlaybackRates() {
+				this.availableRates = this.ytPlayer.getAvailablePlaybackRates();
+				this.rateMin = this.availableRates[0];
+				this.rateMax = this.availableRates[this.availableRates.length - 1];
+			}
+		}, {
+			key: 'onYTPReady',
+			value: function onYTPReady(e) {
+				this._initPromise.resolve();
+				this.setAvailablePlaybackRates();
+			}
+		}, {
+			key: 'onYTPRateChange',
+			value: function onYTPRateChange(e) {
+				this.trigger('ratechange');
+			}
+		}, {
+			key: 'onYTPPlaybackQualityChange',
+			value: function onYTPPlaybackQualityChange(e) {
+				var data = e.data;
+				this._playbackQuality = this.getAvailableQualityLevels().find(function (item) {
+					return item.name === data;
+				});
+				this.trigger('qualitychange', this._playbackQuality);
+			}
+		}, {
+			key: 'onYTPStateChange',
+			value: function onYTPStateChange(e) {
+				var state = e.data;
+				if (state === this.lastState) {
+					return;
+				}
+
+				this.lastState = state;
+				switch (state) {
+					case YT.PlayerState.UNSTARTED:
+						this.trigger('loadstart');
+						this.trigger('loadedmetadata');
+						this.trigger('durationchange');
+						this.trigger('ratechange');
+						this.trigger('volumechange');
+						break;
+
+					case YT.PlayerState.ENDED:
+						this.trigger('ended');
+						break;
+
+					case YT.PlayerState.PLAYING:
+						this.trigger('timeupdate');
+						this.trigger('durationchange');
+						this.trigger('playing');
+
+						this.ytPlayer.setPlaybackQuality(this._nextPlaybackQuality);
+
+						if (this.isSeeking) {
+							this.onSeeked();
+						}
+
+						this.emitTimeupdate();
+						break;
+
+					case YT.PlayerState.PAUSED:
+						this.trigger('canplay');
+
+						if (this.isSeeking) {
+							this.onSeeked();
+						}
+						break;
+
+					case YT.PlayerState.BUFFERING:
+						this.player.trigger('timeupdate');
+						this.player.trigger('waiting');
+
+						this.ytPlayer.setPlaybackQuality(this._nextPlaybackQuality);
+						break;
+				}
+			}
+		}, {
+			key: 'onSeeked',
+			value: function onSeeked() {
+				clearInterval(this.seekingInterval);
+				this.isSeeking = false;
+
+				if (this.wasPausedBeforeSeek) {
+					this.pause();
+				}
+
+				this.trigger('seeked');
+			}
+		}, {
+			key: 'emitTimeupdate',
+			value: function emitTimeupdate() {
+				var _this4 = this;
+
+				clearInterval(this.seekingInterval);
+
+				this.seekingInterval = setInterval(function () {
+					if (_this4.lastState === YT.PlayerState.PAUSED) {
+						clearInterval(_this4.seekingInterval);
+					} else if (_this4.currentTime !== _this4.timeBeforeSeek) {
+						_this4.trigger('timeupdate');
+					}
+				}, 250);
+			}
+		}, {
+			key: 'src',
+			set: function set(src) {
+				if (src == null) return;
+				if (this.src && this.src.url === src.url) return;
+
+				var url = src.url || src.id;
+
+				this.videoId = Youtube.parseUrl(url);
+
+				if (this.player.options.poster) {
+					this.poster = this.player.options.poster;
+				} else {
+					this.poster = 'https://img.youtube.com/vi/' + this.videoId + '/0.jpg';
+				}
+			}
+		}, {
+			key: 'currentTime',
+			get: function get() {
+				return this.ytPlayer ? this.ytPlayer.getCurrentTime() : 0;
+			},
+			set: function set(value) {
+				if (this.lastState === YT.PlayerState.PAUSED) {
+					this.timeBeforeSeek = this.currentTime;
+				}
+
+				if (!this.isSeeking) {
+					this.wasPausedBeforeSeek = this.paused;
+				}
+
+				this.isSeeking = true;
+				this.ytPlayer.seekTo(value, true);
+				this.trigger('timeupdate');
+				this.trigger('seeking');
+
+				this.emitTimeupdate();
+			}
+		}, {
+			key: 'duration',
+			get: function get() {
+				return this.ytPlayer && this.ytPlayer.getDuration ? this.ytPlayer.getDuration() : NaN;
+			}
+		}, {
+			key: 'paused',
+			get: function get() {
+				return this.ytPlayer ? this.lastState !== YT.PlayerState.PLAYING && this.lastState !== YT.PlayerState.BUFFERING : true;
+			}
+		}, {
+			key: 'rate',
+			get: function get() {
+				return this.ytPlayer.getPlaybackRate();
+			},
+			set: function set(value) {
+				_set(Youtube.prototype.__proto__ || Object.getPrototypeOf(Youtube.prototype), 'rate', value, this);
+				this.ytPlayer.setPlaybackRate(value);
+				this.trigger('ratechange');
+			}
+		}, {
+			key: 'muted',
+			set: function set(value) {
+				var _this5 = this;
+
+				if (value) {
+					this.ytPlayer.mute();
+				} else {
+					this.ytPlayer.unMute();
+				}
+
+				setTimeout(function () {
+					_this5.trigger('volumechange');
+				}, 50);
+			},
+			get: function get() {
+				return this.ytPlayer.isMuted();
+			}
+		}, {
+			key: 'defaultVolume',
+			get: function get() {
+				return this.volume || this.player.options.volume.default;
+			}
+		}, {
+			key: 'playbackQuality',
+			set: function set(name) {
+				_set(Youtube.prototype.__proto__ || Object.getPrototypeOf(Youtube.prototype), 'playbackQuality', name, this);
+				var time = this.currentTime;
+				var status = this.ytPlayer.getPlayerState();
+
+				if (status !== YT.PlayerState.UNSTARTED && status !== YT.PlayerState.CUED) {
+					this.ytPlayer.pauseVideo();
+				}
+
+				this._nextPlaybackQuality = name;
+				this.ytPlayer.setPlaybackQuality(name);
+				this.ytPlayer.seekTo(time);
+
+				if (status !== YT.PlayerState.PAUSED) {
+					this.ytPlayer.playVideo();
+				}
+			},
+			get: function get() {
+				var _this6 = this;
+
+				if (this._playbackQuality == null) {
+					this._playbackQuality = this.getAvailableQualityLevels().find(function (item) {
+						return item.name === _this6.ytPlayer.getPlaybackQuality();
+					});
+				}
+				return this._playbackQuality;
+			}
+		}, {
+			key: 'volume',
+			get: function get() {
+				return this.ytPlayer ? this.ytPlayer.getVolume() / 100.0 : 1;
+			},
+			set: function set(value) {
+				var _this7 = this;
+
+				this.ytPlayer.setVolume(value * 100);
+
+				setTimeout(function () {
+					_this7.trigger('volumechange');
+				}, 50);
+			}
+		}], [{
+			key: 'parseUrl',
+			value: function parseUrl(url) {
+				var result = null;
+				var regex = Youtube.URL_REGEX;
+				var match = url.match(regex);
+				if (url.length === 11) {
+					result = url;
+				} else if (match && match[2].length === 11) {
+					result = match[2];
+				}
+				return result;
+			}
+		}]);
+
+		return Youtube;
+	}(_Entity3.default);
+
+	Youtube.URL_REGEX = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+
+	Youtube.QUALITY_NAMES = {
+		tiny: '140p',
+		small: '240p',
+		medium: '360p',
+		large: '480p',
+		hd720: '720p',
+		hd1080: '1080p',
+		highres: 'HD',
+		auto: 'Авто'
+	};
+
+	_Component2.default.registerComponent('Youtube', Youtube);
+	exports.default = Youtube;
+
+/***/ },
+/* 37 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var define = __webpack_require__(38);
+	var ES = __webpack_require__(42);
+
+	var implementation = __webpack_require__(60);
+	var getPolyfill = __webpack_require__(61);
+	var shim = __webpack_require__(62);
+
+	var slice = Array.prototype.slice;
+
+	var polyfill = getPolyfill();
+
+	var boundFindShim = function find(array, predicate) { // eslint-disable-line no-unused-vars
+		ES.RequireObjectCoercible(array);
+		var args = slice.call(arguments, 1);
+		return polyfill.apply(array, args);
+	};
+
+	define(boundFindShim, {
+		getPolyfill: getPolyfill,
+		implementation: implementation,
+		shim: shim
+	});
+
+	module.exports = boundFindShim;
+
+
+/***/ },
+/* 38 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var keys = __webpack_require__(39);
+	var foreach = __webpack_require__(41);
+	var hasSymbols = typeof Symbol === 'function' && typeof Symbol() === 'symbol';
+
+	var toStr = Object.prototype.toString;
+
+	var isFunction = function (fn) {
+		return typeof fn === 'function' && toStr.call(fn) === '[object Function]';
+	};
+
+	var arePropertyDescriptorsSupported = function () {
+		var obj = {};
+		try {
+			Object.defineProperty(obj, 'x', { enumerable: false, value: obj });
+	        /* eslint-disable no-unused-vars, no-restricted-syntax */
+	        for (var _ in obj) { return false; }
+	        /* eslint-enable no-unused-vars, no-restricted-syntax */
+			return obj.x === obj;
+		} catch (e) { /* this is IE 8. */
+			return false;
+		}
+	};
+	var supportsDescriptors = Object.defineProperty && arePropertyDescriptorsSupported();
+
+	var defineProperty = function (object, name, value, predicate) {
+		if (name in object && (!isFunction(predicate) || !predicate())) {
+			return;
+		}
+		if (supportsDescriptors) {
+			Object.defineProperty(object, name, {
+				configurable: true,
+				enumerable: false,
+				value: value,
+				writable: true
+			});
+		} else {
+			object[name] = value;
+		}
+	};
+
+	var defineProperties = function (object, map) {
+		var predicates = arguments.length > 2 ? arguments[2] : {};
+		var props = keys(map);
+		if (hasSymbols) {
+			props = props.concat(Object.getOwnPropertySymbols(map));
+		}
+		foreach(props, function (name) {
+			defineProperty(object, name, map[name], predicates[name]);
+		});
+	};
+
+	defineProperties.supportsDescriptors = !!supportsDescriptors;
+
+	module.exports = defineProperties;
+
+
+/***/ },
+/* 39 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	// modified from https://github.com/es-shims/es5-shim
+	var has = Object.prototype.hasOwnProperty;
+	var toStr = Object.prototype.toString;
+	var slice = Array.prototype.slice;
+	var isArgs = __webpack_require__(40);
+	var isEnumerable = Object.prototype.propertyIsEnumerable;
+	var hasDontEnumBug = !isEnumerable.call({ toString: null }, 'toString');
+	var hasProtoEnumBug = isEnumerable.call(function () {}, 'prototype');
+	var dontEnums = [
+		'toString',
+		'toLocaleString',
+		'valueOf',
+		'hasOwnProperty',
+		'isPrototypeOf',
+		'propertyIsEnumerable',
+		'constructor'
+	];
+	var equalsConstructorPrototype = function (o) {
+		var ctor = o.constructor;
+		return ctor && ctor.prototype === o;
+	};
+	var excludedKeys = {
+		$console: true,
+		$external: true,
+		$frame: true,
+		$frameElement: true,
+		$frames: true,
+		$innerHeight: true,
+		$innerWidth: true,
+		$outerHeight: true,
+		$outerWidth: true,
+		$pageXOffset: true,
+		$pageYOffset: true,
+		$parent: true,
+		$scrollLeft: true,
+		$scrollTop: true,
+		$scrollX: true,
+		$scrollY: true,
+		$self: true,
+		$webkitIndexedDB: true,
+		$webkitStorageInfo: true,
+		$window: true
+	};
+	var hasAutomationEqualityBug = (function () {
+		/* global window */
+		if (typeof window === 'undefined') { return false; }
+		for (var k in window) {
+			try {
+				if (!excludedKeys['$' + k] && has.call(window, k) && window[k] !== null && typeof window[k] === 'object') {
+					try {
+						equalsConstructorPrototype(window[k]);
+					} catch (e) {
+						return true;
+					}
+				}
+			} catch (e) {
+				return true;
+			}
+		}
+		return false;
+	}());
+	var equalsConstructorPrototypeIfNotBuggy = function (o) {
+		/* global window */
+		if (typeof window === 'undefined' || !hasAutomationEqualityBug) {
+			return equalsConstructorPrototype(o);
+		}
+		try {
+			return equalsConstructorPrototype(o);
+		} catch (e) {
+			return false;
+		}
+	};
+
+	var keysShim = function keys(object) {
+		var isObject = object !== null && typeof object === 'object';
+		var isFunction = toStr.call(object) === '[object Function]';
+		var isArguments = isArgs(object);
+		var isString = isObject && toStr.call(object) === '[object String]';
+		var theKeys = [];
+
+		if (!isObject && !isFunction && !isArguments) {
+			throw new TypeError('Object.keys called on a non-object');
+		}
+
+		var skipProto = hasProtoEnumBug && isFunction;
+		if (isString && object.length > 0 && !has.call(object, 0)) {
+			for (var i = 0; i < object.length; ++i) {
+				theKeys.push(String(i));
+			}
+		}
+
+		if (isArguments && object.length > 0) {
+			for (var j = 0; j < object.length; ++j) {
+				theKeys.push(String(j));
+			}
+		} else {
+			for (var name in object) {
+				if (!(skipProto && name === 'prototype') && has.call(object, name)) {
+					theKeys.push(String(name));
+				}
+			}
+		}
+
+		if (hasDontEnumBug) {
+			var skipConstructor = equalsConstructorPrototypeIfNotBuggy(object);
+
+			for (var k = 0; k < dontEnums.length; ++k) {
+				if (!(skipConstructor && dontEnums[k] === 'constructor') && has.call(object, dontEnums[k])) {
+					theKeys.push(dontEnums[k]);
+				}
+			}
+		}
+		return theKeys;
+	};
+
+	keysShim.shim = function shimObjectKeys() {
+		if (Object.keys) {
+			var keysWorksWithArguments = (function () {
+				// Safari 5.0 bug
+				return (Object.keys(arguments) || '').length === 2;
+			}(1, 2));
+			if (!keysWorksWithArguments) {
+				var originalKeys = Object.keys;
+				Object.keys = function keys(object) {
+					if (isArgs(object)) {
+						return originalKeys(slice.call(object));
+					} else {
+						return originalKeys(object);
+					}
+				};
+			}
+		} else {
+			Object.keys = keysShim;
+		}
+		return Object.keys || keysShim;
+	};
+
+	module.exports = keysShim;
+
+
+/***/ },
+/* 40 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var toStr = Object.prototype.toString;
+
+	module.exports = function isArguments(value) {
+		var str = toStr.call(value);
+		var isArgs = str === '[object Arguments]';
+		if (!isArgs) {
+			isArgs = str !== '[object Array]' &&
+				value !== null &&
+				typeof value === 'object' &&
+				typeof value.length === 'number' &&
+				value.length >= 0 &&
+				toStr.call(value.callee) === '[object Function]';
+		}
+		return isArgs;
+	};
+
+
+/***/ },
+/* 41 */
+/***/ function(module, exports) {
+
+	
+	var hasOwn = Object.prototype.hasOwnProperty;
+	var toString = Object.prototype.toString;
+
+	module.exports = function forEach (obj, fn, ctx) {
+	    if (toString.call(fn) !== '[object Function]') {
+	        throw new TypeError('iterator must be a function');
+	    }
+	    var l = obj.length;
+	    if (l === +l) {
+	        for (var i = 0; i < l; i++) {
+	            fn.call(ctx, obj[i], i, obj);
+	        }
+	    } else {
+	        for (var k in obj) {
+	            if (hasOwn.call(obj, k)) {
+	                fn.call(ctx, obj[k], k, obj);
+	            }
+	        }
+	    }
+	};
+
+
+
+/***/ },
+/* 42 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var toStr = Object.prototype.toString;
+	var hasSymbols = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol';
+	var symbolToStr = hasSymbols ? Symbol.prototype.toString : toStr;
+
+	var $isNaN = __webpack_require__(43);
+	var $isFinite = __webpack_require__(44);
+	var MAX_SAFE_INTEGER = Number.MAX_SAFE_INTEGER || Math.pow(2, 53) - 1;
+
+	var assign = __webpack_require__(45);
+	var sign = __webpack_require__(46);
+	var mod = __webpack_require__(47);
+	var isPrimitive = __webpack_require__(48);
+	var toPrimitive = __webpack_require__(49);
+	var parseInteger = parseInt;
+	var bind = __webpack_require__(54);
+	var strSlice = bind.call(Function.call, String.prototype.slice);
+	var isBinary = bind.call(Function.call, RegExp.prototype.test, /^0b[01]+$/i);
+	var isOctal = bind.call(Function.call, RegExp.prototype.test, /^0o[0-7]+$/i);
+	var nonWS = ['\u0085', '\u200b', '\ufffe'].join('');
+	var nonWSregex = new RegExp('[' + nonWS + ']', 'g');
+	var hasNonWS = bind.call(Function.call, RegExp.prototype.test, nonWSregex);
+	var invalidHexLiteral = /^[-+]0x[0-9a-f]+$/i;
+	var isInvalidHexLiteral = bind.call(Function.call, RegExp.prototype.test, invalidHexLiteral);
+
+	// whitespace from: http://es5.github.io/#x15.5.4.20
+	// implementation from https://github.com/es-shims/es5-shim/blob/v3.4.0/es5-shim.js#L1304-L1324
+	var ws = [
+		'\x09\x0A\x0B\x0C\x0D\x20\xA0\u1680\u180E\u2000\u2001\u2002\u2003',
+		'\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028',
+		'\u2029\uFEFF'
+	].join('');
+	var trimRegex = new RegExp('(^[' + ws + ']+)|([' + ws + ']+$)', 'g');
+	var replace = bind.call(Function.call, String.prototype.replace);
+	var trim = function (value) {
+		return replace(value, trimRegex, '');
+	};
+
+	var ES5 = __webpack_require__(56);
+
+	var hasRegExpMatcher = __webpack_require__(58);
+
+	// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-abstract-operations
+	var ES6 = assign(assign({}, ES5), {
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-call-f-v-args
+		Call: function Call(F, V) {
+			var args = arguments.length > 2 ? arguments[2] : [];
+			if (!this.IsCallable(F)) {
+				throw new TypeError(F + ' is not a function');
+			}
+			return F.apply(V, args);
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-toprimitive
+		ToPrimitive: toPrimitive,
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-toboolean
+		// ToBoolean: ES5.ToBoolean,
+
+		// http://www.ecma-international.org/ecma-262/6.0/#sec-tonumber
+		ToNumber: function ToNumber(argument) {
+			var value = isPrimitive(argument) ? argument : toPrimitive(argument, 'number');
+			if (typeof value === 'symbol') {
+				throw new TypeError('Cannot convert a Symbol value to a number');
+			}
+			if (typeof value === 'string') {
+				if (isBinary(value)) {
+					return this.ToNumber(parseInteger(strSlice(value, 2), 2));
+				} else if (isOctal(value)) {
+					return this.ToNumber(parseInteger(strSlice(value, 2), 8));
+				} else if (hasNonWS(value) || isInvalidHexLiteral(value)) {
+					return NaN;
+				} else {
+					var trimmed = trim(value);
+					if (trimmed !== value) {
+						return this.ToNumber(trimmed);
+					}
+				}
+			}
+			return Number(value);
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-tointeger
+		// ToInteger: ES5.ToNumber,
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-toint32
+		// ToInt32: ES5.ToInt32,
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-touint32
+		// ToUint32: ES5.ToUint32,
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-toint16
+		ToInt16: function ToInt16(argument) {
+			var int16bit = this.ToUint16(argument);
+			return int16bit >= 0x8000 ? int16bit - 0x10000 : int16bit;
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-touint16
+		// ToUint16: ES5.ToUint16,
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-toint8
+		ToInt8: function ToInt8(argument) {
+			var int8bit = this.ToUint8(argument);
+			return int8bit >= 0x80 ? int8bit - 0x100 : int8bit;
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-touint8
+		ToUint8: function ToUint8(argument) {
+			var number = this.ToNumber(argument);
+			if ($isNaN(number) || number === 0 || !$isFinite(number)) { return 0; }
+			var posInt = sign(number) * Math.floor(Math.abs(number));
+			return mod(posInt, 0x100);
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-touint8clamp
+		ToUint8Clamp: function ToUint8Clamp(argument) {
+			var number = this.ToNumber(argument);
+			if ($isNaN(number) || number <= 0) { return 0; }
+			if (number >= 0xFF) { return 0xFF; }
+			var f = Math.floor(argument);
+			if (f + 0.5 < number) { return f + 1; }
+			if (number < f + 0.5) { return f; }
+			if (f % 2 !== 0) { return f + 1; }
+			return f;
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-tostring
+		ToString: function ToString(argument) {
+			if (typeof argument === 'symbol') {
+				throw new TypeError('Cannot convert a Symbol value to a string');
+			}
+			return String(argument);
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-toobject
+		ToObject: function ToObject(value) {
+			this.RequireObjectCoercible(value);
+			return Object(value);
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-topropertykey
+		ToPropertyKey: function ToPropertyKey(argument) {
+			var key = this.ToPrimitive(argument, String);
+			return typeof key === 'symbol' ? symbolToStr.call(key) : this.ToString(key);
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-tolength
+		ToLength: function ToLength(argument) {
+			var len = this.ToInteger(argument);
+			if (len <= 0) { return 0; } // includes converting -0 to +0
+			if (len > MAX_SAFE_INTEGER) { return MAX_SAFE_INTEGER; }
+			return len;
+		},
+
+		// http://www.ecma-international.org/ecma-262/6.0/#sec-canonicalnumericindexstring
+		CanonicalNumericIndexString: function CanonicalNumericIndexString(argument) {
+			if (toStr.call(argument) !== '[object String]') {
+				throw new TypeError('must be a string');
+			}
+			if (argument === '-0') { return -0; }
+			var n = this.ToNumber(argument);
+			if (this.SameValue(this.ToString(n), argument)) { return n; }
+			return void 0;
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-requireobjectcoercible
+		RequireObjectCoercible: ES5.CheckObjectCoercible,
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-isarray
+		IsArray: Array.isArray || function IsArray(argument) {
+			return toStr.call(argument) === '[object Array]';
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-iscallable
+		// IsCallable: ES5.IsCallable,
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-isconstructor
+		IsConstructor: function IsConstructor(argument) {
+			return typeof argument === 'function' && !!argument.prototype; // unfortunately there's no way to truly check this without try/catch `new argument`
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-isextensible-o
+		IsExtensible: function IsExtensible(obj) {
+			if (!Object.preventExtensions) { return true; }
+			if (isPrimitive(obj)) {
+				return false;
+			}
+			return Object.isExtensible(obj);
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-isinteger
+		IsInteger: function IsInteger(argument) {
+			if (typeof argument !== 'number' || $isNaN(argument) || !$isFinite(argument)) {
+				return false;
+			}
+			var abs = Math.abs(argument);
+			return Math.floor(abs) === abs;
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-ispropertykey
+		IsPropertyKey: function IsPropertyKey(argument) {
+			return typeof argument === 'string' || typeof argument === 'symbol';
+		},
+
+		// http://www.ecma-international.org/ecma-262/6.0/#sec-isregexp
+		IsRegExp: function IsRegExp(argument) {
+			if (!argument || typeof argument !== 'object') {
+				return false;
+			}
+			if (hasSymbols) {
+				var isRegExp = argument[Symbol.match];
+				if (typeof isRegExp !== 'undefined') {
+					return ES5.ToBoolean(isRegExp);
+				}
+			}
+			return hasRegExpMatcher(argument);
+		},
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevalue
+		// SameValue: ES5.SameValue,
+
+		// https://people.mozilla.org/~jorendorff/es6-draft.html#sec-samevaluezero
+		SameValueZero: function SameValueZero(x, y) {
+			return (x === y) || ($isNaN(x) && $isNaN(y));
+		},
+
+		/**
+		 * 7.3.2 GetV (V, P)
+		 * 1. Assert: IsPropertyKey(P) is true.
+		 * 2. Let O be ToObject(V).
+		 * 3. ReturnIfAbrupt(O).
+		 * 4. Return O.[[Get]](P, V).
+		 */
+		GetV: function GetV(V, P) {
+			// 7.3.2.1
+			if (!this.IsPropertyKey(P)) {
+				throw new TypeError('Assertion failed: IsPropertyKey(P) is not true');
+			}
+
+			// 7.3.2.2-3
+			var O = this.ToObject(V);
+
+			// 7.3.2.4
+			return O[P];
+		},
+
+		/**
+		 * 7.3.9 - http://www.ecma-international.org/ecma-262/6.0/#sec-getmethod
+		 * 1. Assert: IsPropertyKey(P) is true.
+		 * 2. Let func be GetV(O, P).
+		 * 3. ReturnIfAbrupt(func).
+		 * 4. If func is either undefined or null, return undefined.
+		 * 5. If IsCallable(func) is false, throw a TypeError exception.
+		 * 6. Return func.
+		 */
+		GetMethod: function GetMethod(O, P) {
+			// 7.3.9.1
+			if (!this.IsPropertyKey(P)) {
+				throw new TypeError('Assertion failed: IsPropertyKey(P) is not true');
+			}
+
+			// 7.3.9.2
+			var func = this.GetV(O, P);
+
+			// 7.3.9.4
+			if (func == null) {
+				return undefined;
+			}
+
+			// 7.3.9.5
+			if (!this.IsCallable(func)) {
+				throw new TypeError(P + 'is not a function');
+			}
+
+			// 7.3.9.6
+			return func;
+		},
+
+		/**
+		 * 7.3.1 Get (O, P) - http://www.ecma-international.org/ecma-262/6.0/#sec-get-o-p
+		 * 1. Assert: Type(O) is Object.
+		 * 2. Assert: IsPropertyKey(P) is true.
+		 * 3. Return O.[[Get]](P, O).
+		 */
+		Get: function Get(O, P) {
+			// 7.3.1.1
+			if (this.Type(O) !== 'Object') {
+				throw new TypeError('Assertion failed: Type(O) is not Object');
+			}
+			// 7.3.1.2
+			if (!this.IsPropertyKey(P)) {
+				throw new TypeError('Assertion failed: IsPropertyKey(P) is not true');
+			}
+			// 7.3.1.3
+			return O[P];
+		},
+
+		Type: function Type(x) {
+			if (typeof x === 'symbol') {
+				return 'Symbol';
+			}
+			return ES5.Type(x);
+		},
+
+		// http://www.ecma-international.org/ecma-262/6.0/#sec-speciesconstructor
+		SpeciesConstructor: function SpeciesConstructor(O, defaultConstructor) {
+			if (this.Type(O) !== 'Object') {
+				throw new TypeError('Assertion failed: Type(O) is not Object');
+			}
+			var C = O.constructor;
+			if (typeof C === 'undefined') {
+				return defaultConstructor;
+			}
+			if (this.Type(C) !== 'Object') {
+				throw new TypeError('O.constructor is not an Object');
+			}
+			var S = hasSymbols && Symbol.species ? C[Symbol.species] : undefined;
+			if (S == null) {
+				return defaultConstructor;
+			}
+			if (this.IsConstructor(S)) {
+				return S;
+			}
+			throw new TypeError('no constructor found');
+		}
+	});
+
+	delete ES6.CheckObjectCoercible; // renamed in ES6 to RequireObjectCoercible
+
+	module.exports = ES6;
+
+
+/***/ },
+/* 43 */
+/***/ function(module, exports) {
+
+	module.exports = Number.isNaN || function isNaN(a) {
+		return a !== a;
+	};
+
+
+/***/ },
+/* 44 */
+/***/ function(module, exports) {
+
+	var $isNaN = Number.isNaN || function (a) { return a !== a; };
+
+	module.exports = Number.isFinite || function (x) { return typeof x === 'number' && !$isNaN(x) && x !== Infinity && x !== -Infinity; };
+
+
+/***/ },
+/* 45 */
+/***/ function(module, exports) {
+
+	var has = Object.prototype.hasOwnProperty;
+	module.exports = Object.assign || function assign(target, source) {
+		for (var key in source) {
+			if (has.call(source, key)) {
+				target[key] = source[key];
+			}
+		}
+		return target;
+	};
+
+
+/***/ },
+/* 46 */
+/***/ function(module, exports) {
+
+	module.exports = function sign(number) {
+		return number >= 0 ? 1 : -1;
+	};
+
+
+/***/ },
+/* 47 */
+/***/ function(module, exports) {
+
+	module.exports = function mod(number, modulo) {
+		var remain = number % modulo;
+		return Math.floor(remain >= 0 ? remain : remain + modulo);
+	};
+
+
+/***/ },
+/* 48 */
+/***/ function(module, exports) {
+
+	module.exports = function isPrimitive(value) {
+		return value === null || (typeof value !== 'function' && typeof value !== 'object');
+	};
+
+
+/***/ },
+/* 49 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var hasSymbols = typeof Symbol === 'function' && typeof Symbol.iterator === 'symbol';
+
+	var isPrimitive = __webpack_require__(50);
+	var isCallable = __webpack_require__(51);
+	var isDate = __webpack_require__(52);
+	var isSymbol = __webpack_require__(53);
+
+	var ordinaryToPrimitive = function OrdinaryToPrimitive(O, hint) {
+		if (typeof O === 'undefined' || O === null) {
+			throw new TypeError('Cannot call method on ' + O);
+		}
+		if (typeof hint !== 'string' || (hint !== 'number' && hint !== 'string')) {
+			throw new TypeError('hint must be "string" or "number"');
+		}
+		var methodNames = hint === 'string' ? ['toString', 'valueOf'] : ['valueOf', 'toString'];
+		var method, result, i;
+		for (i = 0; i < methodNames.length; ++i) {
+			method = O[methodNames[i]];
+			if (isCallable(method)) {
+				result = method.call(O);
+				if (isPrimitive(result)) {
+					return result;
+				}
+			}
+		}
+		throw new TypeError('No default value');
+	};
+
+	var GetMethod = function GetMethod(O, P) {
+		var func = O[P];
+		if (func !== null && typeof func !== 'undefined') {
+			if (!isCallable(func)) {
+				throw new TypeError(func + ' returned for property ' + P + ' of object ' + O + ' is not a function');
+			}
+			return func;
+		}
+	};
+
+	// http://www.ecma-international.org/ecma-262/6.0/#sec-toprimitive
+	module.exports = function ToPrimitive(input, PreferredType) {
+		if (isPrimitive(input)) {
+			return input;
+		}
+		var hint = 'default';
+		if (arguments.length > 1) {
+			if (PreferredType === String) {
+				hint = 'string';
+			} else if (PreferredType === Number) {
+				hint = 'number';
+			}
+		}
+
+		var exoticToPrim;
+		if (hasSymbols) {
+			if (Symbol.toPrimitive) {
+				exoticToPrim = GetMethod(input, Symbol.toPrimitive);
+			} else if (isSymbol(input)) {
+				exoticToPrim = Symbol.prototype.valueOf;
+			}
+		}
+		if (typeof exoticToPrim !== 'undefined') {
+			var result = exoticToPrim.call(input, hint);
+			if (isPrimitive(result)) {
+				return result;
+			}
+			throw new TypeError('unable to convert exotic object to primitive');
+		}
+		if (hint === 'default' && (isDate(input) || isSymbol(input))) {
+			hint = 'string';
+		}
+		return ordinaryToPrimitive(input, hint === 'default' ? 'number' : hint);
+	};
+
+
+/***/ },
+/* 50 */
+/***/ function(module, exports) {
+
+	module.exports = function isPrimitive(value) {
+		return value === null || (typeof value !== 'function' && typeof value !== 'object');
+	};
+
+
+/***/ },
+/* 51 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var fnToStr = Function.prototype.toString;
+
+	var constructorRegex = /^\s*class /;
+	var isES6ClassFn = function isES6ClassFn(value) {
+		try {
+			var fnStr = fnToStr.call(value);
+			var singleStripped = fnStr.replace(/\/\/.*\n/g, '');
+			var multiStripped = singleStripped.replace(/\/\*[.\s\S]*\*\//g, '');
+			var spaceStripped = multiStripped.replace(/\n/mg, ' ').replace(/ {2}/g, ' ');
+			return constructorRegex.test(spaceStripped);
+		} catch (e) {
+			return false; // not a function
+		}
+	};
+
+	var tryFunctionObject = function tryFunctionObject(value) {
+		try {
+			if (isES6ClassFn(value)) { return false; }
+			fnToStr.call(value);
+			return true;
+		} catch (e) {
+			return false;
+		}
+	};
+	var toStr = Object.prototype.toString;
+	var fnClass = '[object Function]';
+	var genClass = '[object GeneratorFunction]';
+	var hasToStringTag = typeof Symbol === 'function' && typeof Symbol.toStringTag === 'symbol';
+
+	module.exports = function isCallable(value) {
+		if (!value) { return false; }
+		if (typeof value !== 'function' && typeof value !== 'object') { return false; }
+		if (hasToStringTag) { return tryFunctionObject(value); }
+		if (isES6ClassFn(value)) { return false; }
+		var strClass = toStr.call(value);
+		return strClass === fnClass || strClass === genClass;
+	};
+
+
+/***/ },
+/* 52 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var getDay = Date.prototype.getDay;
+	var tryDateObject = function tryDateObject(value) {
+		try {
+			getDay.call(value);
+			return true;
+		} catch (e) {
+			return false;
+		}
+	};
+
+	var toStr = Object.prototype.toString;
+	var dateClass = '[object Date]';
+	var hasToStringTag = typeof Symbol === 'function' && typeof Symbol.toStringTag === 'symbol';
+
+	module.exports = function isDateObject(value) {
+		if (typeof value !== 'object' || value === null) { return false; }
+		return hasToStringTag ? tryDateObject(value) : toStr.call(value) === dateClass;
+	};
+
+
+/***/ },
+/* 53 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	var toStr = Object.prototype.toString;
+	var hasSymbols = typeof Symbol === 'function' && typeof Symbol() === 'symbol';
+
+	if (hasSymbols) {
+		var symToStr = Symbol.prototype.toString;
+		var symStringRegex = /^Symbol\(.*\)$/;
+		var isSymbolObject = function isSymbolObject(value) {
+			if (typeof value.valueOf() !== 'symbol') { return false; }
+			return symStringRegex.test(symToStr.call(value));
+		};
+		module.exports = function isSymbol(value) {
+			if (typeof value === 'symbol') { return true; }
+			if (toStr.call(value) !== '[object Symbol]') { return false; }
+			try {
+				return isSymbolObject(value);
+			} catch (e) {
+				return false;
+			}
+		};
+	} else {
+		module.exports = function isSymbol(value) {
+			// this environment does not support Symbols.
+			return false;
+		};
+	}
+
+
+/***/ },
+/* 54 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var implementation = __webpack_require__(55);
+
+	module.exports = Function.prototype.bind || implementation;
+
+
+/***/ },
+/* 55 */
+/***/ function(module, exports) {
+
+	var ERROR_MESSAGE = 'Function.prototype.bind called on incompatible ';
+	var slice = Array.prototype.slice;
+	var toStr = Object.prototype.toString;
+	var funcType = '[object Function]';
+
+	module.exports = function bind(that) {
+	    var target = this;
+	    if (typeof target !== 'function' || toStr.call(target) !== funcType) {
+	        throw new TypeError(ERROR_MESSAGE + target);
+	    }
+	    var args = slice.call(arguments, 1);
+
+	    var bound;
+	    var binder = function () {
+	        if (this instanceof bound) {
+	            var result = target.apply(
+	                this,
+	                args.concat(slice.call(arguments))
+	            );
+	            if (Object(result) === result) {
+	                return result;
+	            }
+	            return this;
+	        } else {
+	            return target.apply(
+	                that,
+	                args.concat(slice.call(arguments))
+	            );
+	        }
+	    };
+
+	    var boundLength = Math.max(0, target.length - args.length);
+	    var boundArgs = [];
+	    for (var i = 0; i < boundLength; i++) {
+	        boundArgs.push('$' + i);
+	    }
+
+	    bound = Function('binder', 'return function (' + boundArgs.join(',') + '){ return binder.apply(this,arguments); }')(binder);
+
+	    if (target.prototype) {
+	        var Empty = function Empty() {};
+	        Empty.prototype = target.prototype;
+	        bound.prototype = new Empty();
+	        Empty.prototype = null;
+	    }
+
+	    return bound;
+	};
+
+
+/***/ },
+/* 56 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var $isNaN = __webpack_require__(43);
+	var $isFinite = __webpack_require__(44);
+
+	var sign = __webpack_require__(46);
+	var mod = __webpack_require__(47);
+
+	var IsCallable = __webpack_require__(51);
+	var toPrimitive = __webpack_require__(57);
+
+	// https://es5.github.io/#x9
+	var ES5 = {
+		ToPrimitive: toPrimitive,
+
+		ToBoolean: function ToBoolean(value) {
+			return Boolean(value);
+		},
+		ToNumber: function ToNumber(value) {
+			return Number(value);
+		},
+		ToInteger: function ToInteger(value) {
+			var number = this.ToNumber(value);
+			if ($isNaN(number)) { return 0; }
+			if (number === 0 || !$isFinite(number)) { return number; }
+			return sign(number) * Math.floor(Math.abs(number));
+		},
+		ToInt32: function ToInt32(x) {
+			return this.ToNumber(x) >> 0;
+		},
+		ToUint32: function ToUint32(x) {
+			return this.ToNumber(x) >>> 0;
+		},
+		ToUint16: function ToUint16(value) {
+			var number = this.ToNumber(value);
+			if ($isNaN(number) || number === 0 || !$isFinite(number)) { return 0; }
+			var posInt = sign(number) * Math.floor(Math.abs(number));
+			return mod(posInt, 0x10000);
+		},
+		ToString: function ToString(value) {
+			return String(value);
+		},
+		ToObject: function ToObject(value) {
+			this.CheckObjectCoercible(value);
+			return Object(value);
+		},
+		CheckObjectCoercible: function CheckObjectCoercible(value, optMessage) {
+			/* jshint eqnull:true */
+			if (value == null) {
+				throw new TypeError(optMessage || 'Cannot call method on ' + value);
+			}
+			return value;
+		},
+		IsCallable: IsCallable,
+		SameValue: function SameValue(x, y) {
+			if (x === y) { // 0 === -0, but they are not identical.
+				if (x === 0) { return 1 / x === 1 / y; }
+				return true;
+			}
+			return $isNaN(x) && $isNaN(y);
+		},
+
+		// http://www.ecma-international.org/ecma-262/5.1/#sec-8
+		Type: function Type(x) {
+			if (x === null) {
+				return 'Null';
+			}
+			if (typeof x === 'undefined') {
+				return 'Undefined';
+			}
+			if (typeof x === 'function' || typeof x === 'object') {
+				return 'Object';
+			}
+			if (typeof x === 'number') {
+				return 'Number';
+			}
+			if (typeof x === 'boolean') {
+				return 'Boolean';
+			}
+			if (typeof x === 'string') {
+				return 'String';
+			}
+		}
+	};
+
+	module.exports = ES5;
+
+
+/***/ },
+/* 57 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var toStr = Object.prototype.toString;
+
+	var isPrimitive = __webpack_require__(50);
+
+	var isCallable = __webpack_require__(51);
+
+	// https://es5.github.io/#x8.12
+	var ES5internalSlots = {
+		'[[DefaultValue]]': function (O, hint) {
+			var actualHint = hint || (toStr.call(O) === '[object Date]' ? String : Number);
+
+			if (actualHint === String || actualHint === Number) {
+				var methods = actualHint === String ? ['toString', 'valueOf'] : ['valueOf', 'toString'];
+				var value, i;
+				for (i = 0; i < methods.length; ++i) {
+					if (isCallable(O[methods[i]])) {
+						value = O[methods[i]]();
+						if (isPrimitive(value)) {
+							return value;
+						}
+					}
+				}
+				throw new TypeError('No default value');
+			}
+			throw new TypeError('invalid [[DefaultValue]] hint supplied');
+		}
+	};
+
+	// https://es5.github.io/#x9
+	module.exports = function ToPrimitive(input, PreferredType) {
+		if (isPrimitive(input)) {
+			return input;
+		}
+		return ES5internalSlots['[[DefaultValue]]'](input, PreferredType);
+	};
+
+
+/***/ },
+/* 58 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var has = __webpack_require__(59);
+	var regexExec = RegExp.prototype.exec;
+	var gOPD = Object.getOwnPropertyDescriptor;
+
+	var tryRegexExecCall = function tryRegexExec(value) {
+		try {
+			var lastIndex = value.lastIndex;
+			value.lastIndex = 0;
+
+			regexExec.call(value);
+			return true;
+		} catch (e) {
+			return false;
+		} finally {
+			value.lastIndex = lastIndex;
+		}
+	};
+	var toStr = Object.prototype.toString;
+	var regexClass = '[object RegExp]';
+	var hasToStringTag = typeof Symbol === 'function' && typeof Symbol.toStringTag === 'symbol';
+
+	module.exports = function isRegex(value) {
+		if (!value || typeof value !== 'object') {
+			return false;
+		}
+		if (!hasToStringTag) {
+			return toStr.call(value) === regexClass;
+		}
+
+		var descriptor = gOPD(value, 'lastIndex');
+		var hasLastIndexDataProperty = descriptor && has(descriptor, 'value');
+		if (!hasLastIndexDataProperty) {
+			return false;
+		}
+
+		return tryRegexExecCall(value);
+	};
+
+
+/***/ },
+/* 59 */
+/***/ function(module, exports, __webpack_require__) {
+
+	var bind = __webpack_require__(54);
+
+	module.exports = bind.call(Function.call, Object.prototype.hasOwnProperty);
+
+
+/***/ },
+/* 60 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var ES = __webpack_require__(42);
+
+	module.exports = function find(predicate) {
+		var list = ES.ToObject(this);
+		var length = ES.ToInteger(ES.ToLength(list.length));
+		if (!ES.IsCallable(predicate)) {
+			throw new TypeError('Array#find: predicate must be a function');
+		}
+		if (length === 0) {
+			return undefined;
+		}
+		var thisArg = arguments[1];
+		for (var i = 0, value; i < length; i++) {
+			value = list[i];
+			if (ES.Call(predicate, thisArg, [value, i, list])) {
+				return value;
+			}
+		}
+		return undefined;
+	};
+
+
+/***/ },
+/* 61 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = function getPolyfill() {
+		// Detect if an implementation exists
+		// Detect early implementations which skipped holes in sparse arrays
+	  // eslint-disable-next-line no-sparse-arrays
+		var implemented = Array.prototype.find && [, 1].find(function () {
+			return true;
+		}) !== 1;
+
+	  // eslint-disable-next-line global-require
+		return implemented ? Array.prototype.find : __webpack_require__(60);
+	};
+
+
+/***/ },
+/* 62 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var define = __webpack_require__(38);
+	var getPolyfill = __webpack_require__(61);
+
+	module.exports = function shimArrayPrototypeFind() {
+		var polyfill = getPolyfill();
+
+		define(Array.prototype, { find: polyfill }, {
+			find: function () {
+				return Array.prototype.find !== polyfill;
+			}
+		});
+
+		return polyfill;
+	};
+
+
+/***/ },
+/* 63 */
 /***/ function(module, exports) {
 
 	module.exports = "<svg xmlns=\"http://www.w3.org/2000/svg\"><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-arrows-alt\"><title>arrows-alt</title><path d=\"M1411 541l-355 355 355 355 144-144q29-31 70-14 39 17 39 59v448q0 26-19 45t-45 19h-448q-42 0-59-40-17-39 14-69l144-144-355-355-355 355 144 144q31 30 14 69-17 40-59 40h-448q-26 0-45-19t-19-45v-448q0-42 40-59 39-17 69 14l144 144 355-355-355-355-144 144q-19 19-45 19-12 0-24-5-40-17-40-59v-448q0-26 19-45t45-19h448q42 0 59 40 17 39-14 69l-144 144 355 355 355-355-144-144q-31-30-14-69 17-40 59-40h448q26 0 45 19t19 45v448q0 42-39 59-13 5-25 5-26 0-45-19z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-backward\"><title>backward</title><path d=\"M1683 141q19-19 32-13t13 32v1472q0 26-13 32t-32-13l-710-710q-8-9-13-19v710q0 26-13 32t-32-13l-710-710q-19-19-19-45t19-45l710-710q19-19 32-13t13 32v710q5-11 13-19z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-bullseye\"><title>bullseye</title><path d=\"M1152 896q0 106-75 181t-181 75-181-75-75-181 75-181 181-75 181 75 75 181zm128 0q0-159-112.5-271.5t-271.5-112.5-271.5 112.5-112.5 271.5 112.5 271.5 271.5 112.5 271.5-112.5 112.5-271.5zm128 0q0 212-150 362t-362 150-362-150-150-362 150-362 362-150 362 150 150 362zm128 0q0-130-51-248.5t-136.5-204-204-136.5-248.5-51-248.5 51-204 136.5-136.5 204-51 248.5 51 248.5 136.5 204 204 136.5 248.5 51 248.5-51 204-136.5 136.5-204 51-248.5zm128 0q0 209-103 385.5t-279.5 279.5-385.5 103-385.5-103-279.5-279.5-103-385.5 103-385.5 279.5-279.5 385.5-103 385.5 103 279.5 279.5 103 385.5z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 400 380\" id=\"leplayer-icon-cat\"><title>cat</title> <path d=\"M 151.34904,307.20455 L 264.34904,307.20455 C 264.34904,291.14096 263.2021,287.95455 236.59904,287.95455 C 240.84904,275.20455 258.12424,244.35808 267.72404,244.35808 C 276.21707,244.35808 286.34904,244.82592 286.34904,264.20455 C 286.34904,286.20455 323.37171,321.67547 332.34904,307.20455 C 345.72769,285.63897 309.34904,292.21514 309.34904,240.20455 C 309.34904,169.05135 350.87417,179.18071 350.87417,139.20455 C 350.87417,119.20455 345.34904,116.50374 345.34904,102.20455 C 345.34904,83.30695 361.99717,84.403577 358.75805,68.734879 C 356.52061,57.911656 354.76962,49.23199 353.46516,36.143889 C 352.53959,26.857305 352.24452,16.959398 342.59855,17.357382 C 331.26505,17.824992 326.96549,37.77419 309.34904,39.204549 C 291.76851,40.631991 276.77834,24.238028 269.97404,26.579549 C 263.22709,28.901334 265.34904,47.204549 269.34904,60.204549 C 275.63588,80.636771 289.34904,107.20455 264.34904,111.20455 C 239.34904,115.20455 196.34904,119.20455 165.34904,160.20455 C 134.34904,201.20455 135.49342,249.3212 123.34904,264.20455 C 82.590696,314.15529 40.823919,293.64625 40.823919,335.20455 C 40.823919,353.81019 72.349045,367.20455 77.349045,361.20455 C 82.349045,355.20455 34.863764,337.32587 87.995492,316.20455 C 133.38711,298.16014 137.43914,294.47663 151.34904,307.20455 z \" style=\"fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1\"/> </symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-commenting-o\"><title>commenting-o</title><path d=\"M640 896q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm384 0q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm384 0q0 53-37.5 90.5t-90.5 37.5-90.5-37.5-37.5-90.5 37.5-90.5 90.5-37.5 90.5 37.5 37.5 90.5zm-512-512q-204 0-381.5 69.5t-282 187.5-104.5 255q0 112 71.5 213.5t201.5 175.5l87 50-27 96q-24 91-70 172 152-63 275-171l43-38 57 6q69 8 130 8 204 0 381.5-69.5t282-187.5 104.5-255-104.5-255-282-187.5-381.5-69.5zm896 512q0 174-120 321.5t-326 233-450 85.5q-70 0-145-8-198 175-460 242-49 14-114 22h-5q-15 0-27-10.5t-16-27.5v-1q-3-4-.5-12t2-10 4.5-9.5l6-9 7-8.5 8-9q7-8 31-34.5t34.5-38 31-39.5 32.5-51 27-59 26-76q-157-89-247.5-220t-90.5-281q0-130 71-248.5t191-204.5 286-136.5 348-50.5 348 50.5 286 136.5 191 204.5 71 248.5z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-download\"><title>download</title><path d=\"M1344 1344q0-26-19-45t-45-19-45 19-19 45 19 45 45 19 45-19 19-45zm256 0q0-26-19-45t-45-19-45 19-19 45 19 45 45 19 45-19 19-45zm128-224v320q0 40-28 68t-68 28h-1472q-40 0-68-28t-28-68v-320q0-40 28-68t68-28h465l135 136q58 56 136 56t136-56l136-136h464q40 0 68 28t28 68zm-325-569q17 41-14 70l-448 448q-18 19-45 19t-45-19l-448-448q-31-29-14-70 17-39 59-39h256v-448q0-26 19-45t45-19h256q26 0 45 19t19 45v448h256q42 0 59 39z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-edit\"><title>edit</title><path d=\"M888 1184l116-116-152-152-116 116v56h96v96h56zm440-720q-16-16-33 1l-350 350q-17 17-1 33t33-1l350-350q17-17 1-33zm80 594v190q0 119-84.5 203.5t-203.5 84.5h-832q-119 0-203.5-84.5t-84.5-203.5v-832q0-119 84.5-203.5t203.5-84.5h832q63 0 117 25 15 7 18 23 3 17-9 29l-49 49q-14 14-32 8-23-6-45-6h-832q-66 0-113 47t-47 113v832q0 66 47 113t113 47h832q66 0 113-47t47-113v-126q0-13 9-22l64-64q15-15 35-7t20 29zm-96-738l288 288-672 672h-288v-288zm444 132l-92 92-288-288 92-92q28-28 68-28t68 28l152 152q28 28 28 68t-28 68z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-forward\"><title>forward</title><path d=\"M109 1651q-19 19-32 13t-13-32v-1472q0-26 13-32t32 13l710 710q8 8 13 19v-710q0-26 13-32t32 13l710 710q19 19 19 45t-19 45l-710 710q-19 19-32 13t-13-32v-710q-5 10-13 19z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-info\"><title>info</title><path d=\"M1216 1344v128q0 26-19 45t-45 19h-512q-26 0-45-19t-19-45v-128q0-26 19-45t45-19h64v-384h-64q-26 0-45-19t-19-45v-128q0-26 19-45t45-19h384q26 0 45 19t19 45v576h64q26 0 45 19t19 45zm-128-1152v192q0 26-19 45t-45 19h-256q-26 0-45-19t-19-45v-192q0-26 19-45t45-19h256q26 0 45 19t19 45z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-list-ul\"><title>list-ul</title><path d=\"M384 1408q0 80-56 136t-136 56-136-56-56-136 56-136 136-56 136 56 56 136zm0-512q0 80-56 136t-136 56-136-56-56-136 56-136 136-56 136 56 56 136zm1408 416v192q0 13-9.5 22.5t-22.5 9.5h-1216q-13 0-22.5-9.5t-9.5-22.5v-192q0-13 9.5-22.5t22.5-9.5h1216q13 0 22.5 9.5t9.5 22.5zm-1408-928q0 80-56 136t-136 56-136-56-56-136 56-136 136-56 136 56 56 136zm1408 416v192q0 13-9.5 22.5t-22.5 9.5h-1216q-13 0-22.5-9.5t-9.5-22.5v-192q0-13 9.5-22.5t22.5-9.5h1216q13 0 22.5 9.5t9.5 22.5zm0-512v192q0 13-9.5 22.5t-22.5 9.5h-1216q-13 0-22.5-9.5t-9.5-22.5v-192q0-13 9.5-22.5t22.5-9.5h1216q13 0 22.5 9.5t9.5 22.5z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-magic\"><title>magic</title><path d=\"M1254 581l293-293-107-107-293 293zm447-293q0 27-18 45l-1286 1286q-18 18-45 18t-45-18l-198-198q-18-18-18-45t18-45l1286-1286q18-18 45-18t45 18l198 198q18 18 18 45zm-1351-190l98 30-98 30-30 98-30-98-98-30 98-30 30-98zm350 162l196 60-196 60-60 196-60-196-196-60 196-60 60-196zm930 478l98 30-98 30-30 98-30-98-98-30 98-30 30-98zm-640-640l98 30-98 30-30 98-30-98-98-30 98-30 30-98z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-pause\"><title>pause</title><path d=\"M1664 192v1408q0 26-19 45t-45 19h-512q-26 0-45-19t-19-45v-1408q0-26 19-45t45-19h512q26 0 45 19t19 45zm-896 0v1408q0 26-19 45t-45 19h-512q-26 0-45-19t-19-45v-1408q0-26 19-45t45-19h512q26 0 45 19t19 45z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-plane\"><title>plane</title><path d=\"M1568 160q44 52 12 148t-108 172l-161 161 160 696q5 19-12 33l-128 96q-7 6-19 6-4 0-7-1-15-3-21-16l-279-508-259 259 53 194q5 17-8 31l-96 96q-9 9-23 9h-2q-15-2-24-13l-189-252-252-189q-11-7-13-23-1-13 9-25l96-97q9-9 23-9 6 0 8 1l194 53 259-259-508-279q-14-8-17-24-2-16 9-27l128-128q14-13 30-8l665 159 160-160q76-76 172-108t148 12z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-play\"><title>play</title><path d=\"M1576 927l-1328 738q-23 13-39.5 3t-16.5-36v-1472q0-26 16.5-36t39.5 3l1328 738q23 13 23 31t-23 31z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-plus\"><title>plus</title><path d=\"M1600 736v192q0 40-28 68t-68 28h-416v416q0 40-28 68t-68 28h-192q-40 0-68-28t-28-68v-416h-416q-40 0-68-28t-28-68v-192q0-40 28-68t68-28h416v-416q0-40 28-68t68-28h192q40 0 68 28t28 68v416h416q40 0 68 28t28 68z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-redo\"><title>redo</title><path d=\"M1664 256v448q0 26-19 45t-45 19h-448q-42 0-59-40-17-39 14-69l138-138q-148-137-349-137-104 0-198.5 40.5t-163.5 109.5-109.5 163.5-40.5 198.5 40.5 198.5 109.5 163.5 163.5 109.5 198.5 40.5q119 0 225-52t179-147q7-10 23-12 14 0 25 9l137 138q9 8 9.5 20.5t-7.5 22.5q-109 132-264 204.5t-327 72.5q-156 0-298-61t-245-164-164-245-61-298 61-298 164-245 245-164 298-61q147 0 284.5 55.5t244.5 156.5l130-129q29-31 70-14 39 17 39 59z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-refresh\"><title>refresh</title><path d=\"M1639 1056q0 5-1 7-64 268-268 434.5t-478 166.5q-146 0-282.5-55t-243.5-157l-129 129q-19 19-45 19t-45-19-19-45v-448q0-26 19-45t45-19h448q26 0 45 19t19 45-19 45l-137 137q71 66 161 102t187 36q134 0 250-65t186-179q11-17 53-117 8-23 30-23h192q13 0 22.5 9.5t9.5 22.5zm25-800v448q0 26-19 45t-45 19h-448q-26 0-45-19t-19-45 19-45l138-138q-148-137-349-137-134 0-250 65t-186 179q-11 17-53 117-8 23-30 23h-199q-13 0-22.5-9.5t-9.5-22.5v-7q65-268 270-434.5t480-166.5q146 0 284 55.5t245 156.5l130-129q19-19 45-19t45 19 19 45z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-trash\"><title>trash</title><path d=\"M704 1376v-704q0-14-9-23t-23-9h-64q-14 0-23 9t-9 23v704q0 14 9 23t23 9h64q14 0 23-9t9-23zm256 0v-704q0-14-9-23t-23-9h-64q-14 0-23 9t-9 23v704q0 14 9 23t23 9h64q14 0 23-9t9-23zm256 0v-704q0-14-9-23t-23-9h-64q-14 0-23 9t-9 23v704q0 14 9 23t23 9h64q14 0 23-9t9-23zm-544-992h448l-48-117q-7-9-17-11h-317q-10 2-17 11zm928 32v64q0 14-9 23t-23 9h-96v948q0 83-47 143.5t-113 60.5h-832q-66 0-113-58.5t-47-141.5v-952h-96q-14 0-23-9t-9-23v-64q0-14 9-23t23-9h309l70-167q15-37 54-63t79-26h320q40 0 79 26t54 63l70 167h309q14 0 23 9t9 23z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-undo\"><title>undo</title><path d=\"M1664 896q0 156-61 298t-164 245-245 164-298 61q-172 0-327-72.5t-264-204.5q-7-10-6.5-22.5t8.5-20.5l137-138q10-9 25-9 16 2 23 12 73 95 179 147t225 52q104 0 198.5-40.5t163.5-109.5 109.5-163.5 40.5-198.5-40.5-198.5-109.5-163.5-163.5-109.5-198.5-40.5q-98 0-188 35.5t-160 101.5l137 138q31 30 14 69-17 40-59 40h-448q-26 0-45-19t-19-45v-448q0-42 40-59 39-17 69 14l130 129q107-101 244.5-156.5t284.5-55.5q156 0 298 61t245 164 164 245 61 298z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-volume-down\"><title>volume-down</title><path d=\"M1088 352v1088q0 26-19 45t-45 19-45-19l-333-333h-262q-26 0-45-19t-19-45v-384q0-26 19-45t45-19h262l333-333q19-19 45-19t45 19 19 45zm384 544q0 76-42.5 141.5t-112.5 93.5q-10 5-25 5-26 0-45-18.5t-19-45.5q0-21 12-35.5t29-25 34-23 29-35.5 12-57-12-57-29-35.5-34-23-29-25-12-35.5q0-27 19-45.5t45-18.5q15 0 25 5 70 27 112.5 93t42.5 142z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-volume-off\"><title>volume-off</title><path d=\"M1280 352v1088q0 26-19 45t-45 19-45-19l-333-333h-262q-26 0-45-19t-19-45v-384q0-26 19-45t45-19h262l333-333q19-19 45-19t45 19 19 45z\"/></symbol><symbol fill=\"currentColor\" viewBox=\"0 0 1792 1792\" id=\"leplayer-icon-volume-up\"><title>volume-up</title><path d=\"M832 352v1088q0 26-19 45t-45 19-45-19l-333-333h-262q-26 0-45-19t-19-45v-384q0-26 19-45t45-19h262l333-333q19-19 45-19t45 19 19 45zm384 544q0 76-42.5 141.5t-112.5 93.5q-10 5-25 5-26 0-45-18.5t-19-45.5q0-21 12-35.5t29-25 34-23 29-35.5 12-57-12-57-29-35.5-34-23-29-25-12-35.5q0-27 19-45.5t45-18.5q15 0 25 5 70 27 112.5 93t42.5 142zm256 0q0 153-85 282.5t-225 188.5q-13 5-25 5-27 0-46-19t-19-45q0-39 39-59 56-29 76-44 74-54 115.5-135.5t41.5-173.5-41.5-173.5-115.5-135.5q-20-15-76-44-39-20-39-59 0-26 19-45t45-19q13 0 26 5 140 59 225 188.5t85 282.5zm256 0q0 230-127 422.5t-338 283.5q-13 5-26 5-26 0-45-19t-19-45q0-36 39-59 7-4 22.5-10.5t22.5-10.5q46-25 82-51 123-91 192-227t69-289-69-289-192-227q-36-26-82-51-7-4-22.5-10.5t-22.5-10.5q-39-23-39-59 0-26 19-45t45-19q13 0 26 5 211 91 338 283.5t127 422.5z\"/></symbol></svg>"
 
 /***/ },
-/* 36 */
+/* 64 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -6425,7 +8458,7 @@
 	};
 
 /***/ },
-/* 37 */
+/* 65 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -6444,7 +8477,7 @@
 	};
 
 /***/ },
-/* 38 */
+/* 66 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -6458,6 +8491,25 @@
 			controls: {
 				common: [['play', 'volume', 'timeline', 'rate', 'source', 'divider', 'fullscreen'], []],
 				fullscreen: [['play', 'volume', 'timeline', 'rate', 'source', 'divider', 'fullscreen']]
+			}
+		}
+	};
+
+/***/ },
+/* 67 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	var preset = exports.preset = {
+		options: {
+			entity: 'Youtube',
+			controls: {
+				common: [['play', 'volume', 'timeline', 'rate', 'source', 'divider', 'section', 'fullscreen'], []],
+				fullscreen: [['play', 'volume', 'timeline', 'rate', 'source', 'divider', 'section', 'fullscreen']]
 			}
 		}
 	};
