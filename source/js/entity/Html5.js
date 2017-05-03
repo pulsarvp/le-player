@@ -1,29 +1,150 @@
 import $ from 'jquery';
 import Cookie from '../utils/cookie';
 import Component from '../components/Component';
-import MediaError from '../MediaError';
 import { IS_SAFARI, IS_IOS, IS_ANDROID } from '../utils/browser';
+import Entity from './Entity';
 
 
-class Html5 extends Component {
+class Html5 extends Entity {
 	constructor (player, options) {
-		super(player, options)
-		this.player = player;
+		super(player, options);
 		this.media = this.element[0];
 
 		this.subtitles = [];
 		this.bufferRanges = [];
 
-		if (this.player.options.src == null) {
-			this.player.error = new MediaError('Видеофайл не найден.');
+		this.src = this.player.options.src;
+
+		if(this.player.options.poster != null) {
+			this.poster = this.player.options.poster;
 		}
 
-		this.src = this.player.options.src;
+		if(this.getAvailableQualityLevels().length > 0) {
+			this._playbackQuality = this.getAvailableQualityLevels()[0];
+		}
+
+		this.element.on('loadstart', this.onLoadStart.bind(this));
+		this.element.on('timeupdate', this.onTimeUpdate.bind(this));
+		this.element.on('durationchange', this.onDurationChange.bind(this));
+		this.element.on('progress', this.onProgress.bind(this));
+		this.element.on('seeking', this.onSeeking.bind(this));
+		this.element.on('seeked', this.onSeeked.bind(this));
+		this.element.on('volumechange', this.onVolumeChange.bind(this));
+		this.element.on('click', this.onClick.bind(this));
+		this.element.on('dblclick', this.onDblclick.bind(this));
+		this.element.on('play', this.onPlay.bind(this));
+		this.element.on('pause', this.onPause.bind(this));
+		this.element.on('ratechange', this.onRateChange.bind(this));
+		this.element.on('ended', this.onEnded.bind(this));
+		this.element.on('canplaythrough', this.onCanplayThrough.bind(this));
+		this.element.on('waiting', this.onWaiting.bind(this));
+		this.element.on('error', this.onError.bind(this));
+	}
+
+	onLoadStart(e) {
+		this.trigger('loadstart');
+	}
+
+	onTimeUpdate(e) {
+		this.trigger('timeupdate');
+	}
+
+	onDurationChange(e) {
+		this.trigger('durationchange');
+	}
+
+	onProgress(e) {
+		this.trigger('progress');
+	}
+
+	onSeeking(e) {
+		this.trigger('seeking');
+	}
+
+	onSeeked(e) {
+		this.trigger('seeked');
+	}
+
+	onVolumeChange(e) {
+		this.trigger('volumechange');
+	}
+
+	onClick() {
+		this.trigger('click');
+	}
+
+	onDblclick() {
+		this.trigger('dblclick');
+	}
+
+	onPlay() {
+		this.trigger('play');
+	}
+
+	onPause() {
+		this.trigger('pause');
+	}
+
+	onPlaying() {
+		this.trigger('playing');
+	}
+
+	onRateChange() {
+		this.trigger('ratechange');
+	}
+
+	onEnded() {
+		this.trigger('ended');
+	}
+
+	onCanplayThrough() {
+		this.trigger('canplaythrough');
+	}
+
+	onWaiting() {
+		this.trigger('waiting');
+	}
+
+	onError(e) {
+		this.trigger('error', { code : e.target.error.code });
 	}
 
 	/* TODO */
 	createElement() {
-		return this.element = $(this.options.ctx);
+		this.element = this.options.ctx;
+		[
+
+			// Remove controls because we dont not support native controls yet
+			'controls',
+			'poster',
+
+			// It is unnecessary attrs, this functionality solve CSS
+			'height',
+			'width'
+
+		].forEach(item => {
+			this.element.removeAttr(item);
+		});
+
+		// Set attrs from options
+		[
+			'preload',
+			'autoplay',
+			'loop',
+			'muted'
+		].forEach(item => {
+			if(this.player.options[item]) {
+				this.element.attr(item, this.player.options[item]);
+				this.element.prop(item, this.player.options[item]);
+			}
+		});
+
+
+		this.element.find('source[data-quality]').each((i, item) => {
+			$(item).remove();
+		});
+
+		return this.element;
 	}
 
 	get currentTime () {
@@ -61,8 +182,12 @@ class Html5 extends Component {
 		return this.media.playbackRate;
 	}
 
-	get defaultRate() {
-		return Cookie.get('rate') || this.player.options.rate.default
+	set muted(value) {
+		this.media.muted = value;
+	}
+
+	get muted() {
+		return this.media.muted
 	}
 
 	get rateMax() {
@@ -80,11 +205,11 @@ class Html5 extends Component {
 	get rateMin() {
 		let min = this.player.options.rate.min;
 
-		if(IS_IOS || IS_ANDROID) {
+		if (IS_IOS || IS_ANDROID) {
 			min = Html5.MOBILE_MIN_RATE;
 		}
 
-		if(IS_SAFARI) {
+		if (IS_SAFARI) {
 			min = Html5.SAFARI_MIN_RATE;
 		}
 
@@ -98,28 +223,46 @@ class Html5 extends Component {
 		}
 	}
 
+	getAvailableQualityLevels() {
+		return this.player.options.sources.map(item => ({
+			name : item.title,
+			...item
+		}));
+	}
 
-	set src (src) {
-		if(src == null) return;
-		if(this.src && this.src.url === src.url) return;
-
+	set playbackQuality(name) {
+		super.playbackQuality = name;
 		const time = this.currentTime;
 		const rate = this.rate;
 		const stop = this.paused;
 
-		this.media.src = src.url;
+		this._playbackQuality = this.getAvailableQualityLevels().find(item => item.name === name);
 
+		this.src = this._playbackQuality;
 		this.playbackRate = rate;
-
 		this.currentTime = time;
-
-		this._source = src;
 
 		if (stop) {
 			this.pause();
 		} else {
 			this.play();
 		}
+
+		this.trigger('qualitychange', this._playbackQuality);
+
+	}
+
+	get playbackQuality() {
+		return this._playbackQuality;
+	}
+
+	set src (src) {
+		if(src == null) return;
+		if(this.src && this.src.url === src.url) return;
+
+		this.media.src = src.url;
+
+		this._source = src;
 	}
 
 	get src () {
@@ -194,6 +337,7 @@ class Html5 extends Component {
 	}
 
 	init () {
+		super.init();
 		let dfd = $.Deferred();
 		this._initSubtitles();
 		this._initVideo()
@@ -203,19 +347,6 @@ class Html5 extends Component {
 				dfd.resolve();
 			});
 		return dfd.promise();
-	}
-
-	startBuffering() {
-		const volume = this.volume;
-		this.volume = 0
-		return this.play()
-			.then(() => {
-				return this.pause();
-			})
-			.then(() => {
-				this.currentTime = 0;
-				this.volume = volume;
-			})
 	}
 
 	supportsFullScreen() {
@@ -258,10 +389,6 @@ class Html5 extends Component {
 		} else {
 			this.pause();
 		}
-	}
-
-	seek (time) {
-		this.media.currentTime = time;
 	}
 
 	play () {
