@@ -20,6 +20,7 @@
   height: 32px;
   position: relative;
   width: 100%;
+  outline: none;
 }
 .leplayer-controls--left {
   width: 1%;
@@ -188,6 +189,9 @@
 .leplayer-controls .control-dropdown {
   position: relative;
 }
+.leplayer-controls .control-dropdown .leplayer-icon svg {
+  pointer-events: none;
+}
 .leplayer-controls .control-dropdown__content {
   background: #dee5ed;
   bottom: 32px;
@@ -207,13 +211,6 @@
   height: 1px;
   bottom: -1px;
   left: 0;
-}
-.leplayer-controls .control-dropdown:hover .control-dropdown__content {
-  display: block;
-}
-.leplayer-controls .control-dropdown.disabled:hover .control-dropdown__content {
-  display: none;
-  color: inherit;
 }
 .leplayer-controls .info-control__content {
   white-space: nowrap;
@@ -415,6 +412,7 @@
 .leplayer-control-collection {
   margin-top: 10px;
   margin-bottom: 10px;
+  outline: none;
 }
 .leplayer-control-collection--one-row {
   display: -ms-flexbox;
@@ -658,6 +656,33 @@
 .leplayer-video video::-webkit-media-controls-enclosure {
   display: none !important;
 }
+.leplayer-video .leplayer__youtube-wrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  overflow: hidden;
+  height: 100%;
+  margin: 0 auto;
+  width: 100%;
+  padding-top: 0;
+}
+.leplayer-video .leplayer__youtube {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+.leplayer-video .leplayer__youtube-blocker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+.leplayer--virgin .leplayer-video .leplayer__youtube-blocker {
+  background: black;
+}
 .leplayer--fullscreen .leplayer-video,
 .leplayer--fullscreen video {
   height: 100% !important;
@@ -722,6 +747,9 @@
   display: -ms-flexbox;
   display: flex;
 }
+.leplayer--inited.leplayer--virgin.leplayer--waiting .leplayer-play-button {
+  display: none;
+}
 .leplayer--fullscreen .leplayer-play-button,
 .leplayer--fullscreen .leplayer-loader-container {
   z-index: 1008;
@@ -774,6 +802,12 @@
 .leplayer--waiting .leplayer-loader-container__icon {
   animation: leplayer-spin 2s infinite linear;
 }
+.leplayer--youtube .leplayer-loader-container {
+  display: none;
+}
+.leplayer--youtube .leplayer-loader-container__icon {
+  animation: none;
+}
 @keyframes leplayer-spin {
   100% {
     transform: rotate(360deg);
@@ -787,6 +821,7 @@
   z-index: 16;
   box-sizing: border-box;
   position: relative;
+  outline: none;
 }
 .leplayer-sections--hidden {
   display: none;
@@ -966,7 +1001,9 @@
   right: 0;
   top: 0;
   bottom: 0;
-  background-size: cover;
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 .leplayer--virgin .leplayer-poster {
   display: block;
