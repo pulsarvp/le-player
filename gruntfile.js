@@ -22,7 +22,7 @@ module.exports = function (grunt) {
 			options : webpackConfig,
 			build : {},
 			"build-dev" : {
-				devtool : 'eval',
+				devtool : 'inline-source-map',
 				plugins : [
 					//new webpack.NoErrorsPlugin()
 				],

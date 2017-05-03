@@ -45,6 +45,11 @@ class SubtitleControl extends ControlContainer {
 
 	onPlayerInited(e, data) {
 		let video = this.player.video;
+
+		if(video.subtitles == null) {
+			return false;
+		}
+
 		if (video.subtitles.length > 0) {
 			for (var i in video.subtitles) {
 				if (!video.subtitles.hasOwnProperty(i)) continue;

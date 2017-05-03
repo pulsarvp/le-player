@@ -33,6 +33,7 @@
 	height: @control-height;
 	position: relative;
 	width: 100%;
+	outline: none;
 
 
 	&--left
@@ -255,6 +256,11 @@
 	.control-dropdown
 	{
 		position: relative;
+
+		.leplayer-icon svg {
+			pointer-events: none;
+		}
+
 		&__content
 		{
 			display: none;
@@ -280,23 +286,6 @@
 			}
 		}
 
-		&:hover
-		{
-			.control-dropdown__content
-			{
-				display: block;
-			}
-		}
-
-		&.disabled:hover
-		{
-			.control-dropdown__content
-			{
-				display: none;
-				color: inherit;
-			}
-
-		}
 	}
 
 	.info-control
@@ -568,6 +557,7 @@
 {
 	margin-top: 10px;
 	margin-bottom: 10px;
+	outline: none;
 
 	&--one-row
 	{
