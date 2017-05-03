@@ -17,7 +17,7 @@ import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
 import { createEl, secondsToTime, noop } from './utils';
-import { IS_IPHONE, IS_IPOD, IS_ANDROID_PHONE } from './utils/browser';
+import { IS_ANDROID_PHONE, IS_IPOD, IS_IPHONE, IS_MOBILE } from './utils/browser';
 
 import MediaError from './MediaError';
 import Html5 from './entity/Html5.js';
@@ -102,8 +102,8 @@ const defaultOptions = {
 			['play', 'rate', 'timeline', 'source',]
 		],
 		android : [
-			['play', 'timeline', 'fullscreen'],
-			['rate', 'source']
+			['play', 'timeline'],
+			['rate', 'source', 'fullscreen']
 		]
 	},
 	controlsOptions : {
@@ -114,7 +114,7 @@ const defaultOptions = {
 
 		fullscreen : {
 			align : 'justify'
-		}
+		},
 	},
 	volume : {
 		default : 0.4,
@@ -1066,8 +1066,17 @@ class Player extends Component {
 		this.addClass('leplayer--virgin');
 
 		if(IS_IPHONE) {
-			this.addClass('leplayer--iphone')
+			this.addClass('leplayer--iphone');
 		}
+
+		if(IS_ANDROID_PHONE) {
+			this.addClass('leplayer--androidphone');
+		}
+
+		if(IS_MOBILE) {
+			this.addClass('leplayer--mobile');
+		}
+
 
 
 		if(options.sectionContainer) {
@@ -1188,6 +1197,10 @@ class Player extends Component {
 			this.options.src = this.options.sources[0]
 		}
 
+
+		// Generate android:fullscreen, android:common and etc controls options
+
+
 		// Merge correctly controls, without deep merge
 		this.options.controls = $.extend({}, defaultOptions.controls, presetOptions.controls, this._userOptions.controls);
 
@@ -1213,7 +1226,7 @@ class Player extends Component {
 	 * @access private
 	 */
 	_initControls() {
-		let controls = []
+		let controls = [];
 
 		for (const name of ['common', 'fullscreen']) {
 			if (!this.options.controls.hasOwnProperty(name)) return;

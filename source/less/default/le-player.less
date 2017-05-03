@@ -575,17 +575,6 @@
 	}
 }
 
-.leplayer--iphone {
-	.leplayer-controls {
-		.timeline-container {
-			width: 1%;
-		}
-		.timeline {
-			display: none;
-		}
-	}
-}
-
 
 .leplayer-control-collection
 {
@@ -913,6 +902,30 @@
 	}
 }
 
+
+// Mobile styles
+
+.leplayer--iphone {
+	.leplayer-controls {
+		.timeline-container {
+			width: 1%;
+		}
+		.timeline {
+			display: none;
+		}
+	}
+}
+
+.leplayer--mobile.leplayer--fullscreen {
+	.leplayer-control-collection--fullscreen {
+		position: static;
+	}
+
+	.controls-fullscreen {
+		position: absolute;
+		z-index: 1007;
+	}
+}
 
 
 @import "components/video.less";
