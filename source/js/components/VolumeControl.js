@@ -23,6 +23,11 @@ class VolumeControl extends ControlDropdown {
 		}, options);
 		super(player, options);
 
+		if(!player.video.featureControlVolume) {
+			this.element.hide();
+			return;
+		}
+
 		this.player.on('volumechange', (e, data) => {
 			const video = this.player.video;
 			this.value = video.muted ? 0 : video.volume;

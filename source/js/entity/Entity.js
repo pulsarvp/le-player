@@ -162,5 +162,8 @@ class Entity extends Component {
 	}
 
 }
+Entity.prototype.featureControlVolume = true;
+
 Component.registerComponent('Entity', Entity);
+
 export default Entity;

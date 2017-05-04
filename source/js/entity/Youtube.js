@@ -354,6 +354,7 @@ class Youtube extends Entity {
 	}
 }
 
+
 Youtube.URL_REGEX = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
 
 Youtube.QUALITY_NAMES = {

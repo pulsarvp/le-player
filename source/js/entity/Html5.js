@@ -485,8 +485,6 @@ class Html5 extends Entity {
 	}
 
 }
-
-
 /**
  * Min rate for android and ios
  */
@@ -495,12 +493,32 @@ Html5.MOBILE_MIN_RATE = 0.5;
 /**
  * Max rate for android and ios
  */
-Html5.MOBILE_MAX_RATE = 2
-
+Html5.MOBILE_MAX_RATE = 2;
 
 Html5.SAFARI_MIN_RATE = 0.5;
 
 Html5.SAFARI_MAX_RATE = 2;
+
+Html5.TEST_VIDEO = document.createElement('video');
+
+/**
+ * @return {boolean}
+ *         - True if volume can be controlled
+ *         - False otherwise
+ */
+Html5.canControlVolume = function() {
+	// IE will error if Windows Media Player not installed #3315
+	try {
+		const volume = Html5.TEST_VIDEO.volume;
+
+		Html5.TEST_VIDEO.volume = (volume / 2) + 0.1;
+		return volume !== Html5.TEST_VIDEO.volume;
+	} catch (e) {
+		return false;
+	}
+};
+
+Html5.prototype.featureControlVolume = Html5.canControlVolume();
 
 Component.registerComponent('Html5', Html5);
 export default Html5;
