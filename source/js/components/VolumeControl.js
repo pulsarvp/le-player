@@ -113,6 +113,10 @@ class VolumeControl extends ControlDropdown {
 	}
 
 	onPlayerInited() {
+		if(!this.player.video.featureControlVolume) {
+			this.element.hide();
+			return;
+		}
 		this.value = this.player.video.defaultVolume;
 	}
 

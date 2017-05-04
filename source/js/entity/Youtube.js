@@ -354,6 +354,25 @@ class Youtube extends Entity {
 	}
 }
 
+Youtube.TEST_VIDEO = document.createElement('video');
+/**
+ * @return {boolean}
+ *         - True if volume can be controlled
+ *         - False otherwise
+ */
+Youtube.canControlVolume = function() {
+	// IE will error if Windows Media Player not installed #3315
+	try {
+		const volume = Youtube.TEST_VIDEO.volume;
+
+		Youtube.TEST_VIDEO.volume = (volume / 2) + 0.1;
+		return volume !== Youtube.TEST_VIDEO.volume;
+	} catch (e) {
+		return false;
+	}
+};
+
+Youtube.prototype.featureControlVolume = Youtube.canControlVolume();
 
 Youtube.URL_REGEX = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
 
