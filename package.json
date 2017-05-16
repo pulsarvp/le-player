@@ -1,6 +1,6 @@
 {
   "name": "le-player",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "The best HTML5 video player made for Lectoriy.",
   "main": "dist/js/le-player.min.js",
   "directories": {
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/miptliot/le-player.git"
+    "url": "git+https://github.com/pulsarvp/le-player.git"
   },
   "keywords": [
     "player",
@@ -32,9 +32,9 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/miptliot/le-player/issues"
+    "url": "https://github.com/pulsarvp/le-player/issues"
   },
-  "homepage": "https://github.com/miptliot/le-player#readme",
+  "homepage": "https://github.com/pulsarvp/le-player#readme",
   "devDependencies": {
     "ace-builds": "^1.2.6",
     "autoprefixer": "^6.3.6",
