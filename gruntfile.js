@@ -40,7 +40,7 @@ module.exports = function (grunt) {
 				},
 				expand : true,
 				cwd : 'source/less/',
-				src : '**/le-player.less',
+				src : '**/le-player*',
 				ext : '.css',
 				dest : 'dist/css/',
 				profile : true,
@@ -62,7 +62,7 @@ module.exports = function (grunt) {
 				},
 				expand : true,
 				cwd : 'source/less/',
-				src : '**/le-player.less',
+				src : '**/le-player*',
 				ext : '.min.css',
 				dest : 'dist/css/'
 			}
@@ -75,7 +75,7 @@ module.exports = function (grunt) {
 				]
 			},
 			dist : {
-				src : 'dist/css/**/le-player.css'
+				src : 'dist/css/**/le-player*'
 			}
 		},
 		concat : {
@@ -141,6 +141,6 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-svgstore');
 	grunt.loadNpmTasks('grunt-http-server');
 
-	grunt.registerTask('default', [ 'less:development', 'webpack:build-dev', 'concat', 'svgstore', 'watch']);
+	grunt.registerTask('default', [ 'svgstore', 'less:development', 'webpack:build-dev', 'concat', 'watch']);
 	grunt.registerTask('production', [ 'clean', 'less', 'postcss', 'concat', 'svgstore', 'webpack:build', 'uglify' ]);
 };
