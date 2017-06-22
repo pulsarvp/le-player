@@ -20,6 +20,9 @@ module.exports = function (grunt) {
 		webpack : {
 			options : webpackConfig,
 			build : {
+				devtool : 'inline-source-map',
+			},
+			'build-min' : {
 				output : {
 					filename : '[name].min.js',
 				},
@@ -31,11 +34,8 @@ module.exports = function (grunt) {
 					})
 				],
 			},
-			"build-dev" : {
+			dev : {
 				devtool : 'inline-source-map',
-				plugins : [
-					//new webpack.NoErrorsPlugin()
-				],
 				watch : true
 			}
 		},
@@ -126,6 +126,6 @@ module.exports = function (grunt) {
 	grunt.loadNpmTasks('grunt-svgstore');
 	grunt.loadNpmTasks('grunt-http-server');
 
-	grunt.registerTask('default', ['svgstore', 'less:development', 'postcss', 'webpack:build-dev', 'watch']);
-	grunt.registerTask('production', ['clean', 'less', 'postcss', 'svgstore', 'webpack']);
+	grunt.registerTask('default', ['svgstore', 'less:development', 'postcss', 'webpack:dev', 'watch']);
+	grunt.registerTask('production', ['clean', 'less', 'postcss', 'svgstore', 'webpack:build', 'webpack:build-min']);
 };
