@@ -138,7 +138,7 @@ class Youtube extends Entity {
 			this.ytPlayer.pauseVideo();
 		}
 
-		this._playbackQuality = name;
+		this._nextPlaybackQuality = name;
 		this.ytPlayer.setPlaybackQuality(name);
 		this.ytPlayer.seekTo(time);
 
@@ -149,7 +149,11 @@ class Youtube extends Entity {
 	}
 
 	get playbackQuality() {
-		return this.ytPlayer.getPlaybackQuality();
+		if (this._playbackQuality == null) {
+			this._playbackQuality = this.getAvailableQualityLevels()
+				.find(item => item.name === this.ytPlayer.getPlaybackQuality())
+		}
+		return this._playbackQuality;
 	}
 
 	get volume() {
@@ -207,12 +211,12 @@ class Youtube extends Entity {
 		let ytOptions = {
 			autoplay : globalOptions.autoplay ? 1 : 0,
 			loop : globalOptions.loop ? 1 : 0,
-			iv_load_policy: 3,
+			iv_load_policy : 3,
 			controls : 0,
 			modestbranding : 1,
 			rel : 0,
 			showinfo : 0,
-			cc_load_policy: 1,
+			cc_load_policy : 1,
 			disablekb : 0,
 			fs : 0,
 			start : globalOptions.time
@@ -254,7 +258,8 @@ class Youtube extends Entity {
 
 	onYTPPlaybackQualityChange(e) {
 		const data = e.data;
-		this.trigger('qualitychange', data);
+		this._playbackQuality = this.getAvailableQualityLevels().find(item => item.name === data);
+		this.trigger('qualitychange', this._playbackQuality);
 	}
 
 	onYTPStateChange(e) {
@@ -282,6 +287,8 @@ class Youtube extends Entity {
 			this.trigger('durationchange');
 			this.trigger('playing');
 
+			this.ytPlayer.setPlaybackQuality(this._nextPlaybackQuality);
+
 			if(this.isSeeking) {
 				this.onSeeked();
 			}
@@ -300,7 +307,8 @@ class Youtube extends Entity {
 		case YT.PlayerState.BUFFERING:
 			this.player.trigger('timeupdate');
 			this.player.trigger('waiting');
-			this.ytPlayer.setPlaybackQuality(this._playbackQuality);
+
+			this.ytPlayer.setPlaybackQuality(this._nextPlaybackQuality);
 			break;
 		}
 
@@ -332,12 +340,11 @@ class Youtube extends Entity {
 		let result = null;
 		const regex = Youtube.URL_REGEX;
 		const match = url.match(regex);
-		if(url.length === 11 ) {
+		if(url.length === 11) {
 			result = url;
 		} else if(match && match[2].length === 11) {
 			result = match[2];
 		}
-		console.log(result);
 		return result;
 	}
 }
