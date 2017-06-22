@@ -52,7 +52,6 @@ class SubtitleControl extends ControlContainer {
 
 	update() {
 		super.update();
-		console.log(this.getCurrentValue())
 		this.element.toggleClass(
 			'control-checkbox--checked',
 			this.getCurrentValue() != null

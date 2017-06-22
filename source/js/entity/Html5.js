@@ -275,13 +275,14 @@ class Html5 extends Entity {
 
 	set track (value) {
 		[...this.media.textTracks].forEach(item => {
-			if(item.language === value) {
+			if(value != null && item.language === value.language) {
 				item.mode = 'showing'
-				this._track = value;
 			} else {
 				item.mode = 'hidden';
 			}
-		})
+		});
+		this._track = value;
+		this.trigger('trackschange');
 	}
 
 	get paused() {
