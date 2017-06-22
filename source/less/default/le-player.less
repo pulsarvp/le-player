@@ -109,6 +109,9 @@
 		{
 			background: @color-fs-control-checked;
 			color: @color-fs-text-hovered;
+			&:hover {
+				background: darken(@color-fs-control-checked, 5%);
+			}
 		}
 
 		.info-control
@@ -255,6 +258,9 @@
 	{
 		background: @color-control-checked;
 		color: @color-text-checked;
+		&:hover {
+			background: darken(@color-control-checked, 5%);
+		}
 	}
 
 	.control-dropdown
@@ -377,6 +383,7 @@
 	.inner-item
 	{
 	}
+
 
 	.timeline
 	{

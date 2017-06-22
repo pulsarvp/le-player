@@ -50,6 +50,15 @@ class SubtitleControl extends ControlContainer {
 		this.update()
 	}
 
+	update() {
+		super.update();
+		console.log(this.getCurrentValue())
+		this.element.toggleClass(
+			'control-checkbox--checked',
+			this.getCurrentValue() != null
+		)
+	}
+
 	getData() {
 		return this.player.video.subtitles;
 	}
