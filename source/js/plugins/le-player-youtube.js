@@ -1,14 +1,9 @@
+'use strict';
+
 import $ from 'jquery';
-import Entity from './Entity';
-import Component from '../components/Component';
 
-
-function loadScript(url) {
-	return $.getScript(url);
-}
-
-/* global YT */
-const apiLoaded = loadScript('https://www.youtube.com/iframe_api');
+const Player = window.lePlayer || window.$.lePlayer;
+const Entity = Player.getComponent('Entity');
 
 class Youtube extends Entity {
 	constructor(player, options) {
@@ -191,7 +186,7 @@ class Youtube extends Entity {
 
 	init() {
 		super.init();
-		return apiLoaded
+		return Youtube.apiLoaded()
 			.then(() => this.initYTPlayer())
 	}
 
@@ -367,5 +362,32 @@ Youtube.QUALITY_NAMES = {
 	auto : 'Авто'
 }
 
-Component.registerComponent('Youtube', Youtube);
-export default Youtube;
+Youtube.apiLoaded = function() {
+	if(this._loaded) return $.Deferred().resolve();
+
+	return $.getScript('https://www.youtube.com/iframe_api')
+		.then(() => this._loaded = true)
+}
+
+Player.registerComponent('Youtube', Youtube);
+
+Player.preset('youtube', {
+	options : {
+		entity : 'Youtube',
+		controls : {
+			common : [
+				['play', 'volume', 'timeline', 'rate', 'source', 'divider', 'section', 'fullscreen'],
+				[]
+			],
+			fullscreen : [
+				['play', 'volume', 'timeline', 'rate', 'source', 'divider', 'section', 'fullscreen'],
+			]
+		}
+	},
+});
+
+Player.plugin('youtube', function(pluginOptions) {
+
+	/* global YT */
+	Youtube.apiLoaded()
+})
