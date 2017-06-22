@@ -379,7 +379,15 @@ class Player extends Component {
 			 *
 			 * @event Player#qualitychange
 			 */
-			'qualitychange'
+			'qualitychange',
+
+			/**
+			 * qualitychange html5
+			 *
+			 * @event Player#trackschange
+			 */
+			'trackschange',
+
 
 
 		].forEach(eventName => {

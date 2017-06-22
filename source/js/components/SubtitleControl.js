@@ -25,43 +25,39 @@ class SubtitleControl extends ControlContainer {
 			disable : true
 		}, options);
 		super(player, options);
+
+		this.player.on('playing', this.update.bind(this));
+		this.player.on('trackschange', this.update.bind(this));
 	}
 
 	onClick (e) {
 		super.onClick(e);
-		let video = this.player.video;
-		this.active = null
-		video.track = -1;
+		const video = this.player.video;
+		video.track = null
 	}
 
 	onItemClick (e) {
-		super.onItemClick(e);
+		e.preventDefault();
+		e.stopPropagation()
 		let item = $(e.target)
 		let video = this.player.video;
-		if (item.data('language')) {
-			video.track = item.data('language');
+		if (item.data()) {
+			video.track = item.data();
 		}
 	}
 
 	onPlayerInited(e, data) {
-		let video = this.player.video;
-
-		if(video.subtitles == null) {
-			return false;
-		}
-
-		if (video.subtitles.length > 0) {
-			for (var i in video.subtitles) {
-				if (!video.subtitles.hasOwnProperty(i)) continue;
-				let item = video.subtitles[ i ];
-				this.addItem(item.title, {
-					src : item.src,
-					language : item.language
-				});
-			}
-			this.disable = false;
-		}
+		this.update()
 	}
+
+	getData() {
+		return this.player.video.subtitles;
+	}
+
+	getCurrentValue() {
+		return this.player.video.track;
+	}
+
 }
 
 Component.registerComponent('SubtitleControl', SubtitleControl);

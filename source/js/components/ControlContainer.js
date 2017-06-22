@@ -100,7 +100,7 @@ class ControlContainer extends ControlDropdown {
 			.on('click', this.onItemClick.bind(this))
 			.append(content);
 
-		this.list.push(item);
+		this.list = this.list.concat(item);
 
 		this.dropdownContent.append(item);
 
@@ -121,6 +121,28 @@ class ControlContainer extends ControlDropdown {
 	 */
 	buildCSSClass() {
 		return `${super.buildCSSClass()} control-container`
+	}
+
+	update() {
+		const data = this.getData()
+		const currentValue = this.getCurrentValue()
+
+		if(data == null || data.length === 0) {
+			this.disable = true;
+			return;
+		}
+
+		this.list = [];
+		this.dropdownContent.empty();
+
+		data.forEach(item => {
+			const elem = this.addItem(item.title, item);
+			if(currentValue && currentValue.name === item.name) {
+
+				this.active = elem;
+			}
+		});
+		this.disable = false;
 	}
 }
 
