@@ -16,6 +16,14 @@ const trackProvide = track => {
 	}
 }
 
+const checkCaptionsExist = ytPlayer => {
+	try {
+		return ytPlayer.getOptions('captions') != null
+	} catch (error) {
+		return false
+	}
+}
+
 class Youtube extends Entity {
 	constructor(player, options) {
 		super(player, options);
@@ -118,11 +126,13 @@ class Youtube extends Entity {
 	}
 
 	get subtitles() {
-		return (this.ytPlayer.getOption('captions', 'tracklist') || []).map(trackProvide);
+		return checkCaptionsExist(this.ytPlayer)
+			? (this.ytPlayer.getOption('captions', 'tracklist') || []).map(trackProvide)
+			: []
 	}
 
 	get track() {
-		if(this._track === undefined) {
+		if(this._track === undefined && checkCaptionsExist(this.ytPlayer)) {
 			return trackProvide(this.ytPlayer.getOption('captions', 'track'))
 		} else {
 			return this._track;
