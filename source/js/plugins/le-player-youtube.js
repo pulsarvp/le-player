@@ -53,8 +53,17 @@ class Youtube extends Entity {
 			this.wasPausedBeforeSeek = this.paused;
 		}
 
+		let time;
+		if (value > this.duration) {
+			time = this.duration
+		} else if (value < 0) {
+			time = 0
+		} else {
+			time = value;
+		}
+
 		this.isSeeking = true;
-		this.ytPlayer.seekTo(value, true);
+		this.ytPlayer.seekTo(time, true);
 		this.trigger('timeupdate');
 		this.trigger('seeking');
 
