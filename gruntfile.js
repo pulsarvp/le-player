@@ -58,7 +58,7 @@ module.exports = function (grunt) {
 					yuicompress : true,
 					strictUnits : true,
 					optimization : 2,
-					sourceMap : true
+					sourceMap : false
 				},
 				expand : true,
 				cwd : 'source/less/',
