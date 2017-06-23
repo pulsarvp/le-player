@@ -61,7 +61,7 @@ const options = {
 
 if(isProd) {
 	options.entry = Object.assign({}, options.entry, {
-		'le-player-full' : './source/js/le-player-full.js',
+		'le-player.full' : './source/js/le-player.full.js',
 	})
 }
 
