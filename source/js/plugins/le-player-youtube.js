@@ -16,13 +16,6 @@ const trackProvide = track => {
 	}
 }
 
-const checkCaptionsExist = ytPlayer => {
-	try {
-		return ytPlayer.getOptions('captions') != null
-	} catch (error) {
-		return false
-	}
-}
 
 class Youtube extends Entity {
 	constructor(player, options) {
@@ -126,13 +119,13 @@ class Youtube extends Entity {
 	}
 
 	get subtitles() {
-		return checkCaptionsExist(this.ytPlayer)
+		return this.checkCaptionsExist()
 			? (this.ytPlayer.getOption('captions', 'tracklist') || []).map(trackProvide)
 			: []
 	}
 
 	get track() {
-		if(this._track === undefined && checkCaptionsExist(this.ytPlayer)) {
+		if(this._track === undefined && this.checkCaptionsExist()) {
 			return trackProvide(this.ytPlayer.getOption('captions', 'track'))
 		} else {
 			return this._track;
@@ -143,7 +136,9 @@ class Youtube extends Entity {
 		this._track = value;
 		if(value === null) {
 			this._tracksDisable = true;
+			/* Disable captions */
 			this.ytPlayer.unloadModule('captions');
+
 			this.trigger('trackschange');
 			return;
 		}
@@ -152,6 +147,7 @@ class Youtube extends Entity {
 			.setOption('captions', 'reload', true);
 
 		if(this._tracksDisable) {
+			/* Enable captions */
 			this.ytPlayer.loadModule('captions');
 		}
 		this.trigger('trackschange');
@@ -312,7 +308,6 @@ class Youtube extends Entity {
 	onYTPReady(e) {
 		this._initPromise.resolve();
 		this.setAvailablePlaybackRates();
-
 	}
 
 	onYTPRateChange(e) {
@@ -339,6 +334,7 @@ class Youtube extends Entity {
 			this.trigger('durationchange');
 			this.trigger('ratechange');
 			this.trigger('volumechange');
+			this.trigger('trackschange')
 			break;
 
 		case YT.PlayerState.ENDED:
@@ -356,6 +352,7 @@ class Youtube extends Entity {
 				this.onSeeked();
 			}
 
+			this.loadCaptions()
 			this.emitTimeupdate();
 			break;
 
@@ -372,6 +369,7 @@ class Youtube extends Entity {
 			this.player.trigger('waiting');
 
 			this.ytPlayer.setPlaybackQuality(this._nextPlaybackQuality);
+
 			break;
 		}
 
@@ -399,6 +397,35 @@ class Youtube extends Entity {
 			}
 		}, 250)
 	}
+
+	loadCaptions() {
+		const emptyTracklist = () => (this.subtitles == null || this.subtitles.length === 0);
+
+		clearInterval(this._loadCaptionsWatcher);
+		if(
+			!this._tracksDisable &&
+			this.checkCaptionsExist() &&
+			emptyTracklist()
+		) {
+			this.ytPlayer.loadModule('captions');
+
+			this._loadCaptionsWatcher = setInterval(() => {
+				if(!emptyTracklist() && this.checkCaptionsExist()) {
+					this.trigger('trackschange');
+					clearInterval(this._loadCaptionsWatcher);
+				}
+			}, 250)
+		}
+	}
+
+	checkCaptionsExist() {
+		try {
+			return this.ytPlayer.getOptions('captions') != null;
+		} catch (error) {
+			return false;
+		}
+	}
+
 	static parseUrl(url) {
 		let result = null;
 		const regex = Youtube.URL_REGEX;
