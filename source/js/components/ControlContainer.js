@@ -97,6 +97,7 @@ class ControlContainer extends ControlDropdown {
 		const item = $('<div />')
 			.addClass('control-container__item')
 			.data(data)
+			.attr('title', data.title)
 			.on('click', this.onItemClick.bind(this))
 			.append(content);
 
@@ -136,7 +137,7 @@ class ControlContainer extends ControlDropdown {
 		this.dropdownContent.empty();
 
 		data.forEach(item => {
-			const elem = this.addItem(item.title, item);
+			const elem = this.addItem(item.name, item);
 			if(currentValue && currentValue.name === item.name) {
 
 				this.active = elem;

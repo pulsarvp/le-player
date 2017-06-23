@@ -11,7 +11,7 @@ const trackProvide = track => {
 	}
 	return {
 		language : track.languageCode,
-		title : track.languageCode,
+		title : track.languageName,
 		name : track.languageCode,
 	}
 }
