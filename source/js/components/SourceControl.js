@@ -32,6 +32,7 @@ class SourceControl extends ControlContainer {
 
 	onItemClick(e) {
 		e.preventDefault();
+
 		const item = $(e.target);
 		const video = this.player.video;
 		video.playbackQuality = item.data('name');

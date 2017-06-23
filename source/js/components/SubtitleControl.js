@@ -39,11 +39,14 @@ class SubtitleControl extends ControlContainer {
 	onItemClick (e) {
 		e.preventDefault();
 		e.stopPropagation()
-		let item = $(e.target)
-		let video = this.player.video;
+
+		const item = $(e.target)
+		const video = this.player.video;
 		if (item.data()) {
 			video.track = item.data();
 		}
+
+		this.dropdownContent.hide()
 	}
 
 	onPlayerInited(e, data) {
