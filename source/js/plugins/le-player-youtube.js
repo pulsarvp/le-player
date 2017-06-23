@@ -385,11 +385,11 @@ Player.preset('youtube', {
 		entity : 'Youtube',
 		controls : {
 			common : [
-				['play', 'volume', 'timeline', 'rate', 'source', 'divider', 'section', 'fullscreen'],
+				['play', 'volume', 'timeline', 'rate', 'backward', 'source', 'subtitle', 'divider', 'section', 'fullscreen'],
 				[]
 			],
 			fullscreen : [
-				['play', 'volume', 'timeline', 'rate', 'source', 'divider', 'section', 'fullscreen'],
+				['play', 'volume', 'timeline', 'rate', 'backward', 'source', 'subtitle', 'divider', 'section', 'fullscreen'],
 			]
 		}
 	},
