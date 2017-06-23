@@ -5,6 +5,18 @@ import $ from 'jquery';
 const Player = window.lePlayer || window.$.lePlayer;
 const Entity = Player.getComponent('Entity');
 
+const trackProvide = track => {
+	if(track == null || track.languageCode == null) {
+		return track
+	}
+	return {
+		language : track.languageCode,
+		title : track.languageName,
+		name : track.languageCode,
+	}
+}
+
+
 class Youtube extends Entity {
 	constructor(player, options) {
 		super(player, options);
@@ -17,6 +29,9 @@ class Youtube extends Entity {
 		this.element.on('dblclick', this.onDblclick.bind(this));
 	}
 
+	/**
+	 * @override
+	 */
 	set src(src) {
 		if(src == null) return;
 		if(this.src && this.src.url === src.url) return;
@@ -112,12 +127,53 @@ class Youtube extends Entity {
 		return this.volume || this.player.options.volume.default;
 	}
 
+	get subtitles() {
+		return this.checkCaptionsExist()
+			? (this.ytPlayer.getOption('captions', 'tracklist') || []).map(trackProvide)
+			: []
+	}
+
+	get track() {
+		if(this._track === undefined && this.checkCaptionsExist()) {
+			return trackProvide(this.ytPlayer.getOption('captions', 'track'))
+		} else {
+			return this._track;
+		}
+	}
+
+	set track(value) {
+		this._track = value;
+		if(value === null) {
+			this._tracksDisable = true;
+			/* Disable captions */
+			this.ytPlayer.unloadModule('captions');
+
+			this.trigger('trackschange');
+			return;
+		}
+		this.ytPlayer
+			.setOption('captions', 'track', { languageCode : value.name })
+			.setOption('captions', 'reload', true);
+
+		if(this._tracksDisable) {
+			/* Enable captions */
+			this.ytPlayer.loadModule('captions');
+		}
+		this.trigger('trackschange');
+	}
+
+	/**
+	 * @override
+	 */
 	increaseRate() {
 		const index = this.availableRates.indexOf(this.rate);
 		if(index + 1 >= this.availableRates.length) return;
 		return this.rate = this.availableRates[index + 1];
 	}
 
+	/**
+	 * @override
+	 */
 	decreaseRate() {
 		const index = this.availableRates.indexOf(this.rate);
 		if(index - 1 < 0) return;
@@ -137,6 +193,7 @@ class Youtube extends Entity {
 			name : item
 		}));
 	}
+
 
 	set playbackQuality(name) {
 		super.playbackQuality = name;
@@ -225,7 +282,7 @@ class Youtube extends Entity {
 			modestbranding : 1,
 			rel : 0,
 			showinfo : 0,
-			cc_load_policy : 1,
+			cc_load_policy : 0,
 			disablekb : 0,
 			fs : 0,
 			start : globalOptions.time
@@ -245,6 +302,7 @@ class Youtube extends Entity {
 					onPlaybackQualityChange : this.onYTPPlaybackQualityChange.bind(this)
 				}
 			})
+
 		})
 		return this._initPromise.promise();
 	}
@@ -285,6 +343,7 @@ class Youtube extends Entity {
 			this.trigger('durationchange');
 			this.trigger('ratechange');
 			this.trigger('volumechange');
+			this.trigger('trackschange')
 			break;
 
 		case YT.PlayerState.ENDED:
@@ -302,6 +361,7 @@ class Youtube extends Entity {
 				this.onSeeked();
 			}
 
+			this.loadCaptions()
 			this.emitTimeupdate();
 			break;
 
@@ -318,6 +378,7 @@ class Youtube extends Entity {
 			this.player.trigger('waiting');
 
 			this.ytPlayer.setPlaybackQuality(this._nextPlaybackQuality);
+
 			break;
 		}
 
@@ -345,6 +406,35 @@ class Youtube extends Entity {
 			}
 		}, 250)
 	}
+
+	loadCaptions() {
+		const emptyTracklist = () => (this.subtitles == null || this.subtitles.length === 0);
+
+		clearInterval(this._loadCaptionsWatcher);
+		if(
+			!this._tracksDisable &&
+			this.checkCaptionsExist() &&
+			emptyTracklist()
+		) {
+			this.ytPlayer.loadModule('captions');
+
+			this._loadCaptionsWatcher = setInterval(() => {
+				if(!emptyTracklist() && this.checkCaptionsExist()) {
+					this.trigger('trackschange');
+					clearInterval(this._loadCaptionsWatcher);
+				}
+			}, 250)
+		}
+	}
+
+	checkCaptionsExist() {
+		try {
+			return this.ytPlayer.getOptions('captions') != null;
+		} catch (error) {
+			return false;
+		}
+	}
+
 	static parseUrl(url) {
 		let result = null;
 		const regex = Youtube.URL_REGEX;
