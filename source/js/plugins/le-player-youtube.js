@@ -53,8 +53,17 @@ class Youtube extends Entity {
 			this.wasPausedBeforeSeek = this.paused;
 		}
 
+		let time;
+		if (value > this.duration) {
+			time = this.duration
+		} else if (value < 0) {
+			time = 0
+		} else {
+			time = value;
+		}
+
 		this.isSeeking = true;
-		this.ytPlayer.seekTo(value, true);
+		this.ytPlayer.seekTo(time, true);
 		this.trigger('timeupdate');
 		this.trigger('seeking');
 
@@ -376,11 +385,11 @@ Player.preset('youtube', {
 		entity : 'Youtube',
 		controls : {
 			common : [
-				['play', 'volume', 'timeline', 'rate', 'source', 'divider', 'section', 'fullscreen'],
+				['play', 'volume', 'timeline', 'rate', 'backward', 'source', 'subtitle', 'divider', 'section', 'fullscreen'],
 				[]
 			],
 			fullscreen : [
-				['play', 'volume', 'timeline', 'rate', 'source', 'divider', 'section', 'fullscreen'],
+				['play', 'volume', 'timeline', 'rate', 'backward', 'source', 'subtitle', 'divider', 'section', 'fullscreen'],
 			]
 		}
 	},
