@@ -1602,6 +1602,8 @@ Player._loadSVGSprite = function(svg) {
 
 Player.defaultSprite = require('../../dist/svg/svg-defs.svg');
 
+/* global VERSION */
+Player.version = VERSION;
 
 window.$.fn.lePlayer = function (options) {
 	return this.each(function () {
