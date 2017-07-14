@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path');
+const webpack = require('webpack');
 const isProd = process.env.NODE_ENV === 'production'
 
 module.exports = {
@@ -14,6 +15,12 @@ module.exports = {
 		filename: '[name].js',
 		publicPath: "/dist/js/"
 	},
+
+	plugins: [
+        new webpack.DefinePlugin({
+            VERSION: JSON.stringify(require("./package.json").version)
+        })
+	],
 
 	module: {
 		preLoaders : [
