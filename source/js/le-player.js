@@ -1730,6 +1730,7 @@ Player.plugin('miniplayer', function(pluginOptions) {
 });
 
 Player.preset('vps', require('./presets/vps.js').preset);
+Player.preset('simple', require('./presets/simple.js').preset);
 Player.preset('sms', require('./presets/sms.js').preset);
 Player.preset('compressed', require('./presets/compressed.js').preset);
 
