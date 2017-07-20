@@ -1,4 +1,4 @@
-const controls = ['play', 'volume', 'timeline', 'rate', 'download', 'fullscreen'];
+const controls = ['play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'download', 'fullscreen'];
 
 export const preset = {
 	options : {
