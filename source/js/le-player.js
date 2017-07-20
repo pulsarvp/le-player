@@ -1609,6 +1609,8 @@ Player._loadSVGSprite = function(svg) {
 
 Player.defaultSprite = require('../../dist/svg/svg-defs.svg');
 
+/* global VERSION */
+Player.version = VERSION;
 
 window.$.fn.lePlayer = function (options) {
 	return this.each(function () {
@@ -1728,6 +1730,7 @@ Player.plugin('miniplayer', function(pluginOptions) {
 });
 
 Player.preset('vps', require('./presets/vps.js').preset);
+Player.preset('simple', require('./presets/simple.js').preset);
 Player.preset('sms', require('./presets/sms.js').preset);
 Player.preset('compressed', require('./presets/compressed.js').preset);
 
