@@ -96,6 +96,7 @@ class Entity extends Component {
 
 	set rate(value) {
 		if(value > this.rateMax || value < this.rateMin) return;
+		Cookie.set('rate', value);
 	}
 
 	increaseRate() {
@@ -129,6 +130,17 @@ class Entity extends Component {
 		return Cookie.get('rate') || this.player.options.rate.default
 	}
 
+	get defaultVolume () {
+		return Cookie.get('volume') || this.player.options.volume.default;
+	}
+
+	set volume(value) {
+		const player = this.player;
+		if(value < 1 && value > player.options.volume.mutelimit) {
+			Cookie.set('volume', value);
+		}
+	}
+
 	set src (value) {
 
 	}
@@ -158,6 +170,14 @@ class Entity extends Component {
 		} else {
 			this.pause();
 		}
+	}
+
+	_initRate () {
+		this.rate = this.defaultRate;
+	}
+
+	_initVolume () {
+		this.volume = this.defaultVolume;
 	}
 
 }

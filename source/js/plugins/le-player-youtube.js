@@ -125,10 +125,6 @@ class Youtube extends Entity {
 		return this.ytPlayer.isMuted();
 	}
 
-	get defaultVolume() {
-		return this.volume || this.player.options.volume.default;
-	}
-
 	get subtitles() {
 		return this.checkCaptionsExist()
 			? (this.ytPlayer.getOption('captions', 'tracklist') || []).map(trackProvide)
@@ -229,6 +225,7 @@ class Youtube extends Entity {
 	}
 
 	set volume(value) {
+		super.volume = value;
 		this.ytPlayer.setVolume(value * 100);
 
 		setTimeout(() => {
@@ -318,6 +315,8 @@ class Youtube extends Entity {
 
 	onYTPReady(e) {
 		this._initPromise.resolve();
+		this._initRate();
+		this._initVolume();
 		this.setAvailablePlaybackRates();
 	}
 
