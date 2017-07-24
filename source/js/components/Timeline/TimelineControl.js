@@ -60,7 +60,10 @@ class TimelineControl extends Control {
 
 	_onTimeUpdate(e, data) {
 		const duration = this.player.video.duration;
-		const currentTime = this.player.currentTime;
+		let currentTime = this.player.currentTime;
+		if(data && data.currentTime !== undefined) {
+			currentTime = data.currentTime;
+		}
 		let percent = currentTime / duration;
 
 		if(isNaN(duration) && currentTime === 0) percent = 0;

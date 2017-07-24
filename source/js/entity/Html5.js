@@ -161,7 +161,7 @@ class Html5 extends Entity {
 			time = value;
 		}
 
-		this.player.trigger('timeupdateload', { time });
+		this.player.trigger('timeupdateload', { currentTime : time });
 
 		this.media.currentTime = time;
 	}

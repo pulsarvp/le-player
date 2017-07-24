@@ -70,7 +70,7 @@ class Youtube extends Entity {
 		}
 
 		let time;
-		if (value > this.duration) {
+		if (value >= this.duration) {
 			time = this.duration
 		} else if (value < 0) {
 			time = 0
@@ -80,7 +80,8 @@ class Youtube extends Entity {
 
 		this.isSeeking = true;
 		this.ytPlayer.seekTo(time, true);
-		this.trigger('timeupdate');
+		this.player.trigger('timeupdateload', { currentTime : time });
+
 		this.trigger('seeking');
 
 		this.emitTimeupdate();
@@ -344,10 +345,14 @@ class Youtube extends Entity {
 			this.trigger('durationchange');
 			this.trigger('ratechange');
 			this.trigger('volumechange');
-			this.trigger('trackschange')
+			this.trigger('trackschange');
+			if(this.player.options.autoplay) {
+				this.trigger('play');
+			}
 			break;
 
 		case YT.PlayerState.ENDED:
+			this.trigger('pause');
 			this.trigger('ended');
 			break;
 
