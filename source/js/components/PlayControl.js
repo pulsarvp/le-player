@@ -26,7 +26,9 @@ class PlayControl extends Control {
 		this.player.on('pause', this.showPlay.bind(this));
 		this.player.on('ended', this.showReplay.bind(this));
 
-		this.player.on('seeking play', this.removeReplay.bind(this));
+		this.player.on('play', this.removeReplay.bind(this));
+		this.player.on('seeking', this.removeReplay.bind(this));
+		this.player.on('loadstart', this.removeReplay.bind(this));
 	}
 
 
