@@ -60,8 +60,12 @@ class TimelineControl extends Control {
 
 	_onTimeUpdate(e, data) {
 		const duration = this.player.video.duration;
-		const time = this.player.currentTime;
-		this.hardMove(time / duration);
+		const currentTime = this.player.currentTime;
+		let percent = currentTime / duration;
+
+		if(isNaN(duration) && currentTime === 0) percent = 0;
+
+		this.move({ percent, currentTime });
 	}
 
 	/**
@@ -154,7 +158,7 @@ class TimelineControl extends Control {
 		if (e.which !== 1) return;
 		if (this.drag) return;
 		const video = this.player.video;
-		this.hardMove(this.getPosition(e.pageX));
+		this.move({ percent : this.getPosition(e.pageX)});
 		video.currentTime = (video.duration * this.getPosition(e.pageX));
 	}
 
@@ -201,28 +205,17 @@ class TimelineControl extends Control {
 	 * Move marker on timeline on percent from argument, not from video.currentTime
 	 * @param {Number} percent The percent which you want to move marker on timeline
 	 */
-	hardMove (percent) {
-		let currentTime = this.player.video.duration * percent;
+	move ({ percent, currentTime }) {
+		if(currentTime === undefined) {
+			currentTime = this.player.video.duration * percent;
+		}
+
 		if(isNaN(currentTime)) return;
 		percent = percent * 100;
 		this.marker.element.css('left', percent + '%');
 		this.playedRanges.css('width', percent + '%');
 		this.currentTime.text = secondsToTime(currentTime);
 	}
-
-	/**
-	 * @deprecated
-	 */
-	move () {
-		let video = this.player.video;
-		let percent = (video.currentTime / video.duration * 100).toFixed(2);
-		let currentTime = video.currentTime;
-		if(isNaN(currentTime)) return;
-		this.marker.element.css('left', percent + '%');
-		this.playedRanges.css('width', percent + '%');
-		this.currentTime.text = secondsToTime(currentTime);
-	}
-
 
 	updateLabels() {
 		const video = this.player.video;
