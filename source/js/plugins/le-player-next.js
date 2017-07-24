@@ -69,12 +69,12 @@ class NextComponent extends Component {
 			title : '',
 			description : '',
 			timeout : 10000,
-			auto : false
+			auto : false,
+			fn : () => {},
 		}, options);
 
 		super(player, options);
 
-		this.url = this.options.url;
 		this.cancelButton = this.element.find('.leplayer-next__cancel');
 		this.player.on('play', () => this.hide());
 		this.player.on('loadstart', () => this.hide());
@@ -140,8 +140,10 @@ class NextComponent extends Component {
 	}
 
 	next() {
-		if(this.url != null) {
+		if(this.options.url != null) {
 			window.location = this.options.url;
+		} else if (this.options.fn && $.isFunction(this.options.fn)) {
+			this.options.fn(this)
 		}
 	}
 
