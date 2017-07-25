@@ -54,13 +54,13 @@ class TimelineControl extends Control {
 			this.marker.markerTime
 				.show()
 				.html(secondsToTime(video.duration * p));
-			video.seek(video.duration * p);
+			video.currentTime = video.duration * p
 		}
 	}
 
 	_onTimeUpdate(e, data) {
-		const { time } = data;
 		const duration = this.player.video.duration;
+		const time = this.player.currentTime;
 		this.hardMove(time / duration);
 	}
 

@@ -10,7 +10,7 @@ import Component from './Component';
 /**
  * @param {Player} player Main player
  * @param {Object} [options]
- * @param {String} [options.imgUrl] path to poster image
+ * @param {String} [options.url] path to poster image
  * @class Poster
  * @extends Component
  */
@@ -18,10 +18,24 @@ class Poster extends Component {
 
 	constructor(player, options={}) {
 		options = $.extend({}, {
-			imgUrl : player.options.poster
+			url : options.url
 		}, options);
 
 		super(player, options);
+
+		this.url = this.options.url;
+	}
+
+	set url(value) {
+		if(value == null) {
+			return;
+		}
+		this._url = value;
+		this.element.css('background-image', `url("${value}")`)
+	}
+
+	get url() {
+		return this._url;
 	}
 
 	/**
@@ -29,8 +43,9 @@ class Poster extends Component {
 	 */
 	createElement() {
 		this.element = $('<div />')
-			.css('background-image', `url("${this.options.imgUrl}")`)
-			.addClass('leplayer-poster')
+			.addClass('leplayer-poster');
+
+		return this.element;
 	}
 
 }

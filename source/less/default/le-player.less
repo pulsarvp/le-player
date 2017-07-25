@@ -3,7 +3,6 @@
 
 .leplayer
 {
-	color: @color-text;
 	display: block;
 	outline: 0;
 	position: relative;
@@ -33,6 +32,7 @@
 	height: @control-height;
 	position: relative;
 	width: 100%;
+	outline: none;
 
 
 	&--left
@@ -109,6 +109,9 @@
 		{
 			background: @color-fs-control-checked;
 			color: @color-fs-text-hovered;
+			&:hover {
+				background: darken(@color-fs-control-checked, 5%);
+			}
 		}
 
 		.info-control
@@ -255,11 +258,19 @@
 	{
 		background: @color-control-checked;
 		color: @color-text-checked;
+		&:hover {
+			background: darken(@color-control-checked, 5%);
+		}
 	}
 
 	.control-dropdown
 	{
 		position: relative;
+
+		.leplayer-icon svg {
+			pointer-events: none;
+		}
+
 		&__content
 		{
 			display: none;
@@ -285,23 +296,6 @@
 			}
 		}
 
-		&:hover
-		{
-			.control-dropdown__content
-			{
-				display: block;
-			}
-		}
-
-		&.disabled:hover
-		{
-			.control-dropdown__content
-			{
-				display: none;
-				color: inherit;
-			}
-
-		}
 	}
 
 	.info-control
@@ -335,6 +329,7 @@
 		{
 			display: block;
 			color: @color-text;
+			white-space: nowrap;
 			cursor: pointer;
 			font-size: @control-text-font-size;
 			line-height: @control-height;
@@ -389,6 +384,7 @@
 	.inner-item
 	{
 	}
+
 
 	.timeline
 	{
@@ -573,6 +569,7 @@
 {
 	margin-top: 10px;
 	margin-bottom: 10px;
+	outline: none;
 
 	&--one-row
 	{

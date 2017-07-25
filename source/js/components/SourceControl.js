@@ -8,6 +8,7 @@ import Component from './Component';
 import Control from './Control';
 import ControlContainer from './ControlContainer';
 
+
 /**
  * @class SourceControl
  * @param {Player} player Main player
@@ -24,45 +25,32 @@ class SourceControl extends ControlContainer {
 			disable : true
 		}, options);
 		super(player, options);
-	}
 
-	/**
-	 * @override
-	 */
-	onClick (e) {
-		super.onClick(e);
-		const defaultItem = this.getByIndex(0);
-
-		this.player.video.src = {
-			url : defaultItem.data('url'),
-			title : defaultItem.data('title')
-		}
-		this.active = defaultItem;
-
+		this.player.on('playing', this.update.bind(this));
+		this.player.on('qualitychange', this.update.bind(this));
 	}
 
 	onItemClick(e) {
-		super.onItemClick(e);
-		let item = $(e.target);
-		this.player.video.src = {
-			url : item.data('url'),
-			title : item.data('title')
-		}
+		e.preventDefault();
+
+		const item = $(e.target);
+		const video = this.player.video;
+		video.playbackQuality = item.data('name');
+
+		this.dropdownContent.hide();
 
 	}
 
 	onPlayerInited(e, data) {
-		const sources = this.player.options.sources;
-		if (sources.length > 1) {
-			sources.forEach(item => {
-				this.addItem(item.title, {
-					url : item.url,
-					title : item.title
-				})
-			})
-			this.setActiveByIndex(0);
-			this.disable = false;
-		}
+		this.update();
+	}
+
+	getData() {
+		return this.player.video.getAvailableQualityLevels();
+	}
+
+	getCurrentValue() {
+		return this.player.video.playbackQuality;
 	}
 }
 

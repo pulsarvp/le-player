@@ -2,7 +2,6 @@ $(function() {
 	var dropdown = $('#changeTheme');
 	var _currentTheme = 'default'
 
-
 	function parseParams(params) {
 		var ret = {},
 			hash,
@@ -86,7 +85,7 @@ $(function() {
 
 	_load();
 	var options = safeEval(editor.getValue());
-	var player = new lePlayer($('#video'), options);
+	window.player = new lePlayer($('#video'), options);
 
 })
 

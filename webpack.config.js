@@ -2,11 +2,13 @@
 
 const webpack = require('webpack');
 const path = require('path');
+const isProd = process.env.NODE_ENV === 'production'
 
-module.exports = {
+const options = {
 	entry: {
-		'le-player' : './source/js/le-player.js',
-		'le-player-ga' : './source/js/plugins/le-player-ga.js'
+		'le-player' : ['./source/js/le-player.js'],
+		'le-player-ga' : ['./source/js/plugins/le-player-ga.js'],
+		'le-player-youtube' : ['./source/js/plugins/le-player-youtube.js'],
 	},
 
 	output: {
@@ -15,11 +17,11 @@ module.exports = {
 		publicPath: "/dist/js/"
 	},
 
-    plugins : [
+	plugins: [
         new webpack.DefinePlugin({
             VERSION: JSON.stringify(require("./package.json").version)
         })
-    ],
+	],
 
 	module: {
 		preLoaders : [
@@ -64,4 +66,10 @@ module.exports = {
 	}
 };
 
+if(isProd) {
+	options.entry = Object.assign({}, options.entry, {
+		'le-player.full' : './source/js/le-player.full.js',
+	})
+}
 
+module.exports = options;

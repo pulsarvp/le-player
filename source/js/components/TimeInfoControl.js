@@ -27,7 +27,7 @@ class TimeInfoControl extends Control {
 		super(player, options);
 
 		this.player.on('timeupdate', (e, data) => {
-			const { time } = data;
+			const time = this.player.currentTime;
 			this._currentTimeControl.text = secondsToTime(time);
 		});
 

@@ -22,8 +22,11 @@ class BackwardControl extends Control {
 			className : 'backward',
 			name : 'backward',
 			title : `Отмотать назад на ${player.options.playback.step.medium} секунд`,
+			disable : true
 		}, options);
 		super(player, options);
+
+		this.player.on('firstplay', () => this.disable = false)
 	}
 
 	/**
