@@ -6,7 +6,6 @@ import $ from 'jquery';
 class Entity extends Component {
 	constructor(player, options) {
 		super(player, options);
-		this.subtitles = [];
 		this._triggerStack = [];
 		this._stopListen = false;
 

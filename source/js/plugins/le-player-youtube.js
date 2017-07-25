@@ -1,14 +1,22 @@
+'use strict';
+
 import $ from 'jquery';
-import Entity from './Entity';
-import Component from '../components/Component';
 
+const Player = window.lePlayer || window.$.lePlayer;
+const Entity = Player.getComponent('Entity');
 
-function loadScript(url) {
-	return $.getScript(url);
+const trackProvide = track => {
+	if(track == null || track.languageCode == null) {
+		return track
+	}
+	return {
+		language : track.languageCode,
+		title : track.languageCode,
+		tooltip : track.languageName,
+		name : track.languageCode,
+	}
 }
 
-/* global YT */
-const apiLoaded = loadScript('https://www.youtube.com/iframe_api');
 
 class Youtube extends Entity {
 	constructor(player, options) {
@@ -22,6 +30,9 @@ class Youtube extends Entity {
 		this.element.on('dblclick', this.onDblclick.bind(this));
 	}
 
+	/**
+	 * @override
+	 */
 	set src(src) {
 		if(src == null) return;
 		if(this.src && this.src.url === src.url) return;
@@ -58,8 +69,17 @@ class Youtube extends Entity {
 			this.wasPausedBeforeSeek = this.paused;
 		}
 
+		let time;
+		if (value > this.duration) {
+			time = this.duration
+		} else if (value < 0) {
+			time = 0
+		} else {
+			time = value;
+		}
+
 		this.isSeeking = true;
-		this.ytPlayer.seekTo(value, true);
+		this.ytPlayer.seekTo(time, true);
 		this.trigger('timeupdate');
 		this.trigger('seeking');
 
@@ -108,12 +128,53 @@ class Youtube extends Entity {
 		return this.volume || this.player.options.volume.default;
 	}
 
+	get subtitles() {
+		return this.checkCaptionsExist()
+			? (this.ytPlayer.getOption('captions', 'tracklist') || []).map(trackProvide)
+			: []
+	}
+
+	get track() {
+		if(this._track === undefined && this.checkCaptionsExist()) {
+			return trackProvide(this.ytPlayer.getOption('captions', 'track'))
+		} else {
+			return this._track;
+		}
+	}
+
+	set track(value) {
+		this._track = value;
+		if(value === null) {
+			this._tracksDisable = true;
+			/* Disable captions */
+			this.ytPlayer.unloadModule('captions');
+
+			this.trigger('trackschange');
+			return;
+		}
+		this.ytPlayer
+			.setOption('captions', 'track', { languageCode : value.name })
+			.setOption('captions', 'reload', true);
+
+		if(this._tracksDisable) {
+			/* Enable captions */
+			this.ytPlayer.loadModule('captions');
+		}
+		this.trigger('trackschange');
+	}
+
+	/**
+	 * @override
+	 */
 	increaseRate() {
 		const index = this.availableRates.indexOf(this.rate);
 		if(index + 1 >= this.availableRates.length) return;
 		return this.rate = this.availableRates[index + 1];
 	}
 
+	/**
+	 * @override
+	 */
 	decreaseRate() {
 		const index = this.availableRates.indexOf(this.rate);
 		if(index - 1 < 0) return;
@@ -133,6 +194,7 @@ class Youtube extends Entity {
 			name : item
 		}));
 	}
+
 
 	set playbackQuality(name) {
 		super.playbackQuality = name;
@@ -191,7 +253,7 @@ class Youtube extends Entity {
 
 	init() {
 		super.init();
-		return apiLoaded
+		return Youtube.apiLoaded()
 			.then(() => this.initYTPlayer())
 	}
 
@@ -221,7 +283,7 @@ class Youtube extends Entity {
 			modestbranding : 1,
 			rel : 0,
 			showinfo : 0,
-			cc_load_policy : 1,
+			cc_load_policy : 0,
 			disablekb : 0,
 			fs : 0,
 			start : globalOptions.time
@@ -241,6 +303,7 @@ class Youtube extends Entity {
 					onPlaybackQualityChange : this.onYTPPlaybackQualityChange.bind(this)
 				}
 			})
+
 		})
 		return this._initPromise.promise();
 	}
@@ -281,6 +344,7 @@ class Youtube extends Entity {
 			this.trigger('durationchange');
 			this.trigger('ratechange');
 			this.trigger('volumechange');
+			this.trigger('trackschange')
 			break;
 
 		case YT.PlayerState.ENDED:
@@ -298,6 +362,7 @@ class Youtube extends Entity {
 				this.onSeeked();
 			}
 
+			this.loadCaptions()
 			this.emitTimeupdate();
 			break;
 
@@ -314,6 +379,7 @@ class Youtube extends Entity {
 			this.player.trigger('waiting');
 
 			this.ytPlayer.setPlaybackQuality(this._nextPlaybackQuality);
+
 			break;
 		}
 
@@ -341,6 +407,35 @@ class Youtube extends Entity {
 			}
 		}, 250)
 	}
+
+	loadCaptions() {
+		const emptyTracklist = () => (this.subtitles == null || this.subtitles.length === 0);
+
+		clearInterval(this._loadCaptionsWatcher);
+		if(
+			!this._tracksDisable &&
+			this.checkCaptionsExist() &&
+			emptyTracklist()
+		) {
+			this.ytPlayer.loadModule('captions');
+
+			this._loadCaptionsWatcher = setInterval(() => {
+				if(!emptyTracklist() && this.checkCaptionsExist()) {
+					this.trigger('trackschange');
+					clearInterval(this._loadCaptionsWatcher);
+				}
+			}, 250)
+		}
+	}
+
+	checkCaptionsExist() {
+		try {
+			return this.ytPlayer.getOptions('captions') != null;
+		} catch (error) {
+			return false;
+		}
+	}
+
 	static parseUrl(url) {
 		let result = null;
 		const regex = Youtube.URL_REGEX;
@@ -387,5 +482,32 @@ Youtube.QUALITY_NAMES = {
 	auto : 'Авто'
 }
 
-Component.registerComponent('Youtube', Youtube);
-export default Youtube;
+Youtube.apiLoaded = function() {
+	if(this._loaded) return $.Deferred().resolve();
+
+	return $.getScript('https://www.youtube.com/iframe_api')
+		.then(() => this._loaded = true)
+}
+
+Player.registerComponent('Youtube', Youtube);
+
+Player.preset('youtube', {
+	options : {
+		entity : 'Youtube',
+		controls : {
+			common : [
+				['play', 'volume', 'timeline', 'rate', 'backward', 'source', 'subtitle', 'divider', 'section', 'fullscreen'],
+				[]
+			],
+			fullscreen : [
+				['play', 'volume', 'timeline', 'rate', 'backward', 'source', 'subtitle', 'divider', 'section', 'fullscreen'],
+			]
+		}
+	},
+});
+
+Player.plugin('youtube', function(pluginOptions) {
+
+	/* global YT */
+	Youtube.apiLoaded()
+})

@@ -36,7 +36,6 @@ import './components/KeybindingInfoControl';
 import './components/TimeInfoControl';
 
 import './entity/Html5';
-import './entity/Youtube';
 
 import 'array.prototype.find';
 
@@ -380,7 +379,15 @@ class Player extends Component {
 			 *
 			 * @event Player#qualitychange
 			 */
-			'qualitychange'
+			'qualitychange',
+
+			/**
+			 * qualitychange html5
+			 *
+			 * @event Player#trackschange
+			 */
+			'trackschange',
+
 
 
 		].forEach(eventName => {
@@ -1602,6 +1609,8 @@ Player._loadSVGSprite = function(svg) {
 
 Player.defaultSprite = require('../../dist/svg/svg-defs.svg');
 
+/* global VERSION */
+Player.version = VERSION;
 
 window.$.fn.lePlayer = function (options) {
 	return this.each(function () {
@@ -1721,6 +1730,8 @@ Player.plugin('miniplayer', function(pluginOptions) {
 });
 
 Player.preset('vps', require('./presets/vps.js').preset);
+Player.preset('simple', require('./presets/simple.js').preset);
 Player.preset('sms', require('./presets/sms.js').preset);
 Player.preset('compressed', require('./presets/compressed.js').preset);
-Player.preset('youtube', require('./presets/youtube.js').preset);
+
+module.exports = Player

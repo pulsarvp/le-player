@@ -32,6 +32,7 @@ class SourceControl extends ControlContainer {
 
 	onItemClick(e) {
 		e.preventDefault();
+
 		const item = $(e.target);
 		const video = this.player.video;
 		video.playbackQuality = item.data('name');
@@ -44,26 +45,12 @@ class SourceControl extends ControlContainer {
 		this.update();
 	}
 
-	update() {
-		const video = this.player.video;
-		const qualityLevels = video.getAvailableQualityLevels();
-		const currentQuality = video.playbackQuality;
+	getData() {
+		return this.player.video.getAvailableQualityLevels();
+	}
 
-		if(qualityLevels.length === 0) {
-			this.disable = true;
-			return;
-		}
-
-		this.list = [];
-		this.dropdownContent.empty();
-
-		qualityLevels.forEach(item => {
-			const elem = this.addItem(item.title, item);
-			if(currentQuality.name === item.name) {
-				this.active = elem;
-			}
-		});
-		this.disable = false;
+	getCurrentValue() {
+		return this.player.video.playbackQuality;
 	}
 }
 

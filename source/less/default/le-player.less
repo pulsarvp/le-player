@@ -3,7 +3,6 @@
 
 .leplayer
 {
-	color: @color-text;
 	display: block;
 	outline: 0;
 	position: relative;
@@ -110,6 +109,9 @@
 		{
 			background: @color-fs-control-checked;
 			color: @color-fs-text-hovered;
+			&:hover {
+				background: darken(@color-fs-control-checked, 5%);
+			}
 		}
 
 		.info-control
@@ -256,6 +258,9 @@
 	{
 		background: @color-control-checked;
 		color: @color-text-checked;
+		&:hover {
+			background: darken(@color-control-checked, 5%);
+		}
 	}
 
 	.control-dropdown
@@ -324,6 +329,7 @@
 		{
 			display: block;
 			color: @color-text;
+			white-space: nowrap;
 			cursor: pointer;
 			font-size: @control-text-font-size;
 			line-height: @control-height;
@@ -378,6 +384,7 @@
 	.inner-item
 	{
 	}
+
 
 	.timeline
 	{
