@@ -143,6 +143,16 @@
 		bottom: 132px;
 		z-index: @z-index-fullscreen + 8;
 		height: calc(~"100% - 120px");
+
+		@media screen and (max-width: 500px) {
+			top: 50%;
+			left: 50%;
+			bottom: auto;
+			font-size: 18px;
+			width: 360px;
+			transform: translate(-50%, -50%);
+		}
+
 	}
 
 	&.leplayer--user-active
