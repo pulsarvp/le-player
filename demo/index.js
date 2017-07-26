@@ -2,7 +2,6 @@ $(function() {
 	var dropdown = $('#changeTheme');
 	var _currentTheme = 'default'
 
-
 	function parseParams(params) {
 		var ret = {},
 			hash,
