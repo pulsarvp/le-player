@@ -135,8 +135,7 @@ class NextComponent extends Component {
 	}
 
 	cancel() {
-		this.cancelled = true;
-		this.hide();
+		this.removeClass('leplayer-next--auto');
 	}
 
 	next() {
