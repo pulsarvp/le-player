@@ -237,7 +237,7 @@ class Html5 extends Entity {
 		this._playbackQuality = this.getAvailableQualityLevels().find(item => item.name === name);
 
 		this.src = this._playbackQuality;
-		this.playbackRate = rate;
+		this.rate = rate;
 		this.currentTime = time;
 
 		if (stop) {
