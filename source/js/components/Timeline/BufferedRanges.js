@@ -19,6 +19,7 @@ class BufferedRanges extends Component {
 
 		this.player.on('progress', this.update.bind(this));
 		this.player.on('seeked', this.update.bind(this));
+		this.player.on('loadstart', this.update.bind(this));
 	}
 
 	/**
@@ -45,12 +46,11 @@ class BufferedRanges extends Component {
 			end = buffered.end(buffered.length - 1);
 		}
 
+		let width = 0;
 		if (duration > 0) {
-			this.range.css({
-				width : percentify(end, duration) * 100 + '%'
-			})
-
+			width = percentify(end, duration) * 100 + '%'
 		}
+		this.range.css({ width })
 	}
 }
 Component.registerComponent('BufferedRanges', BufferedRanges);

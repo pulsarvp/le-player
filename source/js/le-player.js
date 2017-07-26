@@ -17,6 +17,7 @@ import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
 import { createEl, secondsToTime, noop } from './utils';
+import Cookie from './utils/cookie';
 import { IS_IPHONE, IS_IPOD, IS_ANDROID_PHONE } from './utils/browser';
 
 import MediaError from './MediaError';
@@ -1600,6 +1601,7 @@ Player.getPreset = function(name) {
 
 Player._presets = {};
 
+Player.Cookie = Cookie;
 
 Player._loadSVGSprite = function(svg) {
 	const hiddenElement = $('<div/>').hide();

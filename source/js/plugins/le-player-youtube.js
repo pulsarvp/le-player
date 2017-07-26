@@ -70,7 +70,7 @@ class Youtube extends Entity {
 		}
 
 		let time;
-		if (value > this.duration) {
+		if (value >= this.duration) {
 			time = this.duration
 		} else if (value < 0) {
 			time = 0
@@ -80,7 +80,8 @@ class Youtube extends Entity {
 
 		this.isSeeking = true;
 		this.ytPlayer.seekTo(time, true);
-		this.trigger('timeupdate');
+		this.player.trigger('timeupdateload', { currentTime : time });
+
 		this.trigger('seeking');
 
 		this.emitTimeupdate();
@@ -122,10 +123,6 @@ class Youtube extends Entity {
 
 	get muted() {
 		return this.ytPlayer.isMuted();
-	}
-
-	get defaultVolume() {
-		return this.volume || this.player.options.volume.default;
 	}
 
 	get subtitles() {
@@ -228,6 +225,7 @@ class Youtube extends Entity {
 	}
 
 	set volume(value) {
+		super.volume = value;
 		this.ytPlayer.setVolume(value * 100);
 
 		setTimeout(() => {
@@ -317,6 +315,8 @@ class Youtube extends Entity {
 
 	onYTPReady(e) {
 		this._initPromise.resolve();
+		this._initRate();
+		this._initVolume();
 		this.setAvailablePlaybackRates();
 	}
 
@@ -344,10 +344,14 @@ class Youtube extends Entity {
 			this.trigger('durationchange');
 			this.trigger('ratechange');
 			this.trigger('volumechange');
-			this.trigger('trackschange')
+			this.trigger('trackschange');
+			if(this.player.options.autoplay) {
+				this.trigger('play');
+			}
 			break;
 
 		case YT.PlayerState.ENDED:
+			this.trigger('pause');
 			this.trigger('ended');
 			break;
 
