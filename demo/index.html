@@ -5,6 +5,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>LePlayer Demo Page</title>
 		<link id="linkPlayerTheme" rel="stylesheet" href="../dist/css/default/le-player.css">
+		<link id="linkPlayerTheme" rel="stylesheet" href="../dist/css/default/le-player-next.css">
 		<link id="linkPlayerTheme" rel="stylesheet" href="../dist/css/default/le-player-youtube.css">
 		<link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
 		<style>
@@ -122,11 +123,17 @@
 					<h3>options =</h3>
 					<div id="editor">new Object({
 	//preset : 'compressed',
-	title : 'Title',
-	description : '<a hre="#">Link ... </a>',
+	title : 'Идеальный газ. Первое начало термодинамики',
+	description : '1-я лекция из курса: Физика. Термодинамика. Дополнительные семинары',
 	sectionContainer: "#sections",
 	poster : './poster.jpg',
 	preload : 'metadata',
+	width: '100%',
+	controlsOptions : {
+		common : {
+			align : ['justify', 'right'],
+		}
+	},
     data : {
         sections : [
             {
@@ -168,9 +175,17 @@
     },
 	plugins : {
 		'ga' : {},
+		'next' : {
+			url : '',
+			title : 'Скорость звука. Истечение газов из отверстия. Циклы',
+			description : '2-я лекция из курса: Физика. Термодинамика. Дополнительные семинары',
+			poster : 'http://lectoriy.mipt.ru/img/lecture/Physics-Optics-L01-Kozel-090212.01.jpg',
+			auto : true,
+			time : 3199
+		},
 		'miniplayer' : {
 			width : '1140px'
-		}
+		},
 	},
 });
 					</div>
@@ -209,6 +224,7 @@
 		<script src="index.js" charset="utf-8"></script>
 		<script src="../dist/js/le-player.js"></script>
 		<script src="../dist/js/le-player-ga.js"></script>
+		<script src="../dist/js/le-player-next.js"></script>
 		<script src="../dist/js/le-player-youtube.js"></script>
 		<script>
 			$(document).ready(function () {
