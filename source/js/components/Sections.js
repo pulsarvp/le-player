@@ -36,7 +36,7 @@ class Sections extends Component {
 			.find('.leplayer-section')
 			.on('click', this.onSectionClick.bind(this));
 
-		this.player.on('sectionstoggle', this._onSectionsToggle.bind(this));
+		// this.player.on('sectionstoggle', this._onSectionsToggle.bind(this));
 
 		this.player.on('timeupdate', this.onTimeUpdate.bind(this));
 
@@ -170,12 +170,18 @@ class Sections extends Component {
 		}
 	}
 
-	_onSectionsToggle(e, data) {
-		if (this.element.hasClass('leplayer-sections--hidden') && data.checked) {
+	set visible(value) {
+		if (this.element.hasClass('leplayer-sections--hidden') && value) {
 			this.element.removeClass('leplayer-sections--hidden');
-		} else if (!data.checked) {
+			this.player.trigger('sectionstoggle', { isVisible : value });
+		} else if (!value) {
 			this.element.addClass('leplayer-sections--hidden');
+			this.player.trigger('sectionstoggle', { isVisible : value });
 		}
+	}
+
+	get visible() {
+		return !this.element.hasClass('leplayer-sections--hidden')
 	}
 
 	/**

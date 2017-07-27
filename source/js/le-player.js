@@ -17,7 +17,7 @@ import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
 import { createEl, secondsToTime, noop } from './utils';
-import { IS_ANDROID_PHONE, IS_IPOD, IS_IPHONE, IS_MOBILE } from './utils/browser';
+import { IS_ANDROID_PHONE, IS_ANDROID, IS_IPOD, IS_IPHONE, IS_MOBILE } from './utils/browser';
 
 import MediaError from './MediaError';
 import Html5 from './entity/Html5.js';
@@ -99,8 +99,8 @@ const defaultOptions = window.options = {
 			['play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
 		],
 		'common:android' : [
-			['play', 'timeline'],
-			['rate', 'source', 'section', 'fullscreen']
+			['play', 'timeline', 'fullscreen'],
+			['rate', 'source', 'section']
 		],
 		'fullscreen:mobile' : [
 			['play', 'timeline', 'fullscreen'],
@@ -326,8 +326,6 @@ class Player extends Component {
 		this._dblclickTimeout = null;
 
 		this._initSections().then((data) => {
-			this.sections = data.sectionsComponent;
-
 			/**
 			 * Sections init event
 			 *
@@ -709,6 +707,7 @@ class Player extends Component {
 			 *
 			 * @event Player#fullscreenchange
 			 */
+			console.log("FULLSCREENCHANGE")
 			this.trigger('fullscreenchange', true);
 		} else if (this.video.supportsFullScreen()) {
 			this.video.enterFullscreen();
@@ -1175,6 +1174,15 @@ class Player extends Component {
 		}
 	}
 
+	toggleSections(flag) {
+		if(this.sections) {
+			this.sections.visible = flag;
+		}
+		if(this.outsideSections) {
+			this.outsideSections.visible = flag;
+		}
+	}
+
 
 
 	/**
@@ -1300,21 +1308,21 @@ class Player extends Component {
 
 				sections = this._completeSections(sections);
 
-				const sectionsComponent = new Sections(this, {
+				this.sections = new Sections(this, {
 					items : sections,
 					fullscreenOnly : isSectionOutside,
 					hideScroll : true
 				});
 
-				this.innerElement.append(sectionsComponent.element);
+				this.innerElement.append(this.sections.element);
 
 				if (isSectionOutside) {
-					const outsideSections = new Sections(this, {
+					this.outsideSections = new Sections(this, {
 						items : sections
 					});
-					this.sectionsContainer.append(outsideSections.element);
+					this.sectionsContainer.append(this.outsideSections.element);
 				}
-				dfd.resolve({ sectionsComponent, items : sections });
+				dfd.resolve({ items : sections });
 			})
 		}
 
@@ -1483,9 +1491,21 @@ class Player extends Component {
 	_onFullscreenChange(e, isFs) {
 		if(isFs) {
 			this.view = 'fullscreen';
+
+			// Hide sections by default on mobile fullscreen
+			if(IS_ANDROID) {
+				this._lastSectionsValue = this.sections.visible;
+				this.sections.visible = false;
+			}
+
 		} else {
 			this.view = 'common';
 
+			if(IS_ANDROID) {
+				this.sections.visible = this._lastSectionsValue;
+			}
+
+			// Pause video on exit fullscreeen on mobile
 			if(IS_ANDROID_PHONE || IS_IPHONE || IS_IPOD) {
 				this.pause();
 			}
@@ -1514,9 +1534,9 @@ class Player extends Component {
 	}
 
 	_onEntityFullscrenChange() {
-		const fsApi = FullscreenApi;
-		const isFs = !!document[fsApi.fullscreenElement];
-		this.trigger('fullscreenchange', isFs);
+		// const fsApi = FullscreenApi;
+		// const isFs = !!document[fsApi.fullscreenElement];
+		// this.trigger('fullscreenchange', isFs);
 	}
 
 }
