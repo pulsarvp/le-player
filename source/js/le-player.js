@@ -1079,8 +1079,8 @@ class Player extends Component {
 			this.addClass('leplayer--iphone');
 		}
 
-		if(IS_ANDROID_PHONE) {
-			this.addClass('leplayer--androidphone');
+		if(IS_ANDROID) {
+			this.addClass('leplayer--android');
 		}
 
 		if(IS_MOBILE) {
