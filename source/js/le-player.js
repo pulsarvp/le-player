@@ -18,9 +18,9 @@ import FullscreenApi from './FullscreenApi';
 
 import { createEl, secondsToTime, noop } from './utils';
 import { IS_ANDROID_PHONE, IS_ANDROID, IS_IPOD, IS_IPHONE, IS_MOBILE } from './utils/browser';
+import Cookie from './utils/cookie';
 
 import MediaError from './MediaError';
-import Html5 from './entity/Html5.js';
 
 // Register common controls
 import './components/PlayControl';
@@ -35,6 +35,11 @@ import './components/SubtitleControl';
 import './components/DownloadControl';
 import './components/KeybindingInfoControl';
 import './components/TimeInfoControl';
+
+import './entity/Html5';
+
+import 'array.prototype.find';
+
 
 Control.registerControl('divider', function() {
 	return {
@@ -65,7 +70,8 @@ function excludeArray(source, dist) {
 	return result;
 }
 
-const defaultOptions = window.options = {
+const defaultOptions = {
+	entity : 'Html5',
 	autoplay : false,
 	height : 'auto',
 	loop : false,
@@ -307,13 +313,14 @@ class Player extends Component {
 		 */
 		this.element = this.createElement();
 
+		this.loadEntity(this.options.entity, { ctx : element });
 		/**
 		 * Video html5 component
 		 *
 		 * @memberof! Player#
-		 * @type {Html5}
+		 * @type {Entity}
 		 */
-		this.video = new Html5(this, { element });
+		this.video = this.entity;
 
 		// Create controls
 		// TODO: move this action to the createElement
@@ -339,6 +346,234 @@ class Player extends Component {
 		});
 		this._initPlugins();
 
+		this._listenHotKeys();
+
+		this._userActivity = false;
+		this._listenUserActivity();
+
+		this._waitingTimeouts = [];
+
+		/* Retrigger {@link Entity} Events */
+		[
+			/**
+			 * durationchange player event
+			 *
+			 * @event Player#durationchange
+			 */
+			'durationchange',
+
+			/**
+			 * progress html5 media event
+			 *
+			 * @event Player#progress
+			 */
+			'progress',
+
+			/**
+			 * dblclick
+			 *
+			 * @event Player#dbclick
+			 */
+			'dblclick',
+
+			/**
+			 * dblclick
+			 *
+			 * @event Player#dbclick
+			 */
+			'click',
+
+
+			/**
+			 * canplay html5 media event
+			 *
+			 * @event Player#canplay
+			 */
+			'canplay',
+
+			/**
+			 * qualitychange html5
+			 *
+			 * @event Player#qualitychange
+			 */
+			'qualitychange',
+
+			/**
+			 * qualitychange html5
+			 *
+			 * @event Player#trackschange
+			 */
+			'trackschange',
+
+
+
+		].forEach(eventName => {
+			this.video.on(eventName, () => {
+				this.trigger(eventName);
+			})
+		});
+
+		this.video.one('play', () => {
+            /**
+             * First play event
+             *
+             * @event Player#firstplay
+             */
+			this.trigger('firstplay');
+			this.removeClass('leplayer--virgin');
+		});
+
+		this.video.on('timeupdate', () => {
+			if (this.video.currentTime > 0) {
+				this.removeClass('leplayer--virgin');
+			}
+
+			/**
+			 * timeupdate html5 media event
+			 *
+			 * @event Player#timeupdate
+			 */
+			this.trigger('timeupdate', { time : this.video.currentTime, duration : this.video.duration });
+
+		})
+
+		this.video.on('loadstart', () => {
+			this.removeClass('leplayer--ended');
+
+			this.error = null;
+			/**
+			 * loadstart player event
+			 *
+			 * @event Player#loadstart
+			 */
+			this.trigger('loadstart');
+		});
+
+		this.video.on('seeking', () => {
+			this._startWaiting();
+			/**
+			 * seeking html5 media event
+			 *
+			 * @event Player#seeking
+			 */
+			this.trigger('seeking');
+		});
+
+		this.video.on('seeked', () => {
+			this._stopWayting();
+			/**
+			 * seeked html5 media event
+			 *
+			 * @event Player#seeked
+			 */
+			this.trigger('seeked');
+		});
+
+		this.video.on('volumechange', () => {
+			/**
+			 * volumechange html5 media event
+			 *
+			 * @event Player#volumechange
+			 */
+			this.trigger('volumechange', { volume : this.video.volume });
+		});
+
+		this.video.on('posterchange', (e, data) => {
+			const url = data.url;
+			this.poster.url = url;
+			this.trigger('posterchange');
+		});
+
+		this.video.on('play', (e) => {
+			this.removeClass('leplayer--ended');
+			this.removeClass('leplayer--paused');
+			this.addClass('leplayer--playing');
+
+			/**
+			 * play html5 media event
+			 *
+			 * @event Player#play
+			 */
+			this.trigger('play');
+		});
+
+		this.video.on('pause', () => {
+			this.removeClass('leplayer--playing');
+			this.addClass('leplayer--paused');
+
+			/**
+			 * pause html5 media event
+			 *
+			 * @event Player#pause
+			 */
+			this.trigger('pause');
+		});
+
+		this.video.on('playing', () => {
+			this._stopWayting();
+
+			/**
+			 * playing html5 media event
+			 *
+			 * @event Player#playing
+			 */
+			this.trigger('playing');
+		});
+
+		this.video.on('ratechange', () => {
+			/**
+			 * rate html5 media event
+			 *
+			 * @event Player#rate
+			 */
+			this.trigger('ratechange', { rate : this.video.rate });
+		});
+
+		this.video.on('ended', () => {
+			this.addClass('leplayer--ended');
+
+			if(this.options.loop) {
+				this.currentTime = 0;
+				this.video.play();
+			} else if (!this.video.paused) {
+				this.video.pause();
+			}
+
+			/**
+			 * ended html5 media event
+			 *
+			 * @event Player#ended
+			 */
+			this.trigger('ended');
+		});
+
+		this.video.on('canplaythrough', () => {
+			this._stopWayting();
+			/**
+			 * canplaythrough html5 media event
+			 *
+			 * @event Player#canplaythrough
+			 */
+			this.trigger('canplaythrough');
+		});
+
+		this.video.on('waiting', () => {
+			this._startWaiting();
+
+			this.video.one('timeupdate', () => this._stopWayting());
+
+			/**
+			 * waiting html5 media event
+			 *
+			 * @event Player#waiting
+			 */
+			this.trigger('waiting');
+		});
+
+		this.video.on('error', (e, data) => {
+			this.error = new MediaError(data.code);
+		});
+
 		this.video.init().then(() => {
 			/**
 			 * Player init event
@@ -356,220 +591,6 @@ class Player extends Component {
 			}
 		});
 
-		this._listenHotKeys();
-
-		this._userActivity = false;
-		this._listenUserActivity();
-
-		const mediaElement = this.video.element;
-		mediaElement.one({
-			play : (e) => {
-				/**
-				 * First play event
-				 *
-				 * @event Player#firstplay
-				 */
-				this.trigger('firstplay');
-				this.removeClass('leplayer--virgin');
-			}
-		});
-
-		this._waitingTimeouts = [];
-
-		mediaElement.on({
-
-			loadstart : (e) => {
-				this.removeClass('leplayer--ended');
-
-				this.error = null;
-				/**
-				 * loadstart html5 media event
-				 *
-				 * @event Player#loadstart
-				 */
-				this.trigger('loadstart');
-			},
-
-			durationchange : (e) => {
-				/**
-				 * durationchange html5 media event
-				 *
-				 * @event Player#durationchange
-				 */
-				this.trigger('durationchange');
-			},
-
-			timeupdate : (e) => {
-				if (this.video.currentTime > 0) {
-					this.removeClass('leplayer--virgin');
-				}
-
-				/**
-				 * timeupdate html5 media event
-				 *
-				 * @event Player#timeupdate
-				 */
-				this.trigger('timeupdate', { time : this.video.currentTime, duration : this.video.duration });
-
-			},
-
-			seeking : (e) => {
-				this._startWaiting();
-				/**
-				 * seeking html5 media event
-				 *
-				 * @event Player#seeking
-				 */
-				this.trigger('seeking');
-
-			},
-
-			seeked : (e) => {
-				this._stopWayting();
-				/**
-				 * seeked html5 media event
-				 *
-				 * @event Player#seeked
-				 */
-				this.trigger('seeked');
-			},
-
-			progress : () => {
-				/**
-				 * progress html5 media event
-				 *
-				 * @event Player#progress
-				 */
-				this.trigger('progress');
-			},
-
-			dblclick : () => {
-				/**
-				 * dblclick
-				 *
-				 * @event Player#dbclick
-				 */
-				this.trigger('dblclick');
-			},
-
-			click : () => {
-				/**
-				 * click
-				 *
-				 * @event Player#click
-				 */
-				this.trigger('click')
-			},
-
-			volumechange : (e) => {
-				/**
-				 * volumechange html5 media event
-				 *
-				 * @event Player#volumechange
-				 */
-				this.trigger('volumechange', { volume : this.video.volume });
-			},
-
-			play : (e) => {
-				this.removeClass('leplayer--ended');
-				this.removeClass('leplayer--paused');
-				this.addClass('leplayer--playing');
-
-				/**
-				 * play html5 media event
-				 *
-				 * @event Player#play
-				 */
-				this.trigger('play');
-			},
-
-			pause : (e) => {
-				this.removeClass('leplayer--playing');
-				this.addClass('leplayer--paused');
-
-				/**
-				 * pause html5 media event
-				 *
-				 * @event Player#pause
-				 */
-				this.trigger('pause');
-			},
-
-			playing : (e) => {
-				this._stopWayting();
-
-				/**
-				 * playing html5 media event
-				 *
-				 * @event Player#playing
-				 */
-				this.trigger('playing');
-			},
-
-			ratechange : (e) => {
-
-				/**
-				 * rate html5 media event
-				 *
-				 * @event Player#rate
-				 */
-				this.trigger('ratechange', { rate : this.video.rate });
-			},
-
-			canplay : (e) => {
-				/**
-				 * canplay html5 media event
-				 *
-				 * @event Player#canplay
-				 */
-				this.trigger('canplay');
-			},
-
-			ended : (e) => {
-				this.addClass('leplayer--ended')
-
-				if(this.options.loop) {
-					this.currentTime = 0;
-					this.video.play();
-				} else if (!this.video.paused) {
-					this.video.pause();
-				}
-
-				/**
-				 * ended html5 media event
-				 *
-				 * @event Player#ended
-				 */
-				this.trigger('ended');
-			},
-
-			canplaythrough : (e) => {
-				this._stopWayting();
-				/**
-				 * canplaythrough html5 media event
-				 *
-				 * @event Player#canplaythrough
-				 */
-				this.trigger('canplaythrough');
-			},
-
-			waiting : (e) => {
-				this._startWaiting()
-
-				this.one('timeupdate', () => this._stopWayting());
-
-				/**
-				 * waiting html5 media event
-				 *
-				 * @event Player#waiting
-				 */
-				this.trigger('waiting');
-			},
-
-			error : (e) => {
-				this.error = new MediaError(e.target.error.code);
-			}
-		});
 
 		this.on('fullscreenchange', this._onFullscreenChange.bind(this));
 		this.on('click', this._onClick.bind(this));
@@ -579,11 +600,20 @@ class Player extends Component {
 		this.on('pause', this._onPause.bind(this));
 
 		$(document).on(FullscreenApi.fullscreenchange, this._onEntityFullscrenChange.bind(this));
+	}
 
+	get entity() {
+		return this._entity;
+	}
+
+	loadEntity(name, options) {
+		const Entity = Player.getComponent(name);
+		this._entity = new Entity(this, options);
 	}
 
 	/**
 	 * Starts playing the video
+	 *
 	 *
 	 * @access public
 	 * @example
@@ -951,37 +981,6 @@ class Player extends Component {
 
 		this.element = createEl('div');
 
-		[
-
-			// Remove controls because we dont not support native controls yet
-			'controls',
-			'poster',
-
-			// It is unnecessary attrs, this functionality solve CSS
-			'height',
-			'width'
-
-		].forEach(item => {
-			element.removeAttr(item);
-		});
-
-		// Set attrs from options
-		[
-			'preload',
-			'autoplay',
-			'loop',
-			'muted'
-		].forEach(item => {
-			if(this.options[item]) {
-				element.attr(item, this.options[item]);
-				element.prop(item, this.options[item]);
-			}
-		})
-
-		element.find('source[data-quality]').each((i, item) => {
-			$(item).remove();
-		});
-
 
 		this.element = this.element
 			.addClass('leplayer')
@@ -1031,15 +1030,13 @@ class Player extends Component {
 		.append(this.loader)
 		.append(this.splashIcon.element)
 
-		if(options.poster) {
-			this.poster = new Poster(this);
-			this.videoContainer.append(this.poster.element);
-		}
+		this.poster = new Poster(this);
+		this.videoContainer.append(this.poster.element);
 
 
 		const lastTimer = new Time(this, {
 			fn : (player) => {
-				const video = player.video
+				const video = player.video;
 				return secondsToTime(video.duration - video.currentTime);
 			}
 		})
@@ -1110,6 +1107,10 @@ class Player extends Component {
 	_optionsFromElement() {
 		// Copy video attrs to the opitons
 		const  element = this._element;
+		if (element == null || element.length === 0) {
+			return {}
+		}
+
 		let attrOptions = [
 			'height',
 			'width',
@@ -1120,7 +1121,7 @@ class Player extends Component {
 			'preload',
 		]
 		.reduce((obj, item) => {
-			const val = element.attr(item)
+			const val = element.attr(item);
 			if(val != null) {
 				obj[item] = element.attr(item);
 			}
@@ -1163,7 +1164,10 @@ class Player extends Component {
 	 * @returns {String} Icon name
 	 */
 	calcVolumeIcon(value) {
-		const volume = value || this.video.volume;
+		if(value == null) {
+			value = this.video.volume;
+		}
+		const volume = value;
 
 		if (volume < this.options.volume.mutelimit) {
 			return 'volume-off';
@@ -1224,6 +1228,8 @@ class Player extends Component {
 		this.options.controls = $.extend({}, defaultOptions.controls, presetOptions.controls, this._userOptions.controls);
 
 		// exclude controls option
+		// TODO(adinvadim):
+		// Set depreceted flag for this option;
 		for (const name in this.options.excludeControls) {
 			if (!this.options.excludeControls.hasOwnProperty(name)) return;
 			const controlCollection = this.options.excludeControls[name];
@@ -1269,19 +1275,15 @@ class Player extends Component {
 		}
 
 		this.element.on('keydown.leplayer.hotkey', (e) => {
-			const _isFocused = () => this.element.is(':focus');
-			if (_isFocused) {
+			this.options.keyBinding.forEach(binding => {
 
-				this.options.keyBinding.forEach(binding => {
+				if(isKeyBinding(e, binding)) {
+					e.preventDefault();
+					binding.fn(this);
+					return false;
+				}
 
-					if(isKeyBinding(e, binding)) {
-						e.preventDefault();
-						binding.fn(this);
-						return false;
-					}
-
-				})
-			}
+			})
 		})
 	}
 
@@ -1498,6 +1500,7 @@ class Player extends Component {
 				this.sections.visible = false;
 			}
 
+			this.focus();
 		} else {
 			this.view = 'common';
 
@@ -1656,6 +1659,7 @@ Player.getPreset = function(name) {
 
 Player._presets = {};
 
+Player.Cookie = Cookie;
 
 Player._loadSVGSprite = function(svg) {
 	const hiddenElement = $('<div/>').hide();
@@ -1665,6 +1669,8 @@ Player._loadSVGSprite = function(svg) {
 
 Player.defaultSprite = require('../../dist/svg/svg-defs.svg');
 
+/* global VERSION */
+Player.version = VERSION;
 
 window.$.fn.lePlayer = function (options) {
 	return this.each(function () {
@@ -1784,5 +1790,8 @@ Player.plugin('miniplayer', function(pluginOptions) {
 });
 
 Player.preset('vps', require('./presets/vps.js').preset);
+Player.preset('simple', require('./presets/simple.js').preset);
 Player.preset('sms', require('./presets/sms.js').preset);
 Player.preset('compressed', require('./presets/compressed.js').preset);
+
+module.exports = Player

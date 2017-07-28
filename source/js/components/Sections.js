@@ -22,13 +22,13 @@ class Sections extends Component {
 
 		//options.items = items;
 
-		super(player, options)
+		super(player, options);
 
 		this.scrollElement = this._innerElement;
 		this.activeSection = this.getSectionByIndex(0);
 
 		this.items = items;
-		this.length = this.items.length
+		this.length = this.items.length;
 
 		this.setActiveByIndex(0);
 
@@ -43,6 +43,8 @@ class Sections extends Component {
 		this.player.on('inited', this.updateSectionDuration.bind(this));
 
 		this.player.on('durationchange', this.updateSectionDuration.bind(this));
+
+		this.player.on('focus', () => this.player.focus());
 
 		return this;
 	}
@@ -71,7 +73,10 @@ class Sections extends Component {
 		const { fullscreenOnly, hideScroll } = this.options;
 
 
-		this.element = $('<div />').addClass('leplayer-sections');
+		this.element = $('<div />')
+			.addClass('leplayer-sections')
+			.attr('tabindex', '0');
+
 		this._innerElement = $('<div />').addClass('leplayer-sections__inner');
 
 		if(fullscreenOnly) {
@@ -149,7 +154,7 @@ class Sections extends Component {
 			return
 		}
 
-		const currentTime = data.time;
+		const currentTime = this.player.currentTime;
 
 		// Update span with end section time
 		// TODO: Вынести это в отдельный компонент ShowTime или типо того

@@ -154,7 +154,7 @@ class ControlCollection extends Component {
 		let globalAlign = null;
 
 		this.element = createEl('div', {
-			className : `leplayer-control-collection leplayer-control-collection--${name}`
+			className : `leplayer-control-collection leplayer-control-collection--${name}`,
 		})
 
 		if(typeof align === 'string') {
@@ -179,6 +179,7 @@ class ControlCollection extends Component {
 			});
 
 			elemRow.addClass(`leplayer-controls--${rowAlign}`)
+				.attr('tabindex', 0);
 
 			elemRow.find('.divider + .divider').remove();
 		});

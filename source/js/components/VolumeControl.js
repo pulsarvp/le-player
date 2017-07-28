@@ -24,13 +24,15 @@ class VolumeControl extends ControlDropdown {
 		super(player, options);
 
 		this.player.on('volumechange', (e, data) => {
-			this.value = data.volume;
+			const video = this.player.video;
+			this.value = video.muted ? 0 : video.volume;
 		})
 	}
 
 	createElement() {
 		super.createElement();
 		let drag = false;
+		const video = this.player.video;
 
 		this.marker = $('<div/>').addClass('volume-marker');
 
@@ -44,7 +46,10 @@ class VolumeControl extends ControlDropdown {
 				if (drag) return;
 				let p = this.getPosition(e.pageY);
 				if (p >= 0 && p <= 1) {
-					this.player.video.volume = 1 - p;
+					if(video.muted) {
+						video.muted = false;
+					}
+					video.volume = 1 - p;
 				}
 			});
 
@@ -64,7 +69,10 @@ class VolumeControl extends ControlDropdown {
 				if (!drag) return;
 				let p = this.getPosition(e.pageY);
 				if (p >= 0 && p <= 1) {
-					this.player.video.volume = 1 - p
+					if(video.muted) {
+						video.muted = false;
+					}
+					video.volume = 1 - p
 				}
 			},
 
@@ -87,11 +95,7 @@ class VolumeControl extends ControlDropdown {
 	toggleMuted () {
 		const { video } = this.player;
 
-		if (video.volume === 0) {
-			video.volume = video.defaultVolume;
-		} else {
-			video.volume = 0;
-		}
+		video.muted = !video.muted;
 	}
 
 	getPosition (y) {

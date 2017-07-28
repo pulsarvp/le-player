@@ -1,6 +1,6 @@
 {
   "name": "le-player",
-  "version": "0.2.1",
+  "version": "0.3.5",
   "description": "The best HTML5 video player made for Lectoriy.",
   "main": "dist/js/le-player.min.js",
   "directories": {
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/miptliot/le-player.git"
+    "url": "git+https://github.com/pulsarvp/le-player.git"
   },
   "keywords": [
     "player",
@@ -27,11 +27,14 @@
     "Pulsar"
   ],
   "author": "Anna Manaenkova <anna.manaenkova@phystech.edu>",
+  "contributors": [
+    "Vadim Kostin <adin.vadim@gmail.com>"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/miptliot/le-player/issues"
+    "url": "https://github.com/pulsarvp/le-player/issues"
   },
-  "homepage": "https://github.com/miptliot/le-player#readme",
+  "homepage": "https://github.com/pulsarvp/le-player#readme",
   "devDependencies": {
     "ace-builds": "^1.2.6",
     "autoprefixer": "^6.3.6",
@@ -61,5 +64,8 @@
     "raw-loader": "^0.5.1",
     "webpack": "^1.12.14",
     "webpack-dev-server": "^1.14.1"
+  },
+  "dependencies": {
+    "array.prototype.find": "^2.0.4"
   }
 }

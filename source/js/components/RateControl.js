@@ -25,12 +25,10 @@ class RateControl extends Control {
 		}, options);
 		super(player, options);
 
-		this.player.on('ratechange', (e, data) => {
-			this.value = data.rate
-		})
+		this.player.on('ratechange', () => {
+			this.update();
+		});
 	}
-
-
 
 	/**
 	 * @override
@@ -46,7 +44,7 @@ class RateControl extends Control {
 			collection : this.options.collection,
 			title : 'Уменьшить скорость проигрывания',
 			onClick : function(e) {
-				video.rate -= this.player.options.rate.step;
+				video.decreaseRate();
 			}
 		});
 
@@ -57,7 +55,7 @@ class RateControl extends Control {
 			collection : this.options.collection,
 			title : 'Увеличить скорость проигрывания',
 			onClick : function(e) {
-				video.rate += this.player.options.rate.step;
+				video.increaseRate();
 			}
 		});
 
@@ -85,7 +83,7 @@ class RateControl extends Control {
 	 * @override
 	 */
 	onPlayerInited() {
-		this.value = this.player.video.defaultRate;
+		this.update();
 	}
 
 	/**
@@ -95,21 +93,29 @@ class RateControl extends Control {
 		e.preventDefault()
 	}
 
-	set value (value) {
-		let video = this.player.video;
-		let options = this.player.options;
-		if (this.disable) {
-			return false;
-		}
-		this.upControl.disable = false;
-		this.downControl.disable = false;
+	update(value) {
+		const video = this.player.video;
 
-		if (video.rate <= video.rateMin) {
+		value = value || video.rate;
+		value = parseFloat(value)
+			.toFixed(2)
+			.toString()
+			.replace(/,/g, '.');
+		this.currentRate.text = '×' + value;
+
+		if(this.disable) return;
+
+		if(video.rate <= video.rateMin) {
 			this.downControl.disable = true;
-		} else if (video.rate >= video.rateMax) {
-			this.upControl.disable = true;
+		} else {
+			this.downControl.disable = false;
 		}
-		this.show();
+
+		if(video.rate >= video.rateMax) {
+			this.upControl.disable = true;
+		} else {
+			this.upControl.disable = false;
+		}
 	}
 
 	set disable(value) {
@@ -121,16 +127,6 @@ class RateControl extends Control {
 	init () {
 		let rate = Cookie.get('rate', this.player.options.rate.default);
 		this.show(rate);
-	}
-
-	show (value) {
-		let video = this.player.video;
-		value = value || video.rate;
-		value = parseFloat(value)
-			.toFixed(2)
-			.toString()
-			.replace(/,/g, '.');
-		this.currentRate.text = '×' + value;
 	}
 
 }
