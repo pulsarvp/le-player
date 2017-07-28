@@ -763,7 +763,6 @@ class Player extends Component {
 			 *
 			 * @event Player#fullscreenchange
 			 */
-			console.log("FULLSCREENCHANGE")
 			this.trigger('fullscreenchange', true);
 		} else if (this.video.supportsFullScreen()) {
 			this.video.enterFullscreen();

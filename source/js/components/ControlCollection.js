@@ -43,7 +43,6 @@ class ControlCollection extends Component {
                 { flag : IS_ANDROID_PHONE, name : 'android' },
                 { flag : IS_IPHONE, name : 'ios' },
 			].forEach(item => {
-				console.log(item);
 				if(item.flag) {
 					const localName = `${name}:${item.name}`;
 
@@ -64,7 +63,6 @@ class ControlCollection extends Component {
 		}, localUaOptions, controlsOptions, options);
 
 		super(player, options);
-		console.log(options.name, options.align);
 
 		this.active = options.active || false;
 		this.name = options.name;
