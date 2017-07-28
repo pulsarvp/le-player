@@ -670,6 +670,32 @@ class Player extends Component {
 	}
 
 	/**
+	 * Change source and save time, rate
+	 *
+	 * @access public
+	 * @param {Object} quality
+	 * @param {String} [quality.title] The name of qualitut e.x SD or HD
+	 * @param {String} quality.url
+	 */
+	changeQuality(quality) {
+		const video = this.video;
+		if(quality == null) return;
+		const time = this.currentTime;
+		const rate = this.rate;
+		const isPaused = this.paused;
+
+		video.src = quality;
+		this.playbackRate = rate;
+		this.currentTime = time;
+
+		if(isPaused) {
+			this.pause()
+		} else {
+			this.play()
+		}
+	}
+
+	/**
 	 * On del view callback
 	 *
 	 * @access public
@@ -899,6 +925,18 @@ class Player extends Component {
 		this.trigger('error', { error : this._error});
 
 		return this;
+	}
+
+	get rate() {
+		return this.video.rate;
+	}
+
+	set rate(value) {
+		this.video.rate = value;
+	}
+
+	get paused() {
+		return this.video.paused;
 	}
 
 	/**
@@ -1788,6 +1826,7 @@ Player.plugin('miniplayer', function(pluginOptions) {
 
 	this._updateMiniPlayer();
 });
+
 
 Player.preset('vps', require('./presets/vps.js').preset);
 Player.preset('simple', require('./presets/simple.js').preset);
