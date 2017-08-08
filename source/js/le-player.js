@@ -17,6 +17,7 @@ import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
 import { createEl, secondsToTime, noop } from './utils';
+import Cookie from './utils/cookie';
 import { IS_IPHONE, IS_IPOD, IS_ANDROID_PHONE } from './utils/browser';
 
 import MediaError from './MediaError';
@@ -36,7 +37,6 @@ import './components/KeybindingInfoControl';
 import './components/TimeInfoControl';
 
 import './entity/Html5';
-import './entity/Youtube';
 
 import 'array.prototype.find';
 
@@ -380,7 +380,15 @@ class Player extends Component {
 			 *
 			 * @event Player#qualitychange
 			 */
-			'qualitychange'
+			'qualitychange',
+
+			/**
+			 * qualitychange html5
+			 *
+			 * @event Player#trackschange
+			 */
+			'trackschange',
+
 
 
 		].forEach(eventName => {
@@ -1593,6 +1601,7 @@ Player.getPreset = function(name) {
 
 Player._presets = {};
 
+Player.Cookie = Cookie;
 
 Player._loadSVGSprite = function(svg) {
 	const hiddenElement = $('<div/>').hide();
@@ -1726,4 +1735,5 @@ Player.preset('vps', require('./presets/vps.js').preset);
 Player.preset('simple', require('./presets/simple.js').preset);
 Player.preset('sms', require('./presets/sms.js').preset);
 Player.preset('compressed', require('./presets/compressed.js').preset);
-Player.preset('youtube', require('./presets/youtube.js').preset);
+
+module.exports = Player

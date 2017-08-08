@@ -161,7 +161,7 @@ class Html5 extends Entity {
 			time = value;
 		}
 
-		this.player.trigger('timeupdateload', { time });
+		this.player.trigger('timeupdateload', { currentTime : time });
 
 		this.media.currentTime = time;
 	}
@@ -217,10 +217,8 @@ class Html5 extends Entity {
 	}
 
 	set rate (value) {
-		if (value <= this.rateMax && value >= this.rateMin) {
-			this.media.playbackRate = value;
-			Cookie.set('rate', value);
-		}
+		super.rate = value;
+		this.media.playbackRate = value;
 	}
 
 	getAvailableQualityLevels() {
@@ -269,13 +267,20 @@ class Html5 extends Entity {
 		return this._source
 	}
 
+	get track () {
+		return this._track;
+	}
+
 	set track (value) {
-		for (var i = 0; i < this.media.textTracks.length; i++) {
-			if (this.media.textTracks[ i ].language === value)
-				this.media.textTracks[ i ].mode = 'showing';
-			else
-				this.media.textTracks[ i ].mode = 'hidden';
-		}
+		[...this.media.textTracks].forEach(item => {
+			if(value != null && item.language === value.language) {
+				item.mode = 'showing'
+			} else {
+				item.mode = 'hidden';
+			}
+		});
+		this._track = value;
+		this.trigger('trackschange');
 	}
 
 	get paused() {
@@ -286,12 +291,8 @@ class Html5 extends Entity {
 		return this.media.volume;
 	}
 
-
-	get defaultVolume () {
-		return Cookie.get('volume') || this.player.options.volume.default;
-	}
-
 	set volume (value) {
+		super.volume = value;
 		const player = this.player;
 		if (value > 1) {
 			this.media.volume = 1;
@@ -299,7 +300,6 @@ class Html5 extends Entity {
 			this.media.volume = 0;
 		} else {
 			this.media.volume = value;
-			Cookie.set('volume', value);
 		}
 		this.media.mute = (value < player.options.volume.mutelimit);
 	}
@@ -423,24 +423,16 @@ class Html5 extends Entity {
 		return this.media.load()
 	}
 
-	_initRate () {
-		this.rate = this.defaultRate;
-	}
-
-	_initVolume () {
-		this.volume = this.defaultVolume;
-	}
-
 	_initSubtitles () {
 		let _self = this;
 		this.element.children('track[kind="subtitles"]').each(function () {
-			let language = $(this).attr('srclang');
-			let title = $(this).attr('label');
-			let src = $(this).attr('src');
+			const language = $(this).attr('srclang');
+			const title = $(this).attr('label');
+			const src = $(this).attr('src');
 			if (title.length > 0 && src.length > 0) {
 				_self.subtitles.push({
 					title : title,
-					src : src,
+					name : language,
 					language : language
 				});
 			}

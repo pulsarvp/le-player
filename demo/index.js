@@ -86,7 +86,7 @@ $(function() {
 
 	_load();
 	var options = safeEval(editor.getValue());
-	var player = new lePlayer($('#video'), options);
+	window.player = new lePlayer($('#video'), options);
 
 })
 
