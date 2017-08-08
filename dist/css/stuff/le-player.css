@@ -1,5 +1,4 @@
 .leplayer {
-  color: #0a196b;
   display: block;
   outline: 0;
   position: relative;
@@ -77,6 +76,9 @@
 .leplayer-controls.controls-fullscreen .control-checkbox--checked {
   background: #333e4c;
   color: #c4d8ee;
+}
+.leplayer-controls.controls-fullscreen .control-checkbox--checked:hover {
+  background: #29313d;
 }
 .leplayer-controls.controls-fullscreen .info-control__content {
   background: #47566b;
@@ -188,6 +190,9 @@
   background: #0a196b;
   color: #e0e3f0;
 }
+.leplayer-controls .control-checkbox--checked:hover {
+  background: #081354;
+}
 .leplayer-controls .control-dropdown {
   position: relative;
 }
@@ -234,6 +239,7 @@
 .leplayer-controls .control-container__item {
   display: block;
   color: #0a196b;
+  white-space: nowrap;
   cursor: pointer;
   font-size: 12px;
   line-height: 32px;
@@ -663,33 +669,6 @@
 .leplayer-video video::-webkit-media-controls-enclosure {
   display: none !important;
 }
-.leplayer-video .leplayer__youtube-wrapper {
-  position: relative;
-  padding-bottom: 56.25%;
-  overflow: hidden;
-  height: 100%;
-  margin: 0 auto;
-  width: 100%;
-  padding-top: 0;
-}
-.leplayer-video .leplayer__youtube {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1;
-}
-.leplayer-video .leplayer__youtube-blocker {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  left: 0;
-}
-.leplayer--virgin .leplayer-video .leplayer__youtube-blocker {
-  background: black;
-}
 .leplayer--fullscreen .leplayer-video,
 .leplayer--fullscreen video {
   height: 100% !important;
@@ -812,12 +791,6 @@
 }
 .leplayer--waiting .leplayer-loader-container__icon {
   animation: leplayer-spin 2s infinite linear;
-}
-.leplayer--youtube .leplayer-loader-container {
-  display: none;
-}
-.leplayer--youtube .leplayer-loader-container__icon {
-  animation: none;
 }
 @keyframes leplayer-spin {
   100% {
