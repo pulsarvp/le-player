@@ -42,7 +42,7 @@
   bottom: 20px;
   display: block;
   left: 20px;
-  position: fixed;
+  position: absolute;
   right: 20px;
   width: auto;
   z-index: 1007;
@@ -474,7 +474,7 @@
 .leplayer--fullscreen .leplayer__inner {
   height: 100%;
   margin: 0 auto;
-  position: fixed;
+  position: absolute;
   top: 0;
   width: 100%;
   z-index: 1006;
@@ -1086,7 +1086,7 @@
   bottom: 20px;
   display: block;
   left: 20px;
-  position: fixed;
+  position: absolute;
   right: 20px;
   width: auto;
   z-index: 1007;
@@ -1518,7 +1518,7 @@
 .leplayer--fullscreen .leplayer__inner {
   height: 100%;
   margin: 0 auto;
-  position: fixed;
+  position: absolute;
   top: 0;
   width: 100%;
   z-index: 1006;
