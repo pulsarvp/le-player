@@ -113,7 +113,7 @@ const defaultOptions = {
 			['rate', 'source', 'section']
 		],
 		'common:ios' : [
-			['play', 'rate', 'timeline', 'source', 'section']
+			['play', 'rate', 'timeline', 'source']
 		],
 	},
 	controlsOptions : {
