@@ -70,6 +70,11 @@
 	&.controls-fullscreen
 	{
 		display: block;
+		left: 20px;
+		position: absolute;
+		right: 20px;
+		width: auto;
+		z-index: @z-index-fullscreen + 7;
 		.control
 		{
 			background: @color-fs-control;
@@ -668,7 +673,7 @@
 	{
 		height: 100%;
 		margin: 0 auto;
-		position: fixed;
+		position: absolute;
 		top: 0;
 		width: 100%;
 		z-index: @z-index-fullscreen + 6;
