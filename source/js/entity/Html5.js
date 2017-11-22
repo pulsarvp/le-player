@@ -342,6 +342,7 @@ class Html5 extends Entity {
 
 	init () {
 		super.init();
+		this.load();
 		let dfd = $.Deferred();
 		this._initSubtitles();
 		this._initVideo()
@@ -446,7 +447,7 @@ class Html5 extends Entity {
 	_initVideo () {
 		let dfd = $.Deferred();
 		if (this.media.readyState > HTMLMediaElement.HAVE_NOTHING) {
-			dfd.resolve()
+			dfd.resolve();
 			this._textTracksHack();
 		} else {
 			$(this.media).one('loadedmetadata', (e) => {
@@ -454,7 +455,6 @@ class Html5 extends Entity {
 				this._textTracksHack();
 			});
 		}
-		dfd.notify();
 		return dfd.promise();
 	}
 
