@@ -24,7 +24,7 @@ class TimelineControl extends Control {
 	constructor (player, options={}) {
 		options = $.extend({}, {
 			name : 'timeline',
-			className : 'timeline timeline-container'
+			className : 'control-timeline timeline-container'
 		}, options);
 		super(player, options);
 

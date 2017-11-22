@@ -44,7 +44,6 @@ $(function() {
 			return null;
 		}
 		if(params.options != null) {
-			console.log(js_beautify(params.options));
 			editor.setValue(js_beautify(params.options));
 		}
 		if(params.theme != null) {

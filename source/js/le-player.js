@@ -17,8 +17,8 @@ import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
 import { createEl, secondsToTime, noop } from './utils';
+import { IS_ANDROID_PHONE, IS_ANDROID, IS_IPOD, IS_IPHONE, IS_MOBILE } from './utils/browser';
 import Cookie from './utils/cookie';
-import { IS_IPHONE, IS_IPOD, IS_ANDROID_PHONE } from './utils/browser';
 
 import MediaError from './MediaError';
 
@@ -103,16 +103,34 @@ const defaultOptions = {
 		],
 		mini : [
 			['play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
-		]
+		],
+		'common:android' : [
+			['play', 'timeline', 'fullscreen'],
+			['rate', 'source', 'section']
+		],
+		'fullscreen:mobile' : [
+			['play', 'timeline', 'fullscreen'],
+			['rate', 'source', 'section']
+		],
+		'common:ios' : [
+			['play', 'rate', 'timeline', 'source']
+		],
 	},
 	controlsOptions : {
 
 		common : {
-			align : ['justify', 'left']
+			align : ['justify', 'left'],
+			// mobile : true
 		},
-
 		fullscreen : {
 			align : 'justify'
+		},
+		'common:android' : {
+			align : ['justify', 'right']
+		},
+
+		'fullscreen:mobile' : {
+			align : ['justify', 'right']
 		}
 	},
 	volume : {
@@ -315,8 +333,6 @@ class Player extends Component {
 		this._dblclickTimeout = null;
 
 		this._initSections().then((data) => {
-			this.sections = data.sectionsComponent;
-
 			/**
 			 * Sections init event
 			 *
@@ -1093,6 +1109,19 @@ class Player extends Component {
 		this.addClass('leplayer--paused');
 		this.addClass('leplayer--virgin');
 
+		if(IS_IPHONE) {
+			this.addClass('leplayer--iphone');
+		}
+
+		if(IS_ANDROID) {
+			this.addClass('leplayer--android');
+		}
+
+		if(IS_MOBILE) {
+			this.addClass('leplayer--mobile');
+		}
+
+
 
 		if(options.sectionContainer) {
 			this.sectionsContainer = $(options.sectionContainer);
@@ -1186,6 +1215,15 @@ class Player extends Component {
 		}
 	}
 
+	toggleSections(flag) {
+		if(this.sections) {
+			this.sections.visible = flag;
+		}
+		if(this.outsideSections) {
+			this.outsideSections.visible = flag;
+		}
+	}
+
 
 
 	/**
@@ -1219,6 +1257,10 @@ class Player extends Component {
 			this.options.src = this.options.sources[0]
 		}
 
+
+		// Generate android:fullscreen, android:common and etc controls options
+
+
 		// Merge correctly controls, without deep merge
 		this.options.controls = $.extend({}, defaultOptions.controls, presetOptions.controls, this._userOptions.controls);
 
@@ -1246,9 +1288,12 @@ class Player extends Component {
 	 * @access private
 	 */
 	_initControls() {
+		let controls = [];
+
 		for (const name of ['common', 'fullscreen']) {
 			if (!this.options.controls.hasOwnProperty(name)) return;
 			const controlCollection = new ControlCollection(this, { name });
+
 			this.element.append(controlCollection.element);
 		}
 
@@ -1302,21 +1347,21 @@ class Player extends Component {
 
 				sections = this._completeSections(sections);
 
-				const sectionsComponent = new Sections(this, {
+				this.sections = new Sections(this, {
 					items : sections,
 					fullscreenOnly : isSectionOutside,
 					hideScroll : true
 				});
 
-				this.innerElement.append(sectionsComponent.element);
+				this.innerElement.append(this.sections.element);
 
 				if (isSectionOutside) {
-					const outsideSections = new Sections(this, {
+					this.outsideSections = new Sections(this, {
 						items : sections
 					});
-					this.sectionsContainer.append(outsideSections.element);
+					this.sectionsContainer.append(this.outsideSections.element);
 				}
-				dfd.resolve({ sectionsComponent, items : sections });
+				dfd.resolve({ items : sections });
 			})
 		}
 
@@ -1485,10 +1530,22 @@ class Player extends Component {
 	_onFullscreenChange(e, isFs) {
 		if(isFs) {
 			this.view = 'fullscreen';
+
+			// Hide sections by default on mobile fullscreen
+			if(IS_ANDROID) {
+				this._lastSectionsValue = this.sections.visible;
+				this.sections.visible = false;
+			}
+
 			this.focus();
 		} else {
 			this.view = 'common';
 
+			if(IS_ANDROID) {
+				this.sections.visible = this._lastSectionsValue;
+			}
+
+			// Pause video on exit fullscreeen on mobile
 			if(IS_ANDROID_PHONE || IS_IPHONE || IS_IPOD) {
 				this.pause();
 			}
@@ -1517,9 +1574,9 @@ class Player extends Component {
 	}
 
 	_onEntityFullscrenChange() {
-		const fsApi = FullscreenApi;
-		const isFs = !!document[fsApi.fullscreenElement];
-		this.trigger('fullscreenchange', isFs);
+		// const fsApi = FullscreenApi;
+		// const isFs = !!document[fsApi.fullscreenElement];
+		// this.trigger('fullscreenchange', isFs);
 	}
 
 }

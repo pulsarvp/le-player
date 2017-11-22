@@ -27,14 +27,20 @@ class SectionControl extends ControlCheckbox {
 		super(player, options);
 
 		this.player.on('sectionsinit', this._onSectionsInit.bind(this));
+		this.player.on('sectionstoggle', this._onSectionToggle.bind(this))
 	}
 
 	onChecked(e, data) {
 		super.onChecked(e);
-		this.player.trigger('sectionstoggle', {
-			checked : data.checked,
-			view : this.player.view
-		});
+		this.player.toggleSections(data.checked);
+	}
+
+	_onSectionToggle(e, data) {
+		const { isVisible } = data;
+		if(this.checked !== isVisible) {
+			this.checked = isVisible;
+		}
+
 	}
 
 	_onSectionsInit(e) {
