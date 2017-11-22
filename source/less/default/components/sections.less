@@ -144,6 +144,14 @@
 		bottom: 132px;
 		z-index: @z-index-fullscreen + 8;
 		height: calc(~"100% - 120px");
+
+		@media screen and (max-width: 500px) {
+			top: 50%;
+			left: 50%;
+			bottom: auto;
+			transform: translate(-50%, -50%);
+		}
+
 	}
 
 	&.leplayer--user-active
@@ -193,6 +201,17 @@
 		{
 			background: @color-fs-section-hover;
 		}
+	}
+
+	&.leplayer--android {
+		.leplayer-section
+		{
+			&.leplayer-section--active
+			{
+				background: @color-text;
+			}
+		}
+
 	}
 
 	.leplayer-section-time

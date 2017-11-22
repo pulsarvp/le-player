@@ -8,6 +8,7 @@ import Component from './Component';
 import Control from './Control';
 
 import { createEl } from '../utils';
+import { IS_ANDROID_PHONE, IS_IPHONE, IS_MOBILE } from '../utils/browser';
 
 
 /**
@@ -21,22 +22,45 @@ import { createEl } from '../utils';
  */
 class ControlCollection extends Component {
 	constructor (player, options) {
-		const name = options.name;
+		let { name } = options;
 
-		let playerOptions = {
-			controls : player.options.controls[name],
+		// Options by user agent
+		// Options only for common:android or whatever:android, whatever:ios controls
+		let localUaOptions = {};
+
+		let controlsOptions = {};
+
+		let controls = [];
+
+		if(name != null) {
+
+			controls = player.options.controls[name];
+
+			controlsOptions = player.options.controlsOptions[name];
+
+			[
+				{ flag : IS_MOBILE, name : 'mobile'},
+                { flag : IS_ANDROID_PHONE, name : 'android' },
+                { flag : IS_IPHONE, name : 'ios' },
+			].forEach(item => {
+				if(item.flag) {
+					const localName = `${name}:${item.name}`;
+
+					if(player.options.controls[localName]) {
+						localUaOptions = $.extend({}, localUaOptions, player.options.controlsOptions[localName]);
+						controls = player.options.controls[localName];
+					}
+				}
+				return item.flag;
+			});
 		}
 
-		if(player.options.controlsOptions[name]) {
-			playerOptions['align'] = player.options.controlsOptions[name].align;
-			playerOptions['controlsOptions'] = player.options.controlsOptions[name].controls;
-		}
 
 		options = $.extend({}, {
-			controls : [],
-			controlsOptions : {},
+			controls : controls,
 			align : 'left',
-		}, playerOptions, options);
+			controlsOptions : {}
+		}, localUaOptions, controlsOptions, options);
 
 		super(player, options);
 
