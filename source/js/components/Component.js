@@ -5,6 +5,8 @@
 
 import $ from 'jquery';
 
+const toPlayerEvent = (events) => events.split(' ').reduce((acc, e) => acc + `leplayer_${e} `, '');
+
 /**
  * Player component - Base class for all UI
  *
@@ -99,14 +101,25 @@ class Component {
 	 * @param {Arguments} ...args jQuery.fn.on other arguments
 	 * @returns {Player} this
 	 */
-	on(eventName, ...args) {
-		this.element.on(`leplayer_${eventName}`, ...args);
+	on(eventNames, ...args) {
+		if(typeof eventNames === 'string' || eventNames instanceof String) {
+			this.element.on(toPlayerEvent(eventNames), ...args);
+		} else {
+			console.warn('First argument of \'Component.on\' should be a string');
+			this.element.on(eventNames, ...args);
+		}
 		return this;
 	}
 
 
-	one(eventName, ...args) {
-		this.element.one(`leplayer_${eventName}`, ...args);
+	one(eventNames, ...args) {
+		if(typeof eventNames === 'string' || eventNames instanceof String) {
+			this.element.one(toPlayerEvent(eventNames), ...args);
+		} else {
+			console.warn('First argument of \'Component.one\' should be a string');
+			this.element.one(eventNames, ...args);
+		}
+		return this;
 	}
 
 
