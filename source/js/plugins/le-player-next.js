@@ -135,6 +135,7 @@ class NextComponent extends Component {
 	}
 
 	cancel() {
+		clearTimeout(this._timeout);
 		this.removeClass('leplayer-next--auto');
 	}
 
@@ -153,6 +154,7 @@ class NextComponent extends Component {
 
 		if(this.options.auto) {
 			this.progressButton.startAnimation();
+			clearTimeout(this._timeout);
 			this._timeout = setTimeout(() => this.next(), this.options.timeout);
 		}
 	}
