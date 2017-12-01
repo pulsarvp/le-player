@@ -17,7 +17,15 @@ import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
 import { createEl, secondsToTime, noop } from './utils';
-import { IS_ANDROID_PHONE, IS_ANDROID, IS_IPOD, IS_IPHONE, IS_MOBILE } from './utils/browser';
+import {
+	IS_ANDROID_PHONE,
+	IS_ANDROID,
+	IS_IPOD,
+	IS_IPHONE,
+	IS_MOBILE,
+	IS_TOUCH
+} from './utils/browser';
+
 import Cookie from './utils/cookie';
 
 import MediaError from './MediaError';
@@ -1504,10 +1512,26 @@ class Player extends Component {
 	 */
 	_onClick(e) {
 		clearTimeout(this._dblclickTimeout);
-		this._dblclickTimeout = setTimeout(() => {
-			this.video.element.focus()
-			this.togglePlay();
-		}, 300);
+		const togglePlay = () => {
+			this._dblclickTimeout = setTimeout(() => {
+				this.video.element.focus()
+				this.togglePlay();
+
+			}, 300);
+		}
+
+		/**
+		 * See LPLR-290
+		 * On touch devices in fullscreen if user not active we don't should toggle
+		 * At first we show him a controls
+		 */
+		if(IS_TOUCH() && this.view === 'fullscreen') {
+			if(this.player.userActive) {
+				togglePlay()
+			}
+		} else {
+			togglePlay()
+		}
 	}
 
 	/**
