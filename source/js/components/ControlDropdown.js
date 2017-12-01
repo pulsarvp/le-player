@@ -18,6 +18,9 @@ import Component from './Component';
 class ControlDropdown extends Control {
 
 	constructor(player, options={}) {
+		options = $.extend({}, {
+			tag : 'div',
+		}, options);
 		super(player, options);
 		this.element.on('mouseenter', () => !this.disable && this.dropdownContent.show());
 		this.element.on('mouseleave', () => this.dropdownContent.hide());
@@ -40,12 +43,12 @@ class ControlDropdown extends Control {
 		return `control-dropdown ${super.buildCSSClass()}`
 	}
 
-	_onClick(e) {
+	onClick(e) {
 		if($(e.target).closest(this.dropdownContent).length > 0) {
 			return;
 		}
 
-		super._onClick(e);
+		super.onClick(e);
 	}
 
 }

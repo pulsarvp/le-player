@@ -77,7 +77,7 @@ class PlayControl extends Control {
 	 * @override
 	 */
 	onClick(e) {
-		//super.onClick(e);
+		super.onClick(e);
 		this.player.video.togglePlay();
 	}
 }

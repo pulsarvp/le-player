@@ -25,6 +25,7 @@ class Control extends Component {
 
 	constructor(player, options) {
 		super(player, options);
+		this.emitTapEvents();
 		this.disable = this.options.disable != null? this.options.disable : true;
 
 		this.player.on('inited', (e) => {
@@ -32,8 +33,8 @@ class Control extends Component {
 		})
 
 		this.element.on({
-			click : this._onClick.bind(this),
-			leplayer_control_click : this.onClick.bind(this)
+			click : this.onClick.bind(this),
+			tap : this.onClick.bind(this),
 		});
 
 		this.player.on('inited', this.onPlayerInited.bind(this))
@@ -49,10 +50,9 @@ class Control extends Component {
 			});
 		}
 		let attrs = {
-			role : 'button',
 			title : this.options.title
 		}
-		this.element = $('<div />')
+		this.element = $(`<${this.options.tag || 'button'} />`)
 			.addClass(this.buildCSSClass())
 			.append(this.icon && this.icon.element)
 			.attr(attrs);
@@ -64,24 +64,31 @@ class Control extends Component {
 	 * @override
 	 */
 	buildCSSClass() {
-		return `control ${this.options.className} ${super.buildCSSClass()}`
+		let result = `control ${this.options.className} ${super.buildCSSClass()}`;
+		/**
+		 * @see https://stackoverflow.com/questions/23885255/how-to-remove-ignore-hover-css-style-on-touch-devices
+		 * We should ignore hover effetcs on iphone, because we show hover effect on tap
+		 */
+		if(!this.player.hasClass('leplayer--iphone')) {
+			result += ' control--no-iphone';
+		}
+		return result;
+	}
+
+	/**
+	 * @override
+	 */
+	set tap(value) {
+		this.toggleClass('control--tap', value);
 	}
 
 	set disable(value) {
 		this._disable = value;
-		this.element.toggleClass('disabled', value);
+		this.toggleClass('disabled', value);
 	}
 
 	get disable() {
 		return this._disable
-	}
-
-	_onClick (e) {
-		if (this.disable) {
-			return false;
-		}
-		this.element.trigger('leplayer_control_click');
-		this.player.trigger('controlclick', { control : this });
 	}
 
 	/**
@@ -91,6 +98,11 @@ class Control extends Component {
 	 */
 	onClick (e) {
 		e.preventDefault();
+		if (this.disable) {
+			return false;
+		}
+		this.player.trigger('controlclick', { control : this });
+
 		if (typeof this.options.onClick === 'function') {
 			this.options.onClick.call(this, arguments);
 		}

@@ -15,7 +15,8 @@ import Component from './Component';
 class ControlText extends Control {
 	constructor (player, options={}) {
 		options = $.extend({}, {
-			className : ''
+			className : '',
+			tag : 'div',
 		}, options);
 		super(player, options);
 	}

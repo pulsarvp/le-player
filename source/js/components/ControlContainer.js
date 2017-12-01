@@ -15,7 +15,7 @@ import ControlDropdown from './ControlDropdown';
  */
 class ControlContainer extends ControlDropdown {
 
-	constructor(player, options) {
+	constructor(player, options={}) {
 		super(player, options);
 		this._active = null;
 		/**
