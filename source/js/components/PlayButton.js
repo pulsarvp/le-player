@@ -7,6 +7,7 @@ import Control from './Control';
 import Component from './Component';
 import Icon from './Icon';
 import { createEl } from '../utils';
+import { IS_TOUCH } from '../utils/browser';
 
 /**
  * @param {Player} player Main player
@@ -33,7 +34,19 @@ class PlayButton extends Control {
 
 	onClick(e) {
 		super.onClick(e);
-		this.player.play();
+		/**
+		 * See LPLR-290
+		 * On touch devices in fullscreen if user not active we don't should play.
+		 * At first we show him a controls
+		 */
+		if(IS_TOUCH() && this.player.view === 'fullscreen') {
+			if(this.player.userActive) {
+				this.player.play();
+			}
+		} else {
+			this.player.play();
+		}
+
 	}
 
 	/**

@@ -22,3 +22,5 @@ export const IS_IPOD = (/iPod/i).test(USER_AGENT);
 export const IS_IOS = IS_IPHONE || IS_IPAD || IS_IPOD;
 
 export const IS_SAFARI = USER_AGENT.indexOf('Safari') > -1 && !IS_CHROME;
+
+export const IS_TOUCH = () => 'ontouchstart' in window || navigator.maxTouchPoints;
