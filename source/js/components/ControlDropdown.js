@@ -7,6 +7,7 @@
 import $ from 'jquery';
 import Control from './Control';
 import Component from './Component';
+import { IS_MOBILE } from '../utils/browser';
 
 /**
  * @class ControlDropdown
@@ -22,10 +23,14 @@ class ControlDropdown extends Control {
 			tag : 'div',
 		}, options);
 		super(player, options);
-		this.element.on('mouseenter', () => !this.disable && this.dropdownContent.show());
-		this.element.on('mouseleave', () => this.dropdownContent.hide());
+		this._opened = false;
+		this.element.on('mouseenter', this.open.bind(this));
+		this.element.on('mouseleave', this.close.bind(this));
+		if(IS_MOBILE) {
+			this.element.on('tap', this.toggle.bind(this));
+			$(document).on('touchend touchstart click', this.onDocumentEvents.bind(this));
+		}
 	}
-
 
 	/**
 	 * @override
@@ -43,12 +48,47 @@ class ControlDropdown extends Control {
 		return `control-dropdown ${super.buildCSSClass()}`
 	}
 
+	/**
+	 * @override
+	 */
 	onClick(e) {
 		if($(e.target).closest(this.dropdownContent).length > 0) {
 			return;
 		}
 
 		super.onClick(e);
+	}
+
+	toggle() {
+		if(this.disable) true;
+		if(this._opened) {
+			this.close();
+		} else {
+			this.open();
+		}
+	}
+
+	open() {
+		if(this.disable) return;
+		this._opened = true;
+		this.dropdownContent.show();
+	}
+
+	close() {
+		if(this.disable) return;
+		this._opened = false;
+		this.dropdownContent.hide();
+	}
+
+	onDocumentEvents(e) {
+		if(
+			!($(e.target).closest(this.element).length > 0) &&
+			!($(e.target).closest(this.dropdownContent).length > 0)
+		) {
+			if(this._opened){
+				this.close();
+			}
+		}
 	}
 
 }

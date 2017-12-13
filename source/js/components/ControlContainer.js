@@ -84,6 +84,7 @@ class ControlContainer extends ControlDropdown {
 			$(element).addClass('control-container__item--active');
 		}
 		this._active = element;
+		this.close();
 		return this._active
 	}
 
@@ -98,12 +99,14 @@ class ControlContainer extends ControlDropdown {
 			.addClass('control-container__item')
 			.data(data)
 			.attr('title', data.tooltip)
-			.on('click', this.onItemClick.bind(this))
+			.on('click tap', this.onItemClick.bind(this))
 			.append(content);
 
 		this.list = this.list.concat(item);
 
 		this.dropdownContent.append(item);
+
+		this.emitTapEvents(item);
 
 		return item;
 	}
