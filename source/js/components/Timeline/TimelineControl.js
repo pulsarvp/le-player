@@ -10,7 +10,6 @@ import ControlText from '../ControlText';
 import BufferedRanges from './BufferedRanges';
 import Marker from './Marker';
 import { secondsToTime } from '../../utils';
-import { setTimeout } from 'timers';
 
 /**
  * @param {Player} player Main player

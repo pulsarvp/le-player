@@ -45,7 +45,6 @@ class Html5 extends Entity {
 	}
 
 	onTimeUpdate(e) {
-		console.log("WHHAT", this.currentTime);
 		this.trigger('timeupdate');
 	}
 
