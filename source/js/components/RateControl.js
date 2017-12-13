@@ -21,7 +21,8 @@ import Cookie from '../utils/cookie';
 class RateControl extends Control {
 	constructor (player, options={}) {
 		options = $.extend({}, {
-			className : 'control-container'
+			className : 'control-container',
+			tag : 'div'
 		}, options);
 		super(player, options);
 
@@ -89,7 +90,7 @@ class RateControl extends Control {
 	/**
 	 *
 	 */
-	_onClick(e) {
+	onClick(e) {
 		e.preventDefault()
 	}
 

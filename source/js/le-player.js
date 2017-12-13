@@ -1296,8 +1296,6 @@ class Player extends Component {
 	 * @access private
 	 */
 	_initControls() {
-		let controls = [];
-
 		for (const name of ['common', 'fullscreen']) {
 			if (!this.options.controls.hasOwnProperty(name)) return;
 			const controlCollection = new ControlCollection(this, { name });
@@ -1598,9 +1596,9 @@ class Player extends Component {
 	}
 
 	_onEntityFullscrenChange() {
-		// const fsApi = FullscreenApi;
-		// const isFs = !!document[fsApi.fullscreenElement];
-		// this.trigger('fullscreenchange', isFs);
+		const fsApi = FullscreenApi;
+		const isFs = !!document[fsApi.fullscreenElement];
+		this.trigger('fullscreenchange', isFs);
 	}
 
 }

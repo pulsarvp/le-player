@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import Cookie from '../utils/cookie';
 import Component from '../components/Component';
 import { IS_SAFARI, IS_IOS, IS_ANDROID } from '../utils/browser';
 import Entity from './Entity';

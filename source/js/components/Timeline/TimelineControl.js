@@ -24,7 +24,8 @@ class TimelineControl extends Control {
 	constructor (player, options={}) {
 		options = $.extend({}, {
 			name : 'timeline',
-			className : 'control-timeline timeline-container'
+			className : 'control-timeline timeline-container',
+			tag : 'div',
 		}, options);
 		super(player, options);
 
@@ -37,7 +38,7 @@ class TimelineControl extends Control {
 
 		this.player.on('timeupdate', this._onTimeUpdate.bind(this));
 
-		this.player.on('timeupdateload', this._onTimeUpdate.bind(this))
+		// this.player.on('timeupdateload', this._onTimeUpdate.bind(this))
 
 		this.player.on('durationchange', this._onDurationChange.bind(this));
 	}
@@ -54,7 +55,7 @@ class TimelineControl extends Control {
 			this.marker.markerTime
 				.show()
 				.html(secondsToTime(video.duration * p));
-			video.currentTime = video.duration * p
+			// video.currentTime = video.duration * p
 		}
 	}
 
@@ -104,7 +105,10 @@ class TimelineControl extends Control {
 		// Buffered ranges
 		this.bufferedRanges = new BufferedRanges(this.player).element;
 
-		this.line = $('<div />')
+		this.line = $('<div />');
+		this.emitTapEvents(this.line)
+
+		this.line
 			.addClass('timeline')
 			.append(this.marker.element)
 			.append(this.markerShadow.element)
@@ -137,9 +141,7 @@ class TimelineControl extends Control {
 				},
 
 				click : this._onLineClick.bind(this),
-
-				touchmove : (e) => {
-				}
+				tap : this._onLineClick.bind(this),
 			});
 
 		this.element.addClass('timeline-container')
@@ -153,12 +155,11 @@ class TimelineControl extends Control {
 	/**
 	 * @override
 	 */
-	_onClick(e) {
+	onClick(e) {
 		e.preventDefault();
 	}
 
 	_onLineClick(e) {
-		if (e.which !== 1) return;
 		if (this.drag) return;
 		const video = this.player.video;
 		this.move({ percent : this.getPosition(e.pageX)});
@@ -223,13 +224,9 @@ class TimelineControl extends Control {
 	updateLabels() {
 		const video = this.player.video;
 		this.totalTime.text = secondsToTime(0, Math.floor(video.duration / 3600) > 0);
-		const width = this.totalTime.element.width();
 
 		this.totalTime.text = secondsToTime(video.duration);
 		this.currentTime.text = secondsToTime(video.currentTime || 0);
-		this.currentTime.element.css({
-			width
-		})
 	}
 
 	/**

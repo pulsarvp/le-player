@@ -21,7 +21,7 @@ class DownloadControl extends Control {
 		options = $.extend({
 			title : 'Скачать видео',
 			className : 'download',
-			name : 'download'
+			name : 'download',
 		}, options);
 		super(player, options);
 		this.player.on('loadstart', this.onLoadStart.bind(this));
