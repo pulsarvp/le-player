@@ -14,7 +14,7 @@ import Icon from './Icon';
  * @param {Player} player Main player
  * @param {Object} [options]
  * @class DownloadControl
- * @exnteds Control
+ * @extends Control
  */
 class DownloadControl extends Control {
 	constructor (player, options={}) {
