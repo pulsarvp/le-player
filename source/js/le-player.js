@@ -671,29 +671,32 @@ class Player extends Component {
 
 	/**
 	 * Get some data for player
+	 * Sends network request at most once.
 	 *
 	 * @access public
 	 * @returns {jQuery.promise} Promise
 	 */
 	getData() {
-		const dfd = new $.Deferred();
-
-		if (this._data !== undefined) {
-			dfd.resolve(this._data);
-			return dfd.promise()
+		/* Data is ready (or network request pending).
+		 * @witzawitz if this was possible before this change,
+		 *   then I likely broke smth. */
+		if ('_data' in this) {
 		}
 
-		if (typeof this.options.data === 'string') {
-			return $.ajax({
+		/* `options.data` is url. */
+		else if (typeof this.options.data === 'string') {
+			this._data = $.ajax({
 				url : this.options.data,
 				method : 'GET',
 				dataType : 'json'
 			}).promise();
 
+		/* `options.data` is actual data. */
 		} else if (typeof this.options.data === 'object') {
-			dfd.resolve(this.options.data);
-			return dfd.promise()
+			this._data = new $.Deferred().resolve(this.options.data);
 		}
+
+		return this._data
 	}
 
 	getSectionData() {
