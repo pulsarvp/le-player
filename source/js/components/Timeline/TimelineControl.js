@@ -57,9 +57,10 @@ class TimelineControl extends Control {
 				.html(secondsToTime(currentTime));
 			video.currentTime = currentTime
 
-			this.marker.markerPreview
-				.show()
-				.attr('src', this._getPreview(currentTime))
+			this._updateMarkerPreview(
+				this.marker.markerPreview,
+				currentTime
+			)
 		}
 	}
 
@@ -128,10 +129,10 @@ class TimelineControl extends Control {
 							.markerTime
 							.show()
 							.html(secondsToTime(video.duration * p));
-						this.markerShadow
-							.markerPreview
-							.show()
-							.attr('src', this._getPreview(video.duration * p))
+						this._updateMarkerPreview(
+							this.markerShadow.markerPreview,
+							video.duration * p
+						)
 					} else {
 						this.markerShadow.element.hide();
 					}
@@ -160,9 +161,16 @@ class TimelineControl extends Control {
 	}
 
 	_getPreview(seconds) {
-		void this.player.options
-		/* debugger */
-		return 'http://www.lets-develop.com/wp-content/uploads/2014/10/How-to-change-img-src-with-jQuery-change-img-url.jpg'
+		return this.player.getPreview(seconds)
+	}
+
+	_updateMarkerPreview(markerPreview, seconds) {
+		this._getPreview(seconds)
+			.then(src => {
+				markerPreview
+					.show()
+					.attr('src', src)
+			})
 	}
 
 	/**

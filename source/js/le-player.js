@@ -693,7 +693,7 @@ class Player extends Component {
 
 		/* `options.data` is actual data. */
 		} else if (typeof this.options.data === 'object') {
-			this._data = new $.Deferred().resolve(this.options.data);
+			this._data = $.Deferred().resolve(this.options.data);
 		}
 
 		return this._data
@@ -703,6 +703,45 @@ class Player extends Component {
 		return this.getData()
 			.then(data => {
 				return data.sections
+			})
+	}
+
+	/**
+	 * Preview frames for timeline.
+	 */
+	getPreviewData() {
+		if ('_previewData' in this) {
+			// Do nothing when already calculated.
+		} else {
+			this._previewData = this.getData()
+				.then(data => {
+					if (!('previews' in data)) return $.Deferred().reject()
+
+					/* Copy and sort from last to first. */
+					return data.previews
+						.slice()
+						.sort((a, b) => a.time > b.time ? -1 : 1)
+				})
+		}
+
+		return this._previewData
+	}
+
+	/**
+	 * Get preview frame for a given position.
+	 *
+	 * @param {number} position in seconds
+	 */
+	getPreview(seconds) {
+		return this.getPreviewData()
+			.then(previews => {
+				/* We know `previews` are sorted by time from last to first. */
+				let idx = previews
+					.findIndex(x => x.time < seconds)
+
+				return idx !== null
+					? previews[idx].image
+					: $.Deferred().reject()
 			})
 	}
 
@@ -1245,7 +1284,10 @@ class Player extends Component {
 	}
 
 	/**
-	 * Init sections, get ajax or json with sections data and create Sections object and added them to the DOM
+	 * Init sections:
+	 * - get ajax or json with sections data
+	 * - create `Sections` object
+	 * - render `SectionsComponent`
 	 *
 	 * @access private
 	 * @returns {jqPromise} jQuery promise
@@ -1260,6 +1302,7 @@ class Player extends Component {
 
 				const isSectionOutside = (this.sectionsContainer && this.sectionsContainer.length > 0);
 
+				/* There is no sections. */
 				if (sections == null || sections.length === 0) {
 					dfd.reject(null);
 					return;
