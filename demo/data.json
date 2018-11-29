@@ -35,5 +35,27 @@
 			"description": "Магнитное поле в намагничивающихся средах. Молекулярные токи и токи проводимости. Усреднение магнитного поля по физически малому объему.",
 			"begin": 3200
 		}
+	],
+	"previews": [
+		{
+			"time": 0,
+			"image": "demo.mp4.previews/0.jpg"
+		},
+		{
+			"time": 10,
+			"image": "demo.mp4.previews/10.jpg"
+		},
+		{
+			"time": 13,
+			"image": "demo.mp4.previews/13.jpg"
+		},
+		{
+			"time": 17,
+			"image": "demo.mp4.previews/17.jpg"
+		},
+		{
+			"time": 22,
+			"image": "demo.mp4.previews/22.jpg"
+		}
 	]
 }
