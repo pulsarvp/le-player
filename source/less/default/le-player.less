@@ -170,7 +170,7 @@
 				border-right: 1px solid @color-fs-marker-shadow-border;
 				z-index: @z-index-fullscreen + 6;
 			}
-			.time
+			.time, .preview
 			{
 				background: @color-fs-marker-shadow-time;
 				z-index: @z-index-fullscreen + 3;
@@ -471,6 +471,15 @@
 			margin-left: -18px;
 			padding: 0 5px;
 			position: absolute;
+			z-index: @z-index-base + 3;
+		}
+		.preview
+		{
+			position: absolute;
+			bottom: 50px;
+			width: 160px;
+			transform: translateX(-50%);
+			border: 2px solid @color-marker-shadow-time;
 			z-index: @z-index-base + 3;
 		}
 	}

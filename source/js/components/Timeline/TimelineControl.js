@@ -50,11 +50,17 @@ class TimelineControl extends Control {
 		const x = data.x;
 		const p = this.getPosition(x);
 		const video = this.player.video;
+		const currentTime = video.duration * p
 		if (p > 0 && p < 1) {
 			this.marker.markerTime
 				.show()
-				.html(secondsToTime(video.duration * p));
-			video.currentTime = video.duration * p
+				.html(secondsToTime(currentTime));
+			video.currentTime = currentTime
+
+			this._updateMarkerPreview(
+				this.marker.markerPreview,
+				currentTime
+			)
 		}
 	}
 
@@ -123,6 +129,10 @@ class TimelineControl extends Control {
 							.markerTime
 							.show()
 							.html(secondsToTime(video.duration * p));
+						this._updateMarkerPreview(
+							this.markerShadow.markerPreview,
+							video.duration * p
+						)
 					} else {
 						this.markerShadow.element.hide();
 					}
@@ -148,6 +158,19 @@ class TimelineControl extends Control {
 				.append(this.currentTime.element)
 				.append(this.line)
 				.append(this.totalTime.element));
+	}
+
+	_getPreview(seconds) {
+		return this.player.getPreview(seconds)
+	}
+
+	_updateMarkerPreview(markerPreview, seconds) {
+		this._getPreview(seconds)
+			.then(src => {
+				markerPreview
+					.show()
+					.attr('src', src)
+			})
 	}
 
 	/**
