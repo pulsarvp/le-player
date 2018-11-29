@@ -23,6 +23,7 @@ class Marker extends Component {
 				if (!this.drag) return;
 				this.drag = false;
 				this.markerTime.hide();
+				this.markerPreview.hide();
 				this.element.trigger('leplayer_mouseup', { x : e.pageX });
 			}
 		});
@@ -52,8 +53,14 @@ class Marker extends Component {
 			.addClass('time')
 			.hide();
 
+		// Preview frame
+		this.markerPreview = $('<img />')
+			.addClass('preview')
+			.hide();
+
 		return this.element = $('<div />')
 			.addClass(`time-marker ${this.options.className}`)
+			.append(this.markerPreview)
 			.append(this.markerTime)
 
 	}
