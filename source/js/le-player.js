@@ -1735,5 +1735,6 @@ Player.preset('vps', require('./presets/vps.js').preset);
 Player.preset('simple', require('./presets/simple.js').preset);
 Player.preset('sms', require('./presets/sms.js').preset);
 Player.preset('compressed', require('./presets/compressed.js').preset);
+Player.preset('2035', require('./presets/2035.js').preset);
 
 module.exports = Player

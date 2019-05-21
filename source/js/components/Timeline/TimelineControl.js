@@ -223,13 +223,13 @@ class TimelineControl extends Control {
 	updateLabels() {
 		const video = this.player.video;
 		this.totalTime.text = secondsToTime(0, Math.floor(video.duration / 3600) > 0);
-		const width = this.totalTime.element.width();
+		// const width = this.totalTime.element.width();
 
 		this.totalTime.text = secondsToTime(video.duration);
 		this.currentTime.text = secondsToTime(video.currentTime || 0);
-		this.currentTime.element.css({
-			width
-		})
+		// this.currentTime.element.css({
+		// 	width
+		// })
 	}
 
 	/**

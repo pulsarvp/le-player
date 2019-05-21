@@ -1,0 +1,216 @@
+// COLOURS COMMON
+@color-base: #141f33;
+@red: #da3831;
+@white: #ffffff;
+
+@color-background-controls: fade(@color-base, 80%);
+@color-background-button: @color-background-controls;
+@color-button: fade(@white, 80%);
+@color-background-button-hover: @color-background-controls;
+@color-button-hover: @white;
+@color-background-button-disabled: @color-background-controls;
+@color-button-disabled: fade(@white, 60%);
+
+
+@color-background-button-play: @red;
+@color-button-play: @white;
+@color-background-button-play-hover: @red;
+@color-button-play-hover: @white;
+
+@color-background--dropdown: @white;
+@color--dropdown-header: @color-base;
+@color--dropdown:fade(@color-base, 80%);
+@color-background--dropdown-active: @red;
+@color--dropdown-action: @red;
+
+
+//play
+//volume
+//timeline
+//rate
+//keybinding-info,
+//backward
+//source
+//subtitle
+//divider
+//download
+//section
+//fullscreen
+
+
+// rgb(26, 74, 126)
+@color-primary: hsl(211, 65%, 30%);
+@color-active: white;
+@color-dark: black;
+
+// hsl(211,30%,90%)
+// rgb(225, 232, 239)
+@color-background: desaturate(lighten(@color-primary, 60%), 35%);
+
+// video-line
+// hsl(211,22%,56%)
+// rgb(118, 142, 167)
+@color-background-line: desaturate(lighten(@color-primary, 25%), 45%);
+@color-background-line-active: fade(@color-primary, 60%);
+;
+@color-background-line-buffered: fade(red, 40%);
+
+// play
+// hsl(211, 30%, 54%)
+// rgb(103, 139, 174)
+@color-background-play: desaturate(lighten(@color-primary, 25%), 35%);
+@color-background-play-hovered: @color-text;
+
+// disabled
+// hsl(211,23%,66%)
+// rgb(148, 165, 188)
+@color-disabled: desaturate(lighten(@color-primary, 35%), 45%);
+
+// control
+@color-control: lime;
+@color-control-hovered: @color-text;
+@color-control-active: orange;
+@color-control-checked: @color-text;
+
+// dropdown
+
+// inner items
+@color-inner-item: @color-text;
+@color-inner-item-hover: lighten(@color-primary, 5%);
+@color-inner-item-active: @color-background-play;
+
+// marker
+@color-marker: @color-primary;
+// hsla(211, 30%, 90%, 0.5)
+// rgba(225, 232, 239, 0.5)
+@color-marker-border: fade(desaturate(lighten(@color-primary, 60%), 35%), 50%);
+@color-marker-shadow-border: @color-marker-border;
+@color-marker-shadow: fade(@color-primary, 80%);
+// hsla(211, 20, 55, 0.5)
+// rgba(118, 138, 167, 0.8)
+@color-marker-shadow-time: fade(desaturate(lighten(@color-primary, 25%), 45%), 80%);
+
+// timeline
+// hsl(211, 25, 25)
+// rgb(48, 63, 80)
+@color-timeline-section-even: desaturate(darken(@color-primary, 5%), 40%);
+// hsl(211, 22, 56)
+// rgb(118, 142, 167)
+@color-timeline-section-odd: desaturate(lighten(@color-primary, 25%), 45%);
+
+// text
+@color-text: @color-primary;
+@color-text-hovered: @color-background;
+@color-text-checked: @color-background;
+@color-text-active: @color-background;
+
+@color-info-text: black;
+
+@color-fs-active: white;
+@color-fs-primary: hsl(215, 20%, 35%);
+// #465264;
+@color-fs-background: @color-fs-primary;
+@color-fs-background-hover: darken(@color-fs-background, 10%);
+
+// video-line
+// #768496
+//hsl(215, 20%, 55%)
+@color-fs-background-line: lighten(@color-fs-primary, 20%);
+@color-fs-background-line-active: rgba(0, 0, 0, 0.25);
+@color-fs-background-line-buffered: fade(red, 40%);
+
+// play btn
+// #384150;
+@color-fs-background-play: darken(@color-fs-background, 15%);
+@color-fs-background-play-hovered: @color-fs-background-hover;
+
+// disabled
+// #4b6b9b;
+// hsl(215, 35%, 45%);
+@color-fs-disabled: desaturate(lighten(@color-fs-primary, 10%), 15%);
+
+// control
+@color-fs-control: @color-fs-background;
+@color-fs-control-hovered: @color-fs-background-hover;
+@color-fs-control-checked: @color-fs-control-hovered;
+
+// dropdown
+@color-fs-dropdown: @color-fs-background;
+
+// inner item
+@color-fs-inner-item-hover: rgba(0, 0, 0, 0.15);
+@color-fs-inner-item-active: @color-fs-background-play;
+
+// marker
+// #2a313c;
+@color-fs-marker: darken(@color-fs-primary, 15%);
+
+// rgba(225, 232, 239, 0.7);
+// hsl(215, 30%, 90%)
+@color-fs-marker-border: fade(desaturate(lighten(@color-fs-primary, 55%), 10%), 70%);
+
+// rgba(26, 74, 126, 0.8);
+// hsla(215, 30%, 65%, 0.8)
+@color-fs-marker-shadow: fade(desaturate(lighten(@color-fs-primary, 30%), 10%), 70%);
+
+// rgba(225, 232, 239, 0.5);
+// hsla(215, 30%, 95%, 0.5)
+@color-fs-marker-shadow-border: fade(desaturate(lighten(@color-fs-primary, 60%), 10%), 50%);
+
+
+//rgba(118, 138, 167, 0.8);
+//hsla(215, 20%, 56%, 0.8)
+@color-fs-marker-shadow-time: fade(lighten(@color-fs-primary, 20%), 80%);
+
+// text
+//#e1e8ef;
+//hsl(215, 30%, 91%)
+@color-fs-text: desaturate(lighten(@color-primary, 55%), 10%);
+@color-fs-text-hovered: @color-fs-text;
+@color-fs-text-active: @color-fs-background;
+@color-fs-text-checked: @color-fs-background;
+
+// sections
+@color-section: white;
+@color-section-active: @color-disabled;
+// hsl(211,23%,70%)
+// rgb(157, 178, 200)
+@color-section-hover: darken(@color-section-active, 10%);
+@color-section-2n: desaturate(lighten(@color-primary, 60%), 32%);
+@color-section-muted: #555;
+@color-section-text: black;
+
+@color-fs-section: fade(@color-fs-section-active, 70%);
+@color-fs-section-active: darken(@color-fs-primary, 20%);
+@color-fs-section-hover: darken(@color-fs-primary, 25%);
+// hsl(215, 20%, 22%);
+@color-fs-section-2n: fade(@color-fs-section-2n-active, 70%);
+@color-fs-section-2n-active: darken(@color-fs-primary, 10%);
+@color-fs-section-2n-hover: darken(@color-fs-primary, 15%);
+@color-fs-section-text: @color-fs-text;
+
+// MINIPLAYER
+@color-miniplayer-bg: #f5f8fa;
+
+// SIZES
+@control-font-size: 16px;
+@control-text-font-size: 12px;
+@control-height: 40px;
+@control-width: 32px;
+@control-play-width: 60px;
+@divider-width: 10px;
+@miniplayer-height: 127px;
+
+// FONTS
+@font-main: "PT Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+@divider-width: 10px;
+@timeline-transition: 0s 0.1s ease-in-out;
+
+// Z-INDEX
+@z-index-base: 10;
+@z-index-miniplayer: @z-index-base + 10;
+@z-index-fullscreen: 1000;
+
+// ANIMATION
+@timeline-transition: 0s 0.1s ease-in-out;

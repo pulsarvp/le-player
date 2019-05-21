@@ -1,0 +1,924 @@
+@import "variables.less";
+
+
+.leplayer
+{
+	display: block;
+	outline: 0;
+	position: relative;
+	background-color: transparent;
+
+	&.leplayer--fullscreen
+	{
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		width: 100% !important;
+		max-width: none !important;
+
+	}
+
+}
+
+
+// CONTROLS
+
+.leplayer-controls
+{
+	border-collapse: separate;
+	display: table;
+	height: @control-height;
+	position: relative;
+	width: 100%;
+	outline: none;
+
+
+	&--left
+	{
+		width: 1%;
+		margin-right: auto;
+	}
+
+	&--right
+	{
+		width: 1%;
+		margin-left: auto;
+	}
+
+	&--justify
+	{
+		width: auto;
+	}
+
+	&:not(:last-child)
+	{
+		//margin-bottom: 10px;
+	}
+
+	&.controls-common
+	{
+		//margin-top: 10px;
+	}
+
+	&.controls-fullscreen
+	{
+		display: block;
+		position: absolute;
+		bottom: 0px;
+		left: 0px;
+		right: 0px;
+		width: auto;
+		z-index: @z-index-fullscreen + 7;
+		.control
+		{
+			background: @color-background-button;
+			color: @color-button;
+			&:hover
+			{
+				background: @color-background-button-hover;
+				color: @color-button-hover;
+			}
+			&.disabled
+			{
+				color: @color-fs-disabled;
+				&:hover
+				{
+					background: @color-background-button-disabled;
+					color: @color-button-disabled;
+				}
+			}
+			&.play
+			{
+				background: @color-background-button-play;
+				color:  @color-button-play;
+				&:hover
+				{
+					background: @color-background-button-play-hover;
+					color:  @color-button-play-hover;
+				}
+			}
+		}
+		.control-dropdown__content
+		{
+			background: @color-background--dropdown;
+			color:@color--dropdown;
+			z-index: @z-index-fullscreen + 8;
+		}
+
+		.control-checkbox--checked
+		{
+			background: @color-fs-control-checked;
+			color: @color-fs-text-hovered;
+			&:hover {
+				background: darken(@color-fs-control-checked, 5%);
+			}
+		}
+
+		.info-control
+		{
+			&__content
+			{
+				background: @color-fs-background;
+				color: white;
+			}
+		}
+		.control-text
+		{
+			background: @color-background-button;
+			color: @color-button;
+		}
+		.control-container__item
+		{
+			color: @color--dropdown;
+			&:hover
+			{
+
+				background: @color-background--dropdown-active;
+				color: @white;
+			}
+			&--active
+			{
+				background: none;
+				color: @color--dropdown-action;
+			}
+		}
+		.timeline
+		{
+			background: @color-fs-background-line;
+
+		}
+		.timeline-container
+		{
+			background: @color-background-button;
+			.control-text
+			{
+				height: auto;
+				position: relative;
+			}
+			&:hover
+			{
+				background: @color-background-button;
+			}
+		}
+		.time-marker
+		{
+			background: @red;
+
+			z-index: @z-index-fullscreen + 7;
+			&.shadow
+			{
+				background: @red;
+				z-index: @z-index-fullscreen + 6;
+			}
+			.time
+			{
+				background: @color-fs-marker-shadow-time;
+				z-index: @z-index-fullscreen + 3;
+			}
+		}
+		.time-played
+		{
+			background: @red;
+			z-index: @z-index-fullscreen + 5;
+		}
+		.time-buffered
+		{
+			background-color: fade(@white, 20%);
+			z-index: @z-index-fullscreen + 4;
+		}
+		.volume-active
+		{
+			background: @red;
+		}
+		.volume-slider
+		{
+			height: 144px;
+		}
+		.volume-line
+		{
+			background: #9fabbd; //todo: в переменные!
+		}
+		.volume-marker
+		{
+			background: @red;
+
+		}
+	}
+
+	.control
+	{
+		background: @color-background-button;
+		color: @color-button;
+		cursor: pointer;
+		display: table-cell;
+		font-size: @control-font-size;
+		height: @control-height;
+		line-height: 100%;
+		padding: 0 (@control-width - @control-font-size) / 2;
+		text-align: center;
+		vertical-align: middle;
+		width: 1%;
+		border-radius: 0px !important;
+		&:hover
+		{
+			background: @color-background-button-hover;
+			color: @color-button-hover;
+		}
+
+
+		&.play
+		{
+			background: @color-background-button-play;
+			color: @color-button-play;
+			padding: 0 (@control-play-width - @control-font-size) / 2;
+			width: 1%;
+			&.disabled:hover
+			{
+				background: @color-background-button-play-hover;
+				color: @color-button-play;
+			}
+			&:hover
+			{
+				background: @color-background-button-play-hover;
+				color: @color-button-play;
+			}
+		}
+
+		&.disabled
+		{
+			cursor: not-allowed;
+			color: @color-disabled;
+			&:hover
+			{
+				background: @color-background;
+				color: @color-disabled;
+			}
+		}
+	}
+
+	.control-checkbox--checked
+	{
+		background: @color-control-checked;
+		color: @color-text-checked;
+		&:hover {
+			background: darken(@color-control-checked, 5%);
+		}
+	}
+
+	.control-dropdown
+	{
+		position: relative;
+
+		.leplayer-icon svg {
+			pointer-events: none;
+		}
+
+		&__content
+		{
+			display: none;
+			position: absolute;
+			background: @color-background--dropdown;
+			bottom: @control-height;
+			cursor: default;
+			display: none;
+			left: 0;
+			min-width: 100%;
+			position: absolute;
+			z-index: @z-index-base + 8;
+			left: 50%;
+			transform: translateX(-50%);
+			border-radius: 8px;
+			overflow: hidden;
+			&:before
+			{
+				content: '';
+				position: absolute;
+				width: @control-height;
+				height: 1px;
+				bottom: -1px;
+				left: 0;
+			}
+		}
+
+	}
+
+	.info-control
+	{
+		&__content
+		{
+			white-space: nowrap;
+			text-align: left;
+			background: @color-background;
+			padding: 10px;
+			color: @color-info-text;
+			font-size: @control-text-font-size;
+			/*left: 50%;*/
+			min-width: 300px;
+			/*transform: translateX(-50%);*/
+		}
+
+		&__item
+		{
+		}
+	}
+
+	.control-container
+	{
+		display: table-cell;
+		height: @control-height;
+		position: relative;
+		width: 1%;
+
+		&__item
+		{
+			display: block;
+			color: @color--dropdown;
+			white-space: nowrap;
+			cursor: pointer;
+			font-size: @control-text-font-size;
+			line-height: @control-height;
+			padding: 0 7px;
+			&:hover
+			{
+
+				background: @color-background--dropdown-active;
+				color: @white;
+			}
+			&--active
+			{
+				background: none;
+				color: @color--dropdown-action;
+			}
+		}
+	}
+
+	.control-icon
+	{
+		line-height: @control-height;
+		padding: 0 (@control-width - @control-font-size) / 2;
+	}
+
+	.control-text
+	{
+		background: @color-background-button;
+		color: @color-button;
+		display: table-cell;
+		font-size: @control-text-font-size;
+		box-sizing: content-box;
+		line-height: 100%;
+		padding: 0 5px;
+		text-align: center;
+		vertical-align: middle;
+	}
+
+	.divider
+	{
+		background: none;
+		display: table-cell;
+		padding: 0 @divider-width / 2;
+		width: 0.01%;
+	}
+
+	.fa
+	{
+		text-align: center;
+		width: @control-font-size;
+	}
+
+	.inner-item
+	{
+	}
+
+
+	.timeline
+	{
+		background: fade(@white, 20%);
+		cursor: pointer;
+		display: block;
+		height: 4px;
+		margin: (@control-height - 12px) / 2 0;
+		position: relative;
+		width: 100%;
+		border-radius: 2px;
+	}
+
+	.timeline-container
+	{
+		background: @color-background-button;
+		display: table-cell;
+		position: relative;
+		white-space: nowrap;
+		width: 100%;
+
+		&:hover
+		{
+			background: @color-background-button;
+		}
+	}
+
+	.timeline-subcontainer
+	{
+		display: table;
+		width: 100%;
+	}
+
+	.time-current, .time-total
+	{
+		width: 1%;
+		background: none !important;
+	}
+
+	.time-marker
+	{
+		background: @red;
+		//border-right: 1px solid @color-marker-border;
+		cursor: pointer;
+		height: 16px;
+		left: 0;
+		margin-left: -10px;
+		position: absolute;
+		top: -6px;
+		//transition: left @timeline-transition;
+		width: 16px;
+		border-radius: 8px;
+		z-index: @z-index-base + 7;
+		display: none;
+		&:before
+		{
+			//content: '';
+			//width: 4px;
+			//height: 100%;
+			//position: absolute;
+			//left: -1px;
+			//background: transparent;
+		}
+		&--drag:before,
+		&:hover:before
+		{
+			background: @color-marker;
+		}
+		&.shadow
+		{
+			background: @red;
+			//border-right: 1px solid @color-marker-shadow-border;
+			transition: none;
+			z-index: @z-index-base + 6;
+			&:before
+			{
+				content: none;
+			}
+		}
+		.time
+		{
+			background: @color-marker-shadow-time;
+			border-radius: 1px;
+			bottom: 20px;
+			color: @color-active;
+			font-size: @control-text-font-size;
+			line-height: @control-text-font-size + 6px;
+			margin-left: -18px;
+			padding: 0 5px;
+			position: absolute;
+			z-index: @z-index-base + 3;
+		}
+	}
+
+	.time-played
+	{
+		background: @red;
+		bottom: 0;
+		left: 0;
+		position: absolute;
+		top: 0;
+		//transition: width @timeline-transition;
+		width: 0;
+		z-index: @z-index-base + 15;
+		border-radius: 2px;
+	}
+
+	.leplayer-timeline-sections
+	{
+		overflow-x: hidden;
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: 0;
+		right: 0;
+	}
+
+	.leplayer-timeline-section
+	{
+		background: none; //todo: поправить
+		bottom: 0;
+		left: 0;
+		position: absolute;
+		top: 0;
+		//transition: width @timeline-transition;
+		width: 0;
+		z-index: @z-index-base + 4;
+	}
+
+	.leplayer-timeline-section:nth-child(2n)
+	{
+		background: @color-timeline-section-even;
+	}
+
+	.time-buffered
+	{
+		background-color: fade(@white, 20%);
+		bottom: 0;
+		left: 0;
+		position: absolute;
+		top: 0;
+		width: 0;
+		z-index: @z-index-base + 4;
+	}
+
+	.volume-active
+	{
+		background: @red;
+		bottom: 0;
+		height: 50%;
+		position: absolute;
+		width: 100%;
+		border-radius: 2px;
+	}
+
+	.volume-slider
+	{
+		height: 144px;
+	}
+
+	.volume-line
+	{
+		background: #9fabbd; //todo: в переменные!
+		bottom: 10px;
+		border-radius: 2px;
+		position: absolute;
+		left: 18px;
+		right: 18px;
+		top: 10px;
+		cursor: pointer;
+
+	}
+
+	.volume-marker
+	{
+		background: @red;
+		//bottom: 50%;
+		cursor: pointer;
+		height: 16px;
+		width: 16px;
+		left: -6px;
+		margin-bottom: -10px;
+		right: -4px;
+		position: absolute;
+		border-radius: 8px;
+
+
+
+	}
+
+}
+
+
+.leplayer-control-collection
+{
+	//margin-top: 10px;
+	//margin-bottom: 10px;
+	outline: none;
+	display: flex;
+
+	&.leplayer-control-collection--common{
+		position: absolute;
+		bottom: 0px;
+		z-index: 999;
+	}
+
+
+	&--one-row
+	{
+		display: flex;
+	}
+}
+
+.leplayer-control-collection--fullscreen
+{
+	display: none;
+}
+
+.leplayer--fullscreen
+{
+	.leplayer-control-collection--common
+	{
+		display: none;
+	}
+
+}
+
+.leplayer--fullscreen.leplayer--user-active
+{
+
+	.leplayer-control-collection--fullscreen
+	{
+		display: block;
+	}
+}
+
+
+.leplayer-error-display
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	background: red;
+	color: white;
+	font-weight: 500;
+	width: 100%;
+	height: auto;
+	display: none;
+	text-align: center;
+	font-size: 15px;
+	padding: 15px;
+	z-index: @z-index-base + 8;
+}
+
+
+.leplayer--fullscreen
+{
+	.leplayer-error-display
+	{
+		z-index: @z-index-fullscreen + 8;
+	}
+}
+
+
+.leplayer--error
+{
+	.leplayer-error-display
+	{
+		display: block;
+	}
+}
+.leplayer-icon
+{
+	display: block;
+	min-width: 1.5em;
+	min-height: 1.5em;
+	svg
+	{
+		display: block;
+		width: 1.5em;
+		height: 1.5em;
+	}
+}
+
+
+
+.leplayer__inner
+{
+	position: relative;
+	overflow: hidden;
+}
+
+.leplayer--fullscreen
+{
+	.leplayer__inner
+	{
+		height: 100%;
+		margin: 0 auto;
+		position: absolute;
+		top: 0;
+		width: 100%;
+		z-index: @z-index-fullscreen + 6;
+	}
+}
+
+.leplayer--mini
+{
+	.leplayer__inner
+	{
+		top: 0;
+		left: 0;
+		right: 0;
+		height: auto;
+		display: flex;
+		position: fixed;
+		max-width: 100%;
+		margin-left: auto;
+		margin-right: auto;
+		align-items: stretch;
+		box-sizing: border-box;
+		z-index: @z-index-miniplayer;
+		max-height: @miniplayer-height;
+		background: @color-miniplayer-bg;
+		box-shadow: 0 10px 15px -10px rgba(0,0,0,.75);
+	}
+}
+
+.leplayer__info
+{
+	display: none;
+}
+
+.leplayer__last
+{
+	display: none;
+	position: absolute;
+
+	.leplayer-time
+	{
+		display: inline;
+	}
+}
+
+
+.leplayer--mini
+{
+	.leplayer__info
+	{
+		display: flex;
+		padding: 10px;
+		height: 50px;
+		margin: 0;
+		flex-direction: column;
+		color: black;
+		height: 100%;
+		// Width of controls in miniplayer
+		min-width: 300px;
+	}
+
+	.leplayer__last
+	{
+		display: block;
+		right: 20px;
+
+		@media screen and (max-width: 750px) {
+			display: none;
+		}
+
+	}
+
+	.leplayer__title {
+		color: black;
+		font-size: 14px;
+		margin-bottom: 5px;
+		font-weight: 500;
+		line-height: 100%;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.leplayer__video-info {
+		margin-bottom: 10px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+}
+
+.leplayer__title
+{
+	color: black;
+	font-size: 14px;
+	margin-bottom: 5px;
+	font-weight: 500;
+	line-height: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.leplayer--mini
+{
+	.leplayer__title
+	{
+		display: block;
+	}
+}
+
+
+.leplayer-key
+{
+	font-family: inherit;
+	font-size: inherit;
+	box-shadow: 1px 1px 0 1px rgba(120,120,120,0.5);
+	background: #eee;
+	border-radius: 2px;
+	color: #000;
+	display: inline-block;
+	margin: 4.25px 2px 4.25px 0;
+	padding: 4px;
+}
+
+
+.leplayer-control-collection--mini {
+	margin-top: auto;
+	margin-bottom: auto;
+	display: none;
+
+	.control-time {
+		display: table-cell;
+		vertical-align: middle;
+		padding: 6px 10px;
+		font-weight: 500;
+		width: 150px;
+		white-space: nowrap;
+		box-sizing: border-box;
+
+		@media (max-width: 440px) {
+			display: none;
+		}
+
+		&__current {
+			background: none;
+			cursor: default;
+			font-size: 15px;
+			text-align: right;
+			color: black;
+		}
+
+		&__total {
+			background: none;
+			cursor: default;
+			color: black;
+
+			&:before {
+				content : '/';
+				margin-right: 9px;
+			}
+		}
+
+	}
+
+	.volume-control:hover .volume-slider {
+		display: none
+	}
+
+	.rate-current
+	{
+		min-width: 34px;
+	}
+}
+
+.leplayer--mini
+{
+	.leplayer-control-collection--mini
+	{
+		display: block;
+	}
+}
+
+
+@keyframes leplayer-splashicon-fadeout {
+    0% {
+        opacity: 1
+    }
+    to {
+        opacity: 0;
+        transform: scale(2);
+    }
+}
+.leplayer-splashicon
+{
+	display: none;
+	position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 52px;
+    height: 52px;
+    z-index: 17;
+    margin-left: -26px;
+    margin-top: -26px;
+    background: rgba(0,0,0,.5);
+    border-radius: 26px;
+	color: white;
+	justify-content: center;
+	align-items: center;
+    animation: leplayer-splashicon-fadeout .5s linear 1 normal forwards;
+
+	&--active
+	{
+		display: flex;
+	}
+}
+
+.leplayer--virgin
+{
+	.leplayer-splashicon
+	{
+		display: none
+	}
+}
+
+
+@import "components/video.less";
+@import "components/play-button.less";
+@import "components/loader-container.less";
+@import "components/sections.less";
+@import "components/timeline-buffered.less";
+@import "components/poster.less";
