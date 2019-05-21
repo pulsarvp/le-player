@@ -8,6 +8,7 @@
 	box-sizing: border-box;
 	position: relative;
 	outline: none;
+	background: #f0f2f7;
 
 	&--hidden
 	{
@@ -49,11 +50,15 @@
 	width: 100%;
 	&:nth-child(2n)
 	{
-		background: fade(@white,20%);
+		background: fade(@white,50%);
 	}
 	&.leplayer-section--active
 	{
-		background: fade(@white,40%);
+		background: @white;
+		.leplayer-section-time{
+			color: @red;
+		}
+
 
 		.leplayer-section-description
 		{
@@ -62,7 +67,8 @@
 	}
 	&:hover
 	{
-		background: @color-section-hover;
+		background: @white;
+
 	}
 }
 
@@ -175,6 +181,9 @@
 		&:hover
 		{
 			background: @color-fs-section-active;
+			.leplayer-section-time{
+				color: @red;
+			}
 		}
 		&:nth-child(2n)
 		{
@@ -183,6 +192,9 @@
 			&.leplayer-section--active
 			{
 				background: @color-fs-section-2n-active;
+				.leplayer-section-time{
+					color: @red;
+				}
 			}
 
 			&:hover
