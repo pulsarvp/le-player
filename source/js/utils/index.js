@@ -57,6 +57,14 @@ export function createEl(tag='div', props) {
 }
 
 
+/**
+ * @params {String} Html
+ */
+export function $html(html) {
+
+}
+
+
 export function noop() {}
 
 export const getScrollBarWidth = (function() {

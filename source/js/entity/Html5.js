@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import Cookie from '../utils/cookie';
 import Component from '../components/Component';
 import { IS_SAFARI, IS_IOS, IS_ANDROID } from '../utils/browser';
 import Entity from './Entity';
@@ -237,7 +236,7 @@ class Html5 extends Entity {
 		this._playbackQuality = this.getAvailableQualityLevels().find(item => item.name === name);
 
 		this.src = this._playbackQuality;
-		this.playbackRate = rate;
+		this.rate = rate;
 		this.currentTime = time;
 
 		if (stop) {
@@ -323,6 +322,10 @@ class Html5 extends Entity {
 		return this.media.played;
 	}
 
+	get ended() {
+		return this.media.ended;
+	}
+
 	get playedPercentage() {
 		let result = 0;
 		for (let i = 0; i < this.played.length; i++) {
@@ -338,6 +341,7 @@ class Html5 extends Entity {
 
 	init () {
 		super.init();
+		this.load();
 		let dfd = $.Deferred();
 		this._initSubtitles();
 		this._initVideo()
@@ -442,7 +446,7 @@ class Html5 extends Entity {
 	_initVideo () {
 		let dfd = $.Deferred();
 		if (this.media.readyState > HTMLMediaElement.HAVE_NOTHING) {
-			dfd.resolve()
+			dfd.resolve();
 			this._textTracksHack();
 		} else {
 			$(this.media).one('loadedmetadata', (e) => {
@@ -450,7 +454,6 @@ class Html5 extends Entity {
 				this._textTracksHack();
 			});
 		}
-		dfd.notify();
 		return dfd.promise();
 	}
 
@@ -477,8 +480,6 @@ class Html5 extends Entity {
 	}
 
 }
-
-
 /**
  * Min rate for android and ios
  */
@@ -487,12 +488,32 @@ Html5.MOBILE_MIN_RATE = 0.5;
 /**
  * Max rate for android and ios
  */
-Html5.MOBILE_MAX_RATE = 2
-
+Html5.MOBILE_MAX_RATE = 2;
 
 Html5.SAFARI_MIN_RATE = 0.5;
 
 Html5.SAFARI_MAX_RATE = 2;
+
+Html5.TEST_VIDEO = document.createElement('video');
+
+/**
+ * @return {boolean}
+ *         - True if volume can be controlled
+ *         - False otherwise
+ */
+Html5.canControlVolume = function() {
+	// IE will error if Windows Media Player not installed #3315
+	try {
+		const volume = Html5.TEST_VIDEO.volume;
+
+		Html5.TEST_VIDEO.volume = (volume / 2) + 0.1;
+		return volume !== Html5.TEST_VIDEO.volume;
+	} catch (e) {
+		return false;
+	}
+};
+
+Html5.prototype.featureControlVolume = Html5.canControlVolume();
 
 Component.registerComponent('Html5', Html5);
 export default Html5;

@@ -21,7 +21,7 @@ class DownloadControl extends Control {
 		options = $.extend({
 			title : 'Скачать видео',
 			className : 'download',
-			name : 'download'
+			name : 'download',
 		}, options);
 		super(player, options);
 		this.player.on('loadstart', this.onLoadStart.bind(this));
@@ -58,10 +58,18 @@ class DownloadControl extends Control {
 	 * @param {String} value Path for video
 	 */
 	set link (value) {
-		const parser = document.createElement('a');
-		parser.href = value;
-		let fileName = parser.pathname.split('/');
-		fileName = fileName[fileName.length - 1];
+		const title = this.player.options.title;
+		let fileName;
+
+		if(title != null) {
+			fileName = decodeURIComponent(title) + '.' + getFileExtension(value);
+		} else {
+			const parser = document.createElement('a');
+			parser.href = value;
+			fileName = parser.pathname.split('/');
+			fileName = fileName[fileName.length - 1];
+		}
+
 		this.element.attr({
 			href : value,
 			download : fileName
@@ -70,9 +78,12 @@ class DownloadControl extends Control {
 
 
 	onLoadStart(e, data) {
-		this.link = this.player.video.src.url
+		this.link = this.player.video.src.url;
 	}
 
+}
+function getFileExtension(fileName) {
+	return fileName.split('.').pop();
 }
 
 Component.registerComponent('DownloadControl', DownloadControl);

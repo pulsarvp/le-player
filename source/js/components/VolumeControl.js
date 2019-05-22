@@ -7,6 +7,8 @@ import $ from 'jquery';
 import Component from './Component';
 import Control from './Control';
 import ControlDropdown from './ControlDropdown';
+import { IS_ANDROID_PHONE } from '../utils/browser';
+
 
 /**
  * @param {Player} player Main player
@@ -22,6 +24,11 @@ class VolumeControl extends ControlDropdown {
 			name : 'volume'
 		}, options);
 		super(player, options);
+
+		if(!player.video.featureControlVolume || IS_ANDROID_PHONE) {
+			this.element.hide();
+			return;
+		}
 
 		this.player.on('volumechange', (e, data) => {
 			const video = this.player.video;
@@ -108,6 +115,10 @@ class VolumeControl extends ControlDropdown {
 	}
 
 	onPlayerInited() {
+		if(!this.player.video.featureControlVolume) {
+			this.element.hide();
+			return;
+		}
 		this.value = this.player.video.defaultVolume;
 	}
 

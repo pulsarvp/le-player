@@ -2,7 +2,6 @@ $(function() {
 	var dropdown = $('#changeTheme');
 	var _currentTheme = 'default'
 
-
 	function parseParams(params) {
 		var ret = {},
 			hash,
@@ -45,7 +44,7 @@ $(function() {
 			return null;
 		}
 		if(params.options != null) {
-			editor.setValue(params.options);
+			editor.setValue(js_beautify(params.options));
 		}
 		if(params.theme != null) {
 			setTheme(params.theme);
@@ -70,7 +69,8 @@ $(function() {
 	var editor = ace.edit("editor");
 	editor.$blockScrolling = Infinity
     editor.setTheme("ace/theme/solarized_light");
-    editor.getSession().setMode("ace/mode/javascript");
+	editor.getSession().setMode("ace/mode/javascript");
+	editor.setValue(js_beautify(editor.getValue()))
 
 
 	$('#editor-save').on('click', function() {

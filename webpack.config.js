@@ -1,7 +1,7 @@
 'use strict';
 
-const path = require('path');
 const webpack = require('webpack');
+const path = require('path');
 const isProd = process.env.NODE_ENV === 'production'
 
 const options = {
@@ -9,6 +9,7 @@ const options = {
 		'le-player' : ['./source/js/le-player.js'],
 		'le-player-ga' : ['./source/js/plugins/le-player-ga.js'],
 		'le-player-youtube' : ['./source/js/plugins/le-player-youtube.js'],
+		'le-player-next' : ['./source/js/plugins/le-player-next.js'],
 	},
 
 	output: {
@@ -68,7 +69,7 @@ const options = {
 
 if(isProd) {
 	options.entry = Object.assign({}, options.entry, {
-		'le-player.full' : './source/js/le-player.full.js',
+		'le-player-full' : ['./source/js/le-player-full.js'],
 	})
 }
 

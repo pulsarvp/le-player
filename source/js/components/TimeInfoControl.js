@@ -76,7 +76,7 @@ class TimeInfoControl extends Control {
 		this._totalTimeControl.text = secondsToTime(video.duration);
 	}
 
-	_onClick(e) {
+	onClick(e) {
 		e.preventDefault()
 	}
 }

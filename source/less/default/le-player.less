@@ -22,13 +22,21 @@
 
 }
 
+// .leplayer--iphone {
+// 	.control:hover,
+// 	.control:focus {
+// 		background: #dee5ed;
+// 		color: #1b4b7e;
+// 	}
+// }
+
 
 // CONTROLS
 
 .leplayer-controls
 {
 	border-collapse: separate;
-	display: table;
+	display: flex;
 	height: @control-height;
 	position: relative;
 	width: 100%;
@@ -37,19 +45,22 @@
 
 	&--left
 	{
-		width: 1%;
 		margin-right: auto;
 	}
 
 	&--right
 	{
-		width: 1%;
 		margin-left: auto;
 	}
 
 	&--justify
 	{
 		width: auto;
+		&::after {
+			content: '';
+			width: 1px;
+			display: block;
+		}
 	}
 
 	&:not(:last-child)
@@ -64,18 +75,15 @@
 
 	&.controls-fullscreen
 	{
-		bottom: 20px;
-		display: block;
-		left: 20px;
-		position: absolute;
-		right: 20px;
+		position: relative;
 		width: auto;
 		z-index: @z-index-fullscreen + 7;
 		.control
 		{
 			background: @color-fs-control;
 			color: @color-fs-text;
-			&:hover
+			&--tap,
+			&.control--no-iphone:hover
 			{
 				background: @color-fs-control-hovered;
 				color: @color-fs-text-hovered;
@@ -83,7 +91,8 @@
 			&.disabled
 			{
 				color: @color-fs-disabled;
-				&:hover
+				&.control--tap,
+				&.control--no-iphone:hover
 				{
 					background: @color-fs-background;
 					color: @color-fs-disabled;
@@ -93,9 +102,19 @@
 			{
 				background: @color-fs-background-play;
 				color:  @color-fs-active;
-				&:hover
+
+				&.control--tap,
+				&.control--no-iphone:hover
 				{
 					background: @color-fs-background-play-hovered;
+				}
+			}
+			&.timeline-container
+			{
+				&.control--tap,
+				&.control--no-iphone:hover
+				{
+					background: @color-fs-background;
 				}
 			}
 		}
@@ -109,7 +128,8 @@
 		{
 			background: @color-fs-control-checked;
 			color: @color-fs-text-hovered;
-			&:hover {
+			&.control--tap,
+			&.control--no-iphone:hover {
 				background: darken(@color-fs-control-checked, 5%);
 			}
 		}
@@ -154,11 +174,8 @@
 				height: auto;
 				position: relative;
 			}
-			&:hover
-			{
-				background: @color-fs-background;
-			}
 		}
+
 		.time-marker
 		{
 			background: @color-fs-marker;
@@ -208,17 +225,22 @@
 	.control
 	{
 		background: @color-background;
+		border: none;
+		border-radius: 0;
 		color: @color-text;
 		cursor: pointer;
-		display: table-cell;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		font-size: @control-font-size;
 		height: @control-height;
+		width: auto;
 		line-height: 100%;
 		padding: 0 (@control-width - @control-font-size) / 2;
 		text-align: center;
 		vertical-align: middle;
-		width: 1%;
-		&:hover
+		&.control--tap,
+		&.control--no-iphone:hover
 		{
 			background: @color-control-hovered;
 			color: @color-text-hovered;
@@ -230,12 +252,12 @@
 			background: @color-background-play;
 			color: @color-active;
 			padding: 0 (@control-play-width - @control-font-size) / 2;
-			width: 1%;
 			&.disabled:hover
 			{
 				background: @color-background-play;
 			}
-			&:hover
+			&.control--tap,
+			&.control--no-iphone:hover
 			{
 				background: @color-background-play-hovered;
 				color: @color-background;
@@ -246,11 +268,11 @@
 		{
 			cursor: not-allowed;
 			color: @color-disabled;
-			&:hover
-			{
-				background: @color-background;
-				color: @color-disabled;
-			}
+			pointer-events: none;
+		}
+
+		@media screen and (max-width: 420px) {
+			padding: 0 5px;
 		}
 	}
 
@@ -258,7 +280,8 @@
 	{
 		background: @color-control-checked;
 		color: @color-text-checked;
-		&:hover {
+		&.control--tap,
+		&.control--no-iphone:hover {
 			background: darken(@color-control-checked, 5%);
 		}
 	}
@@ -320,10 +343,9 @@
 
 	.control-container
 	{
-		display: table-cell;
+		display: flex;
 		height: @control-height;
 		position: relative;
-		width: 1%;
 
 		&__item
 		{
@@ -358,19 +380,20 @@
 	{
 		background: @color-background;
 		color: @color-text;
-		display: table-cell;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		font-size: @control-text-font-size;
 		box-sizing: content-box;
 		line-height: 100%;
 		padding: 0 5px;
 		text-align: center;
-		vertical-align: middle;
 	}
 
 	.divider
 	{
 		background: none;
-		display: table-cell;
+		display: block;
 		padding: 0 @divider-width / 2;
 		width: 0.01%;
 	}
@@ -397,15 +420,20 @@
 		width: 100%;
 	}
 
+	.time-current
+	{
+		width: 40px;
+	}
+
 	.timeline-container
 	{
 		background: @color-background;
-		display: table-cell;
 		position: relative;
 		white-space: nowrap;
 		width: 100%;
 
-		&:hover
+		&.control--tap,
+		&.control--no-iphone:hover
 		{
 			background: @color-background;
 		}
@@ -413,13 +441,8 @@
 
 	.timeline-subcontainer
 	{
-		display: table;
+		display: flex;
 		width: 100%;
-	}
-
-	.time-current, .time-total
-	{
-		width: 1%;
 	}
 
 	.time-marker
@@ -444,8 +467,7 @@
 			left: -1px;
 			background: transparent;
 		}
-		&--drag:before,
-		&:hover:before
+		&--drag:before
 		{
 			background: @color-marker;
 		}
@@ -472,6 +494,28 @@
 			padding: 0 5px;
 			position: absolute;
 			z-index: @z-index-base + 3;
+		}
+	}
+
+	.timline-container.control--no-iphone
+	{
+		.time-marker {
+
+			&:hover:before
+			{
+				background: @color-marker;
+			}
+		}
+	}
+
+	.timline-container.control--tap
+	{
+		.time-marker {
+
+			&:before
+			{
+				background: @color-marker;
+			}
 		}
 	}
 
@@ -580,6 +624,12 @@
 .leplayer-control-collection--fullscreen
 {
 	display: none;
+	bottom: 0;
+	left: 20px;
+	position: fixed;
+	right: 20px;
+	width: auto;
+	z-index: @z-index-fullscreen + 7;
 }
 
 .leplayer--fullscreen
@@ -795,8 +845,7 @@
 	display: none;
 
 	.control-time {
-		display: table-cell;
-		vertical-align: middle;
+		display: block;
 		padding: 6px 10px;
 		font-weight: 500;
 		width: 150px;
@@ -813,12 +862,14 @@
 			font-size: 15px;
 			text-align: right;
 			color: black;
+			display: inline;
 		}
 
 		&__total {
 			background: none;
 			cursor: default;
 			color: black;
+			display: inline;
 
 			&:before {
 				content : '/';
@@ -886,6 +937,46 @@
 	{
 		display: none
 	}
+}
+
+
+// Mobile styles
+
+.leplayer--iphone {
+	.leplayer-controls {
+		.timeline-container {
+			width: auto;
+		}
+		.timeline {
+			display: none;
+		}
+	}
+}
+
+.leplayer--mobile.leplayer--fullscreen {
+	.leplayer-control-collection--fullscreen {
+		position: static;
+	}
+
+	.controls-fullscreen {
+		position: absolute;
+		z-index: 1007;
+		&:nth-child(1) {
+			bottom: 0;
+			margin-bottom: 0;
+			width: 100%;
+		}
+		&:nth-child(2) {
+			top: 0px;
+			left: 0px;
+
+			.control-dropdown__content {
+				bottom : auto;
+				top: @control-height;
+			}
+		}
+	}
+
 }
 
 

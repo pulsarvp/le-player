@@ -13,7 +13,7 @@ class Cookie {
 	 *
 	 */
 	static get (name, dflt) {
-		var cookies = document.cookie.split(';');
+		let cookies = document.cookie.split(';');
 		for (let i in cookies) {
 			var d = cookies[ i ].trim().split('=');
 			if (d[ 0 ] === 'leplayer_' + name)
