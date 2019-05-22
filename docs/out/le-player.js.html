@@ -1,4 +1,45 @@
-'use strict';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>le-player.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Classes</li><li class="nav-heading"><span class="nav-item-type type-class">C</span><span class="nav-item-name"><a href="Player.html">Player</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#.plugin">plugin</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#.preset">preset</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#createElement">createElement</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#exitFullscreen">exitFullscreen</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#getControls">getControls</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#getData">getData</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#getWidth">getWidth</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#load">load</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#onDelView">onDelView</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#onSetView">onSetView</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#pause">pause</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#play">play</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#requestFullscreen">requestFullscreen</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#toggleFullscreen">toggleFullscreen</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="Player.html#togglePlay">togglePlay</a></span></li><li class="nav-heading">Events</li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:canplay">canplay</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:canplaythrough">canplaythrough</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:dbclick">dbclick</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:durationchange">durationchange</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:ended">ended</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:error">error</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:firstplay">firstplay</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:fullscreenchange">fullscreenchange</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:inited">inited</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:loadstart">loadstart</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:pause">pause</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:play">play</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:playing">playing</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:progress">progress</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:qualitychange">qualitychange</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:rate">rate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:sectionsinit">sectionsinit</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:seeked">seeked</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:seeking">seeking</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:timeupdate">timeupdate</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:trackschange">trackschange</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:useractive">useractive</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:volumechange">volumechange</a></span></li><li class="nav-heading"><span class="nav-item-type type-event">E</span><span class="nav-item-name"><a href="Player.html#event:waiting">waiting</a></span></li>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">le-player.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
 
 import $ from 'jquery';
 
@@ -17,16 +58,8 @@ import Poster from './components/Poster';
 import FullscreenApi from './FullscreenApi';
 
 import { createEl, secondsToTime, noop } from './utils';
-import {
-	IS_ANDROID_PHONE,
-	IS_ANDROID,
-	IS_IPOD,
-	IS_IPHONE,
-	IS_MOBILE,
-	IS_TOUCH
-} from './utils/browser';
-
 import Cookie from './utils/cookie';
+import { IS_IPHONE, IS_IPOD, IS_ANDROID_PHONE } from './utils/browser';
 
 import MediaError from './MediaError';
 
@@ -51,7 +84,7 @@ import 'array.prototype.find';
 
 Control.registerControl('divider', function() {
 	return {
-		element : $('<div/>').addClass('divider')
+		element : $('&lt;div/>').addClass('divider')
 	};
 });
 
@@ -111,34 +144,16 @@ const defaultOptions = {
 		],
 		mini : [
 			['play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
-		],
-		'common:android' : [
-			['play', 'timeline', 'fullscreen'],
-			['rate', 'source', 'section']
-		],
-		'fullscreen:mobile' : [
-			['play', 'timeline', 'fullscreen'],
-			['rate', 'source', 'section']
-		],
-		'common:ios' : [
-			['play', 'rate', 'timeline', 'source']
-		],
+		]
 	},
 	controlsOptions : {
 
 		common : {
-			align : ['justify', 'left'],
-			// mobile : true
-		},
-		fullscreen : {
-			align : 'justify'
-		},
-		'common:android' : {
-			align : ['justify', 'right']
+			align : ['justify', 'left']
 		},
 
-		'fullscreen:mobile' : {
-			align : ['justify', 'right']
+		fullscreen : {
+			align : 'justify'
 		}
 	},
 	volume : {
@@ -341,6 +356,8 @@ class Player extends Component {
 		this._dblclickTimeout = null;
 
 		this._initSections().then((data) => {
+			this.sections = data.sectionsComponent;
+
 			/**
 			 * Sections init event
 			 *
@@ -594,7 +611,7 @@ class Player extends Component {
 				this.currentTime = this.options.time;
 			}
 
-			if(this.video.src != null && this.options.autoplay) {
+			if(this.video.src != null &amp;&amp; this.options.autoplay) {
 				this.play();
 			}
 		});
@@ -675,32 +692,6 @@ class Player extends Component {
 		this.on(`setview.${view}`, ...args);
 
 		return this;
-	}
-
-	/**
-	 * Change source and save time, rate
-	 *
-	 * @access public
-	 * @param {Object} quality
-	 * @param {String} [quality.title] The name of qualitut e.x SD or HD
-	 * @param {String} quality.url
-	 */
-	changeQuality(quality) {
-		const video = this.video;
-		if(quality == null) return;
-		const time = this.currentTime;
-		const rate = this.rate;
-		const isPaused = this.paused;
-
-		video.src = quality;
-		this.playbackRate = rate;
-		this.currentTime = time;
-
-		if(isPaused) {
-			this.pause()
-		} else {
-			this.play()
-		}
 	}
 
 	/**
@@ -843,9 +834,9 @@ class Player extends Component {
 			return
 		}
 		let newSections = [].concat(sections)
-		for (let i = 0; i < newSections.length; i++) {
+		for (let i = 0; i &lt; newSections.length; i++) {
 			let endSection;
-			if (i < (newSections.length - 1)) {
+			if (i &lt; (newSections.length - 1)) {
 				endSection = newSections[i+1].begin
 			} else {
 				endSection = this.video.duration;
@@ -934,18 +925,6 @@ class Player extends Component {
 		return this;
 	}
 
-	get rate() {
-		return this.video.rate;
-	}
-
-	set rate(value) {
-		this.video.rate = value;
-	}
-
-	get paused() {
-		return this.video.paused;
-	}
-
 	/**
 	 * Return the height of player. If you want get height only of video element, use this.video.height or whatever
 	 *
@@ -1030,7 +1009,7 @@ class Player extends Component {
 		this.element = this.element
 			.addClass('leplayer')
 			.attr('tabindex', 0)
-			.css('width', options.width && '100%')
+			.css('width', options.width &amp;&amp; '100%')
 			.css('max-width', options.width)
 
 		/**
@@ -1051,7 +1030,7 @@ class Player extends Component {
 		this.playButton = new PlayButton(this);
 
 		// TODO: Вынести это в отдельнеый компонент
-		this.loader = $('<div />')
+		this.loader = $('&lt;div />')
 			.addClass('leplayer-loader-container')
 			.append(new Icon(this, {
 				iconName : 'refresh',
@@ -1106,7 +1085,7 @@ class Player extends Component {
 			html : `Видео закончится через `,
 		}).append(lastTimer.element))
 
-		this.innerElement = $('<div />')
+		this.innerElement = $('&lt;div />')
 			.addClass('leplayer__inner')
 			.append(this.videoContainer)
 			.append(this.infoElement)
@@ -1116,19 +1095,6 @@ class Player extends Component {
 
 		this.addClass('leplayer--paused');
 		this.addClass('leplayer--virgin');
-
-		if(IS_IPHONE) {
-			this.addClass('leplayer--iphone');
-		}
-
-		if(IS_ANDROID) {
-			this.addClass('leplayer--android');
-		}
-
-		if(IS_MOBILE) {
-			this.addClass('leplayer--mobile');
-		}
-
 
 
 		if(options.sectionContainer) {
@@ -1143,8 +1109,8 @@ class Player extends Component {
 
 	/**
 	 * Get options from video's attribute ( height, width, poster, preload etc...)
-	 * Get source video from src attr or <source> element with data attr 'data-quality'
-	 * Also get sources for different quality from <source> element with data attr 'data-quality'
+	 * Get source video from src attr or &lt;source> element with data attr 'data-quality'
+	 * Also get sources for different quality from &lt;source> element with data attr 'data-quality'
 	 *
 	 * @access private
 	 * @returns {Object} options
@@ -1214,21 +1180,12 @@ class Player extends Component {
 		}
 		const volume = value;
 
-		if (volume < this.options.volume.mutelimit) {
+		if (volume &lt; this.options.volume.mutelimit) {
 			return 'volume-off';
-		} else if (value < 0.5) {
+		} else if (value &lt; 0.5) {
 			return 'volume-down';
 		} else {
 			return 'volume-up';
-		}
-	}
-
-	toggleSections(flag) {
-		if(this.sections) {
-			this.sections.visible = flag;
-		}
-		if(this.outsideSections) {
-			this.outsideSections.visible = flag;
 		}
 	}
 
@@ -1245,7 +1202,7 @@ class Player extends Component {
 		const attrOptions = this._optionsFromElement();
 		let presetOptions = {};
 
-		if (this._userOptions.preset && Player.getPreset(this._userOptions.preset)) {
+		if (this._userOptions.preset &amp;&amp; Player.getPreset(this._userOptions.preset)) {
 			presetOptions = Player.getPreset(this._userOptions.preset).options;
 		}
 
@@ -1253,7 +1210,7 @@ class Player extends Component {
 		// Merge default options + preset options + video attributts+ user options
 		this.options = $.extend(true, {}, defaultOptions, presetOptions, attrOptions, this._userOptions);
 
-		if(this.options.sources && !Array.isArray(this.options.sources)) {
+		if(this.options.sources &amp;&amp; !Array.isArray(this.options.sources)) {
 			this.options.sources = [this.options.sources]
 		}
 
@@ -1261,13 +1218,9 @@ class Player extends Component {
 			this.options.src = { url : this.options.src }
 		}
 
-		if(this.options.src == null && this.options.sources.length > 0) {
+		if(this.options.src == null &amp;&amp; this.options.sources.length > 0) {
 			this.options.src = this.options.sources[0]
 		}
-
-
-		// Generate android:fullscreen, android:common and etc controls options
-
 
 		// Merge correctly controls, without deep merge
 		this.options.controls = $.extend({}, defaultOptions.controls, presetOptions.controls, this._userOptions.controls);
@@ -1279,13 +1232,13 @@ class Player extends Component {
 			if (!this.options.excludeControls.hasOwnProperty(name)) return;
 			const controlCollection = this.options.excludeControls[name];
 			controlCollection.forEach((row, index) => {
-				if (this.options.controls[name] && this.options.controls[name][index]) {
+				if (this.options.controls[name] &amp;&amp; this.options.controls[name][index]) {
 					this.options.controls[name][index] = excludeArray(this.options.controls[name][index], row);
 				}
 			})
 		}
 
-		if (this.options.preset && Player.getPreset(this.options.preset)) {
+		if (this.options.preset &amp;&amp; Player.getPreset(this.options.preset)) {
 			Player.getPreset(this.options.preset).initOptions();
 		}
 	}
@@ -1299,7 +1252,6 @@ class Player extends Component {
 		for (const name of ['common', 'fullscreen']) {
 			if (!this.options.controls.hasOwnProperty(name)) return;
 			const controlCollection = new ControlCollection(this, { name });
-
 			this.element.append(controlCollection.element);
 		}
 
@@ -1312,8 +1264,8 @@ class Player extends Component {
 	_listenHotKeys() {
 
 		const isKeyBinding = (e, binding) => {
-			return ((e.which === binding.key) || (e.key === binding.key)) &&
-					(!!binding.shiftKey === e.shiftKey) &&
+			return ((e.which === binding.key) || (e.key === binding.key)) &amp;&amp;
+					(!!binding.shiftKey === e.shiftKey) &amp;&amp;
 					(!!binding.ctrlKey === e.ctrlKey)
 		}
 
@@ -1344,7 +1296,7 @@ class Player extends Component {
 			this.getSectionData().done(sections => {
 				sections = [...sections];
 
-				const isSectionOutside = (this.sectionsContainer && this.sectionsContainer.length > 0);
+				const isSectionOutside = (this.sectionsContainer &amp;&amp; this.sectionsContainer.length > 0);
 
 				if (sections == null || sections.length === 0) {
 					dfd.reject(null);
@@ -1353,21 +1305,21 @@ class Player extends Component {
 
 				sections = this._completeSections(sections);
 
-				this.sections = new Sections(this, {
+				const sectionsComponent = new Sections(this, {
 					items : sections,
 					fullscreenOnly : isSectionOutside,
 					hideScroll : true
 				});
 
-				this.innerElement.append(this.sections.element);
+				this.innerElement.append(sectionsComponent.element);
 
 				if (isSectionOutside) {
-					this.outsideSections = new Sections(this, {
+					const outsideSections = new Sections(this, {
 						items : sections
 					});
-					this.sectionsContainer.append(this.outsideSections.element);
+					this.sectionsContainer.append(outsideSections.element);
 				}
-				dfd.resolve({ items : sections });
+				dfd.resolve({ sectionsComponent, items : sections });
 			})
 		}
 
@@ -1510,26 +1462,10 @@ class Player extends Component {
 	 */
 	_onClick(e) {
 		clearTimeout(this._dblclickTimeout);
-		const togglePlay = () => {
-			this._dblclickTimeout = setTimeout(() => {
-				this.video.element.focus()
-				this.togglePlay();
-
-			}, 300);
-		}
-
-		/**
-		 * See LPLR-290
-		 * On touch devices in fullscreen if user not active we don't should toggle
-		 * At first we show him a controls
-		 */
-		if(IS_TOUCH() && this.view === 'fullscreen') {
-			if(this.player.userActive) {
-				togglePlay()
-			}
-		} else {
-			togglePlay()
-		}
+		this._dblclickTimeout = setTimeout(() => {
+			this.video.element.focus()
+			this.togglePlay();
+		}, 300);
 	}
 
 	/**
@@ -1552,22 +1488,10 @@ class Player extends Component {
 	_onFullscreenChange(e, isFs) {
 		if(isFs) {
 			this.view = 'fullscreen';
-
-			// Hide sections by default on mobile fullscreen
-			if(IS_ANDROID) {
-				this._lastSectionsValue = this.sections.visible;
-				this.sections.visible = false;
-			}
-
 			this.focus();
 		} else {
 			this.view = 'common';
 
-			if(IS_ANDROID) {
-				this.sections.visible = this._lastSectionsValue;
-			}
-
-			// Pause video on exit fullscreeen on mobile
 			if(IS_ANDROID_PHONE || IS_IPHONE || IS_IPOD) {
 				this.pause();
 			}
@@ -1721,7 +1645,7 @@ Player._presets = {};
 Player.Cookie = Cookie;
 
 Player._loadSVGSprite = function(svg) {
-	const hiddenElement = $('<div/>').hide();
+	const hiddenElement = $('&lt;div/>').hide();
 	$('body').prepend(hiddenElement.append(svg));
 	return hiddenElement;
 }
@@ -1811,7 +1735,7 @@ Player.plugin('miniplayer', function(pluginOptions) {
 	}
 
 	this.showMiniPlayer = (force) => {
-		if (!force && this.view === 'mini') {
+		if (!force &amp;&amp; this.view === 'mini') {
 			return;
 		}
 
@@ -1822,7 +1746,7 @@ Player.plugin('miniplayer', function(pluginOptions) {
 	}
 
 	this.hideMiniPlayer = (force) => {
-		if(!force && this.view !== 'mini') {
+		if(!force &amp;&amp; this.view !== 'mini') {
 			return;
 		}
 		this.view = 'common';
@@ -1848,11 +1772,27 @@ Player.plugin('miniplayer', function(pluginOptions) {
 	this._updateMiniPlayer();
 });
 
-
 Player.preset('vps', require('./presets/vps.js').preset);
 Player.preset('simple', require('./presets/simple.js').preset);
 Player.preset('sms', require('./presets/sms.js').preset);
 Player.preset('compressed', require('./presets/compressed.js').preset);
-Player.preset('2035', require('./presets/2035.js').preset);
 
-module.exports = Player
+module.exports = Player</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Thu Aug 24 2017 22:41:48 GMT+0300 (MSK) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

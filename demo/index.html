@@ -4,9 +4,14 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>LePlayer Demo Page</title>
+		<<<<<<< HEAD
 		<link id="linkPlayerTheme" rel="stylesheet" href="../dist/css/default/le-player.css">
 		<link id="linkPlayerTheme" rel="stylesheet" href="../dist/css/default/le-player-next.css">
 		<link id="linkPlayerTheme" rel="stylesheet" href="../dist/css/default/le-player-youtube.css">
+		=======
+		<link id="linkPlayerTheme" rel="stylesheet" href="../dist/css/2035/le-player.css">
+		<link id="linkPlayerTheme" rel="stylesheet" href="../dist/css/2035/le-player-youtube.css">
+		>>>>>>> new_theme_unti
 		<link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
 		<style>
 			body
@@ -26,7 +31,8 @@
 				display: inline-block;
 			}
 
-			#sections {
+			#sections
+			{
 				height: 400px;
 			}
 
@@ -47,62 +53,60 @@
 		<div class="container">
 
 			<div class="header clearfix">
-				<nav class="navbar navbar-default">
-					<div class="navbar-header">
-						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-							<span class="sr-only">Toggle navigation</span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-						</button>
-						<a class="navbar-brand" href="#">lePlayer <span id="version"></span></a>
-					</div>
-					<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                        <ul class="nav navbar-nav float-xs-right">
-                            <li role="presentation" class="nav-item">
-                                <a class="nav-link" href="./">Демо</a>
-							</li>
-							<li role="presentation" class="nav-item ">
-								<a class="nav-link" onclick="window.location = this.href; return false;" href="./?options=new Object({%0A preset%3A 'youtube'%2C%0A title%3A 'Title'%2C%0A description%3A 'Link ... '%2C%0A sectionContainer%3A '%23sections'%2C%0A poster%3A '.%2Fposter.jpg'%2C%0A sources%3A {%0A url%3A 'http%3A%2F%2Fwww.youtube.com%2Fembed%2F9_atu6qAFis'%0A }%2C%0A preload%3A 'metadata'%2C%0A data%3A {%0A sections%3A [{%0A 'title'%3A 'Секция с пустым описание'%2C%0A 'description'%3A ''%2C%0A 'begin'%3A 0%0A }%2C {%0A 'title'%3A 'Секцисоченьдлиннымсловомкотороенаверняканевлезит'%2C%0A 'description'%3A 'Момент сил%2C действующий на рамку в однородном магнитном поле. Магнитный момент рамки. Сила%2C действующая на рамку в неоднородном магнитном поле.'%2C%0A 'begin'%3A 203%0A }%2C {%0A 'title'%3A 'Cекция с длинным словом в описании'%2C%0A 'description'%3A 'Граничные условия для магнитногооченьдлинноеслововотвотиононевлезит поля на границе раздела двух сред (с доказательством из теорем Гаусса и о циркуляции для магнитного поля в веществе).'%2C%0A 'begin'%3A 760%0A }%2C {%0A 'title'%3A 'Демонстрации. Рамка в магнитном поле'%2C%0A 'description'%3A 'Рамка в магнитном поле катушки. Влияние сердечника на величину магнитного поля соленоида.'%2C%0A 'begin'%3A 1060%0A }%2C {%0A 'title'%3A 'Описание в 100 слов'%2C%0A 'description'%3A 'Lorem ipsum dolor sit amet%2C consectetur adipisicing elit. Dolores eligendi eos repellendus veritatis! Accusamus aperiam%2C asperiores aspernatur culpa doloribus eum excepturi in inventore ipsa iste iusto molestias mollitia nam necessitatibus odit perspiciatis qui quos ratione recusandae rerum sapiente similique soluta tempora voluptate voluptatem voluptatibus voluptatum. Commodi dolore dolorum ducimus eaque eum eveniet explicabo hic impedit incidunt ipsam iure iusto labore magnam minima molestias%2C mollitia nam natus neque nobis nostrum nulla odit officiis praesentium quae quaerat quia quos rerum sit vel voluptates. Dicta dolores ex mollitia qui suscipit ullam. Asperiores dolore eaque eius ex excepturi fugiat non ratione repudiandae totam veritatis'%2C%0A 'begin'%3A 1370%0A }%2C {%0A 'title'%3A 'Пустое описание'%2C%0A 'description'%3A ''%2C%0A 'begin'%3A 2000%0A }%2C {%0A 'title'%3A 'Магнитное поле в намагничивающихся средах'%2C%0A 'description'%3A 'Магнитное поле в намагничивающихся средах. Молекулярные токи и токи проводимости. Усреднение магнитного поля по физически малому объему.'%2C%0A 'begin'%3A 3200%0A }]%0A }%2C%0A plugins%3A {%0A 'ga'%3A {}%2C%0A 'miniplayer'%3A {%0A width%3A '1140px'%0A }%2C%0A 'youtube'%3A {}%0A }%2C%0A})%3B&theme=default">Демо Youtube</a>
-
-							</li>
-                            <li role="presentation" class="nav-item">
-                                <a class="nav-link" href="../docs/out/index.html">Readme</a>
-                            </li>
-                            <li role="presentation" class="nav-item">
-                                <a class="nav-link" href="../docs/out/Player.html">Документация</a>
-                            </li>
-                            <li role="presentation" class="dropdown" id="changeTheme">
-                                <a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                    Выбрать тему
-                                    <span class="caret"></span>
-                                </a>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-                                    <li><a href="#default" class="link-set-theme" data-name="default">Лекторий
-                                        <span class="label label-default">Default</span></a></li>
-                                    <li><a href="#vps" class="link-set-theme" data-name="vps">video.mipt</a></li>
-                                    <li><a href="#ussr" class="link-set-theme" data-name="ussr">СССР</a></li>
-                                    <li><a href="#vps-gray" class="link-set-theme" data-name="vps-gray">Новый video.mipt</a>
-                                    </li>
-                                    <li><a href="#opus-green" class="link-set-theme" data-name="opus-green">ОТУС green</a>
-                                    </li>
-                                    <li>
-                                        <a href="#opus-orange" class="link-set-theme" data-name="opus-orange">ОТУС orange</a>
-                                    </li>
-                                    <li><a href="#compressed" class="link-set-theme" data-name="compressed">Compressed
-                                        <span class="label label-success">New</span></a></li>
-                                    <li><a href="#sms" class="link-set-theme" data-name="sms">SMS
-                                        <span class="label label-success">New</span></a></li>
-                                </ul>
-                            </li>
-	                        <li role="presentation" class="nav-item">
-		                        <a class="nav-link" href="https://github.com/miptliot/le-player">GitHub</a>
-	                        </li>
-                        </ul>
-					</div>
+				<nav>
+					<ul class="nav nav-pills float-xs-right">
+						<li role="presentation" class="nav-item active">
+							<a class="nav-link active" href="#">Демо</a>
+						</li>
+						<li role="presentation" class="nav-item ">
+							<a class="nav-link active" onclick="window.location = this.href; return false;" href="./?options=new Object({%0A preset%3A 'youtube'%2C%0A title%3A 'Title'%2C%0A description%3A 'Link ... '%2C%0A sectionContainer%3A '%23sections'%2C%0A poster%3A '.%2Fposter.jpg'%2C%0A sources%3A {%0A url%3A 'http%3A%2F%2Fwww.youtube.com%2Fembed%2F9_atu6qAFis'%0A }%2C%0A preload%3A 'metadata'%2C%0A data%3A {%0A sections%3A [{%0A 'title'%3A 'Секция с пустым описание'%2C%0A 'description'%3A ''%2C%0A 'begin'%3A 0%0A }%2C {%0A 'title'%3A 'Секцисоченьдлиннымсловомкотороенаверняканевлезит'%2C%0A 'description'%3A 'Момент сил%2C действующий на рамку в однородном магнитном поле. Магнитный момент рамки. Сила%2C действующая на рамку в неоднородном магнитном поле.'%2C%0A 'begin'%3A 203%0A }%2C {%0A 'title'%3A 'Cекция с длинным словом в описании'%2C%0A 'description'%3A 'Граничные условия для магнитногооченьдлинноеслововотвотиононевлезит поля на границе раздела двух сред (с доказательством из теорем Гаусса и о циркуляции для магнитного поля в веществе).'%2C%0A 'begin'%3A 760%0A }%2C {%0A 'title'%3A 'Демонстрации. Рамка в магнитном поле'%2C%0A 'description'%3A 'Рамка в магнитном поле катушки. Влияние сердечника на величину магнитного поля соленоида.'%2C%0A 'begin'%3A 1060%0A }%2C {%0A 'title'%3A 'Описание в 100 слов'%2C%0A 'description'%3A 'Lorem ipsum dolor sit amet%2C consectetur adipisicing elit. Dolores eligendi eos repellendus veritatis! Accusamus aperiam%2C asperiores aspernatur culpa doloribus eum excepturi in inventore ipsa iste iusto molestias mollitia nam necessitatibus odit perspiciatis qui quos ratione recusandae rerum sapiente similique soluta tempora voluptate voluptatem voluptatibus voluptatum. Commodi dolore dolorum ducimus eaque eum eveniet explicabo hic impedit incidunt ipsam iure iusto labore magnam minima molestias%2C mollitia nam natus neque nobis nostrum nulla odit officiis praesentium quae quaerat quia quos rerum sit vel voluptates. Dicta dolores ex mollitia qui suscipit ullam. Asperiores dolore eaque eius ex excepturi fugiat non ratione repudiandae totam veritatis'%2C%0A 'begin'%3A 1370%0A }%2C {%0A 'title'%3A 'Пустое описание'%2C%0A 'description'%3A ''%2C%0A 'begin'%3A 2000%0A }%2C {%0A 'title'%3A 'Магнитное поле в намагничивающихся средах'%2C%0A 'description'%3A 'Магнитное поле в намагничивающихся средах. Молекулярные токи и токи проводимости. Усреднение магнитного поля по физически малому объему.'%2C%0A 'begin'%3A 3200%0A }]%0A }%2C%0A plugins%3A {%0A 'ga'%3A {}%2C%0A 'miniplayer'%3A {%0A width%3A '1140px'%0A }%2C%0A 'youtube'%3A {}%0A }%2C%0A})%3B&theme=default">Демо Youtube</a>
+						</li>
+						<li role="presentation" class="nav-item">
+							<a class="nav-link active" href="../docs/out/index.html">Readme</a>
+						</li>
+						<li role="presentation" class="nav-item">
+							<a class="nav-link active" href="../docs/out/Player.html">Документация</a>
+						</li>
+						<li role="presentation" class="dropdown" id="changeTheme">
+							<a class="dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+								Выбрать тему
+								<span class="caret"></span>
+							</a>
+							<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+								<li><a href="#default" class="link-set-theme" data-name="default">Лекторий
+									<span class="label label-default">Default</span></a></li>
+								<li><a href="#vps" class="link-set-theme" data-name="vps">video.mipt</a></li>
+								<li><a href="#ussr" class="link-set-theme" data-name="ussr">СССР</a></li>
+								<li><a href="#vps-gray" class="link-set-theme" data-name="vps-gray">Новый video.mipt</a>
+								</li>
+								<li><a href="#opus-green" class="link-set-theme" data-name="opus-green">ОТУС green</a>
+								</li>
+								<li>
+									<a href="#opus-orange" class="link-set-theme" data-name="opus-orange">ОТУС orange</a>
+								</li>
+								<li>
+									<a href="#compressed" class="link-set-theme" data-name="compressed">Compressed</a>
+								</li>
+								<li>
+									<a href="#sms" class="link-set-theme" data-name="sms">SMS</a>
+								</li>
+								<li>
+									<a href="#stuff" class="link-set-theme" data-name="stuff">
+										Stuff
+										<span class="label label-success">New</span>
+									</a>
+								</li>
+								<li>
+									<a href="#2035" class="link-set-theme" data-name="2035">
+										2035
+										<span class="label label-danger">Hot</span>
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
 				</nav>
 			</div>
-
 
 			<div class="row">
 				<div class="col-sm-12 col-md-7">
@@ -122,72 +126,72 @@
 				<div class="col-md-7 col-sm-12">
 					<h3>options =</h3>
 					<div id="editor">new Object({
-	//preset : 'compressed',
-	title : 'Идеальный газ. Первое начало термодинамики',
-	description : '1-я лекция из курса: Физика. Термодинамика. Дополнительные семинары',
-	sectionContainer: "#sections",
-	poster : './poster.jpg',
-	preload : 'metadata',
-	width: '100%',
-	controlsOptions : {
-		common : {
-			align : ['justify', 'right'],
-		}
-	},
-    data : {
-        sections : [
-            {
-                "title" : "Секция с пустым описание",
-                "description": "",
-                "begin" : 0
-            },
-            {
-                "title" : "Секцисоченьдлиннымсловомкотороенаверняканевлезит",
-                "description": "Момент сил, действующий на рамку в однородном магнитном поле. Магнитный момент рамки. Сила, действующая на рамку в неоднородном магнитном поле.",
-                "begin" : 203
-			},
-			{
-				"title": "Cекция с длинным словом в описании",
-				"description": "Граничные условия для магнитногооченьдлинноеслововотвотиононевлезит поля на границе раздела двух сред (с доказательством из теорем Гаусса и о циркуляции для магнитного поля в веществе).",
-				"begin": 760
-			},
-			{
-			"title": "Демонстрации. Рамка в магнитном поле",
-			"description": "Рамка в магнитном поле катушки. Влияние сердечника на величину магнитного поля соленоида.",
-                "begin": 1060
-            },
-            {
-                "title": "Описание в 100 слов",
-                "description": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores eligendi eos repellendus veritatis! Accusamus aperiam, asperiores aspernatur culpa doloribus eum excepturi in inventore ipsa iste iusto molestias mollitia nam necessitatibus odit perspiciatis qui quos ratione recusandae rerum sapiente similique soluta tempora voluptate voluptatem voluptatibus voluptatum. Commodi dolore dolorum ducimus eaque eum eveniet explicabo hic impedit incidunt ipsam iure iusto labore magnam minima molestias, mollitia nam natus neque nobis nostrum nulla odit officiis praesentium quae quaerat quia quos rerum sit vel voluptates. Dicta dolores ex mollitia qui suscipit ullam. Asperiores dolore eaque eius ex excepturi fugiat non ratione repudiandae totam veritatis",
-                "begin": 1370
-            },
-            {
-                "title": "Пустое описание",
-                "description": "",
-                "begin": 2000
-            },
-            {
-                "title": "Магнитное поле в намагничивающихся средах",
-                "description": "Магнитное поле в намагничивающихся средах. Молекулярные токи и токи проводимости. Усреднение магнитного поля по физически малому объему.",
-                "begin": 3200
-            }
-        ]
-    },
-	plugins : {
-		'ga' : {},
-		'next' : {
-			url : '',
-			title : 'Скорость звука. Истечение газов из отверстия. Циклы',
-			description : '2-я лекция из курса: Физика. Термодинамика. Дополнительные семинары',
-			poster : 'http://lectoriy.mipt.ru/img/lecture/Physics-Optics-L01-Kozel-090212.01.jpg',
-			auto : true,
-			time : 3199
-		},
-		'miniplayer' : {
-			width : '1140px'
-		},
-	},
-});
+						//preset : 'compressed',
+						title : 'Идеальный газ. Первое начало термодинамики',
+						description : '1-я лекция из курса: Физика. Термодинамика. Дополнительные семинары',
+						sectionContainer: "#sections",
+						poster : './poster.jpg',
+						preload : 'metadata',
+						width: '100%',
+						controlsOptions : {
+						common : {
+						align : ['justify', 'right'],
+						}
+						},
+						data : {
+						sections : [
+						{
+						"title" : "Секция с пустым описание",
+						"description": "",
+						"begin" : 0
+						},
+						{
+						"title" : "Секцисоченьдлиннымсловомкотороенаверняканевлезит",
+						"description": "Момент сил, действующий на рамку в однородном магнитном поле. Магнитный момент рамки. Сила, действующая на рамку в неоднородном магнитном поле.",
+						"begin" : 203
+						},
+						{
+						"title": "Cекция с длинным словом в описании",
+						"description": "Граничные условия для магнитногооченьдлинноеслововотвотиононевлезит поля на границе раздела двух сред (с доказательством из теорем Гаусса и о циркуляции для магнитного поля в веществе).",
+						"begin": 760
+						},
+						{
+						"title": "Демонстрации. Рамка в магнитном поле",
+						"description": "Рамка в магнитном поле катушки. Влияние сердечника на величину магнитного поля соленоида.",
+						"begin": 1060
+						},
+						{
+						"title": "Описание в 100 слов",
+						"description": "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolores eligendi eos repellendus veritatis! Accusamus aperiam, asperiores aspernatur culpa doloribus eum excepturi in inventore ipsa iste iusto molestias mollitia nam necessitatibus odit perspiciatis qui quos ratione recusandae rerum sapiente similique soluta tempora voluptate voluptatem voluptatibus voluptatum. Commodi dolore dolorum ducimus eaque eum eveniet explicabo hic impedit incidunt ipsam iure iusto labore magnam minima molestias, mollitia nam natus neque nobis nostrum nulla odit officiis praesentium quae quaerat quia quos rerum sit vel voluptates. Dicta dolores ex mollitia qui suscipit ullam. Asperiores dolore eaque eius ex excepturi fugiat non ratione repudiandae totam veritatis",
+						"begin": 1370
+						},
+						{
+						"title": "Пустое описание",
+						"description": "",
+						"begin": 2000
+						},
+						{
+						"title": "Магнитное поле в намагничивающихся средах",
+						"description": "Магнитное поле в намагничивающихся средах. Молекулярные токи и токи проводимости. Усреднение магнитного поля по физически малому объему.",
+						"begin": 3200
+						}
+						]
+						},
+						plugins : {
+						'ga' : {},
+						'next' : {
+						url : '',
+						title : 'Скорость звука. Истечение газов из отверстия. Циклы',
+						description : '2-я лекция из курса: Физика. Термодинамика. Дополнительные семинары',
+						poster : 'http://lectoriy.mipt.ru/img/lecture/Physics-Optics-L01-Kozel-090212.01.jpg',
+						auto : true,
+						time : 3199
+						},
+						'miniplayer' : {
+						width : '1140px'
+						},
+						},
+						});
 					</div>
 				</div>
 				<div class="col-md-7 col-sm-12 clearfix" style="margin-top: 30px">
@@ -199,7 +203,7 @@
 
 			<div class="bigDivider"></div>
 
-	</div>
+		</div>
 		<script src="../node_modules/jquery/dist/jquery.js"></script>
 		<script src="../node_modules/bootstrap/dist/js/bootstrap.min.js" charset="utf-8"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.6.14/beautify.js"></script>
