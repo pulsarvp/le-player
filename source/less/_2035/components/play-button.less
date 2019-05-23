@@ -2,7 +2,7 @@
 {
 	display: none;
 	align-items: center;
-	align-contents: center;
+	align-content: center;
 	justify-content: center;
 	background: rgba(0, 0, 0, 0.5);
 	color: @color-primary;
@@ -14,8 +14,7 @@
 	text-align: center;
 	z-index: @z-index-base + 8;
 	font-size: 50px;
-	&.control--hover,
-	&.control--no-iphone:hover
+	&:hover
 	{
 		background: rgba(0, 0, 0, 0.2);
 
@@ -67,14 +66,18 @@
 
 .leplayer--fullscreen
 {
-	.leplayer-play-button
-	{
+	.leplayer-play-button {
 		z-index: @z-index-fullscreen + 8;
 	}
 
 	.leplayer-play-button
 	{
 		font-size: 50px;
+	}
+
+	.leplayer-play-button__button
+	{
+		padding: 0.6em;
 	}
 }
 

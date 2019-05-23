@@ -8,6 +8,7 @@
 	box-sizing: border-box;
 	position: relative;
 	outline: none;
+	background: #f0f2f7;
 
 	&--hidden
 	{
@@ -44,16 +45,20 @@
 	display: flex;
 	cursor: pointer;
 	padding: 5px 0;
-	background: @color-section;
+	background: fade(@white,20%);
 	color: @color-section-text;
 	width: 100%;
 	&:nth-child(2n)
 	{
-		background: @color-section-2n;
+		background: fade(@white,50%);
 	}
 	&.leplayer-section--active
 	{
-		background: @color-section-active;
+		background: @white;
+		.leplayer-section-time{
+			color: @red;
+		}
+
 
 		.leplayer-section-description
 		{
@@ -62,7 +67,8 @@
 	}
 	&:hover
 	{
-		background: @color-section-hover;
+		background: @white;
+
 	}
 }
 
@@ -139,19 +145,12 @@
 	{
 		display: none;
 		position: absolute;
-		top: 50px;
-		right: 50px;
-		bottom: 132px;
+		top: 0px;
+		right: 0px;
 		z-index: @z-index-fullscreen + 8;
-		height: calc(~"100% - 120px");
-
-		@media screen and (max-width: 500px) {
-			top: 50%;
-			left: 50%;
-			bottom: auto;
-			transform: translate(-50%, -50%);
-		}
-
+		height: calc(~"100% - 40px");
+		width: 360px;
+		background: @color-background-controls;
 	}
 
 	&.leplayer--user-active
@@ -182,6 +181,9 @@
 		&:hover
 		{
 			background: @color-fs-section-active;
+			.leplayer-section-time{
+				color: @red;
+			}
 		}
 		&:nth-child(2n)
 		{
@@ -190,6 +192,9 @@
 			&.leplayer-section--active
 			{
 				background: @color-fs-section-2n-active;
+				.leplayer-section-time{
+					color: @red;
+				}
 			}
 
 			&:hover
@@ -201,17 +206,6 @@
 		{
 			background: @color-fs-section-hover;
 		}
-	}
-
-	&.leplayer--android {
-		.leplayer-section
-		{
-			&.leplayer-section--active
-			{
-				background: @color-text;
-			}
-		}
-
 	}
 
 	.leplayer-section-time
