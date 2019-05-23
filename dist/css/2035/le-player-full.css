@@ -17,7 +17,7 @@
   border-collapse: separate;
   display: -ms-flexbox;
   display: flex;
-  height: 32px;
+  height: 40px;
   position: relative;
   width: 100%;
   outline: none;
@@ -36,48 +36,49 @@
   width: 1px;
   display: block;
 }
-.leplayer-controls:not(:last-child) {
-  margin-bottom: 10px;
-}
 .leplayer-controls.controls-common {
-  margin-top: 10px;
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  z-index: 1009;
 }
 .leplayer-controls.controls-fullscreen {
-  position: relative;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
   width: auto;
   z-index: 1007;
 }
 .leplayer-controls.controls-fullscreen .control {
-  background: #47566b;
-  color: #c4d8ee;
+  background: rgba(20, 31, 51, 0.8);
+  color: rgba(255, 255, 255, 0.8);
 }
 .leplayer-controls.controls-fullscreen .control--tap,
 .leplayer-controls.controls-fullscreen .control.control--no-iphone:hover {
-  background: #333e4c;
-  color: #c4d8ee;
+  background: rgba(20, 31, 51, 0.8);
+  color: #ffffff;
 }
 .leplayer-controls.controls-fullscreen .control.disabled {
   color: #6d7278;
 }
 .leplayer-controls.controls-fullscreen .control.disabled.control--tap,
 .leplayer-controls.controls-fullscreen .control.disabled.control--no-iphone:hover {
-  background: #47566b;
-  color: #6d7278;
+  background: rgba(20, 31, 51, 0.8);
+  color: rgba(255, 255, 255, 0.6);
 }
 .leplayer-controls.controls-fullscreen .control.play {
-  background: #29313d;
-  color: white;
+  background: #da3831;
+  color: #ffffff;
 }
 .leplayer-controls.controls-fullscreen .control.play.control--tap,
 .leplayer-controls.controls-fullscreen .control.play.control--no-iphone:hover {
-  background: #333e4c;
-}
-.leplayer-controls.controls-fullscreen .control.timeline-container.control--tap,
-.leplayer-controls.controls-fullscreen .control.timeline-container.control--no-iphone:hover {
-  background: #47566b;
+  background: #da3831;
+  color: #ffffff;
 }
 .leplayer-controls.controls-fullscreen .control-dropdown__content {
-  background: #47566b;
+  background: #ffffff;
+  color: rgba(20, 31, 51, 0.8);
   z-index: 1008;
 }
 .leplayer-controls.controls-fullscreen .control-checkbox--checked {
@@ -93,39 +94,40 @@
   color: white;
 }
 .leplayer-controls.controls-fullscreen .control-text {
-  background: #47566b;
-  color: #c4d8ee;
+  background: rgba(20, 31, 51, 0.8);
+  color: rgba(255, 255, 255, 0.8);
 }
 .leplayer-controls.controls-fullscreen .control-container__item {
-  color: #c4d8ee;
+  color: rgba(20, 31, 51, 0.8);
 }
 .leplayer-controls.controls-fullscreen .control-container__item:hover {
-  background: rgba(0, 0, 0, 0.15) !important;
-  color: #c4d8ee;
+  background: #da3831;
+  color: #ffffff;
 }
 .leplayer-controls.controls-fullscreen .control-container__item--active {
-  background: #29313d;
-  color: #47566b;
+  background: none;
+  color: #da3831;
 }
 .leplayer-controls.controls-fullscreen .timeline {
   background: #7588a3;
-  margin: 0;
 }
 .leplayer-controls.controls-fullscreen .timeline-container {
-  background: #47566b;
+  background: rgba(20, 31, 51, 0.8);
 }
 .leplayer-controls.controls-fullscreen .timeline-container .control-text {
   height: auto;
   position: relative;
+  background: none;
+}
+.leplayer-controls.controls-fullscreen .timeline-container:hover {
+  background: rgba(20, 31, 51, 0.8);
 }
 .leplayer-controls.controls-fullscreen .time-marker {
-  background: #29313d;
-  border-right: 1px solid rgba(227, 229, 232, 0.7);
+  background: #da3831;
   z-index: 1007;
 }
 .leplayer-controls.controls-fullscreen .time-marker.shadow {
-  background: rgba(157, 164, 175, 0.7);
-  border-right: 1px solid rgba(241, 242, 244, 0.5);
+  background: #da3831;
   z-index: 1006;
 }
 .leplayer-controls.controls-fullscreen .time-marker .time {
@@ -133,31 +135,30 @@
   z-index: 1003;
 }
 .leplayer-controls.controls-fullscreen .time-played {
-  background: rgba(0, 0, 0, 0.25);
+  background: #da3831;
   z-index: 1005;
 }
 .leplayer-controls.controls-fullscreen .time-buffered {
-  background-color: rgba(255, 0, 0, 0.4);
+  background-color: rgba(255, 255, 255, 0.2);
   z-index: 1004;
 }
 .leplayer-controls.controls-fullscreen .volume-active {
-  background: rgba(0, 0, 0, 0.25);
+  background: #da3831;
 }
 .leplayer-controls.controls-fullscreen .volume-slider {
   height: 144px;
 }
 .leplayer-controls.controls-fullscreen .volume-line {
-  background: #7588a3;
+  background: #9fabbd;
 }
 .leplayer-controls.controls-fullscreen .volume-marker {
-  background: #29313d;
-  border-top: 1px solid rgba(227, 229, 232, 0.7);
+  background: #da3831;
 }
 .leplayer-controls .control {
-  background: #dee5ed;
+  background: rgba(20, 31, 51, 0.8);
+  color: rgba(255, 255, 255, 0.8);
   border: none;
   border-radius: 0;
-  color: #1b4b7e;
   cursor: pointer;
   display: -ms-flexbox;
   display: flex;
@@ -166,7 +167,7 @@
   -ms-flex-pack: center;
       justify-content: center;
   font-size: 16px;
-  height: 32px;
+  height: 40px;
   width: auto;
   line-height: 100%;
   padding: 0 8px;
@@ -175,21 +176,22 @@
 }
 .leplayer-controls .control.control--tap,
 .leplayer-controls .control.control--no-iphone:hover {
-  background: #1b4b7e;
-  color: #dee5ed;
+  background: rgba(20, 31, 51, 0.8);
+  color: #ffffff;
 }
 .leplayer-controls .control.play {
-  background: #6a8baf;
-  color: white;
+  background: #da3831;
+  color: #ffffff;
   padding: 0 22px;
 }
 .leplayer-controls .control.play.disabled:hover {
-  background: #6a8baf;
+  background: #da3831;
+  color: #ffffff;
 }
 .leplayer-controls .control.play.control--tap,
 .leplayer-controls .control.play.control--no-iphone:hover {
-  background: #1b4b7e;
-  color: #dee5ed;
+  background: #da3831;
+  color: #ffffff;
 }
 .leplayer-controls .control.disabled {
   cursor: not-allowed;
@@ -216,8 +218,8 @@
   pointer-events: none;
 }
 .leplayer-controls .control-dropdown__content {
-  background: #dee5ed;
-  bottom: 32px;
+  background: #ffffff;
+  bottom: 40px;
   cursor: default;
   display: none;
   left: 0;
@@ -226,11 +228,12 @@
   z-index: 18;
   left: 50%;
   transform: translateX(-50%);
+  border-radius: 4px;
 }
 .leplayer-controls .control-dropdown__content:before {
   content: '';
   position: absolute;
-  width: 32px;
+  width: 40px;
   height: 1px;
   bottom: -1px;
   left: 0;
@@ -249,33 +252,33 @@
 .leplayer-controls .control-container {
   display: -ms-flexbox;
   display: flex;
-  height: 32px;
+  height: 40px;
   position: relative;
 }
 .leplayer-controls .control-container__item {
   display: block;
-  color: #1b4b7e;
+  color: rgba(20, 31, 51, 0.8);
   white-space: nowrap;
   cursor: pointer;
   font-size: 12px;
-  line-height: 32px;
+  line-height: 40px;
   padding: 0 7px;
 }
 .leplayer-controls .control-container__item:hover {
-  background: #1f5793 !important;
-  color: #dee5ed;
+  background: #da3831;
+  color: #ffffff;
 }
 .leplayer-controls .control-container__item--active {
-  background: #6a8baf;
-  color: #dee5ed;
+  background: none;
+  color: #da3831;
 }
 .leplayer-controls .control-icon {
-  line-height: 32px;
+  line-height: 40px;
   padding: 0 8px;
 }
 .leplayer-controls .control-text {
-  background: #dee5ed;
-  color: #1b4b7e;
+  background: rgba(20, 31, 51, 0.8);
+  color: rgba(255, 255, 255, 0.8);
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: center;
@@ -299,26 +302,31 @@
   width: 16px;
 }
 .leplayer-controls .timeline {
-  background: #758ba3;
+  background: rgba(255, 255, 255, 0.2);
   cursor: pointer;
   display: block;
-  height: 12px;
-  margin: 10px 0;
+  height: 4px;
+  margin: 14px 0;
   position: relative;
   width: 100%;
+  border-radius: 2px;
 }
 .leplayer-controls .time-current {
   width: 40px;
+  background: none;
+}
+.leplayer-controls .time-total {
+  background: none;
 }
 .leplayer-controls .timeline-container {
-  background: #dee5ed;
+  background: rgba(20, 31, 51, 0.8);
   position: relative;
   white-space: nowrap;
   width: 100%;
 }
 .leplayer-controls .timeline-container.control--tap,
 .leplayer-controls .timeline-container.control--no-iphone:hover {
-  background: #dee5ed;
+  background: rgba(20, 31, 51, 0.8);
 }
 .leplayer-controls .timeline-subcontainer {
   display: -ms-flexbox;
@@ -326,31 +334,24 @@
   width: 100%;
 }
 .leplayer-controls .time-marker {
-  background: #1b4b7e;
-  border-right: 1px solid rgba(222, 229, 237, 0.5);
+  background: #da3831;
   cursor: pointer;
   height: 16px;
   left: 0;
   margin-left: -2px;
   position: absolute;
-  top: -2px;
-  width: 2px;
+  top: -6px;
+  width: 16px;
+  border-radius: 8px;
   z-index: 17;
-}
-.leplayer-controls .time-marker:before {
-  content: '';
-  width: 4px;
-  height: 100%;
-  position: absolute;
-  left: -1px;
-  background: transparent;
+  display: none;
+  margin-left: -8px;
 }
 .leplayer-controls .time-marker--drag:before {
   background: #1b4b7e;
 }
 .leplayer-controls .time-marker.shadow {
-  background: rgba(27, 75, 126, 0.8);
-  border-right: 1px solid rgba(222, 229, 237, 0.5);
+  background: #da3831;
   transition: none;
   z-index: 16;
 }
@@ -376,13 +377,14 @@
   background: #1b4b7e;
 }
 .leplayer-controls .time-played {
-  background: rgba(27, 75, 126, 0.6);
+  background: #da3831;
   bottom: 0;
   left: 0;
   position: absolute;
   top: 0;
   width: 0;
-  z-index: 15;
+  z-index: 25;
+  border-radius: 2px;
 }
 .leplayer-controls .leplayer-timeline-sections {
   overflow-x: hidden;
@@ -393,7 +395,7 @@
   right: 0;
 }
 .leplayer-controls .leplayer-timeline-section {
-  background: #758ba3;
+  background: none;
   bottom: 0;
   left: 0;
   position: absolute;
@@ -405,7 +407,7 @@
   background: #303f50;
 }
 .leplayer-controls .time-buffered {
-  background-color: rgba(255, 0, 0, 0.4);
+  background-color: rgba(255, 255, 255, 0.2);
   bottom: 0;
   left: 0;
   position: absolute;
@@ -414,7 +416,7 @@
   z-index: 14;
 }
 .leplayer-controls .volume-active {
-  background: rgba(27, 75, 126, 0.6);
+  background: #da3831;
   bottom: 0;
   height: 50%;
   position: absolute;
@@ -424,27 +426,27 @@
   height: 144px;
 }
 .leplayer-controls .volume-line {
-  background: #758ba3;
+  background: #9fabbd;
   bottom: 10px;
+  border-radius: 2px;
   position: absolute;
-  left: 12px;
-  right: 12px;
+  left: 14px;
+  right: 14px;
   top: 10px;
+  cursor: pointer;
 }
 .leplayer-controls .volume-marker {
-  background: #1b4b7e;
-  bottom: 50%;
-  border-top: 1px solid rgba(222, 229, 237, 0.5);
+  background: #da3831;
   cursor: pointer;
-  height: 2px;
-  left: -4px;
-  margin-bottom: -1px;
+  height: 16px;
+  width: 16px;
+  left: -6px;
+  margin-bottom: -10px;
   right: -4px;
   position: absolute;
+  border-radius: 8px;
 }
 .leplayer-control-collection {
-  margin-top: 10px;
-  margin-bottom: 10px;
   outline: none;
 }
 .leplayer-control-collection--one-row {
@@ -454,9 +456,9 @@
 .leplayer-control-collection--fullscreen {
   display: none;
   bottom: 0;
-  left: 20px;
+  left: 0px;
   position: fixed;
-  right: 20px;
+  right: 0px;
   width: auto;
   z-index: 1007;
 }
@@ -704,7 +706,7 @@
 }
 .leplayer--mobile.leplayer--fullscreen .controls-fullscreen:nth-child(2) .control-dropdown__content {
   bottom: auto;
-  top: 32px;
+  top: 40px;
 }
 .leplayer-video {
   background: #000;
@@ -868,6 +870,7 @@
   box-sizing: border-box;
   position: relative;
   outline: none;
+  background: #f0f2f7;
 }
 .leplayer-sections--hidden {
   display: none;
@@ -892,21 +895,24 @@
   display: flex;
   cursor: pointer;
   padding: 5px 0;
-  background: white;
+  background: rgba(255, 255, 255, 0.2);
   color: black;
   width: 100%;
 }
 .leplayer-section:nth-child(2n) {
-  background: #dde5ee;
+  background: rgba(255, 255, 255, 0.5);
 }
 .leplayer-section.leplayer-section--active {
-  background: #94a5b8;
+  background: #ffffff;
+}
+.leplayer-section.leplayer-section--active .leplayer-section-time {
+  color: #da3831;
 }
 .leplayer-section.leplayer-section--active .leplayer-section-description {
   display: block;
 }
 .leplayer-section:hover {
-  background: #758ba3;
+  background: #ffffff;
 }
 .leplayer-section-time {
   color: #555;
@@ -956,11 +962,12 @@
 .leplayer--fullscreen .leplayer-sections {
   display: none;
   position: absolute;
-  top: 50px;
-  right: 50px;
-  bottom: 132px;
+  top: 0px;
+  right: 0px;
   z-index: 1008;
-  height: calc(100% - 120px);
+  height: calc(100% - 40px);
+  width: 360px;
+  background: rgba(20, 31, 51, 0.8);
 }
 @media screen and (max-width: 500px) {
   .leplayer--fullscreen .leplayer-sections {
@@ -987,11 +994,18 @@
 .leplayer--fullscreen .leplayer-section:hover {
   background: #1f252e;
 }
+.leplayer--fullscreen .leplayer-section.leplayer-section--active .leplayer-section-time,
+.leplayer--fullscreen .leplayer-section:hover .leplayer-section-time {
+  color: #da3831;
+}
 .leplayer--fullscreen .leplayer-section:nth-child(2n) {
   background: rgba(51, 62, 76, 0.7);
 }
 .leplayer--fullscreen .leplayer-section:nth-child(2n).leplayer-section--active {
   background: #333e4c;
+}
+.leplayer--fullscreen .leplayer-section:nth-child(2n).leplayer-section--active .leplayer-section-time {
+  color: #da3831;
 }
 .leplayer--fullscreen .leplayer-section:nth-child(2n):hover {
   background: #29313d;
@@ -1047,7 +1061,8 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  background-color: rgba(255, 0, 0, 0.4);
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
   z-index: 15;
 }
 .leplayer-poster {

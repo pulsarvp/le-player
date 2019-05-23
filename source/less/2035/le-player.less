@@ -65,28 +65,36 @@
 
 	&:not(:last-child)
 	{
-		margin-bottom: 10px;
+		//margin-bottom: 10px;
 	}
 
 	&.controls-common
 	{
-		margin-top: 10px;
+		position: absolute;
+		bottom: 0px;
+		width: 100%;
+		z-index: 1009;
+		//margin-top: 10px;
 	}
 
 	&.controls-fullscreen
 	{
-		position: relative;
+		//display: block;
+		position: absolute;
+		bottom: 0px;
+		left: 0px;
+		right: 0px;
 		width: auto;
 		z-index: @z-index-fullscreen + 7;
 		.control
 		{
-			background: @color-fs-control;
-			color: @color-fs-text;
+			background: @color-background-button;
+			color: @color-button;
 			&--tap,
 			&.control--no-iphone:hover
 			{
-				background: @color-fs-control-hovered;
-				color: @color-fs-text-hovered;
+				background: @color-background-button-hover;
+				color: @color-button-hover;
 			}
 			&.disabled
 			{
@@ -94,19 +102,20 @@
 				&.control--tap,
 				&.control--no-iphone:hover
 				{
-					background: @color-fs-background;
-					color: @color-fs-disabled;
+					background: @color-background-button-disabled;
+					color: @color-button-disabled;
 				}
 			}
 			&.play
 			{
-				background: @color-fs-background-play;
-				color:  @color-fs-active;
+				background: @color-background-button-play;
+				color:  @color-button-play;
 
 				&.control--tap,
 				&.control--no-iphone:hover
 				{
-					background: @color-fs-background-play-hovered;
+					background: @color-background-button-play-hover;
+					color:  @color-button-play-hover;
 				}
 			}
 			&.timeline-container
@@ -114,13 +123,14 @@
 				&.control--tap,
 				&.control--no-iphone:hover
 				{
-					background: @color-fs-background;
+					//background: @color-fs-background;
 				}
 			}
 		}
 		.control-dropdown__content
 		{
-			background: @color-fs-dropdown;
+			background: @color-background--dropdown;
+			color:@color--dropdown;
 			z-index: @z-index-fullscreen + 8;
 		}
 
@@ -144,47 +154,50 @@
 		}
 		.control-text
 		{
-			background: @color-fs-background;
-			color: @color-fs-text;
+			background: @color-background-button;
+			color: @color-button;
 		}
 		.control-container__item
 		{
-			color: @color-fs-text;
+			color: @color--dropdown;
 			&:hover
 			{
-				background: @color-fs-inner-item-hover !important;
-				color: @color-fs-text-hovered;
+				background: @color-background--dropdown-active;
+				color: @white;
 			}
 			&--active
 			{
-				background: @color-fs-inner-item-active;
-				color: @color-fs-text-active;
+				background: none;
+				color: @color--dropdown-action;
 			}
 		}
 		.timeline
 		{
 			background: @color-fs-background-line;
-			margin: 0;
+			//margin: 0;
 		}
 		.timeline-container
 		{
-			background: @color-fs-background;
+			background: @color-background-button;
 			.control-text
 			{
 				height: auto;
 				position: relative;
+				background: none;
+			}
+			&:hover
+			{
+				background: @color-background-button;
 			}
 		}
 
 		.time-marker
 		{
-			background: @color-fs-marker;
-			border-right: 1px solid @color-fs-marker-border;
+			background: @red;
 			z-index: @z-index-fullscreen + 7;
 			&.shadow
 			{
-				background: @color-fs-marker-shadow;
-				border-right: 1px solid @color-fs-marker-shadow-border;
+				background: @red;
 				z-index: @z-index-fullscreen + 6;
 			}
 			.time
@@ -195,17 +208,17 @@
 		}
 		.time-played
 		{
-			background: @color-fs-background-line-active;
+			background: @red;
 			z-index: @z-index-fullscreen + 5;
 		}
 		.time-buffered
 		{
-			background-color: @color-fs-background-line-buffered;
+			background-color: fade(@white, 20%);
 			z-index: @z-index-fullscreen + 4;
 		}
 		.volume-active
 		{
-			background: @color-fs-background-line-active;
+			background: @red;
 		}
 		.volume-slider
 		{
@@ -213,21 +226,21 @@
 		}
 		.volume-line
 		{
-			background: @color-fs-background-line;
+			background: #9fabbd; //todo: в переменные!
 		}
 		.volume-marker
 		{
-			background: @color-fs-marker;
-			border-top: 1px solid @color-fs-marker-border;
+			background: @red;
+
 		}
 	}
 
 	.control
 	{
-		background: @color-background;
+		background: @color-background-button;
+		color: @color-button;
 		border: none;
 		border-radius: 0;
-		color: @color-text;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
@@ -242,25 +255,26 @@
 		&.control--tap,
 		&.control--no-iphone:hover
 		{
-			background: @color-control-hovered;
-			color: @color-text-hovered;
+			background: @color-background-button-hover;
+			color: @color-button-hover;
 		}
 
 
 		&.play
 		{
-			background: @color-background-play;
-			color: @color-active;
+			background: @color-background-button-play;
+			color: @color-button-play;
 			padding: 0 (@control-play-width - @control-font-size) / 2;
 			&.disabled:hover
 			{
-				background: @color-background-play;
+				background: @color-background-button-play-hover;
+				color: @color-button-play;
 			}
 			&.control--tap,
 			&.control--no-iphone:hover
 			{
-				background: @color-background-play-hovered;
-				color: @color-background;
+				background: @color-background-button-play-hover;
+				color: @color-button-play;
 			}
 		}
 
@@ -298,7 +312,7 @@
 		{
 			display: none;
 			position: absolute;
-			background: @color-background;
+			background: @color-background--dropdown;
 			bottom: @control-height;
 			cursor: default;
 			display: none;
@@ -308,6 +322,7 @@
 			z-index: @z-index-base + 8;
 			left: 50%;
 			transform: translateX(-50%);
+			border-radius: 4px;
 			&:before
 			{
 				content: '';
@@ -350,7 +365,7 @@
 		&__item
 		{
 			display: block;
-			color: @color-text;
+			color: @color--dropdown;
 			white-space: nowrap;
 			cursor: pointer;
 			font-size: @control-text-font-size;
@@ -358,14 +373,14 @@
 			padding: 0 7px;
 			&:hover
 			{
-				// TODO: Rename this variable and remove important
-				background: @color-inner-item-hover !important;
-				color: @color-text-hovered;
+
+				background: @color-background--dropdown-active;
+				color: @white;
 			}
 			&--active
 			{
-				background: @color-inner-item-active;
-				color: @color-text-active;
+				background: none;
+				color: @color--dropdown-action;
 			}
 		}
 	}
@@ -378,8 +393,8 @@
 
 	.control-text
 	{
-		background: @color-background;
-		color: @color-text;
+		background: @color-background-button;
+		color: @color-button;
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -411,23 +426,29 @@
 
 	.timeline
 	{
-		background: @color-background-line;
+		background: fade(@white, 20%);
 		cursor: pointer;
 		display: block;
-		height: 12px;
+		height: 4px;
 		margin: (@control-height - 12px) / 2 0;
 		position: relative;
 		width: 100%;
+		border-radius: 2px;
 	}
 
 	.time-current
 	{
 		width: 40px;
+		background: none;
+	}
+	.time-total
+	{
+		background: none;
 	}
 
 	.timeline-container
 	{
-		background: @color-background;
+		background: @color-background-button;
 		position: relative;
 		white-space: nowrap;
 		width: 100%;
@@ -435,7 +456,7 @@
 		&.control--tap,
 		&.control--no-iphone:hover
 		{
-			background: @color-background;
+			background: @color-background-button;
 		}
 	}
 
@@ -447,25 +468,28 @@
 
 	.time-marker
 	{
-		background: @color-marker;
-		border-right: 1px solid @color-marker-border;
+		background: @red;
+		//border-right: 1px solid @color-marker-border;
 		cursor: pointer;
 		height: 16px;
 		left: 0;
 		margin-left: -2px;
 		position: absolute;
-		top: -2px;
+		top: -6px;
 		//transition: left @timeline-transition;
-		width: 2px;
+		width: 16px;
+		border-radius: 8px;
 		z-index: @z-index-base + 7;
+		display: none;
+		margin-left: -8px;
 		&:before
 		{
-			content: '';
-			width: 4px;
-			height: 100%;
-			position: absolute;
-			left: -1px;
-			background: transparent;
+			//content: '';
+			//width: 4px;
+			//height: 100%;
+			//position: absolute;
+			//left: -1px;
+			//background: transparent;
 		}
 		&--drag:before
 		{
@@ -473,8 +497,8 @@
 		}
 		&.shadow
 		{
-			background: @color-marker-shadow;
-			border-right: 1px solid @color-marker-shadow-border;
+			background: @red;
+			//border-right: 1px solid @color-marker-shadow-border;
 			transition: none;
 			z-index: @z-index-base + 6;
 			&:before
@@ -521,14 +545,15 @@
 
 	.time-played
 	{
-		background: @color-background-line-active;
+		background: @red;
 		bottom: 0;
 		left: 0;
 		position: absolute;
 		top: 0;
 		//transition: width @timeline-transition;
 		width: 0;
-		z-index: @z-index-base + 5;
+		z-index: @z-index-base + 15;
+		border-radius: 2px;
 	}
 
 	.leplayer-timeline-sections
@@ -543,7 +568,7 @@
 
 	.leplayer-timeline-section
 	{
-		background: @color-timeline-section-odd;
+		background: none; //todo: поправить
 		bottom: 0;
 		left: 0;
 		position: absolute;
@@ -560,7 +585,7 @@
 
 	.time-buffered
 	{
-		background-color: @color-background-line-buffered;
+		background-color: fade(@white, 20%);
 		bottom: 0;
 		left: 0;
 		position: absolute;
@@ -571,7 +596,7 @@
 
 	.volume-active
 	{
-		background: @color-background-line-active;
+		background: @red;
 		bottom: 0;
 		height: 50%;
 		position: absolute;
@@ -585,25 +610,32 @@
 
 	.volume-line
 	{
-		background: @color-background-line;
+		background: #9fabbd; //todo: в переменные!
 		bottom: 10px;
+		border-radius: 2px;
 		position: absolute;
-		left: 12px;
-		right: 12px;
+		left: 14px;
+		right: 14px;
 		top: 10px;
+		cursor: pointer;
+
 	}
 
 	.volume-marker
 	{
-		background: @color-marker;
-		bottom: 50%;
-		border-top: 1px solid @color-marker-border;
+		background: @red;
+		//bottom: 50%;
 		cursor: pointer;
-		height: 2px;
-		left: -4px;
-		margin-bottom: -1px;
+		height: 16px;
+		width: 16px;
+		left: -6px;
+		margin-bottom: -10px;
 		right: -4px;
 		position: absolute;
+		border-radius: 8px;
+
+
+
 	}
 
 }
@@ -611,8 +643,8 @@
 
 .leplayer-control-collection
 {
-	margin-top: 10px;
-	margin-bottom: 10px;
+	//margin-top: 10px;
+	//margin-bottom: 10px;
 	outline: none;
 
 	&--one-row
@@ -625,9 +657,9 @@
 {
 	display: none;
 	bottom: 0;
-	left: 20px;
+	left: 0px;
 	position: fixed;
-	right: 20px;
+	right: 0px;
 	width: auto;
 	z-index: @z-index-fullscreen + 7;
 }

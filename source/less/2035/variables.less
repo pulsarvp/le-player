@@ -1,4 +1,42 @@
 // COLOURS COMMON
+@color-base: #141f33;
+@red: #da3831;
+@white: #ffffff;
+
+@color-background-controls: fade(@color-base, 80%);
+@color-background-button: @color-background-controls;
+@color-button: fade(@white, 80%);
+@color-background-button-hover: @color-background-controls;
+@color-button-hover: @white;
+@color-background-button-disabled: @color-background-controls;
+@color-button-disabled: fade(@white, 60%);
+
+
+@color-background-button-play: @red;
+@color-button-play: @white;
+@color-background-button-play-hover: @red;
+@color-button-play-hover: @white;
+
+@color-background--dropdown: @white;
+@color--dropdown-header: @color-base;
+@color--dropdown:fade(@color-base, 80%);
+@color-background--dropdown-active: @red;
+@color--dropdown-action: @red;
+
+
+//play
+//volume
+//timeline
+//rate
+//keybinding-info,
+//backward
+//source
+//subtitle
+//divider
+//download
+//section
+//fullscreen
+
 
 // rgb(26, 74, 126)
 @color-primary: hsl(211, 65%, 30%);
@@ -13,7 +51,8 @@
 // hsl(211,22%,56%)
 // rgb(118, 142, 167)
 @color-background-line: desaturate(lighten(@color-primary, 25%), 45%);
-@color-background-line-active: fade(@color-primary, 60%);;
+@color-background-line-active: fade(@color-primary, 60%);
+;
 @color-background-line-buffered: fade(red, 40%);
 
 // play
@@ -156,14 +195,14 @@
 // SIZES
 @control-font-size: 16px;
 @control-text-font-size: 12px;
-@control-height: 32px;
+@control-height: 40px;
 @control-width: 32px;
 @control-play-width: 60px;
 @divider-width: 10px;
 @miniplayer-height: 127px;
 
 // FONTS
-@font-main: "PT Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+@font-main: "PT Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
 @divider-width: 10px;
 @timeline-transition: 0s 0.1s ease-in-out;
