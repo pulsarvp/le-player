@@ -421,6 +421,7 @@
   height: 50%;
   position: absolute;
   width: 100%;
+  border-radius: 2px;
 }
 .leplayer-controls .volume-slider {
   height: 144px;
@@ -432,7 +433,7 @@
   position: absolute;
   left: 14px;
   right: 14px;
-  top: 10px;
+  top: 14px;
   cursor: pointer;
 }
 .leplayer-controls .volume-marker {
@@ -441,7 +442,7 @@
   height: 16px;
   width: 16px;
   left: -6px;
-  margin-bottom: -10px;
+  margin-bottom: -6px;
   right: -4px;
   position: absolute;
   border-radius: 8px;
@@ -583,6 +584,9 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.leplayer--mini .control-dropdown__content.volume-slider {
+  top: 41px;
 }
 .leplayer__title {
   color: black;
