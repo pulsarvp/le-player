@@ -3,12 +3,10 @@
 
 .leplayer
 {
-	position: relative;
 	display: block;
 	outline: 0;
 	position: relative;
 	background-color: transparent;
-
 
 	&.leplayer--fullscreen
 	{
@@ -47,6 +45,7 @@
 	{
 		width: 1%;
 		margin-left: auto;
+		display: none;
 	}
 
 	&--justify
@@ -56,54 +55,56 @@
 
 	&:not(:last-child)
 	{
-		margin-bottom: 0px;
+		//margin-bottom: 10px;
 	}
 
 	&.controls-common
 	{
-		margin-top: 0px;
+		//margin-top: 10px;
 	}
 
 	&.controls-fullscreen
 	{
-		bottom: 20px;
 		display: block;
-		left: 20px;
 		position: absolute;
-		right: 20px;
+		bottom: 0px;
+		left: 0px;
+		right: 0px;
 		width: auto;
 		z-index: @z-index-fullscreen + 7;
 		.control
 		{
-			background: @color-fs-control;
-			color: @color-fs-text;
+			background: @color-background-button;
+			color: @color-button;
 			&:hover
 			{
-				background: none;
-				color: @color-fs-text-hovered;
+				background: @color-background-button-hover;
+				color: @color-button-hover;
 			}
 			&.disabled
 			{
 				color: @color-fs-disabled;
 				&:hover
 				{
-					background: @color-fs-background;
-					color: @color-fs-disabled;
+					background: @color-background-button-disabled;
+					color: @color-button-disabled;
 				}
 			}
 			&.play
 			{
-				background: @color-fs-background-play;
-				color:  @color-fs-active;
+				background: @color-background-button-play;
+				color:  @color-button-play;
 				&:hover
 				{
-					background: @color-fs-background-play-hovered;
+					background: @color-background-button-play-hover;
+					color:  @color-button-play-hover;
 				}
 			}
 		}
 		.control-dropdown__content
 		{
-			background: #ffffff;
+			background: @color-background--dropdown;
+			color:@color--dropdown;
 			z-index: @z-index-fullscreen + 8;
 		}
 
@@ -112,7 +113,7 @@
 			background: @color-fs-control-checked;
 			color: @color-fs-text-hovered;
 			&:hover {
-				background: none;
+				background: darken(@color-fs-control-checked, 5%);
 			}
 		}
 
@@ -126,31 +127,31 @@
 		}
 		.control-text
 		{
-			background: @color-fs-background;
-			color: @color-fs-text;
+			background: @color-background-button;
+			color: @color-button;
 		}
 		.control-container__item
 		{
-			color: @color-fs-text;
+			color: @color--dropdown;
 			&:hover
 			{
-				background: @color-fs-inner-item-hover !important;
-				color: @color-fs-text-hovered;
+				background: @color-background--dropdown-active;
+				color: @white;
 			}
 			&--active
 			{
-				background: @color-fs-inner-item-active;
-				color: @color-fs-text-active;
+				background: none;
+				color: @color--dropdown-action;
 			}
 		}
 		.timeline
 		{
 			background: @color-fs-background-line;
-			margin: 0;
+
 		}
 		.timeline-container
 		{
-			background: @color-fs-background;
+			background: @color-background-button;
 			.control-text
 			{
 				height: auto;
@@ -158,40 +159,37 @@
 			}
 			&:hover
 			{
-				background: @color-fs-background;
+				background: @color-background-button;
 			}
 		}
 		.time-marker
 		{
-			background: @color-fs-marker;
-			border-right: 1px solid @color-fs-marker-border;
+			background: @red;
 			z-index: @z-index-fullscreen + 7;
 			&.shadow
 			{
-				background: @color-fs-marker-shadow;
-				border-right: 1px solid @color-fs-marker-shadow-border;
+				background: @red;
 				z-index: @z-index-fullscreen + 6;
 			}
 			.time
 			{
 				background: @color-fs-marker-shadow-time;
 				z-index: @z-index-fullscreen + 3;
-				color: rgb(20, 31, 51)
 			}
 		}
 		.time-played
 		{
-			background: @color-fs-background-line-active;
+			background: @red;
 			z-index: @z-index-fullscreen + 5;
 		}
 		.time-buffered
 		{
-			background-color: @color-fs-background-line-buffered;
+			background-color: fade(@white, 20%);
 			z-index: @z-index-fullscreen + 4;
 		}
 		.volume-active
 		{
-			background: @color-fs-background-line-active;
+			background: @red;
 		}
 		.volume-slider
 		{
@@ -199,19 +197,19 @@
 		}
 		.volume-line
 		{
-			background: @color-fs-background-line;
+			background: #9fabbd; //todo: в переменные!
 		}
 		.volume-marker
 		{
-			background: @color-fs-marker;
-			border-top: 1px solid @color-fs-marker-border;
+			background: @red;
+
 		}
 	}
 
 	.control
 	{
-		background: @color-background;
-		color: @color-text;
+		background: @color-background-button;
+		color: @color-button;
 		cursor: pointer;
 		display: table-cell;
 		font-size: @control-font-size;
@@ -221,27 +219,29 @@
 		text-align: center;
 		vertical-align: middle;
 		width: 1%;
+		border-radius: 0px !important;
 		&:hover
 		{
-			background: none;
-			color: @color-text-hovered;
+			background: @color-background-button-hover;
+			color: @color-button-hover;
 		}
 
 
 		&.play
 		{
-			background: @color-fs-background-play;
-			color: @color-active;
+			background: @color-background-button-play;
+			color: @color-button-play;
 			padding: 0 (@control-play-width - @control-font-size) / 2;
 			width: 1%;
 			&.disabled:hover
 			{
-				background: @color-fs-background-play;
+				background: @color-background-button-play-hover;
+				color: @color-button-play;
 			}
 			&:hover
 			{
-				background: @color-fs-background-play;
-				color: @color-background;
+				background: @color-background-button-play-hover;
+				color: @color-button-play;
 			}
 		}
 
@@ -278,8 +278,8 @@
 		{
 			display: none;
 			position: absolute;
-			background: #ffffff;
-			bottom: @control-height+4px;
+			background: @color-background--dropdown;
+			bottom: @control-height;
 			cursor: default;
 			display: none;
 			left: 0;
@@ -289,6 +289,7 @@
 			left: 50%;
 			transform: translateX(-50%);
 			border-radius: 8px;
+			overflow: hidden;
 			&:before
 			{
 				content: '';
@@ -332,7 +333,7 @@
 		&__item
 		{
 			display: block;
-			color: @color-text;
+			color: @color--dropdown;
 			white-space: nowrap;
 			cursor: pointer;
 			font-size: @control-text-font-size;
@@ -340,14 +341,14 @@
 			padding: 0 7px;
 			&:hover
 			{
-				// TODO: Rename this variable and remove important
-				background: @color-inner-item-hover !important;
-				color: @color-text-hovered;
+
+				background: @color-background--dropdown-active;
+				color: @white;
 			}
 			&--active
 			{
-				background: @color-inner-item-active;
-				color: @color-text-active;
+				background: none;
+				color: @color--dropdown-action;
 			}
 		}
 	}
@@ -360,8 +361,8 @@
 
 	.control-text
 	{
-		background: @color-background;
-		color: @color-text;
+		background: @color-background-button;
+		color: @color-button;
 		display: table-cell;
 		font-size: @control-text-font-size;
 		box-sizing: content-box;
@@ -392,19 +393,19 @@
 
 	.timeline
 	{
-		background: rgba(255, 255, 255, 0.2); //todo: перенести в переменные
+		background: fade(@white, 20%);
 		cursor: pointer;
 		display: block;
 		height: 4px;
 		margin: (@control-height - 12px) / 2 0;
 		position: relative;
 		width: 100%;
-
+		border-radius: 2px;
 	}
 
 	.timeline-container
 	{
-		background: @color-background;
+		background: @color-background-button;
 		display: table-cell;
 		position: relative;
 		white-space: nowrap;
@@ -412,7 +413,7 @@
 
 		&:hover
 		{
-			background: @color-background;
+			background: @color-background-button;
 		}
 	}
 
@@ -425,47 +426,55 @@
 	.time-current, .time-total
 	{
 		width: 1%;
+		background: none !important;
 	}
 
 	.time-marker
 	{
-		background: none; //todo: перенести в переменные
+		background: @red;
+		//border-right: 1px solid @color-marker-border;
 		cursor: pointer;
-		height: 4px;
-		width: 4px;
-		border-radius: 2px;
-
-		margin-left: -4px;
-		position: absolute;
+		height: 16px;
 		left: 0;
-		top: 0px;
-
+		position: absolute;
+		top: -6px;
 		//transition: left @timeline-transition;
-
+		width: 16px;
+		border-radius: 8px;
 		z-index: @z-index-base + 7;
-
-		&:hover{
-			height: 8px;
-			width: 8px;
-			margin-left: -4px;
-			top: -2px;
-			border-radius: 4px;
-
-
+		display: none;
+		margin-left: -8px;
+		&:before
+		{
+			//content: '';
+			//width: 4px;
+			//height: 100%;
+			//position: absolute;
+			//left: -1px;
+			//background: transparent;
 		}
-
+		&--drag:before,
+		&:hover:before
+		{
+			background: @color-marker;
+		}
 		&.shadow
 		{
-			background: #da3831; //todo: перенести в переменные
+			background: @red;
+			//border-right: 1px solid @color-marker-shadow-border;
 			transition: none;
 			z-index: @z-index-base + 6;
+			&:before
+			{
+				content: none;
+			}
 		}
 		.time
 		{
 			background: @color-marker-shadow-time;
 			border-radius: 1px;
 			bottom: 20px;
-			color: rgba(20, 31, 51, 0.8);
+			color: @color-active;
 			font-size: @control-text-font-size;
 			line-height: @control-text-font-size + 6px;
 			margin-left: -18px;
@@ -477,14 +486,14 @@
 
 	.time-played
 	{
-		background: #da3831; //todo: перенести в переменные
+		background: @red;
 		bottom: 0;
 		left: 0;
 		position: absolute;
 		top: 0;
 		//transition: width @timeline-transition;
 		width: 0;
-		z-index: @z-index-base + 5;
+		z-index: @z-index-base + 15;
 		border-radius: 2px;
 	}
 
@@ -496,12 +505,11 @@
 		bottom: 0;
 		left: 0;
 		right: 0;
-		border-radius: 2px;
 	}
 
 	.leplayer-timeline-section
 	{
-		background: rgba(255, 255, 255, 0.1); //todo: перенести в переменные
+		background: none; //todo: поправить
 		bottom: 0;
 		left: 0;
 		position: absolute;
@@ -513,28 +521,28 @@
 
 	.leplayer-timeline-section:nth-child(2n)
 	{
-		background: rgba(255, 255, 255, 0.2);
+		background: @color-timeline-section-even;
 	}
 
 	.time-buffered
 	{
-		background-color: @color-background-line-buffered;
+		background-color: fade(@white, 20%);
 		bottom: 0;
 		left: 0;
 		position: absolute;
 		top: 0;
 		width: 0;
 		z-index: @z-index-base + 4;
-		border-radius: 2px;
 	}
 
 	.volume-active
 	{
-		background: @color-background-line-active;
+		background: @red;
 		bottom: 0;
 		height: 50%;
 		position: absolute;
 		width: 100%;
+		border-radius: 2px;
 	}
 
 	.volume-slider
@@ -544,25 +552,32 @@
 
 	.volume-line
 	{
-		background: @color-background-line;
+		background: #9fabbd; //todo: в переменные!
 		bottom: 10px;
+		border-radius: 2px;
 		position: absolute;
-		left: 12px;
-		right: 12px;
+		left: 14px;
+		right: 14px;
 		top: 10px;
+		cursor: pointer;
+
 	}
 
 	.volume-marker
 	{
-		background: @color-marker;
-		bottom: 50%;
-		border-top: 1px solid @color-marker-border;
+		background: @red;
+		//bottom: 50%;
 		cursor: pointer;
-		height: 2px;
-		left: -4px;
-		margin-bottom: -1px;
+		height: 16px;
+		width: 16px;
+		left: -6px;
+		margin-bottom: -10px;
 		right: -4px;
 		position: absolute;
+		border-radius: 8px;
+
+
+
 	}
 
 }
@@ -570,15 +585,18 @@
 
 .leplayer-control-collection
 {
-	margin-top: 0px;
-	margin-bottom: 0px;
+	//margin-top: 10px;
+	//margin-bottom: 10px;
 	outline: none;
 	display: flex;
-	background: rgba(20, 31, 51, 0.8);
-	position: absolute;
-	width: 100%;
-	bottom: 0;
-	z-index: 100;
+
+	&.leplayer-control-collection--common{
+		position: absolute;
+		bottom: 0px;
+		z-index: 999;
+		width: 100%;
+	}
+
 
 	&--one-row
 	{

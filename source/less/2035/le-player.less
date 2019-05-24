@@ -22,13 +22,21 @@
 
 }
 
+// .leplayer--iphone {
+// 	.control:hover,
+// 	.control:focus {
+// 		background: #dee5ed;
+// 		color: #1b4b7e;
+// 	}
+// }
+
 
 // CONTROLS
 
 .leplayer-controls
 {
 	border-collapse: separate;
-	display: table;
+	display: flex;
 	height: @control-height;
 	position: relative;
 	width: 100%;
@@ -37,20 +45,22 @@
 
 	&--left
 	{
-		width: 1%;
 		margin-right: auto;
 	}
 
 	&--right
 	{
-		width: 1%;
 		margin-left: auto;
-		display: none;
 	}
 
 	&--justify
 	{
 		width: auto;
+		&::after {
+			content: '';
+			width: 1px;
+			display: block;
+		}
 	}
 
 	&:not(:last-child)
@@ -60,12 +70,16 @@
 
 	&.controls-common
 	{
+		position: absolute;
+		bottom: 0px;
+		width: 100%;
+		z-index: 1009;
 		//margin-top: 10px;
 	}
 
 	&.controls-fullscreen
 	{
-		display: block;
+		//display: block;
 		position: absolute;
 		bottom: 0px;
 		left: 0px;
@@ -76,7 +90,8 @@
 		{
 			background: @color-background-button;
 			color: @color-button;
-			&:hover
+			&--tap,
+			&.control--no-iphone:hover
 			{
 				background: @color-background-button-hover;
 				color: @color-button-hover;
@@ -84,7 +99,8 @@
 			&.disabled
 			{
 				color: @color-fs-disabled;
-				&:hover
+				&.control--tap,
+				&.control--no-iphone:hover
 				{
 					background: @color-background-button-disabled;
 					color: @color-button-disabled;
@@ -94,10 +110,20 @@
 			{
 				background: @color-background-button-play;
 				color:  @color-button-play;
-				&:hover
+
+				&.control--tap,
+				&.control--no-iphone:hover
 				{
 					background: @color-background-button-play-hover;
 					color:  @color-button-play-hover;
+				}
+			}
+			&.timeline-container
+			{
+				&.control--tap,
+				&.control--no-iphone:hover
+				{
+					//background: @color-fs-background;
 				}
 			}
 		}
@@ -112,7 +138,8 @@
 		{
 			background: @color-fs-control-checked;
 			color: @color-fs-text-hovered;
-			&:hover {
+			&.control--tap,
+			&.control--no-iphone:hover {
 				background: darken(@color-fs-control-checked, 5%);
 			}
 		}
@@ -135,7 +162,6 @@
 			color: @color--dropdown;
 			&:hover
 			{
-
 				background: @color-background--dropdown-active;
 				color: @white;
 			}
@@ -148,7 +174,7 @@
 		.timeline
 		{
 			background: @color-fs-background-line;
-
+			//margin: 0;
 		}
 		.timeline-container
 		{
@@ -157,16 +183,17 @@
 			{
 				height: auto;
 				position: relative;
+				background: none;
 			}
 			&:hover
 			{
 				background: @color-background-button;
 			}
 		}
+
 		.time-marker
 		{
 			background: @red;
-
 			z-index: @z-index-fullscreen + 7;
 			&.shadow
 			{
@@ -212,17 +239,21 @@
 	{
 		background: @color-background-button;
 		color: @color-button;
+		border: none;
+		border-radius: 0;
 		cursor: pointer;
-		display: table-cell;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		font-size: @control-font-size;
 		height: @control-height;
+		width: auto;
 		line-height: 100%;
 		padding: 0 (@control-width - @control-font-size) / 2;
 		text-align: center;
 		vertical-align: middle;
-		width: 1%;
-		border-radius: 0px !important;
-		&:hover
+		&.control--tap,
+		&.control--no-iphone:hover
 		{
 			background: @color-background-button-hover;
 			color: @color-button-hover;
@@ -234,13 +265,13 @@
 			background: @color-background-button-play;
 			color: @color-button-play;
 			padding: 0 (@control-play-width - @control-font-size) / 2;
-			width: 1%;
 			&.disabled:hover
 			{
 				background: @color-background-button-play-hover;
 				color: @color-button-play;
 			}
-			&:hover
+			&.control--tap,
+			&.control--no-iphone:hover
 			{
 				background: @color-background-button-play-hover;
 				color: @color-button-play;
@@ -251,11 +282,11 @@
 		{
 			cursor: not-allowed;
 			color: @color-disabled;
-			&:hover
-			{
-				background: @color-background;
-				color: @color-disabled;
-			}
+			pointer-events: none;
+		}
+
+		@media screen and (max-width: 420px) {
+			padding: 0 5px;
 		}
 	}
 
@@ -263,7 +294,8 @@
 	{
 		background: @color-control-checked;
 		color: @color-text-checked;
-		&:hover {
+		&.control--tap,
+		&.control--no-iphone:hover {
 			background: darken(@color-control-checked, 5%);
 		}
 	}
@@ -290,8 +322,7 @@
 			z-index: @z-index-base + 8;
 			left: 50%;
 			transform: translateX(-50%);
-			border-radius: 8px;
-			overflow: hidden;
+			border-radius: 4px;
 			&:before
 			{
 				content: '';
@@ -327,10 +358,9 @@
 
 	.control-container
 	{
-		display: table-cell;
+		display: flex;
 		height: @control-height;
 		position: relative;
-		width: 1%;
 
 		&__item
 		{
@@ -365,19 +395,20 @@
 	{
 		background: @color-background-button;
 		color: @color-button;
-		display: table-cell;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 		font-size: @control-text-font-size;
 		box-sizing: content-box;
 		line-height: 100%;
 		padding: 0 5px;
 		text-align: center;
-		vertical-align: middle;
 	}
 
 	.divider
 	{
 		background: none;
-		display: table-cell;
+		display: block;
 		padding: 0 @divider-width / 2;
 		width: 0.01%;
 	}
@@ -405,15 +436,25 @@
 		border-radius: 2px;
 	}
 
+	.time-current
+	{
+		width: 40px;
+		background: none;
+	}
+	.time-total
+	{
+		background: none;
+	}
+
 	.timeline-container
 	{
 		background: @color-background-button;
-		display: table-cell;
 		position: relative;
 		white-space: nowrap;
 		width: 100%;
 
-		&:hover
+		&.control--tap,
+		&.control--no-iphone:hover
 		{
 			background: @color-background-button;
 		}
@@ -421,14 +462,8 @@
 
 	.timeline-subcontainer
 	{
-		display: table;
+		display: flex;
 		width: 100%;
-	}
-
-	.time-current, .time-total
-	{
-		width: 1%;
-		background: none !important;
 	}
 
 	.time-marker
@@ -438,6 +473,7 @@
 		cursor: pointer;
 		height: 16px;
 		left: 0;
+		margin-left: -2px;
 		position: absolute;
 		top: -6px;
 		//transition: left @timeline-transition;
@@ -455,8 +491,7 @@
 			//left: -1px;
 			//background: transparent;
 		}
-		&--drag:before,
-		&:hover:before
+		&--drag:before
 		{
 			background: @color-marker;
 		}
@@ -483,6 +518,28 @@
 			padding: 0 5px;
 			position: absolute;
 			z-index: @z-index-base + 3;
+		}
+	}
+
+	.timline-container.control--no-iphone
+	{
+		.time-marker {
+
+			&:hover:before
+			{
+				background: @color-marker;
+			}
+		}
+	}
+
+	.timline-container.control--tap
+	{
+		.time-marker {
+
+			&:before
+			{
+				background: @color-marker;
+			}
 		}
 	}
 
@@ -560,7 +617,7 @@
 		position: absolute;
 		left: 14px;
 		right: 14px;
-		top: 10px;
+		top: 14px;
 		cursor: pointer;
 
 	}
@@ -573,7 +630,7 @@
 		height: 16px;
 		width: 16px;
 		left: -6px;
-		margin-bottom: -10px;
+		margin-bottom: -6px;
 		right: -4px;
 		position: absolute;
 		border-radius: 8px;
@@ -590,15 +647,6 @@
 	//margin-top: 10px;
 	//margin-bottom: 10px;
 	outline: none;
-	display: flex;
-
-	&.leplayer-control-collection--common{
-		position: absolute;
-		bottom: 0px;
-		z-index: 999;
-		width: 100%;
-	}
-
 
 	&--one-row
 	{
@@ -609,6 +657,12 @@
 .leplayer-control-collection--fullscreen
 {
 	display: none;
+	bottom: 0;
+	left: 0px;
+	position: fixed;
+	right: 0px;
+	width: auto;
+	z-index: @z-index-fullscreen + 7;
 }
 
 .leplayer--fullscreen
@@ -751,14 +805,19 @@
 		height: 100%;
 		// Width of controls in miniplayer
 		min-width: 300px;
+		position: relative;
+		flex:1 1 500px;
 	}
 
 	.leplayer__last
 	{
 		display: block;
-		right: 20px;
+		right: 8px;
+		width: 121px;
+		font-size: 0.9em;
+		line-height: 1.1em;
 
-		@media screen and (max-width: 750px) {
+		@media screen and (max-width: 1000px) {
 			display: none;
 		}
 
@@ -780,6 +839,10 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+	//
+	.control-dropdown__content.volume-slider {
+		top: 41px
 	}
 }
 
@@ -824,8 +887,7 @@
 	display: none;
 
 	.control-time {
-		display: table-cell;
-		vertical-align: middle;
+		display: block;
 		padding: 6px 10px;
 		font-weight: 500;
 		width: 150px;
@@ -842,12 +904,14 @@
 			font-size: 15px;
 			text-align: right;
 			color: black;
+			display: inline;
 		}
 
 		&__total {
 			background: none;
 			cursor: default;
 			color: black;
+			display: inline;
 
 			&:before {
 				content : '/';
@@ -869,9 +933,13 @@
 
 .leplayer--mini
 {
-	.leplayer-control-collection--mini
-	{
+
+	.leplayer-control-collection--mini {
 		display: block;
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
 	}
 }
 
@@ -915,6 +983,46 @@
 	{
 		display: none
 	}
+}
+
+
+// Mobile styles
+
+.leplayer--iphone {
+	.leplayer-controls {
+		.timeline-container {
+			width: auto;
+		}
+		.timeline {
+			display: none;
+		}
+	}
+}
+
+.leplayer--mobile.leplayer--fullscreen {
+	.leplayer-control-collection--fullscreen {
+		position: static;
+	}
+
+	.controls-fullscreen {
+		position: absolute;
+		z-index: 1007;
+		&:nth-child(1) {
+			bottom: 0;
+			margin-bottom: 0;
+			width: 100%;
+		}
+		&:nth-child(2) {
+			top: 0px;
+			left: 0px;
+
+			.control-dropdown__content {
+				bottom : auto;
+				top: @control-height;
+			}
+		}
+	}
+
 }
 
 

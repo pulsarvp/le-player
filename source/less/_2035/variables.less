@@ -1,26 +1,65 @@
 // COLOURS COMMON
+@color-base: #141f33;
+@red: #da3831;
+@white: #ffffff;
+
+@color-background-controls: fade(@color-base, 80%);
+@color-background-button: @color-background-controls;
+@color-button: fade(@white, 80%);
+@color-background-button-hover: @color-background-controls;
+@color-button-hover: @white;
+@color-background-button-disabled: @color-background-controls;
+@color-button-disabled: fade(@white, 60%);
+
+
+@color-background-button-play: @red;
+@color-button-play: @white;
+@color-background-button-play-hover: @red;
+@color-button-play-hover: @white;
+
+@color-background--dropdown: @white;
+@color--dropdown-header: @color-base;
+@color--dropdown:fade(@color-base, 80%);
+@color-background--dropdown-active: @red;
+@color--dropdown-action: @red;
+
+
+//play
+//volume
+//timeline
+//rate
+//keybinding-info,
+//backward
+//source
+//subtitle
+//divider
+//download
+//section
+//fullscreen
+
 
 // rgb(26, 74, 126)
-@color-primary: #ffffff;
+@color-primary: hsl(211, 65%, 30%);
 @color-active: white;
 @color-dark: black;
 
 // hsl(211,30%,90%)
 // rgb(225, 232, 239)
-@color-background: none;
+@color-background: desaturate(lighten(@color-primary, 60%), 35%);
 
 // video-line
 // hsl(211,22%,56%)
 // rgb(118, 142, 167)
-@color-background-line: none;
-@color-background-line-active: none;
-@color-background-line-buffered: none;
+@color-background-line: desaturate(lighten(@color-primary, 25%), 45%);
+@color-background-line-active: fade(@color-primary, 60%);
+;
+@color-background-line-buffered: fade(red, 40%);
 
 // play
 // hsl(211, 30%, 54%)
 // rgb(103, 139, 174)
-@color-background-play: none;
-@color-background-play-hovered: none;
+@color-background-play: desaturate(lighten(@color-primary, 25%), 35%);
+@color-background-play-hovered: @color-text;
 
 // disabled
 // hsl(211,23%,66%)
@@ -70,20 +109,20 @@
 @color-fs-active: white;
 @color-fs-primary: hsl(215, 20%, 35%);
 // #465264;
-@color-fs-background:none;
-@color-fs-background-hover: none;
+@color-fs-background: @color-fs-primary;
+@color-fs-background-hover: darken(@color-fs-background, 10%);
 
 // video-line
 // #768496
 //hsl(215, 20%, 55%)
-@color-fs-background-line: none;
-@color-fs-background-line-active: none;
-@color-fs-background-line-buffered: none;
+@color-fs-background-line: lighten(@color-fs-primary, 20%);
+@color-fs-background-line-active: rgba(0, 0, 0, 0.25);
+@color-fs-background-line-buffered: fade(red, 40%);
 
 // play btn
 // #384150;
-@color-fs-background-play: #da3831;
-@color-fs-background-play-hovered: #da3831;
+@color-fs-background-play: darken(@color-fs-background, 15%);
+@color-fs-background-play-hovered: @color-fs-background-hover;
 
 // disabled
 // #4b6b9b;
@@ -159,13 +198,13 @@
 @control-height: 40px;
 @control-width: 32px;
 @control-play-width: 60px;
-@divider-width: 0px;
+@divider-width: 10px;
 @miniplayer-height: 127px;
 
 // FONTS
-@font-main: "PT Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+@font-main: "PT Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
-
+@divider-width: 10px;
 @timeline-transition: 0s 0.1s ease-in-out;
 
 // Z-INDEX
