@@ -13,7 +13,10 @@ export const preset = {
 			],
 			fullscreen : [
 				['play', 'timeline', 'rate', 'volume', 'source', 'fullscreen']
-			]
+			],
+			mini : [
+				['play', 'divider', 'timeline', 'volume', 'fullscreen']
+			],
 		}
 	},
 }

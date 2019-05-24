@@ -110,7 +110,7 @@ const defaultOptions = {
 			['play', 'volume', 'divider', 'timeline', 'divider', 'rate', 'divider', 'keybinding info',  'divider', 'backward', 'divider', 'source', 'divider', 'subtitle', 'divider', 'download', 'divider', 'section', 'divider', 'fullscreen']
 		],
 		mini : [
-			['play', 'timeline', 'volume', 'fullscreen']
+			['play', 'volume', 'divider', 'fullscreen', 'divider', 'timeinfo']
 		],
 		'common:android' : [
 			['play', 'timeline', 'fullscreen'],
