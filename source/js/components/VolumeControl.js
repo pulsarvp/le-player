@@ -111,7 +111,11 @@ class VolumeControl extends ControlDropdown {
 
 	onClick (e) {
 		super.onClick(e);
-		this.toggleMuted();
+		//todo: lea_alex kostil'
+		if (e.target === this.icon.element[0]){
+			this.toggleMuted();
+		}
+
 	}
 
 	onPlayerInited() {
