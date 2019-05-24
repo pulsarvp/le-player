@@ -15,7 +15,7 @@ export const preset = {
 				['play', 'timeline', 'rate', 'volume', 'source', 'fullscreen']
 			],
 			mini : [
-				['play', 'divider', 'timeline', 'volume', 'fullscreen']
+				['play', 'timeline', 'volume', 'fullscreen']
 			],
 		}
 	},
