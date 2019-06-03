@@ -509,6 +509,22 @@ Player.preset('youtube', {
 		}
 	},
 });
+Player.preset('2035', {
+	options : {
+		entity : 'Youtube',
+		controls : {
+			common : [
+				['play', 'volume', 'timeline', 'rate', 'backward', 'section', 'fullscreen'],
+			],
+			fullscreen : [
+				['play', 'volume', 'timeline', 'rate', 'backward',  'section', 'fullscreen'],
+			],
+			mini : [
+				['play', 'timeline', 'volume', 'fullscreen']
+			],
+		}
+	},
+});
 
 Player.plugin('youtube', function(pluginOptions) {
 
