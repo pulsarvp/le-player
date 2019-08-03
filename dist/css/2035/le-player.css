@@ -17,7 +17,6 @@
   border-collapse: separate;
   display: -ms-flexbox;
   display: flex;
-  height: 40px;
   position: relative;
   width: 100%;
   outline: none;
@@ -37,16 +36,15 @@
   display: block;
 }
 .leplayer-controls.controls-common {
-  position: absolute;
-  bottom: 0px;
+  bottom: 0;
   width: 100%;
   z-index: 1009;
 }
 .leplayer-controls.controls-fullscreen {
   position: absolute;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
+  bottom: 0;
+  left: 0;
+  right: 0;
   width: auto;
   z-index: 1007;
 }
