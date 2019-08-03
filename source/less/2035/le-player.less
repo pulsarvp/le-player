@@ -1,6 +1,5 @@
 @import "variables.less";
 
-
 .leplayer
 {
 	display: block;
@@ -30,18 +29,16 @@
 // 	}
 // }
 
-
 // CONTROLS
 
 .leplayer-controls
 {
 	border-collapse: separate;
 	display: flex;
-	height: @control-height;
+	//height: @control-height;
 	position: relative;
 	width: 100%;
 	outline: none;
-
 
 	&--left
 	{
@@ -56,7 +53,8 @@
 	&--justify
 	{
 		width: auto;
-		&::after {
+		&::after
+		{
 			content: '';
 			width: 1px;
 			display: block;
@@ -70,8 +68,8 @@
 
 	&.controls-common
 	{
-		position: absolute;
-		bottom: 0px;
+		//position: absolute;
+		bottom: 0;
 		width: 100%;
 		z-index: 1009;
 		//margin-top: 10px;
@@ -81,9 +79,9 @@
 	{
 		//display: block;
 		position: absolute;
-		bottom: 0px;
-		left: 0px;
-		right: 0px;
+		bottom: 0;
+		left: 0;
+		right: 0;
 		width: auto;
 		z-index: @z-index-fullscreen + 7;
 		.control
@@ -109,13 +107,13 @@
 			&.play
 			{
 				background: @color-background-button-play;
-				color:  @color-button-play;
+				color: @color-button-play;
 
 				&.control--tap,
 				&.control--no-iphone:hover
 				{
 					background: @color-background-button-play-hover;
-					color:  @color-button-play-hover;
+					color: @color-button-play-hover;
 				}
 			}
 			&.timeline-container
@@ -130,7 +128,7 @@
 		.control-dropdown__content
 		{
 			background: @color-background--dropdown;
-			color:@color--dropdown;
+			color: @color--dropdown;
 			z-index: @z-index-fullscreen + 8;
 		}
 
@@ -139,7 +137,8 @@
 			background: @color-fs-control-checked;
 			color: @color-fs-text-hovered;
 			&.control--tap,
-			&.control--no-iphone:hover {
+			&.control--no-iphone:hover
+			{
 				background: darken(@color-fs-control-checked, 5%);
 			}
 		}
@@ -259,7 +258,6 @@
 			color: @color-button-hover;
 		}
 
-
 		&.play
 		{
 			background: @color-background-button-play;
@@ -285,7 +283,8 @@
 			pointer-events: none;
 		}
 
-		@media screen and (max-width: 420px) {
+		@media screen and (max-width: 420px)
+		{
 			padding: 0 5px;
 		}
 	}
@@ -295,7 +294,8 @@
 		background: @color-control-checked;
 		color: @color-text-checked;
 		&.control--tap,
-		&.control--no-iphone:hover {
+		&.control--no-iphone:hover
+		{
 			background: darken(@color-control-checked, 5%);
 		}
 	}
@@ -304,7 +304,8 @@
 	{
 		position: relative;
 
-		.leplayer-icon svg {
+		.leplayer-icon svg
+		{
 			pointer-events: none;
 		}
 
@@ -423,7 +424,6 @@
 	{
 	}
 
-
 	.timeline
 	{
 		background: fade(@white, 20%);
@@ -523,7 +523,8 @@
 
 	.timline-container.control--no-iphone
 	{
-		.time-marker {
+		.time-marker
+		{
 
 			&:hover:before
 			{
@@ -534,7 +535,8 @@
 
 	.timline-container.control--tap
 	{
-		.time-marker {
+		.time-marker
+		{
 
 			&:before
 			{
@@ -635,12 +637,9 @@
 		position: absolute;
 		border-radius: 8px;
 
-
-
 	}
 
 }
-
 
 .leplayer-control-collection
 {
@@ -683,7 +682,6 @@
 	}
 }
 
-
 .leplayer-error-display
 {
 	position: absolute;
@@ -702,7 +700,6 @@
 	z-index: @z-index-base + 8;
 }
 
-
 .leplayer--fullscreen
 {
 	.leplayer-error-display
@@ -711,7 +708,6 @@
 	}
 }
 
-
 .leplayer--error
 {
 	.leplayer-error-display
@@ -719,6 +715,7 @@
 		display: block;
 	}
 }
+
 .leplayer-icon
 {
 	display: block;
@@ -731,8 +728,6 @@
 		height: 1em;
 	}
 }
-
-
 
 .leplayer__inner
 {
@@ -771,7 +766,7 @@
 		z-index: @z-index-miniplayer;
 		max-height: @miniplayer-height;
 		background: @color-miniplayer-bg;
-		box-shadow: 0 10px 15px -10px rgba(0,0,0,.75);
+		box-shadow: 0 10px 15px -10px rgba(0, 0, 0, .75);
 	}
 }
 
@@ -791,7 +786,6 @@
 	}
 }
 
-
 .leplayer--mini
 {
 	.leplayer__info
@@ -806,7 +800,7 @@
 		// Width of controls in miniplayer
 		min-width: 300px;
 		position: relative;
-		flex:1 1 500px;
+		flex: 1 1 500px;
 	}
 
 	.leplayer__last
@@ -817,13 +811,15 @@
 		font-size: 0.9em;
 		line-height: 1.1em;
 
-		@media screen and (max-width: 1000px) {
+		@media screen and (max-width: 1000px)
+		{
 			display: none;
 		}
 
 	}
 
-	.leplayer__title {
+	.leplayer__title
+	{
 		color: black;
 		font-size: 14px;
 		margin-bottom: 5px;
@@ -834,14 +830,16 @@
 		text-overflow: ellipsis;
 	}
 
-	.leplayer__video-info {
+	.leplayer__video-info
+	{
 		margin-bottom: 10px;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
 	//
-	.control-dropdown__content.volume-slider {
+	.control-dropdown__content.volume-slider
+	{
 		top: 41px
 	}
 }
@@ -866,12 +864,11 @@
 	}
 }
 
-
 .leplayer-key
 {
 	font-family: inherit;
 	font-size: inherit;
-	box-shadow: 1px 1px 0 1px rgba(120,120,120,0.5);
+	box-shadow: 1px 1px 0 1px rgba(120, 120, 120, 0.5);
 	background: #eee;
 	border-radius: 2px;
 	color: #000;
@@ -880,13 +877,14 @@
 	padding: 4px;
 }
 
-
-.leplayer-control-collection--mini {
+.leplayer-control-collection--mini
+{
 	margin-top: auto;
 	margin-bottom: auto;
 	display: none;
 
-	.control-time {
+	.control-time
+	{
 		display: block;
 		padding: 6px 10px;
 		font-weight: 500;
@@ -894,11 +892,13 @@
 		white-space: nowrap;
 		box-sizing: border-box;
 
-		@media (max-width: 440px) {
+		@media (max-width: 440px)
+		{
 			display: none;
 		}
 
-		&__current {
+		&__current
+		{
 			background: none;
 			cursor: default;
 			font-size: 15px;
@@ -907,21 +907,24 @@
 			display: inline;
 		}
 
-		&__total {
+		&__total
+		{
 			background: none;
 			cursor: default;
 			color: black;
 			display: inline;
 
-			&:before {
-				content : '/';
+			&:before
+			{
+				content: '/';
 				margin-right: 9px;
 			}
 		}
 
 	}
 
-	.volume-control:hover .volume-slider {
+	.volume-control:hover .volume-slider
+	{
 		display: none
 	}
 
@@ -934,7 +937,8 @@
 .leplayer--mini
 {
 
-	.leplayer-control-collection--mini {
+	.leplayer-control-collection--mini
+	{
 		display: block;
 		position: absolute;
 		bottom: 0;
@@ -943,33 +947,36 @@
 	}
 }
 
-
-@keyframes leplayer-splashicon-fadeout {
-    0% {
-        opacity: 1
-    }
-    to {
-        opacity: 0;
-        transform: scale(2);
-    }
+@keyframes leplayer-splashicon-fadeout
+{
+	0%
+	{
+		opacity: 1
+	}
+	to
+	{
+		opacity: 0;
+		transform: scale(2);
+	}
 }
+
 .leplayer-splashicon
 {
 	display: none;
 	position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 52px;
-    height: 52px;
-    z-index: 17;
-    margin-left: -26px;
-    margin-top: -26px;
-    background: rgba(0,0,0,.5);
-    border-radius: 26px;
+	left: 50%;
+	top: 50%;
+	width: 52px;
+	height: 52px;
+	z-index: 17;
+	margin-left: -26px;
+	margin-top: -26px;
+	background: rgba(0, 0, 0, .5);
+	border-radius: 26px;
 	color: white;
 	justify-content: center;
 	align-items: center;
-    animation: leplayer-splashicon-fadeout .5s linear 1 normal forwards;
+	animation: leplayer-splashicon-fadeout .5s linear 1 normal forwards;
 
 	&--active
 	{
@@ -985,46 +992,54 @@
 	}
 }
 
-
 // Mobile styles
 
-.leplayer--iphone {
-	.leplayer-controls {
-		.timeline-container {
+.leplayer--iphone
+{
+	.leplayer-controls
+	{
+		.timeline-container
+		{
 			width: auto;
 		}
-		.timeline {
+		.timeline
+		{
 			display: none;
 		}
 	}
 }
 
-.leplayer--mobile.leplayer--fullscreen {
-	.leplayer-control-collection--fullscreen {
+.leplayer--mobile.leplayer--fullscreen
+{
+	.leplayer-control-collection--fullscreen
+	{
 		position: static;
 	}
 
-	.controls-fullscreen {
+	.controls-fullscreen
+	{
 		position: absolute;
 		z-index: 1007;
-		&:nth-child(1) {
+		&:nth-child(1)
+		{
 			bottom: 0;
 			margin-bottom: 0;
 			width: 100%;
 		}
-		&:nth-child(2) {
+		&:nth-child(2)
+		{
 			top: 0px;
 			left: 0px;
 
-			.control-dropdown__content {
-				bottom : auto;
+			.control-dropdown__content
+			{
+				bottom: auto;
 				top: @control-height;
 			}
 		}
 	}
 
 }
-
 
 @import "components/video.less";
 @import "components/play-button.less";
