@@ -65,7 +65,7 @@
 	&.controls-fullscreen
 	{
 		bottom: 20px;
-		display: block;
+		display: table;
 		left: 20px;
 		position: absolute;
 		right: 20px;
@@ -101,7 +101,7 @@
 		}
 		.control-dropdown__content
 		{
-			background: @color-fs-dropdown;
+			background: @color-background;
 			z-index: @z-index-fullscreen + 8;
 		}
 
@@ -132,8 +132,8 @@
 			color: @color-fs-text;
 			&:hover
 			{
-				background: @color-fs-inner-item-hover !important;
-				color: @color-fs-text-hovered;
+				background: @color-background;
+				color: @color-text-hovered;
 			}
 			&--active
 			{
@@ -217,18 +217,24 @@
 		padding: 0 (@control-width - @control-font-size) / 2;
 		text-align: center;
 		vertical-align: middle;
-		width: 1%;
+		width: auto;
+		margin: 0;
+		outline: none;
+		border: none;
 		&:hover
 		{
 			background: @control-bg;
 			color: @control-text;
+			outline: none;
+			border: none;
 		}
 
 
 		&.play
 		{
 			color: @color-active;
-			width: 1%;
+			width: auto;
+			padding: 0 8px;
 			&.disabled:hover
 			{
 				background: @color-background-play;
@@ -264,6 +270,7 @@
 	.control-dropdown
 	{
 		position: relative;
+		display: table-cell;
 
 		.leplayer-icon svg {
 			pointer-events: none;
@@ -317,10 +324,13 @@
 
 	.control-container
 	{
-		display: table-cell;
-		height: @control-height;
+		display: table;
 		position: relative;
-		width: 1%;
+		width: auto;
+
+		&.control-dropdown {
+			display: table-cell;
+		}
 
 		&__item
 		{
@@ -334,7 +344,7 @@
 			&:hover
 			{
 				// TODO: Rename this variable and remove important
-				background: @color-inner-item-hover !important;
+				background: @color-background !important;
 				color: @color-text-hovered;
 			}
 			&--active
@@ -378,11 +388,6 @@
 		width: @control-font-size;
 	}
 
-	.inner-item
-	{
-	}
-
-
 	.timeline
 	{
 		background: @color-background-line;
@@ -401,6 +406,7 @@
 		position: relative;
 		white-space: nowrap;
 		width: 100%;
+		padding: 0 8px;
 	}
 
 	.timeline-subcontainer
@@ -574,6 +580,9 @@
 
 		.leplayer-controls .control {
 			color: @color-green;
+			&:hover {
+				color: #fff;
+			}
 		}
 	}
 
