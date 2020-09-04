@@ -10,7 +10,7 @@ import Component from './Component';
 /**
  * @param {Player} player Main player
  * @class ControlText
- * @exnteds Control
+ * @extends Control
  */
 class ControlText extends Control {
 	constructor (player, options={}) {
